@@ -1,0 +1,6 @@
+@ITStepFinalProject_HostAddress = http://localhost:5173
+
+GET {{ITStepFinalProject_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
