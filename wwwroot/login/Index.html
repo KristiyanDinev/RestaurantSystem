@@ -1,0 +1,35 @@
+<html>
+
+<head>
+    <title>Login</title>
+    <link rel='stylesheet' type='text/css' media='screen' href='login/main.css'>
+
+</head>
+
+<body>
+
+    <h1>Login</h1>
+
+    <div class="login">
+
+        <label>Email</label>
+        <input type="email" id="Email" maxlength="50" required>
+        <br>
+        <label>Password</label>
+        <input type="password" id="Password" required>
+        <br>
+        <label>Remember Me?</label>
+        <input type="checkbox" id="RememberMe">
+        <br>
+        <p id="Stats"></p>
+        <br>
+
+        <button onclick="submit()">Login</button>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src='login/main.js'></script>
+</body>
+
+</html>
