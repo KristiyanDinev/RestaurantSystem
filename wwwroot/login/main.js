@@ -1,4 +1,4 @@
-var Host = "https://localhost:7278"
+
 
 async function submit() {
     let password = document.getElementById("Password")
@@ -15,7 +15,10 @@ async function submit() {
     let formData = new FormData()
     formData.append("password", password.value)
     formData.append("email", email.value)
-    formData.append("rememberMe", document.getElementById("RememberMe").value)
+
+
+    formData.append("rememberMe", document.querySelector('#RememberMe:checked') === null ?
+                                 "off" : "on")
 
     const res = await fetch(Host + "/login", {
         method: "POST",
@@ -23,8 +26,16 @@ async function submit() {
         redirect: 'follow',
     })
 
+    const data2 = await res.json()
+    console.log(data2)
     if (res.status === 200) {
-        window.location.href = Host + "/dishes"
+        //goToDishes()
+
     }
 
+}
+
+
+if (getCookie("RestorantCookie") !== "") {
+    goToDishes()
 }

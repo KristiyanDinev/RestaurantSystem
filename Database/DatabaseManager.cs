@@ -121,7 +121,7 @@ values
             return model;
         }
 
-        public async Task<int> RegisterUser(UserModel model, string password) {
+        public async Task<UserModel> RegisterUser(UserModel model, string password) {
 
             string sql = @$"INSERT INTO Users 
     (Username, Password, Image, Address, PhoneNumber, Email, Notes) VALUES 
@@ -137,28 +137,33 @@ values
             cmd.Dispose();
 
             if (num == 1) {
-                int Id = await LoginUser(model.Email, password);
-                return Id;
+                return model;
 
             } else {
                 throw new Exception("Didn't register");
             }
         }
 
-        public async Task<int> LoginUser(string email, string password) {
+        public async Task<UserModel> LoginUser(string email, string password) {
 
-            string sql = $"SELECT Id FROM Users WHERE Email = {_handleStrings(email)} AND Password = '{_hashString(password)}' LIMIT 1";
+            string sql = $"SELECT * FROM Users WHERE Email = {_handleStrings(email)} AND Password = '{_hashString(password)}' LIMIT 1";
 
             var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
             cmd.Prepare();
             using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync()) {
-                object id = reader["id"];
+                UserModel user = new UserModel();
+                user.Username = Convert.ToString(reader["username"]) ?? "";
+                user.Image = Convert.ToString(reader["image"]);
+                user.Address = Convert.ToString(reader["address"]);
+                user.PhoneNumber = Convert.ToString(reader["phonenumber"]);
+                user.Email = Convert.ToString(reader["email"]);
+                user.Notes = Convert.ToString(reader["Notes"]);
                 reader.Close();
                 cmd.Connection?.Close();
                 cmd.Dispose();
-                return Convert.ToInt32(id);
+                return user;
             }
             reader.Close();
             cmd.Connection?.Close();
@@ -185,6 +190,8 @@ values
                 dish.Price = float.Parse(Convert.ToString(reader["price"]) ?? "00.00");
                 dish.Image = Convert.ToString(reader["image"]);
                 dish.IsAvailable = bool.Parse(Convert.ToString(reader["isavailable"]) ?? "true");
+
+                dishModels.Add(dish);
             }
             reader.Close();
             cmd.Connection?.Close();

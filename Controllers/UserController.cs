@@ -1,36 +1,74 @@
 ﻿using ITStepFinalProject.Database;
 using ITStepFinalProject.Models;
+using ITStepFinalProject.Utils;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using System;
+using System.Net;
+using System.Security.Claims;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ITStepFinalProject.Controllers {
     public class UserController {
 
+        // testing user:
+        // email: some@email.com
+        // pass: 123
+
         public UserController(WebApplication app) {
 
-            app.MapPost("/user", async ([FromForm] int Id, DatabaseManager db) => {
+            app.MapPost("/user", async (HttpContext context, DatabaseManager db,
+                JWTHandler jwt) => {
 
-                UserModel model = await db.GetUser(Id);
-                return model;
+                // get the SearchUserId form JWT
+                Dictionary<string, object>? claims = await 
+                        Utils.Utils.GetRestoratCookieClaims(context, jwt);
 
+                if (claims == null) { 
+                    return new UserModel();
+                }
+
+                    try {
+                        UserModel model = await db.GetUser(
+                            int.Parse(Convert.ToString(claims["SearchUserId"])));
+                        return model;
+
+                    } catch (Exception) {
+                        return new UserModel();
+                    }
+               
             }).RequireRateLimiting("fixed")
             .DisableAntiforgery();
 
-            app.MapPost("/login", async (DatabaseManager db, HttpContext context,
+            app.MapPost("/login", async (DatabaseManager db, HttpContext context, 
+                JWTHandler jwt,
                 [FromForm] string email, [FromForm] string password,
                 [FromForm] string rememberMe) => {
 
+                    if (email.Equals("") || password.Equals("")) {
+                        return Results.BadRequest();
+                    }
+
+                    Dictionary<string, object>? claims = 
+                        await Utils.Utils.GetRestoratCookieClaims(context, jwt);
+
+
+                    if (claims != null) {
+                        return Results.BadRequest();
+                    }
+
                     try {
 
+                        UserModel user = await db.LoginUser(email, password);
+                        Utils.Utils._handleRememberMe(ref context, rememberMe, user.Id, jwt);
 
-                        int Id = await db.LoginUser(email, password);
-                        _handleRememberMe(ref context, rememberMe, Id);
+                            Utils.Utils._handleReadableData(ref context, user);
 
                         return Results.Ok();
 
-                    } catch (Exception) {
+                    } catch (Exception e) {
+                        Console.WriteLine(e);
                         return Results.Unauthorized();
                     }
 
@@ -38,6 +76,7 @@ namespace ITStepFinalProject.Controllers {
             .DisableAntiforgery();
 
             app.MapPost("/register", async (DatabaseManager db, HttpContext context,
+                JWTHandler jwt,
                 [FromForm] string username, [FromForm] string password, 
                 [FromForm] string email, [FromForm] string notes,
                 [FromForm] string phone, [FromForm] string address,
@@ -48,7 +87,15 @@ namespace ITStepFinalProject.Controllers {
                         return Results.BadRequest();
                     }
 
-                try {
+                    Dictionary<string, object>? claims =
+                        await Utils.Utils.GetRestoratCookieClaims(context, jwt);
+
+
+                    if (claims != null) {
+                        return Results.BadRequest();
+                    }
+
+                    try {
                         UserModel userModel = new UserModel();
                         userModel.Username = username;
                         userModel.Email = email;
@@ -74,16 +121,18 @@ namespace ITStepFinalProject.Controllers {
                                 string imgPath = "wwwroot/user/images/" + imageName;
                                 using FileStream fs = 
                                     File.Create("wwwroot/user/images/" + imageName);
-                                await fs.WriteAsync(FromStringToUint8Array(byteData));
+                                await fs.WriteAsync(Utils.Utils.FromStringToUint8Array(byteData));
 
                                 userModel.Image = "/user/images/" + imageName;
                             }
                         }
 
-                        int Id = await db.RegisterUser(userModel, password);
+                        UserModel user = await db.RegisterUser(userModel, password);
 
-                        _handleRememberMe(ref context, rememberMe, Id);
-                        
+                        Utils.Utils._handleRememberMe(ref context, rememberMe, user.Id, jwt);
+
+                        Utils.Utils._handleReadableData(ref context, user);
+
 
                         return Results.Ok();
 
@@ -95,24 +144,30 @@ namespace ITStepFinalProject.Controllers {
             }).RequireRateLimiting("fixed")
             .DisableAntiforgery();
 
+            app.MapPost("/logout", (DatabaseManager db, HttpContext context) => {
 
+                    try {
+                    IResponseCookies responseCookies = context.Response.Cookies;
+                    responseCookies.Delete("RestorantCookie");
+
+                    responseCookies.Delete("Username");
+                    responseCookies.Delete("Email");
+                    responseCookies.Delete("Address");
+                    responseCookies.Delete("Notes");
+                    responseCookies.Delete("Image");
+                    responseCookies.Delete("Phone");
+
+                    return Results.Ok();
+
+                    } catch (Exception) {
+                        return Results.Unauthorized();
+                    }
+
+                }).RequireRateLimiting("fixed")
+            .DisableAntiforgery();
         }
 
 
-        private static byte[] FromStringToUint8Array(string data) {
-            string[] dataNumbers = data.Split(",");
-            byte[] byteArray = new byte[dataNumbers.Length];
-            for (int i = 0; i < dataNumbers.Length; i++) {
-                byteArray[i] = Convert.ToByte(dataNumbers[i]);
-            }
-            return byteArray;
-        }
-
-        private static void _handleRememberMe(ref HttpContext context, 
-            string remeberMe, int Id) {
-            if (remeberMe.Equals("on")) {
-                context.Response.Cookies.Append("UserId", Id.ToString());
-            }
-        }
+        
     }
 }

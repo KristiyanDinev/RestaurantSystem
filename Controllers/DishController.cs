@@ -5,7 +5,7 @@ namespace ITStepFinalProject.Controllers {
     public class DishController {
 
         public DishController(WebApplication app) {
-            app.MapGet("/dishes/{type:string}", async (HttpContext context, 
+            app.MapGet("/dishes/{type}", async (HttpContext context, 
                 DatabaseManager db, string type) => {
 
                     Dictionary<string, List<DishModel>> data = 
@@ -21,7 +21,6 @@ namespace ITStepFinalProject.Controllers {
                     } catch (Exception) {
                         return data;
                     }
-
             });
         }
     }

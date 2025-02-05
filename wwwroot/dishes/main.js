@@ -1,76 +1,125 @@
-var Host = "https://localhost:7278"
 
-function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
+function Logout() {
 
-async function getUser(id) {
-    let formData = new FormData();
-    formData.append("Id", Number(id));
-
-    const res = await fetch(Host + "/user", {
+    fetch(Host + "/logout", {
         method: "POST",
-        body: formData,
         redirect: 'follow',
-    })
 
-    const data = await res.json()
-    document.getElementById("UserData").innerHTML = "Logged in as: "+data.username
+    }).then((res) => {
+        if (res.status === 200) {
+            goToLogin()
+        }
+    })
 }
+
+let username = getCookie("Username")
+
+document.getElementById("UserData").innerHTML = username === "" ? "" : "Logged in as: " + username
 
 var divDish = document.getElementById("dishes")
 
-getUser(getCookie("UserId"))
-
 function addDish(data) {
-    // {}
+    /*
+    avrageTimeToCook: "3"
+grams: 440
+id: 1
+image: ""
+isAvailable: true
+name: "Salad 1"
+price: 10.99
+type_Of_Dish: "salad"
+    */
+    divDish
+    
 }
 
 async function getSalads() {
-    let formData = new FormData();
-    formData.append("type", "salad");
-
-    const res = await fetch(Host + "/user", {
-        method: "POST",
-        body: formData,
+    const dish = "salad";
+    const res = await fetch(Host + "/dishes/" + dish, {
+        method: "GET",
         redirect: 'follow',
     })
 
     const data = await res.json()
     if (data.dishes === null) {
-        document.getElementById("dish_stats").innerHTML = "Can't get salads"
+        document.getElementById("dish_stats").innerHTML = "Can't get " + dish+"s"
         return
     }
-    console.log(data.dishes)
+    
     for (let i in data.dishes) {
         addDish(data.dishes[i])
     }
 }
 
 async function getAppetizers() {
+    const dish = "appetizers";
+    const res = await fetch(Host + "/dishes/" + dish, {
+        method: "GET",
+        redirect: 'follow',
+    })
 
+    const data = await res.json()
+    if (data.dishes === null) {
+        document.getElementById("dish_stats").innerHTML = "Can't get " + dish
+        return
+    }
+
+    for (let i in data.dishes) {
+        addDish(data.dishes[i])
+    }
 }
 
 async function getDishes() {
+    const dish = "dishes";
+    const res = await fetch(Host + "/dishes/" + dish, {
+        method: "GET",
+        redirect: 'follow',
+    })
 
+    const data = await res.json()
+    if (data.dishes === null) {
+        document.getElementById("dish_stats").innerHTML = "Can't get " + dish
+        return
+    }
+
+    for (let i in data.dishes) {
+        addDish(data.dishes[i])
+    }
 }
 
 async function getDrinks() {
+    const dish = "drinks";
+    const res = await fetch(Host + "/dishes/" + dish, {
+        method: "GET",
+        redirect: 'follow',
+    })
 
+    const data = await res.json()
+    if (data.dishes === null) {
+        document.getElementById("dish_stats").innerHTML = "Can't get " + dish 
+        return
+    }
+
+    for (let i in data.dishes) {
+        addDish(data.dishes[i])
+    }
 }
 
 async function getDesserts() {
+    const dish = "desserts";
+    const res = await fetch(Host + "/dishes/" + dish, {
+        method: "GET",
+        redirect: 'follow',
+    })
 
+    const data = await res.json()
+    if (data.dishes === null) {
+        document.getElementById("dish_stats").innerHTML = "Can't get " + dish
+        return
+    }
+
+    for (let i in data.dishes) {
+        addDish(data.dishes[i])
+    }
 }
+

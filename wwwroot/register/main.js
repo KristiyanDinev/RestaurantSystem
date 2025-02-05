@@ -1,4 +1,3 @@
-var Host = "https://localhost:7278"
 
 function readURL(input) {
     if (input.files && input.files[0]) {
@@ -36,7 +35,7 @@ fileSelection.addEventListener('change', async function (e) {
     }
 })
 
-async function submit() {
+function submit() {
     let username = document.getElementById("Username")
     let password = document.getElementById("Password")
     let address = document.getElementById("Address")
@@ -62,14 +61,19 @@ async function submit() {
     formData.append("rememberMe", document.getElementById("RememberMe").value)
     formData.append("image", ImageFile)
 
-    const res = await fetch(Host + "/register", {
+    fetch(Host + "/register", {
         method: "POST",
         body: formData,
         redirect: 'follow',
+    }).then((res) => {
+        if (res.status === 200) {
+            window.location.href = Host + '/dishes'
+        }
     })
 
-    if (res.status === 200) {
-        window.location.href = Host + "/dishes"
-    }
+}
 
+
+if (getCookie("RestorantCookie") !== "") {
+    goToDishes()
 }
