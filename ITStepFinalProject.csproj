@@ -7,12 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="9.0.2" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.1" />
+    <Compile Remove="wwwroot\user\**" />
+    <Content Remove="wwwroot\user\**" />
+    <EmbeddedResource Remove="wwwroot\user\**" />
+    <None Remove="wwwroot\user\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\user\images\" />
+    <PackageReference Include="Npgsql" Version="9.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\dishes\drinks\" />
+    <Folder Include="wwwroot\dishes\appetizers\" />
+    <Folder Include="wwwroot\dishes\dishes\" />
+    <Folder Include="wwwroot\dishes\desserts\" />
+    <Folder Include="wwwroot\dishes\salad\" />
   </ItemGroup>
 
 </Project>

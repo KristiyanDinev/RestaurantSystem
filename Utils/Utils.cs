@@ -4,29 +4,16 @@ using System.Security.Claims;
 namespace ITStepFinalProject.Utils {
     public class Utils {
 
-        public static async Task<bool> IsDateExpired(JWTHandler JWT,
-            string? _jwt, string key) {
-            if (_jwt == null) {
-                return false;
-            }
-            Dictionary<string, object>? claims = await JWT.VerifyJWT(_jwt);
-            if (claims == null) {
-                return false;
-            }
+        public static bool IsDateExpired(ISession session,
+           string key) {
             try {
-                return DateTime.Parse(Convert.ToString(claims[key])) <= DateTime.Now;
+                return DateTime.Parse(session.GetString(key)) <= DateTime.Now;
 
             } catch (Exception) {
                 return false;
             }
         }
 
-        public static string? Get_JWT_FromCookie(IRequestCookieCollection cookies) {
-            if (cookies.TryGetValue("RestorantCookie", out string? jwtD)) {
-                return jwtD;
-            }
-            return null;
-        }
 
         public static byte[] FromStringToUint8Array(string data) {
             string[] dataNumbers = data.Split(",");
@@ -37,48 +24,57 @@ namespace ITStepFinalProject.Utils {
             return byteArray;
         }
 
-        public static void _handleRememberMe(ref HttpContext context,
-            string remeberMe, int Id, JWTHandler jwt) {
+        public static void _handleRememberMe(ref ISession session,
+            string remeberMe, int Id) {
 
-            IResponseCookies cookies = context.Response.Cookies;
-            cookies.Delete("RestorantCookie");
-
-            List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim("UserId", Id.ToString()));
-
-            // on / off
+            session.SetInt32("UserId", Id);
             if (remeberMe.Equals("off")) {
-                claims.Add(new Claim("UserId_ExpirationDate",
-                    DateTime.Now.AddDays(1.0).ToString()));
+
+                session.SetString("UserId_ExpirationDate",
+                    DateTime.Now.AddDays(1.0).ToString());
+            }
+        }
+
+
+
+        public static async Task<string> GetFileContent(string path) {
+            // path => /login => /dishes
+            if (path.Contains('.')) {
+                return await File.ReadAllTextAsync($"wwwroot{path}");
+
+            } else {
+                return await File.ReadAllTextAsync($"wwwroot{path}/Index.html");
+            }
+        }
+
+
+        public static void _handleEmptyEntryInFile(ref string FileData, object model) {
+            foreach (string property in
+                    model.GetType().GetProperties().Select(f => f.Name).ToList()) {
+                FileData = FileData.Replace("{{" + property + "}}", "");
+            }
+        }
+
+
+        public static void _handleEntryInFile(ref string FileData, object model) {
+            Type type = model.GetType();
+            foreach (string property in
+                    type.GetProperties().Select(f => f.Name).ToList()) {
+
+                FileData = FileData.Replace("{{" + property + "}}",
+                    Convert.ToString(type.GetProperty(property).GetValue(model)));
             }
 
-            cookies.Append("RestorantCookie", jwt.GenerateJwtToken(claims));
         }
 
-        public static void _handleReadableData(ref HttpContext context,
-            UserModel user) {
 
-            IResponseCookies cookies = context.Response.Cookies;
+        public static int? IsLoggedIn(ISession session) {
+            try {
+                return session.GetInt32("UserId");
 
-            cookies.Delete("Username");
-            cookies.Delete("Email");
-            cookies.Delete("Address");
-            cookies.Delete("Notes");
-            cookies.Delete("Image");
-            cookies.Delete("Phone");
-
-            cookies.Append("Username", user.Username);
-            cookies.Append("Email", user.Email);
-            cookies.Append("Address", user.Address ?? "");
-            cookies.Append("Notes", user.Notes ?? "");
-            cookies.Append("Phone", user.PhoneNumber ?? "");
-            cookies.Append("Image", user.Image ?? "");
-        }
-
-        public static async Task<Dictionary<string, object>?> GetRestoratCookieClaims(HttpContext context,
-            JWTHandler jwt) {
-            return await jwt.VerifyJWT(
-                Get_JWT_FromCookie(context.Request.Cookies));
+            } catch (Exception) {
+                return null;
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using ITStepFinalProject.Models;
 using Npgsql;
 using NpgsqlTypes;
-using System.Reflection;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace ITStepFinalProject.Database {
@@ -25,6 +25,8 @@ values
          * 
          * 
          */
+
+        private static readonly string _hashingSlat = "D6RTYFUYGIBUNOI";
 
         public static async void Setup() {
             string sql = """
@@ -58,6 +60,7 @@ values
                     Notes VARCHAR(255),
                     OrderedAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
                     UserId INT REFERENCES Users(Id),
+                    ResturantAddress TEXT NOT NULL,
                     TotalPrice NUMERIC(10, 2) NOT NULL
                 );
 
@@ -81,6 +84,13 @@ values
                     Created_At TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
                 );
 
+                CREATE TABLE IF NOT EXISTS Cupons (
+                    CuponCode VARCHAR(25) NOT NULL UNIQUE,
+                    DiscountPercent NUMERIC(10, 2) NOT NULL,
+                    ExpirationDate TIMESTAMP WITH TIME ZONE NOT NULL,
+                    Name VARCHAR(100) NOT NULL
+                );
+
                 """;
 
 
@@ -99,21 +109,15 @@ values
 
             string sql = "SELECT * FROM Users WHERE Id = @Id";
 
-            UserModel model = new UserModel();
-            model.Id = id;
 
             var cmd = await DatabaseCommandBuilder.BuildCommand(
                 sql, npgsqlParameters);
             cmd.Prepare();
             using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
 
+            UserModel model = new UserModel();
             while (await reader.ReadAsync()) {
-                model.Username = Convert.ToString(reader["username"]) ?? "";
-                model.Image = Convert.ToString(reader["image"]);
-                model.Address = Convert.ToString(reader["address"]);
-                model.PhoneNumber = Convert.ToString(reader["phonenumber"]);
-                model.Email = Convert.ToString(reader["email"]);
-                model.Notes = Convert.ToString(reader["Notes"]);
+                model = ConvertToUser(reader);
             }
             reader.Close();
             cmd.Connection?.Close();
@@ -123,43 +127,44 @@ values
 
         public async Task<UserModel> RegisterUser(UserModel model, string password) {
 
+            string email = _handleStrings(model.Email);
+            string hashedPass = _hashString(password);
+
             string sql = @$"INSERT INTO Users 
     (Username, Password, Image, Address, PhoneNumber, Email, Notes) VALUES 
-    ({_handleStrings(model.Username)}, '{_hashString(password)}', {_handleStrings(model.Image)}, 
+    ({_handleStrings(model.Username)}, '{hashedPass}', {_handleStrings(model.Image)}, 
     {_handleStrings(model.Address)}, {_handleStrings(model.PhoneNumber)}, 
-    {_handleStrings(model.Email)}, {_handleStrings(model.Notes)})";
+    {email}, {_handleStrings(model.Notes)}); 
+        SELECT * FROM Users WHERE Email = {email} AND Password = '{hashedPass}';
+";
 
             var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
             
             
-            int num = await cmd.ExecuteNonQueryAsync();
+            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+            UserModel user = new UserModel();
+            while (await reader.ReadAsync()) {
+                user = ConvertToUser(reader);
+            }
+
+            reader.Close();
             cmd.Connection?.Close();
             cmd.Dispose();
 
-            if (num == 1) {
-                return model;
-
-            } else {
-                throw new Exception("Didn't register");
-            }
+            return user;
         }
 
         public async Task<UserModel> LoginUser(string email, string password) {
 
             string sql = $"SELECT * FROM Users WHERE Email = {_handleStrings(email)} AND Password = '{_hashString(password)}' LIMIT 1";
-
+          
             var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
             cmd.Prepare();
             using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync()) {
-                UserModel user = new UserModel();
-                user.Username = Convert.ToString(reader["username"]) ?? "";
-                user.Image = Convert.ToString(reader["image"]);
-                user.Address = Convert.ToString(reader["address"]);
-                user.PhoneNumber = Convert.ToString(reader["phonenumber"]);
-                user.Email = Convert.ToString(reader["email"]);
-                user.Notes = Convert.ToString(reader["Notes"]);
+                UserModel user = ConvertToUser(reader);
                 reader.Close();
                 cmd.Connection?.Close();
                 cmd.Dispose();
@@ -181,17 +186,8 @@ values
             using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync()) {
-                DishModel dish = new DishModel();
-                dish.Id = Convert.ToInt32(reader["id"]);
-                dish.Name = Convert.ToString(reader["name"]) ?? "";
-                dish.Grams = Convert.ToInt32(reader["grams"]);
-                dish.AvrageTimeToCook = Convert.ToString(reader["avragetimetocook"]) ?? "";
-                dish.Type_Of_Dish = type;
-                dish.Price = float.Parse(Convert.ToString(reader["price"]) ?? "00.00");
-                dish.Image = Convert.ToString(reader["image"]);
-                dish.IsAvailable = bool.Parse(Convert.ToString(reader["isavailable"]) ?? "true");
 
-                dishModels.Add(dish);
+                dishModels.Add(ConvertToDish(reader));
             }
             reader.Close();
             cmd.Connection?.Close();
@@ -199,7 +195,192 @@ values
             return dishModels;
         }
 
+        public async Task<DishModel> GetDishById(int id) {
+            string sql = "SELECT * FROM Dishes WHERE id = "+id;
+
+            var cmd = await DatabaseCommandBuilder.BuildCommand(
+                sql, null);
+            cmd.Prepare();
+            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+            DishModel dish = new DishModel();
+            while (await reader.ReadAsync()) {
+                dish = ConvertToDish(reader);
+            }
+            reader.Close();
+            cmd.Connection?.Close();
+            cmd.Dispose();
+            return dish;
+        }
+
+
+        public async void AddOrder(int userId, List<int> dishesId,
+            string Notes, float TotalPrice, string ResturantAddress) {
+
+            string orderSql = @$"INSERT INTO Orders (CurrentStatus, Notes, TotalPrice, UserId, ResturantAddress) 
+        VALUES ('db', {_handleStrings(Notes)}, 
+        {TotalPrice}, {userId}, {_handleStrings(ResturantAddress)}); 
+            SELECT Id FROM Orders WHERE UserId = {userId} AND CurrentStatus = 'db' LIMIT 1;";
+
+            var orderCMD = await DatabaseCommandBuilder.BuildCommand(orderSql, null);
+            using NpgsqlDataReader reader = await orderCMD.ExecuteReaderAsync();
+
+            int? orderId = null;
+            while (await reader.ReadAsync()) {
+                orderId = Convert.ToInt32(reader["id"]);
+            }
+
+            reader.Close();
+            orderCMD.Connection?.Close();
+            orderCMD.Dispose();
+
+            if (orderId == null) {
+                throw new Exception("Can't get ID of order");
+            }
+
+            StringBuilder stringBuilder = 
+                new StringBuilder("INSERT INTO OrderedDishes (OrderId, DishId) VALUES ");
+
+            for (int i = 0; i < dishesId.Count - 1; i++) {
+                stringBuilder.Append($" ({orderId}, {dishesId[i]}), ");
+            }
+
+            stringBuilder.Append($" ({orderId}, {dishesId[dishesId.Count - 1]});");
+
+            var dishesCMD = await DatabaseCommandBuilder
+                    .BuildCommand(stringBuilder.ToString(), null);
+            int num = await dishesCMD.ExecuteNonQueryAsync();
+
+            dishesCMD.Connection?.Close();
+            dishesCMD.Dispose();
+
+            if (num <= 0) {
+                DeleteOrder((int)orderId);
+
+                throw new Exception("Did not insert dishes");
+            }
+
+            string updateOrderStatus = "UPDATE Orders SET CurrentStatus = 'pending' WHERE CurrentStatus = 'db' AND Id = " + orderId;
+            var updateCMD = await DatabaseCommandBuilder.BuildCommand(updateOrderStatus, null);
+             await updateCMD.ExecuteNonQueryAsync();
+
+            updateCMD.Connection?.Close();
+            updateCMD.Dispose();
+        }
+
+        public async void DeleteOrder(int orderId) {
+            string orderSql = $"DELETE FROM Orders WHERE Id = {orderId};";
+
+            var orderCMD = await DatabaseCommandBuilder.BuildCommand(orderSql, null);
+            int num = await orderCMD.ExecuteNonQueryAsync();
+
+            orderCMD.Connection?.Close();
+            orderCMD.Dispose();
+
+            if (num <= 0) {
+                throw new Exception("Can't delete order");
+            }
+        }
+
+        public async void DeleteOrderDishes(int orderId) {
+            string orderSql = $"DELETE FROM OrderedDishes WHERE OrderId = {orderId};";
+
+            var orderCMD = await DatabaseCommandBuilder.BuildCommand(orderSql, null);
+            int num = await orderCMD.ExecuteNonQueryAsync();
+
+            orderCMD.Connection?.Close();
+            orderCMD.Dispose();
+
+            if (num <= 0) {
+                throw new Exception("Can't delete order");
+            }
+        }
+
+        public async Task<List<OrderModel>> GetOrdersByUser(int id) {
+            string sql = "SELECT * FROM Orders WHERE UserId = "+id+ @"
+                JOIN OrderedDishes ON OrderedDishes.OrderId = Orders.Id
+                JOIN Dishes ON OrderedDishes.DishId = Dishes.Id";
+
+            var getOrdersCMD = await DatabaseCommandBuilder.BuildCommand(sql, null);
+            using NpgsqlDataReader reader = await getOrdersCMD.ExecuteReaderAsync();
+
+            List<OrderModel> orders = new List<OrderModel>();
+
+            OrderModel orderModel = new OrderModel();
+            while (await reader.ReadAsync()) {
+
+                int lookingAtOrderId = Convert.ToInt32(reader["id"]);
+
+                if (orderModel.Id != lookingAtOrderId) {
+                    orders.Add(orderModel);
+                    orderModel.Dishes.Clear();
+                }
+
+                orderModel = ConvertToOrder(reader, orderModel);
+            }
+            reader.Close();
+            getOrdersCMD.Connection?.Close();
+            getOrdersCMD.Dispose();
+            return orders;
+        }
+
+        public async Task<string> GetOrder_CurrentStatus_ById(int id) {
+            string sql = "SELECT CurrentStatus FROM Orders WHERE Id = " + id;
+
+            var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
+
+            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+            string? CurrentStatus = null;
+            while (await reader.ReadAsync()) {
+                CurrentStatus = Convert.ToString(reader["currentstatus"]);
+            }
+            reader.Close();
+            cmd.Connection?.Close();
+            cmd.Dispose();
+
+            if (CurrentStatus == null) {
+                throw new Exception("No such order");
+            }
+
+            return CurrentStatus;
+        }
+
+        public async void DeleteCupon(string cuponCode) {
+            string cuponSql = $"DELETE FROM Cupons WHERE CuponCode = {_handleStrings(cuponCode)};";
+
+            var cuponCMD = await DatabaseCommandBuilder.BuildCommand(cuponSql, null);
+            int num = await cuponCMD.ExecuteNonQueryAsync();
+
+            cuponCMD.Connection?.Close();
+            cuponCMD.Dispose();
+
+            if (num <= 0) {
+                throw new Exception("Can't delete cupon");
+            }
+        }
+
+        public async Task<CuponModel> GetCuponByCode(string cuponCode) {
+            string sql = $"SELECT * FROM Cupons WHERE CuponCode = {_handleStrings(cuponCode)}";
+
+            var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
+
+            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+            CuponModel model = new CuponModel();
+            while (await reader.ReadAsync()) {
+                model = ConvertToCupon(reader);
+            }
+            reader.Close();
+            cmd.Connection?.Close();
+            cmd.Dispose();
+
+            return model;
+        }
+       
+
         public static string _hashString(string str) {
+            str += _hashingSlat;
             return Encoding.ASCII.GetString(
                 Program.hashing?.ComputeHash(Encoding.ASCII.GetBytes(str)) ?? []);
         }
@@ -207,6 +388,59 @@ values
         private static string _handleStrings(string? str) {
             return str == null || str.Replace(" ", "").Length == 0 ? 
                 "null" : "'" + str.Replace("'", "''") + "'";
+        }
+
+        private static DishModel ConvertToDish(NpgsqlDataReader reader) {
+            DishModel dish = new DishModel();
+            dish.Id = Convert.ToInt32(reader["id"]);
+            dish.Name = Convert.ToString(reader["name"]);
+            dish.Grams = Convert.ToInt32(reader["grams"]);
+            dish.AvrageTimeToCook = Convert.ToString(reader["avragetimetocook"]);
+            dish.Type_Of_Dish = Convert.ToString(reader["type_of_dish"]);
+            dish.Price = float.Parse(Convert.ToString(reader["price"]));
+            dish.Image = Convert.ToString(reader["image"]);
+            dish.IsAvailable = bool.Parse(Convert.ToString(reader["isavailable"]));
+            dish.Ingredients = Convert.ToString(reader["ingredients"]);
+            return dish;
+        }
+
+        private static UserModel ConvertToUser(NpgsqlDataReader reader) {
+            UserModel user = new UserModel();
+            user.Username = Convert.ToString(reader["username"]);
+            user.Image = Convert.ToString(reader["image"]);
+            user.Address = Convert.ToString(reader["address"]);
+            user.PhoneNumber = Convert.ToString(reader["phonenumber"]);
+            user.Email = Convert.ToString(reader["email"]);
+            user.Notes = Convert.ToString(reader["notes"]);
+            user.Id = Convert.ToInt32(reader["id"]);
+            return user;
+        }
+
+        private static OrderModel ConvertToOrder(NpgsqlDataReader reader, 
+               OrderModel orderModel) {
+
+            if (orderModel.Dishes.Count == 0) {
+                orderModel.Id = Convert.ToInt32(reader["id"]);
+                orderModel.CurrentStatus = Convert.ToString(reader["currentstatus"]);
+                orderModel.ResturantAddress = Convert.ToString(reader["resturantaddress"]);
+                orderModel.Notes = Convert.ToString(reader["notes"] ?? "");
+                orderModel.OrderedAt = DateTime.Parse(Convert.ToString(reader["orderedat"]));
+                orderModel.UserId = Convert.ToInt32(reader["userid"]);
+                orderModel.TotalPrice = float.Parse(Convert.ToString(reader["totalprice"]));
+            }
+
+            orderModel.Dishes.Add(ConvertToDish(reader));
+            return orderModel;
+        }
+
+        private static CuponModel ConvertToCupon(NpgsqlDataReader reader) { 
+            CuponModel model = new CuponModel();
+
+            model.CuponCode = Convert.ToString(reader["cuponcode"]);
+            model.DiscountPercent = float.Parse(Convert.ToString(reader["discountpercent"]));
+            model.ExpirationDate = DateTime.Parse(Convert.ToString(reader["expirationdate"]));
+
+            return model;
         }
     }
 }

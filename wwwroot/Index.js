@@ -1,6 +1,6 @@
-var Host = "https://localhost:7278"
+var Host = "http://127.0.0.1:7278"
 
-
+/*
 function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
@@ -15,7 +15,7 @@ function getCookie(cname) {
         }
     }
     return "";
-}
+}*/
 
 
 function goToProfile() {

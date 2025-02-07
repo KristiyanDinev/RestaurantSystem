@@ -16,15 +16,21 @@ namespace ITStepFinalProject
     {
         public static HashAlgorithm hashing;
 
-        private static JWTHandler JWT;
-
         public static void Main(string[] args)
         {
             hashing = SHA256.Create();
             
 
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddAuthorization();
+
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.Name = ".Resturant.Session";
+                options.Cookie.IsEssential = true;
+                //options.IOTimeout = TimeSpan.FromSeconds(20);
+                options.Cookie.HttpOnly = true;
+            });
 
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "https://127.0.0.1:7278";
@@ -42,9 +48,6 @@ namespace ITStepFinalProject
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
                     ?? "ugyw89ub9Y9H8OP9j1wsfwedS";
-            JWT = new JWTHandler(secretKey);
-
-            builder.Services.AddScoped<JWTHandler>(_ => JWT);
 
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options => {
@@ -56,44 +59,25 @@ namespace ITStepFinalProject
             );
 
 
-
             var app = builder.Build();
 
 
-            app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseSession();
             app.UseStaticFiles();
             app.UseRateLimiter();
 
-            app.Use(async (HttpContext context, RequestDelegate next) =>
-            {
-                string path = context.Request.Path;
-                IRequestCookieCollection cookies = context.Request.Cookies;
-              
-                string? _jwt = Utils.Utils.Get_JWT_FromCookie(cookies);
-                bool isDateExp = await Utils.Utils.IsDateExpired(JWT, _jwt, 
-                    "UserId_ExpirationDate");
+            app.Use(async (HttpContext context, RequestDelegate next) => {
 
-                if (isDateExp) {
-                    context.Response.Redirect(uri + "/login");
+                ISession session = context.Session;
+                await session.LoadAsync();
+                if (!session.IsAvailable) {
                     return;
                 }
 
-                
-                if (context.Request.Method.ToUpper().Equals("GET") && 
-                
-                (File.Exists($"wwwroot{path}") || 
-                File.Exists($"wwwroot{path}/Index.html"))) {
-                    context.Response.Clear();
-                    if (path.Contains('.')) {
-                        await context.Response.WriteAsync(
-                            File.ReadAllText($"wwwroot{path}"));
-
-                    } else {
-                        await context.Response.WriteAsync(
-                            File.ReadAllText($"wwwroot{path}/Index.html"));
-                    }
+                if (Utils.Utils.IsDateExpired(session,
+                    "UserId_ExpirationDate")) {
+                    context.Response.Redirect(uri + "/login");
                     return;
                 }
 
@@ -103,6 +87,8 @@ namespace ITStepFinalProject
 
             new UserController(app);
             new DishController(app);
+            new ErrorController(app);
+            new OrderController(app);
 
 
             app.Run();

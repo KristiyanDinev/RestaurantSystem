@@ -26,16 +26,8 @@ async function submit() {
         redirect: 'follow',
     })
 
-    const data2 = await res.json()
-    console.log(data2)
     if (res.status === 200) {
-        //goToDishes()
-
+        window.location.reload()
     }
 
-}
-
-
-if (getCookie("RestorantCookie") !== "") {
-    goToDishes()
 }

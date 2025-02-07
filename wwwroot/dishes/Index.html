@@ -12,17 +12,17 @@
     <div class="menu">
         <h1>Dishes</h1>
 
-        <p id="UserData"></p>
+         <div class="user">
+                <button onclick="goToProfile()" id="profile">Profile</button>
+                <button onclick="Logout()" id="logout">Log Out</button>
 
-        <button onclick="getSalads()"><p>Salads</p></button>
-        <button onclick="getAppetizers()"><p>Appetizers</p></button>
-        <button onclick="getDishes()"><p>Dishes</p></button>
-        <button onclick="getDrinks()"><p>Drinks</p></button>
-        <button onclick="getDesserts()"><p>Desserts</p></button>
-    </div>
+        </div>
 
-    <div class="dishes">
-        <p id="dish_stats"></p>
+        <button onclick="goToSalads()" id="dish">Salads</button>
+        <button onclick="goToAppetizers()" id="dish">Appetizers</button>
+        <button onclick="goToDishes()" id="dish">Dishes</button>
+        <button onclick="goToDrinks()" id="dish">Drinks</button>
+        <button onclick="goToDesserts()" id="dish">Desserts</button>
     </div>
     
 

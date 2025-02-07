@@ -1,0 +1,56 @@
+* {
+    background-color: darkgray;
+}
+
+#name {
+    font-size: 20px;
+    margin: 20px;
+    margin-right: 50%;
+}
+
+#grams {
+    font-size: 18px;
+    margin: 20px;
+    margin-right: 50%;
+}
+
+#price {
+    font-size: 20px;
+    margin: 20px;
+    margin-right: 50%;
+}
+
+#image {
+    border-radius: 20px;
+    width: 50%;
+}
+
+
+#ingr {
+    font-size: 18px;
+    margin: 20px;
+    margin-right: 50%;
+}
+
+#is_available {
+    font-size: 18px;
+    margin: 20px;
+    margin-right: 50%;
+}
+
+#avg_time_to_took {
+    font-size: 18px;
+    margin: 20px;
+    margin-right: 50%;
+}
+
+#order {
+    margin: 20px;
+    font-size: 20px;
+    border-radius: 20px;
+    background-color: rgb(21, 232, 42);
+    padding: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
+    text-align: center;
+}

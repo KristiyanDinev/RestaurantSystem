@@ -65,15 +65,11 @@ function submit() {
         method: "POST",
         body: formData,
         redirect: 'follow',
+        
     }).then((res) => {
         if (res.status === 200) {
-            window.location.href = Host + '/dishes'
+            window.location.reload()
         }
     })
 
-}
-
-
-if (getCookie("RestorantCookie") !== "") {
-    goToDishes()
 }

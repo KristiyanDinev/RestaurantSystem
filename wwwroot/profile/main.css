@@ -1,0 +1,105 @@
+body {
+    background-color: rgb(196, 196, 196);
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+}
+
+
+#profile_value {
+    text-align: center;
+    padding: 10px;
+    margin: 10px;
+    font-size: 20px;
+    margin-top: 30px;
+}
+
+#image {
+    height: 300px;
+    border-radius: 20px;
+    width: 300px;
+    margin: 20px;
+    padding: 10px;
+}
+
+
+#review {
+    height: 300px;
+    border-radius: 20px;
+    width: 300px;
+    margin: 20px;
+}
+
+#edit {
+    font-size: 20px;
+    background-color: rgb(114, 222, 6);
+    text-align: center;
+    border-radius: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+input[type=text] {
+    flex: 1;
+    border-radius: 15px;
+    border-style: solid;
+    border-color: rgb(146, 146, 146);
+    border-width: 3px;
+    text-align: left;
+    width: 200px;
+    height: 50px;
+    font-size: 20px;
+    margin: 20px;
+}
+
+input[type=password] {
+    flex: 1;
+    border-radius: 15px;
+    border-style: solid;
+    border-color: rgb(146, 146, 146);
+    border-width: 3px;
+    text-align: left;
+    width: 200px;
+    height: 50px;
+    font-size: 20px;
+    margin: 20px;
+    
+}
+
+input[type=email] {
+    flex: 1;
+    border-radius: 15px;
+    border-style: solid;
+    border-color: rgb(146, 146, 146);
+    border-width: 3px;
+    text-align: left;
+    width: 200px;
+    height: 50px;
+    font-size: 20px;
+    margin: 20px;
+}
+
+input[type=phone] {
+    border-radius: 15px;
+    border-style: solid;
+    border-color: rgb(146, 146, 146);
+    border-width: 3px;
+    text-align: left;
+    width: 200px;
+    height: 50px;
+    font-size: 20px;
+    margin: 20px;
+}
+
+textarea {
+    border-radius: 15px;
+    border-style: solid;
+    border-width: 3px;
+    font-size: 20px;
+    margin: 20px;
+}

@@ -1,0 +1,40 @@
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title id="name">{{Name}}</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+
+<body>
+
+    <div class="menu">
+        <p id="name">{{Name}}</p>
+
+        <p id="grams">grams /{{Grams}}/</p>
+
+        <p id="ingr">Ingredients: {{Ingredients}}</p>
+
+        <image src="{{Image}}" id="image" alt="No image for now"></image>
+
+        <p id="is_available"></p>
+
+        <p id="avg_time_to_took">Avrage time to cook: {{AvrageTimeToCook}} minute/s</p>
+
+        <p id="price">{{Price}} lv.</p>
+    </div>
+
+    <button id="order" onclick="addToOrder('{{Id}}', '{{Price}}', '{{Name}}')">Add to order</button>
+
+    <script>
+    let availabel = document.getElementById("is_available")
+        availabel.innerHTML = "{{IsAvailable}}" === "True" ? "Currently Available" : "Currently Not Avaliable"
+        </script>
+
+
+    <link rel='stylesheet' type='text/css' media='screen' href='../../single_dish/main.css'>
+    <script src='../../dishes/main.js'></script>
+</body>
+
+</html>
