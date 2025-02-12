@@ -183,24 +183,7 @@ namespace ITStepFinalProject.Controllers {
                         // image => "someimage.png;BASE64=="
 
                         if (image.Length > 0) {
-                            string[] imageParts = image.Split(';');
-                            string imageName = imageParts[0];
-                            string imageData = imageParts[1];
-
-                            string byteData = Encoding.UTF8.GetString(
-                                Convert.FromBase64String(imageData));
-                            if (!(imageName.Contains('\\') ||
-                                imageName.Contains('/') ||
-                                imageName.Contains('\'') ||
-                                byteData.EndsWith(',') ||
-                                byteData.StartsWith(','))) {
-                                string imgPath = "wwwroot/images/user/" + imageName;
-                                using FileStream fs = 
-                                    File.Create("wwwroot/images/user/" + imageName);
-                                await fs.WriteAsync(Utils.Utils.FromStringToUint8Array(byteData));
-
-                                userModel.Image = "/images/user/" + imageName;
-                            }
+                            userModel.Image = await Utils.Utils.UploadImage(image);
                         }
 
                         UserModel user = await db.RegisterUser(userModel, password);
@@ -235,6 +218,101 @@ namespace ITStepFinalProject.Controllers {
                     }
 
                 }).RequireRateLimiting("fixed")
+            .DisableAntiforgery();
+
+
+            //edit user profile
+            app.MapPost("/profile/edit", async (DatabaseManager db, HttpContext context,
+                [FromForm] string username, 
+                [FromForm] string email, [FromForm] string? notes,
+                [FromForm] string? phone, [FromForm] string address,
+                [FromForm] string? image, [FromForm] string delete_image) =>
+            {
+
+
+                
+
+                try
+                {
+                    if (username.Length == 0 || address.Length == 0 || email.Length == 0) {
+                        return Results.BadRequest();
+                    }
+
+                    ISession session = context.Session;
+                    int? userId = Utils.Utils.IsLoggedIn(session);
+                    if (userId == null)
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    int id = (int)userId;
+
+                    UserModel model = await db.GetUser(id);
+
+                    UserModel user = new UserModel();
+                    user.Id = (int) userId;
+
+                    user.Username = model.Username;
+                    if (!model.Username.Equals(username))
+                    {
+                        user.Username = username;
+                    }
+
+                    user.Email = model.Email;
+                    if (!model.Email.Equals(email))
+                    {
+                        user.Email = email;
+                    }
+
+                    user.Address = model.Address;
+                    if (!model.Address.Equals(address))
+                    {
+                        user.Address = address;
+                    }
+
+                    notes = notes?.Replace(" ","").Length == 0 ? null : notes;
+
+                    user.Notes = model.Notes;
+                    if (model.Notes != notes)
+                    {
+                        user.Notes = notes;
+                    }
+
+                    phone = phone?.Replace(" ", "").Length == 0 ? null : phone;
+
+                    user.PhoneNumber = model.PhoneNumber;
+                    if (model.PhoneNumber != phone)
+                    {
+                        user.PhoneNumber = phone;
+                    }
+
+                    if (delete_image.Equals("yes") && 
+                    model.Image != null && model.Image.Contains('.'))
+                    {
+                        Utils.Utils.RemoveImage("wwwroot"+model.Image);
+                        user.Image = null;
+
+                    } else
+                    {
+                        image = image?.Replace(" ", "").Length == 0 ? null : image;
+                        user.Image = model.Image;
+                        if (image != null)
+                        {
+                            user.Image = await Utils.Utils.UploadImage(image);
+                        }
+                    }
+
+
+                    db.UpdateUser(user);
+
+                    return Results.Ok();
+
+                } catch (Exception)
+                {
+                    return Results.BadRequest();
+                }
+
+            }).RequireRateLimiting("fixed")
             .DisableAntiforgery();
         }
     }

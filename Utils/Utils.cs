@@ -1,5 +1,7 @@
 ﻿using ITStepFinalProject.Models;
 using System.Security.Claims;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text;
 
 namespace ITStepFinalProject.Utils {
     public class Utils {
@@ -75,6 +77,39 @@ namespace ITStepFinalProject.Utils {
             } catch (Exception) {
                 return null;
             }
+        }
+
+        public static void RemoveImage(string image)
+        {
+            if (File.Exists(image))
+            {
+                File.Delete(image);
+            }
+        }
+
+       public static async Task<string?> UploadImage(string image)
+        {
+            string[] imageParts = image.Split(';');
+            string imageName = imageParts[0];
+            string imageData = imageParts[1];
+
+            string byteData = Encoding.UTF8.GetString(
+                Convert.FromBase64String(imageData));
+            if (!(imageName.Contains('\\') ||
+                imageName.Contains('/') ||
+                imageName.Contains('\'') ||
+                byteData.EndsWith(',') ||
+                byteData.StartsWith(',')))
+            {
+                string imgPath = "wwwroot/images/user/" + imageName;
+                RemoveImage(imgPath);
+                using FileStream fs =
+                    File.Create("wwwroot/images/user/" + imageName);
+                await fs.WriteAsync(FromStringToUint8Array(byteData));
+
+                return "/images/user/" + imageName;
+            }
+            return null;
         }
     }
 }

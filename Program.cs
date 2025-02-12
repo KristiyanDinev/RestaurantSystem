@@ -51,10 +51,10 @@ namespace ITStepFinalProject
 
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options => {
-                    options.PermitLimit = 4;
-                    options.Window = TimeSpan.FromSeconds(12);
+                    options.PermitLimit = 2;
+                    options.Window = TimeSpan.FromSeconds(1);
                     options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                    options.QueueLimit = 2;
+                    options.QueueLimit = 1;
                 })
             );
 

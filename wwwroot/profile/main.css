@@ -9,9 +9,7 @@ body {
 #profile_value {
     text-align: center;
     padding: 10px;
-    margin: 10px;
     font-size: 20px;
-    margin-top: 30px;
 }
 
 #image {
@@ -44,7 +42,7 @@ body {
     padding-bottom: 20px;
 }
 
-input[type=text] {
+.user-input {
     flex: 1;
     border-radius: 15px;
     border-style: solid;
@@ -57,44 +55,7 @@ input[type=text] {
     margin: 20px;
 }
 
-input[type=password] {
-    flex: 1;
-    border-radius: 15px;
-    border-style: solid;
-    border-color: rgb(146, 146, 146);
-    border-width: 3px;
-    text-align: left;
-    width: 200px;
-    height: 50px;
-    font-size: 20px;
-    margin: 20px;
-    
-}
 
-input[type=email] {
-    flex: 1;
-    border-radius: 15px;
-    border-style: solid;
-    border-color: rgb(146, 146, 146);
-    border-width: 3px;
-    text-align: left;
-    width: 200px;
-    height: 50px;
-    font-size: 20px;
-    margin: 20px;
-}
-
-input[type=phone] {
-    border-radius: 15px;
-    border-style: solid;
-    border-color: rgb(146, 146, 146);
-    border-width: 3px;
-    text-align: left;
-    width: 200px;
-    height: 50px;
-    font-size: 20px;
-    margin: 20px;
-}
 
 textarea {
     border-radius: 15px;
@@ -103,3 +64,12 @@ textarea {
     font-size: 20px;
     margin: 20px;
 }
+
+
+button {
+    padding: 20px;
+    margin: 50px;
+    font-size: 20px;
+    border-radius: 5px;
+}
+

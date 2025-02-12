@@ -378,6 +378,28 @@ values
             return model;
         }
        
+        public async void UpdateUser(UserModel model)
+        {
+            string sql = @$"UPDATE Users SET 
+                Username = {_handleStrings(model.Username)}, 
+                Image = {_handleStrings(model.Image)}, 
+                Address = {_handleStrings(model.Address)}, 
+                PhoneNumber = {_handleStrings(model.PhoneNumber)}, 
+                Email = {_handleStrings(model.Email)}, 
+                Notes = {_handleStrings(model.Notes)} 
+                WHERE Id = {model.Id};";
+
+            var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
+            int num = await cmd.ExecuteNonQueryAsync();
+
+            cmd.Connection?.Close();
+            cmd.Dispose();
+
+            if (num <= 0)
+            {
+                throw new Exception("Can't update user");
+            }
+        }
 
         public static string _hashString(string str) {
             str += _hashingSlat;

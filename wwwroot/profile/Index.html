@@ -16,19 +16,26 @@
             <br>
             <img id="review" alt="your image" />
 <br>
+<label id="delete_image_status"></label>
+<br>
+<button onclick="toggleDeleteImage()">Toggle Delete Image</button>
+<br>
         <label id="profile_value">Username: {{Username}}</label>
         <br>
-        <input type="text" id="username" maxlength="255" value="{{Username}}" placeholder="Username" required>
+        <input class="user-input" type="text" id="username" 
+        maxlength="255" value="{{Username}}" placeholder="Username" required>
         <br>
 
         <label id="profile_value">Email: {{Email}}</label>
         <br>
-        <input type="email" id="email" maxlength="50" value="{{Email}}" placeholder="Email" required>
+        <input class="user-input" 
+        type="email" id="email" maxlength="50" value="{{Email}}" placeholder="Email" required>
         <br>
 
         <label id="profile_value">Address: {{Address}}</label>
         <br>
-        <input type="text" id="address" value="{{Address}}" placeholder="Address" required>
+        <input class="user-input" 
+        type="text" id="address" value="{{Address}}" placeholder="Address" required>
         <br>
 
         <label id="profile_value">Notes: {{Notes}}</p>
@@ -38,13 +45,14 @@
 
         <label id="profile_value">Phone Number: {{PhoneNumber}}</p>
             <br>
-            <input type="phone" id="phone" value="{{PhoneNumber}}" maxlength="15" placeholder="Phone Number">
+            <input class="user-input" 
+            type="phone" id="phone" value="{{PhoneNumber}}" maxlength="15" placeholder="Phone Number">
             <br>
 
             <p id="Stats"></p>
             <br>
 
-        <button id="edit" onclick="updateUser('{{Id}}')">Edit</button>
+        <button id="edit" onclick="updateUser()">Edit</button>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <link rel='stylesheet' type='text/css' media='screen' href='profile/main.css'>
