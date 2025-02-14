@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text;
+using ITStepFinalProject.Database;
 
 namespace ITStepFinalProject.Utils {
     public class Utils {
@@ -47,23 +48,43 @@ namespace ITStepFinalProject.Utils {
             } else {
                 return await File.ReadAllTextAsync($"wwwroot{path}/Index.html");
             }
+
+        }
+
+        public static void ApplyUserBarElement(ref string data, UserModel user)
+        {
+            data = data.Replace("{{UserBar}}", @$"
+        <div class=""user"">
+
+               <div class=""cart"">
+               <button onclick=""goToCart()"">🛒</button>
+            </div>
+
+            <div class=""profile"" onclick=""goToProfile()"">
+                
+                <img src=""{user.Image}"">
+                <p>{user.Username}</p>
+            </div>
+
+           
+
+
+             <div class=""logout"">
+                <button onclick=""Logout()"" id=""logout"">Log Out <img src=""https://cdn-icons-png.flaticon.com/512/1286/1286853.png "">  </button>
+             </div>
+
+        </div>
+");
         }
 
 
-        public static void _handleEmptyEntryInFile(ref string FileData, object model) {
-            foreach (string property in
-                    model.GetType().GetProperties().Select(f => f.Name).ToList()) {
-                FileData = FileData.Replace("{{" + property + "}}", "");
-            }
-        }
-
-
-        public static void _handleEntryInFile(ref string FileData, object model) {
+        public static void _handleEntryInFile(ref string FileData, 
+            object model, string prefix) {
             Type type = model.GetType();
             foreach (string property in
                     type.GetProperties().Select(f => f.Name).ToList()) {
 
-                FileData = FileData.Replace("{{" + property + "}}",
+                FileData = FileData.Replace("{{" +prefix +"."+ property + "}}",
                     Convert.ToString(type.GetProperty(property).GetValue(model)));
             }
 
@@ -111,5 +132,7 @@ namespace ITStepFinalProject.Utils {
             }
             return null;
         }
+
+        
     }
 }

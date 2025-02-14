@@ -1,13 +1,7 @@
 using ITStepFinalProject.Controllers;
 using ITStepFinalProject.Database;
-using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
-using System.Net;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.RateLimiting;
 
 namespace ITStepFinalProject
@@ -67,6 +61,7 @@ namespace ITStepFinalProject
             app.UseStaticFiles();
             app.UseRateLimiter();
 
+
             app.Use(async (HttpContext context, RequestDelegate next) => {
 
                 ISession session = context.Session;
@@ -81,6 +76,7 @@ namespace ITStepFinalProject
                     return;
                 }
 
+
                 await next.Invoke(context);
             });
 
@@ -89,7 +85,7 @@ namespace ITStepFinalProject
             new DishController(app);
             new ErrorController(app);
             new OrderController(app);
-
+            new CartController(app);
 
             app.Run();
         }

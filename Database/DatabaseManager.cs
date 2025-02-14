@@ -10,18 +10,18 @@ namespace ITStepFinalProject.Database {
 
         /*
          * 
-         * insert into Dishes (Name, Price, Ingredients, Grams, Type_Of_Dish, IsAvailable, AvrageTimeToCook)
+         * insert into Dishes (Name, Price, Ingredients, Grams, Type_Of_Dish, IsAvailable, AvrageTimeToCook, Image)
 values
-('Salad 1', 10.99, 'some stuff in it and this and that', 440, 'salad', true, '3'),
-('Salad 2', 12.99, 'some stuff in it and this and that', 500, 'salad', false, '2'),
-('Drink 1', 13.99, 'some stuff in it and this and that', 100, 'drink', true, '1'),
-('Drink 2', 10.00, 'some stuff in it and this and that', 100, 'drink', false, '1'),
-('Appetizer 1', 10.09, 'some stuff in it and this and that', 440, 'appetizers', true, '3'),
-('Appetizer 2', 20.19, 'some stuff in it and this and that', 140, 'appetizers', false, '4'),
-('Desserts 1', 23.19, 'some stuff in it and this and that', 140, 'desserts', true, '1'),
-('Desserts 2', 30.20, 'some stuff in it and this and that', 120, 'desserts', false, '4'),
-('Dishes 1', 21.19, 'some stuff in it and this and that', 142, 'dishes', true, '2'),
-('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3')
+('Salad 1', 10.99, 'some stuff in it and this and that', 440, 'salad', true, '3', '/images/salad/1.png'),
+('Salad 2', 12.99, 'some stuff in it and this and that', 500, 'salad', false, '2', null),
+('Drink 1', 13.99, 'some stuff in it and this and that', 100, 'drink', true, '1', null),
+('Drink 2', 10.00, 'some stuff in it and this and that', 100, 'drink', false, '1', null),
+('Appetizer 1', 10.09, 'some stuff in it and this and that', 440, 'appetizers', true, '3', null),
+('Appetizer 2', 20.19, 'some stuff in it and this and that', 140, 'appetizers', false, '4', null),
+('Desserts 1', 23.19, 'some stuff in it and this and that', 140, 'desserts', true, '1', null),
+('Desserts 2', 30.20, 'some stuff in it and this and that', 120, 'desserts', false, '4', null),
+('Dishes 1', 21.19, 'some stuff in it and this and that', 142, 'dishes', true, '2', null),
+('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3', null)
          * 
          * 
          */

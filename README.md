@@ -14,7 +14,9 @@
 ### Notes
 - In text files the property names of the Model will be replaced 
 Ex: `{{Id}}` -> `1`: If there is no data or error the `{{property}}` 
-will be removed as a string from the file.
+will be removed as a string from the file. There si prefix of that property Like `{{User.property}}`
+
+- Global elements to replace in static files. User bar -> `{{UserBar}}`
 
 - The Order's CurrentStatus will be `db` when it is being prossesed by the server,
  but if the CurrentStatus is `pending` thne the order is ready to be accepted and it can be cancelled

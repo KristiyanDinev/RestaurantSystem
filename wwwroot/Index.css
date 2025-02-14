@@ -1,0 +1,45 @@
+.user {
+    margin: 20px;
+    background-color: rgb(120, 120, 120);
+    align-items: center;
+
+    border-radius: 20px;
+    flex-direction: row;
+    display: flex;
+}
+
+
+.profile {
+    font-size: 20px;
+    padding: 20px;
+    flex-direction: row-reverse;
+    display: flex;
+    flex: 1;
+}
+
+
+.profile img {
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+    margin-left: 20px;
+}
+
+.logout {
+    font-size: 20px;
+    text-align: right;
+    padding: 20px;
+}
+
+.logout img {
+    height: 10px;
+    width: 10px;
+    padding-left: 10px;
+}
+
+.profile .cart {
+    flex: 1;
+    height: 10px;
+    width: 10px;
+    padding: 10px;
+}

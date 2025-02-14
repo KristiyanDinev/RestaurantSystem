@@ -1,13 +1,16 @@
 <html>
 
 <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>Profile</title>
     </head>
     <body> 
 
         <label id="profile_value">Image</label>
         <br>
-        <image id="image" src="{{Image}}" alt="user image">
+        <image id="image" src="{{User.Image}}" alt="user image">
             <br>
 
             <input type="file" accept="image/*" id="_image">
@@ -20,33 +23,33 @@
 <br>
 <button onclick="toggleDeleteImage()">Toggle Delete Image</button>
 <br>
-        <label id="profile_value">Username: {{Username}}</label>
+        <label id="profile_value">Username: {{User.Username}}</label>
         <br>
         <input class="user-input" type="text" id="username" 
-        maxlength="255" value="{{Username}}" placeholder="Username" required>
+        maxlength="255" value="{{User.Username}}" placeholder="Username" required>
         <br>
 
-        <label id="profile_value">Email: {{Email}}</label>
+        <label id="profile_value">Email: {{User.Email}}</label>
         <br>
         <input class="user-input" 
-        type="email" id="email" maxlength="50" value="{{Email}}" placeholder="Email" required>
+        type="email" id="email" maxlength="50" value="{{User.Email}}" placeholder="Email" required>
         <br>
 
-        <label id="profile_value">Address: {{Address}}</label>
+        <label id="profile_value">Address: {{User.Address}}</label>
         <br>
         <input class="user-input" 
-        type="text" id="address" value="{{Address}}" placeholder="Address" required>
+        type="text" id="address" value="{{User.Address}}" placeholder="Address" required>
         <br>
 
-        <label id="profile_value">Notes: {{Notes}}</p>
+        <label id="profile_value">Notes: {{User.Notes}}</p>
         <br>
-        <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">{{Notes}}</textarea>
+        <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">{{User.Notes}}</textarea>
         <br>
 
-        <label id="profile_value">Phone Number: {{PhoneNumber}}</p>
+        <label id="profile_value">Phone Number: {{User.PhoneNumber}}</p>
             <br>
             <input class="user-input" 
-            type="phone" id="phone" value="{{PhoneNumber}}" maxlength="15" placeholder="Phone Number">
+            type="phone" id="phone" value="{{User.PhoneNumber}}" maxlength="15" placeholder="Phone Number">
             <br>
 
             <p id="Stats"></p>
@@ -55,8 +58,8 @@
         <button id="edit" onclick="updateUser()">Edit</button>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <link rel='stylesheet' type='text/css' media='screen' href='profile/main.css'>
+        <link rel='stylesheet' type='text/css' media='screen' href='profile/profile.css'>
         <script src='Index.js'></script>
-        <script src='profile/main.js'></script>
+        <script src='profile/profile.js'></script>
     </body>
 </html>

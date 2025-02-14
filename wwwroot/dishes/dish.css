@@ -10,30 +10,7 @@ body {
     text-align: center;
 }
 
-.user {
-    margin: 20px;
-}
 
-
-#profile {
-    font-size: 20px;
-    background-color: rgb(134, 226, 43);
-    align-items: end;
-    text-align: center;
-    border-radius: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-    padding: 10px;
-}
-
-#logout {
-    padding: 10px;
-    font-size: 20px;
-    background-color: rgb(226, 43, 43);
-    align-items: end;
-    text-align: center;
-    border-radius: 20px;
-}
 
 
 #dish {
@@ -105,4 +82,16 @@ body {
     padding: 20px;
     border-radius: 20px;
     width: 300px;
+}
+
+
+.quantity p {
+    padding: 10px;
+    font-size: 18px;
+    height: 30px;
+    width: 30px;
+}
+
+.quantity input {
+    width: 50px;
 }

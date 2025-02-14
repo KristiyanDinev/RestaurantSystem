@@ -1,17 +1,5 @@
 var Host = "http://127.0.0.1:7278"
 
-function Logout() {
-
-    fetch(Host + "/logout", {
-        method: "POST",
-        redirect: 'follow',
-
-    }).then((res) => {
-        if (res.status === 200) {
-            goToLogin()
-        }
-    })
-}
 
 async function addToOrder(id, price, name) {
     
@@ -101,23 +89,23 @@ type_Of_Dish: "salad"
     
 }
 
-async function goToSalads() {
+function goToSalads() {
     window.location.href = Host + '/dishes/salad'
 }
 
-async function goToAppetizers() {
+function goToAppetizers() {
     window.location.href = Host + '/dishes/appetizers'
 }
 
-async function goToDishes() {
+function goToDishesFood() {
     window.location.href = Host + '/dishes/dishes'
 }
 
-async function goToDrinks() {
+function goToDrinks() {
     window.location.href = Host + '/dishes/drinks'
 }
 
-async function goToDesserts() {
+function goToDesserts() {
     window.location.href = Host + '/dishes/desserts'
 }
 

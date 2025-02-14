@@ -23,7 +23,8 @@ namespace ITStepFinalProject.Controllers {
                 async (HttpContext context, DatabaseManager db, 
                 string SearchUserIdStr) => {
 
-                    if (Utils.Utils.IsLoggedIn(context.Session) == null) {
+                    int? id = Utils.Utils.IsLoggedIn(context.Session);
+                    if (id == null) {
                         return Results.Redirect("/login");
                     }
 
@@ -36,14 +37,17 @@ namespace ITStepFinalProject.Controllers {
                         string FileData = await Utils.Utils.GetFileContent(context.Request.Path);
                         if (!int.TryParse(SearchUserIdStr, out int SearchUserId)) {
 
-                            Utils.Utils._handleEmptyEntryInFile(ref FileData, new UserModel());
+                            Utils.Utils._handleEntryInFile(ref FileData, new UserModel(), "User");
 
                             return Results.Content(FileData, "text/html");
                         }
 
                         UserModel model = await db.GetUser(SearchUserId);
 
-                        Utils.Utils._handleEntryInFile(ref FileData, model);
+                        Utils.Utils._handleEntryInFile(ref FileData, model, "User");
+
+                        UserModel user = await db.GetUser((int)id);
+                        Utils.Utils.ApplyUserBarElement(ref FileData, user);
 
                         return Results.Content(FileData, "text/html");
 
@@ -69,7 +73,7 @@ namespace ITStepFinalProject.Controllers {
 
                         UserModel model = await db.GetUser((int)userId);
 
-                        Utils.Utils._handleEntryInFile(ref FileData, model);
+                        Utils.Utils._handleEntryInFile(ref FileData, model, "User");
 
                         return Results.Content(FileData, "text/html");
 
@@ -228,10 +232,6 @@ namespace ITStepFinalProject.Controllers {
                 [FromForm] string? phone, [FromForm] string address,
                 [FromForm] string? image, [FromForm] string delete_image) =>
             {
-
-
-                
-
                 try
                 {
                     if (username.Length == 0 || address.Length == 0 || email.Length == 0) {

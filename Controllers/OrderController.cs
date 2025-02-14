@@ -2,7 +2,9 @@
 using ITStepFinalProject.Models;
 using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ITStepFinalProject.Controllers {
     public class OrderController {
@@ -11,15 +13,22 @@ namespace ITStepFinalProject.Controllers {
         public OrderController(WebApplication app) {
 
             // get front-end display of your orders
-            app.MapGet("/orders", async (HttpContext context) => {
+            app.MapGet("/orders", async (HttpContext context, 
+                DatabaseManager db) => {
 
                     try {
                         ISession session = context.Session;
-                        if (Utils.Utils.IsLoggedIn(session) == null) {
+                    int? id = Utils.Utils.IsLoggedIn(session);
+                        if (id == null) {
                             return Results.Unauthorized();
                         }
 
                         string FileData = await Utils.Utils.GetFileContent("/orders");
+
+                    UserModel user = await db.GetUser((int)id);
+
+                    Utils.Utils._handleEntryInFile(ref FileData, user, "User");
+                        Utils.Utils.ApplyUserBarElement(ref FileData, user);
 
                         return Results.Content(FileData, "text/html");
 
@@ -79,6 +88,40 @@ namespace ITStepFinalProject.Controllers {
             }).RequireRateLimiting("fixed")
               .DisableAntiforgery();
 
+
+            // get current dishes about to order (not yet ordered)
+            app.MapPost("/order/dish/current", async (HttpContext context,
+                DatabaseManager db) =>
+            {
+                Dictionary<string, object> res = new Dictionary<string, object>();
+                ISession session = context.Session;
+                if (Utils.Utils.IsLoggedIn(session) == null)
+                {
+                    return res;
+                }
+
+                try
+                {
+
+                    List<DishModel> dishes = new List<DishModel>();
+                    foreach (int id in GetDishesFromOrder(session))
+                    {
+                        DishModel dish = await db.GetDishById(id);
+                        dishes.Add(dish);
+                    }
+
+
+                    res.Add("dishes_to_order", dishes);
+                    return res;
+
+                } catch (Exception)
+                {
+                    return res;
+                }
+
+            }).DisableAntiforgery().RequireRateLimiting("fixed");
+
+
             // remove dish
             app.MapPost("/order/remove", async (HttpContext context,
                 DatabaseManager db, [FromForm] int dishId) => {
@@ -116,8 +159,9 @@ namespace ITStepFinalProject.Controllers {
                             return Results.Unauthorized();
                         }
 
-                        Dictionary<int, float> data = GetDishesFromOrder(session);
-                        float TotalPrice = CalculateTotalPrice(data.Values.ToList(), 0);
+                        Dictionary<int, float> data = GetPricesFromOrder(session);
+                        List<float> currentPrices = data.Values.ToList();
+                        float TotalPrice = CalculateTotalPrice(currentPrices, 0);
 
                         CuponModel? cupon = null;
                         if (cuponCode.Length > 0) {
@@ -127,12 +171,13 @@ namespace ITStepFinalProject.Controllers {
                                 return Results.BadRequest();
                             }
 
-                            TotalPrice = CalculateTotalPrice(data.Values.ToList(),
+                            TotalPrice = CalculateTotalPrice(currentPrices,
                                 cupon.DiscountPercent);
                         }
 
                         db.AddOrder((int)userId,
-                            data.Keys.ToList(), notes, TotalPrice, resturantAddress);
+                            GetDishesFromOrder(session), 
+                            notes, TotalPrice, resturantAddress);
 
                         if (cupon != null) {
                             db.DeleteCupon(cupon.Name);
@@ -228,7 +273,7 @@ namespace ITStepFinalProject.Controllers {
             
         }
 
-        private static Dictionary<int, float> GetDishesFromOrder(ISession session) {
+        private static Dictionary<int, float> GetPricesFromOrder(ISession session) {
             string? orderDishes = session.GetString("OrderDishes");
             Dictionary<int, float> dishes = new Dictionary<int, float>();
             if (orderDishes == null || orderDishes.Length == 0) {
@@ -236,8 +281,37 @@ namespace ITStepFinalProject.Controllers {
             }
 
             foreach (string dish in orderDishes.Split(';')) {
+                if (dish.Length == 0)
+                {
+                    continue;
+                }
                 string[] parts = dish.Split(':');
-                dishes.Add(int.Parse(parts[0]), float.Parse(parts[1]));
+                int id = int.Parse(parts[0]);
+                if (!dishes.ContainsKey(id))
+                {
+                    dishes.Add(id, float.Parse(parts[1]));
+                }
+            }
+            return dishes;
+        }
+
+        private static List<int> GetDishesFromOrder(ISession session)
+        {
+            string? orderDishes = session.GetString("OrderDishes");
+            List<int> dishes = new List<int>();
+            if (orderDishes == null || orderDishes.Length == 0)
+            {
+                return dishes;
+            }
+
+            foreach (string dish in orderDishes.Split(';'))
+            {
+                if (dish.Length == 0)
+                {
+                    continue;
+                }
+                string[] parts = dish.Split(':');
+                dishes.Add(int.Parse(parts[0]));
             }
             return dishes;
         }

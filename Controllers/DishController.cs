@@ -1,6 +1,7 @@
 ﻿using ITStepFinalProject.Database;
 using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ITStepFinalProject.Controllers {
     public class DishController {
@@ -11,13 +12,18 @@ namespace ITStepFinalProject.Controllers {
             app.MapGet("/dishes", async (HttpContext context,
                 DatabaseManager db) => {
 
-                    ISession session = context.Session;
-                    if (session.GetInt32("UserId") == null) {
+                    int? id = Utils.Utils.IsLoggedIn(context.Session);
+                    if (id == null) {
                         return Results.Redirect("/login");
                     }
 
                     try {
                         string data = await Utils.Utils.GetFileContent("/dishes");
+
+                        UserModel user = await db.GetUser((int)id);
+                        Utils.Utils.ApplyUserBarElement(ref data, user);
+                        Utils.Utils._handleEntryInFile(ref data, user, "User");
+
                         return Results.Content(data, "text/html");
 
                     } catch (Exception) {
@@ -33,11 +39,13 @@ namespace ITStepFinalProject.Controllers {
             app.MapGet("/dishes/{type}", async (HttpContext context,
                 DatabaseManager db, string type) => {
 
-                    if (Utils.Utils.IsLoggedIn(context.Session) == null) {
+                    int? id = Utils.Utils.IsLoggedIn(context.Session);
+                    if (id == null) {
                         return Results.Redirect("/login");
                     }
 
                     if (type.Contains('.')) {
+                        // just static file
                         string a = await Utils.Utils.GetFileContent("/dishes/" + type);
                         return Results.Content(a);
                     }
@@ -45,6 +53,11 @@ namespace ITStepFinalProject.Controllers {
                     try {
 
                         string data = await Utils.Utils.GetFileContent("/dishes/" + type);
+
+                        UserModel user = await db.GetUser((int)id);
+                        Utils.Utils._handleEntryInFile(ref data, user, "User");
+                        Utils.Utils.ApplyUserBarElement(ref data, user);
+
                         return Results.Content(data, "text/html");
 
                     } catch (Exception) {
@@ -58,7 +71,8 @@ namespace ITStepFinalProject.Controllers {
             app.MapGet("/dishes/id/{dishId}", async (HttpContext context,
                 DatabaseManager db, string dishId) => {
 
-                    if (Utils.Utils.IsLoggedIn(context.Session) == null) {
+                    int? id = Utils.Utils.IsLoggedIn(context.Session);
+                    if (id == null) {
                         return Results.Redirect("/login");
                     }
 
@@ -71,7 +85,12 @@ namespace ITStepFinalProject.Controllers {
 
                         DishModel dish = await db.GetDishById(Id);
 
-                        Utils.Utils._handleEntryInFile(ref FileData, dish);
+                        Utils.Utils._handleEntryInFile(ref FileData, dish, "Dish");
+
+                        UserModel user = await db.GetUser((int)id);
+                        Utils.Utils._handleEntryInFile(ref FileData, user, "User");
+                        Utils.Utils.ApplyUserBarElement(ref FileData, user);
+
 
                         return Results.Content(FileData, "text/html");
 

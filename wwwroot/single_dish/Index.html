@@ -3,38 +3,41 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title id="name">{{Name}}</title>
+    <title id="name">{{Dish.Name}}</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
 </head>
 
 <body>
 
+    {{UserBar}}
+
     <div class="menu">
-        <p id="name">{{Name}}</p>
+        <p id="name">{{Dish.Name}}</p>
 
-        <p id="grams">grams /{{Grams}}/</p>
+        <p id="grams">grams /{{Dish.Grams}}/</p>
 
-        <p id="ingr">Ingredients: {{Ingredients}}</p>
+        <p id="ingr">Ingredients: {{Dish.Ingredients}}</p>
 
-        <image src="{{Image}}" id="image" alt="No image for now"></image>
+        <image src="{{Dish.Image}}" id="image" alt="No image for now"></image>
 
         <p id="is_available"></p>
 
-        <p id="avg_time_to_took">Avrage time to cook: {{AvrageTimeToCook}} minute/s</p>
+        <p id="avg_time_to_took">Avrage time to cook: {{Dish.AvrageTimeToCook}} minute/s</p>
 
-        <p id="price">{{Price}} lv.</p>
+        <p id="price">{{Dish.Price}} lv.</p>
     </div>
 
-    <button id="order" onclick="addToOrder('{{Id}}', '{{Price}}', '{{Name}}')">Add to order</button>
+    <button id="order" onclick="addToOrder('{{Dish.Id}}', '{{Dish.Price}}', '{{Dish.Name}}')">Add to order</button>
 
     <script>
     let availabel = document.getElementById("is_available")
-        availabel.innerHTML = "{{IsAvailable}}" === "True" ? "Currently Available" : "Currently Not Avaliable"
+        availabel.innerHTML = "{{Dish.IsAvailable}}" === "True" ? "Currently Available" : "Currently Not Avaliable"
         </script>
 
-
-    <link rel='stylesheet' type='text/css' media='screen' href='../../single_dish/main.css'>
-    <script src='../../dishes/main.js'></script>
+<link rel='stylesheet' type='text/css' media='screen' href='../../Index.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../../single_dish/single_dish.css'>
+    <script src='../../Index.js'></script>
+    <script src='../../dishes/dish.js'></script>
 </body>
 
 </html>
