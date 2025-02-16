@@ -5,17 +5,39 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title id="name">Cart</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+
 </head>
 
 <body>
 
     {{UserBar}}
 
+    <h1>Your Cart</h1>
+
     <p id="dish_stats"></p>
 
     <div id="dishes">
     </div>
-    
+
+    <div>
+        <p id="p_for_order">Notes for the order</p>
+        <textarea  id="notes" cols="40" rows="6" maxlength="255" placeholder="Notes"></textarea>
+    </div>
+
+    <div>
+        <p id="p_for_order">Cupon Code</p>
+        <input id="cupon_input" maxlength="25" placeholder="Cupon Code">
+    </div>
+
+    <div>
+        <p id="p_for_order">Resturant Address</p>
+        <select id="resturant_address">
+            <option value="" selected="selected">Address1</option>
+        </select>
+        <input id="resturant_address" placeholder="Address1">
+    </div>
+
+    <button class="start_order" onclick="startOrder()">Order</button>
 
     <link rel='stylesheet' type='text/css' media='screen' href='../Index.css'>
     <link rel='stylesheet' type='text/css' media='screen' href='../dishes/dish.css'>

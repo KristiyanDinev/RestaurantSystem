@@ -1,7 +1,9 @@
 ﻿using ITStepFinalProject.Models;
+using ITStepFinalProject.Utils;
 using Npgsql;
 using NpgsqlTypes;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 
 namespace ITStepFinalProject.Database {
@@ -31,11 +33,13 @@ values
         public static async void Setup() {
             string sql = """
                 CREATE TABLE IF NOT EXISTS Users (
-                    Id SERIAL PRIMARY KEY,
-                    Username VARCHAR(255) NOT NULL UNIQUE,
+                    __Id SERIAL PRIMARY KEY,
+                    Username VARCHAR(100) NOT NULL UNIQUE,
                     Password VARCHAR(64) NOT NULL,
                     Image TEXT,
-                    Address TEXT NOT NULL,
+                    Address VARCHAR(255) NOT NULL,
+                    City VARCHAR(50) NOT NULL,
+                    Country VARCHAR(50) NOT NULL,
                     PhoneNumber VARCHAR(15),
                     Email VARCHAR(50) NOT NULL UNIQUE,
                     Notes VARCHAR(255)
@@ -69,12 +73,6 @@ values
                     DishId INT REFERENCES Dishes(Id)
                 );
 
-                CREATE TABLE IF NOT EXISTS ResturantAddressAvrageDeliverTime (
-                    Address TEXT NOT NULL,
-                    TimeFrame TEXT NOT NULL,
-                    AvrageDeliverTime VARCHAR(20) NOT NULL
-                );
-
                 CREATE TABLE IF NOT EXISTS Reservations (
                     Id SERIAL PRIMARY KEY,
                     ReservatorId INT REFERENCES Users(Id),
@@ -99,6 +97,7 @@ values
             cmd.Dispose();
         }
 
+
         public async Task<UserModel> GetUser(int id) {
             List<NpgsqlParameter> npgsqlParameters = new List<NpgsqlParameter>();
 
@@ -107,7 +106,7 @@ values
 
             npgsqlParameters.Add(idArg);
 
-            string sql = "SELECT * FROM Users WHERE Id = @Id";
+            string sql = "SELECT * FROM Users WHERE __Id = @Id";
 
 
             var cmd = await DatabaseCommandBuilder.BuildCommand(
@@ -131,9 +130,10 @@ values
             string hashedPass = _hashString(password);
 
             string sql = @$"INSERT INTO Users 
-    (Username, Password, Image, Address, PhoneNumber, Email, Notes) VALUES 
+    (Username, Password, Image, Address, City, Country, PhoneNumber, Email, Notes) VALUES 
     ({_handleStrings(model.Username)}, '{hashedPass}', {_handleStrings(model.Image)}, 
-    {_handleStrings(model.Address)}, {_handleStrings(model.PhoneNumber)}, 
+    {_handleStrings(model.Address)}, {_handleStrings(model.City)}, {_handleStrings(model.Country)}
+    , {_handleStrings(model.PhoneNumber)}, 
     {email}, {_handleStrings(model.Notes)}); 
         SELECT * FROM Users WHERE Email = {email} AND Password = '{hashedPass}';
 ";
@@ -378,12 +378,16 @@ values
             return model;
         }
        
+
+        /*
         public async void UpdateUser(UserModel model)
         {
             string sql = @$"UPDATE Users SET 
                 Username = {_handleStrings(model.Username)}, 
                 Image = {_handleStrings(model.Image)}, 
                 Address = {_handleStrings(model.Address)}, 
+                City = {_handleStrings(model.City)}, 
+                Country = {_handleStrings(model.Country)}, 
                 PhoneNumber = {_handleStrings(model.PhoneNumber)}, 
                 Email = {_handleStrings(model.Email)}, 
                 Notes = {_handleStrings(model.Notes)} 
@@ -400,6 +404,74 @@ values
                 throw new Exception("Can't update user");
             }
         }
+        */
+
+
+
+        private async void _UpdateModel(object model, string table)
+        {
+            List<string> identityProperties = ModelUtils.Get_Identity_Model_Property_Names(model);
+            if (identityProperties.Count == 0)
+            {
+                throw new Exception("Model has no identity properties. For example: __Id");
+            }
+
+            StringBuilder stringBuilder = new StringBuilder("UPDATE ")
+                .Append(table).Append(" SET ");
+
+            List<string> properties = ModelUtils.Get_Update_Model_Property_Names(model);
+
+            for (int i = 0; i < properties.Count; i++)
+            {
+                string property = properties[i];
+
+                _SetValue_With_Property(ref stringBuilder, property, model);
+
+                stringBuilder.Append(i == properties.Count - 1 ? " " : ", ");
+            }
+
+            stringBuilder.Append(" WHERE ");
+            for (int i = 0; i < identityProperties.Count; i++)
+            {
+                string property = identityProperties[i];
+                _SetValue_With_Property(ref stringBuilder, property, model);
+
+                stringBuilder.Append(i == properties.Count - 1 ? " " : ", ");
+            }
+            stringBuilder.Append(";");
+
+            /*
+                string sql = @$"UPDATE Users SET 
+                Username = {_handleStrings(model.Username)}, 
+                Image = {_handleStrings(model.Image)}, 
+                Address = {_handleStrings(model.Address)}, 
+                City = {_handleStrings(model.City)}, 
+                Country = {_handleStrings(model.Country)}, 
+                PhoneNumber = {_handleStrings(model.PhoneNumber)}, 
+                Email = {_handleStrings(model.Email)}, 
+                Notes = {_handleStrings(model.Notes)} 
+                WHERE Id = {model.Id};";*/
+
+            Console.WriteLine("Update Model SQL: " + stringBuilder.ToString());
+
+            var cmd = await DatabaseCommandBuilder.BuildCommand(
+                stringBuilder.ToString(), null);
+            int num = await cmd.ExecuteNonQueryAsync();
+
+            cmd.Connection?.Close();
+            cmd.Dispose();
+
+            if (num <= 0)
+            {
+                throw new Exception("Can't update user");
+            }
+        }
+
+        public async void UpdateUser2(object model)
+        {
+            _UpdateModel(model, "Users");
+        } 
+
 
         public static string _hashString(string str) {
             str += _hashingSlat;
@@ -407,9 +479,28 @@ values
                 Program.hashing?.ComputeHash(Encoding.ASCII.GetBytes(str)) ?? []);
         }
 
-        private static string _handleStrings(string? str) {
-            return str == null || str.Replace(" ", "").Length == 0 ? 
-                "null" : "'" + str.Replace("'", "''") + "'";
+        private static string _handleStrings(object str) {
+            return str == null || ((string)str).Replace(" ", "").Length == 0 ? 
+                "null" : "'" + ((string)str).Replace("'", "''") + "'";
+        }
+
+
+        private static object _handlePropertyValue(object model, string property)
+        {
+            object value = ModelUtils.Get_Property_Value(model, property);
+            if (value is String)
+            {
+                value = _handleStrings(value);
+            }
+            return value;
+        }
+
+        private static void _SetValue_With_Property(ref StringBuilder stringBuilder, 
+            string property, object model)
+        {
+            stringBuilder.Append(property);
+            stringBuilder.Append(" = ");
+            stringBuilder.Append(_handlePropertyValue(model, property));
         }
 
         private static DishModel ConvertToDish(NpgsqlDataReader reader) {
@@ -431,10 +522,12 @@ values
             user.Username = Convert.ToString(reader["username"]);
             user.Image = Convert.ToString(reader["image"]);
             user.Address = Convert.ToString(reader["address"]);
+            user.City = Convert.ToString(reader["city"]);
+            user.Country = Convert.ToString(reader["country"]);
             user.PhoneNumber = Convert.ToString(reader["phonenumber"]);
             user.Email = Convert.ToString(reader["email"]);
             user.Notes = Convert.ToString(reader["notes"]);
-            user.Id = Convert.ToInt32(reader["id"]);
+            user.__Id = Convert.ToInt32(reader["__id"]);
             return user;
         }
 

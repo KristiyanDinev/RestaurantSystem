@@ -37,3 +37,7 @@ function goToCart() {
     window.location.href = Host + '/cart'
 }
 
+function goToOrders() {
+    window.location.href = Host + '/orders'
+}
+

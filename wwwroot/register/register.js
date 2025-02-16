@@ -39,11 +39,15 @@ function submit() {
     let username = document.getElementById("Username")
     let password = document.getElementById("Password")
     let address = document.getElementById("Address")
+    let city = document.getElementById("City")
+    let country = document.getElementById("Country")
     let email = document.getElementById("Email")
     
     if (username.value.replace(" ", "").length === 0 ||
         password.value.replace(" ", "").length === 0 ||
         address.value.replace(" ", "").length === 0 ||
+        city.value.replace(" ", "").length === 0 ||
+        country.value.replace(" ", "").length === 0 ||
         email.value.replace(" ", "").length === 0) {
         
         document.getElementById("Stats").innerHTML = "Requred Inputs: Username, Email and Address"
@@ -57,6 +61,8 @@ function submit() {
     formData.append("email", email.value)
     formData.append("notes", document.getElementById("Notes").value)
     formData.append("address", address.value)
+    formData.append("city", city.value)
+    formData.append("country", country.value)
     formData.append("phone", document.getElementById("Phone").value)
     formData.append("rememberMe", document.getElementById("RememberMe").value)
     formData.append("image", ImageFile)

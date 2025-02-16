@@ -1,7 +1,6 @@
 ﻿using ITStepFinalProject.Database;
 using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
 
 namespace ITStepFinalProject.Controllers {
     public class UserController {
@@ -121,7 +120,7 @@ namespace ITStepFinalProject.Controllers {
                         }
 
                         UserModel user = await db.LoginUser(email, password);
-                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.Id);
+                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.__Id);
 
 
                         await session.CommitAsync();
@@ -192,7 +191,7 @@ namespace ITStepFinalProject.Controllers {
 
                         UserModel user = await db.RegisterUser(userModel, password);
                         
-                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.Id);
+                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.__Id);
 
                         await session.CommitAsync();
 
@@ -250,7 +249,7 @@ namespace ITStepFinalProject.Controllers {
                     UserModel model = await db.GetUser(id);
 
                     UserModel user = new UserModel();
-                    user.Id = (int) userId;
+                    user.__Id = (int) userId;
 
                     user.Username = model.Username;
                     if (!model.Username.Equals(username))
@@ -303,7 +302,7 @@ namespace ITStepFinalProject.Controllers {
                     }
 
 
-                    db.UpdateUser(user);
+                    db.UpdateUser2(user);
 
                     return Results.Ok();
 

@@ -1,5 +1,6 @@
 using ITStepFinalProject.Controllers;
 using ITStepFinalProject.Database;
+using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Cryptography;
 using System.Threading.RateLimiting;
@@ -9,11 +10,11 @@ namespace ITStepFinalProject
     public class Program
     {
         public static HashAlgorithm hashing;
-
+        public static List<ResturantAddressModel> resturantAddresses;
         public static void Main(string[] args)
         {
             hashing = SHA256.Create();
-            
+            resturantAddresses = new List<ResturantAddressModel>();
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,40 @@ namespace ITStepFinalProject
                     options.QueueLimit = 1;
                 })
             );
+
+            foreach (string resturantAddress in 
+                (builder.Configuration.GetValue<string>("ResturantAddressAvrageDeliverTime")
+                ?? "Missing Resturant Address").Split("---"))
+            {
+                if (resturantAddress.Length == 0)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    string[] parts = resturantAddress.Split('|');
+
+                    string[] userAddressParts = parts[0].Split(';');
+
+                    ResturantAddressModel resturant = new ResturantAddressModel();
+                    resturant.AvrageTime = parts[1];
+                    resturant.UserAddress = userAddressParts[0];
+                    resturant.UserCity = userAddressParts[1];
+                    resturant.UserCountry = userAddressParts[2];
+
+                    string[] restorantAddressParts = parts[2].Split(';');
+                    resturant.RestorantAddress = restorantAddressParts[0];
+                    resturant.RestorantCity = restorantAddressParts[1];
+                    resturant.RestorantCountry = restorantAddressParts[2];
+
+                    resturantAddresses.Add(resturant);
+
+                } catch (Exception)
+                {
+                    continue;
+                }
+            }
 
 
             var app = builder.Build();

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text;
 using ITStepFinalProject.Database;
+using System.Net;
 
 namespace ITStepFinalProject.Utils {
     public class Utils {
@@ -56,10 +57,12 @@ namespace ITStepFinalProject.Utils {
             data = data.Replace("{{UserBar}}", @$"
         <div class=""user"">
 
-               <div class=""cart"">
-               <button onclick=""goToCart()"">🛒</button>
-            </div>
-
+               <button class=""navigation_button"" onclick=""goToCart()"">🛒</button>
+    
+           <button  class=""navigation_button"" onclick=""goToOrders()"">Orders</button>
+        
+             <button class=""navigation_button"" onclick=""goToDishes()"">Dishes</button>
+            
             <div class=""profile"" onclick=""goToProfile()"">
                 
                 <img src=""{user.Image}"">
@@ -67,8 +70,6 @@ namespace ITStepFinalProject.Utils {
             </div>
 
            
-
-
              <div class=""logout"">
                 <button onclick=""Logout()"" id=""logout"">Log Out <img src=""https://cdn-icons-png.flaticon.com/512/1286/1286853.png "">  </button>
              </div>
@@ -77,6 +78,34 @@ namespace ITStepFinalProject.Utils {
 ");
         }
 
+        public static void ApplyRestorantAddress(ref string data, UserModel user)
+        {
+            List<ResturantAddressModel> filtered = new List<ResturantAddressModel>();
+
+            foreach (ResturantAddressModel restorantAddresses 
+                in Program.resturantAddresses)
+            {
+                if (restorantAddresses.UserCity.Equals(user.City) &&
+                    restorantAddresses.UserCountry.Equals(user.Country) &&
+                    restorantAddresses.UserAddress.StartsWith(user.Address))
+                {
+                    filtered.Add(restorantAddresses);
+                }
+            }
+
+            StringBuilder stringBuilder = new StringBuilder("<select id=\"resturant_address\">");
+
+            foreach (ResturantAddressModel res in filtered)
+            {
+                stringBuilder.AppendLine($@"<option 
+value='{res.RestorantAddress+';'+res.RestorantCity+';'+res.RestorantCountry}' selected='selected'>{
+                    res.RestorantAddress +", "+res.RestorantCity+", "+res.RestorantCountry + " : "+res.AvrageTime
+                    }</option>");
+            }
+
+            stringBuilder.Append("</select>");
+            data = data.Replace("{{ResturantAddress}}", stringBuilder.ToString());
+        }
 
         public static void _handleEntryInFile(ref string FileData, 
             object model, string prefix) {

@@ -5,9 +5,11 @@ body {
 
 .menu {
     flex-direction: row;
-    background-color: rgb(97, 97, 97);
+    background-color: rgb(120, 120, 120);
     align-items: center;
+    border-radius: 20px;
     text-align: center;
+    color: white;
 }
 
 
@@ -22,7 +24,7 @@ body {
 
     font-size: 20px;
     margin: 20px;
-
+    color: white;
     background-color: rgb(144, 144, 144);
     border-radius: 20px;
 }
@@ -94,4 +96,17 @@ body {
 
 .quantity input {
     width: 50px;
+}
+
+.remove_dish {
+    border-radius: 20px;
+    background-color: rgb(207, 40, 40);
+    padding: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    margin: 10px;
+    display: inline-block;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
 }

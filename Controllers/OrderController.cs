@@ -1,10 +1,7 @@
 ﻿using ITStepFinalProject.Database;
 using ITStepFinalProject.Models;
-using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ITStepFinalProject.Controllers {
     public class OrderController {
@@ -148,8 +145,7 @@ namespace ITStepFinalProject.Controllers {
             // start order
             app.MapPost("/order", async (HttpContext context,
                 DatabaseManager db, [FromForm] string notes,
-                [FromForm] string cuponCode, 
-                [FromForm] string resturantAddress) => {
+                [FromForm] string cuponCode, [FromForm] string resturantAddress) => {
 
                     try {
 
@@ -250,27 +246,28 @@ namespace ITStepFinalProject.Controllers {
             if (orderDishes == null || orderDishes.Length == 0) {
                 return;
             }
-                string dishIdStr = dishId.ToString();
-                List<string> dishesId = orderDishes.Split(';').ToList();
+            string dishIdStr = dishId.ToString();
+            List<string> dishesId = orderDishes.Split(';').ToList();
 
-                for (int i = 0; i < dishesId.Count; i++) {
-                    string dish = dishesId[i];
-                    // id:price
-                    if (dish.Length > 0 && dish.StartsWith(dishIdStr)) {
-                        dishesId.RemoveAt(i);
-                        break;
-                    }
+            for (int i = 0; i < dishesId.Count;) {
+                string dish = dishesId[i];
+                // id:price
+                if (dish.Length > 0 && dish.StartsWith(dishIdStr)) {
+                    dishesId.RemoveAt(i);
+
+                } else {
+                    i++;
                 }
+            }
 
-                StringBuilder stringBuilder = new StringBuilder();
-                foreach (string dish in dishesId) { 
-                    if (dish.Length > 0) {
-                        stringBuilder.Append(dish+";");
-                    }
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (string dish in dishesId) { 
+                if (dish.Length > 0) {
+                    stringBuilder.Append(dish+";");
                 }
+            }
 
-                session.SetString("OrderDishes", stringBuilder.ToString());
-            
+            session.SetString("OrderDishes", stringBuilder.ToString());
         }
 
         private static Dictionary<int, float> GetPricesFromOrder(ISession session) {

@@ -1,6 +1,26 @@
 var dish_counts = {}
 var displayedIDs = []
 
+async function removeDish(name, id) {
+    
+    let formData = new FormData()
+    formData.append("dishId", Number(id))
+
+    const res = await fetch(Host + '/order/remove', {
+        method: "POST",
+        body: formData,
+        redirect: 'follow',
+    })
+
+    if (res.status === 200) {
+        alert('Removed every '+name+' from your cart')
+        window.location.reload()
+
+    } else {
+        alert("Can't remove "+name+" from your cart")
+    }
+}
+
 function displayDish(data, element) {
     /*
     avrageTimeToCook: "3"
@@ -73,6 +93,21 @@ type_Of_Dish: "salad"
 
     quantityDiv.appendChild(counter)
 
+
+    let removeButton = document.createElement('button')
+    removeButton.className = "remove_dish"
+    removeButton.innerHTML = "Remove Dish"
+    removeButton.onclick = async () => {
+        if (confirm("Are you sure you want to remove "+data.name +" from your cart?") != true) {
+            return
+        }
+
+
+        await removeDish(data.name, data.id)
+    }
+    
+    quantityDiv.appendChild(removeButton)
+
     wholeDiv.appendChild(quantityDiv)
     
     element.appendChild(wholeDiv)
@@ -92,7 +127,7 @@ async function getDishes() {
     })
 
     const data = await res.json()
-    if (data.dishes_to_order === null) {
+    if (data.dishes_to_order === null || data.dishes_to_order === undefined) {
         document.getElementById("dish_stats").innerHTML = "Can't get current dishes from cart"
         return
     }
@@ -117,3 +152,20 @@ async function getDishes() {
 }
  
 getDishes()
+
+async function startOrder() {
+    
+    var formData = new FormData()
+    formData.append("notes", String())
+    formData.append("cuponCode", String())
+    formData.append("resturantAddress", String())
+
+    const res = await fetch(Host + '/order', {
+        method: 'POST',
+        body: formData,
+        redirect: 'follow',
+    })
+
+
+}
+
