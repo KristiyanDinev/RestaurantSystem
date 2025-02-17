@@ -1,0 +1,20 @@
+﻿<div class="user">
+
+    <button class=" navigation_button" onclick="goToCart()">🛒</button>
+
+    <button class="navigation_button" onclick="goToOrders()">Orders</button>
+
+    <button class="navigation_button" onclick="goToDishes()">Dishes</button>
+
+    <div class="profile" onclick="goToProfile()">
+
+        <img src="{{User.Image}}">
+        <p>{{User.Username}}</p>
+    </div>
+
+
+    <div class="logout">
+        <button onclick="Logout()" id="logout">Log Out <img src="https://cdn-icons-png.flaticon.com/512/1286/1286853.png"></button>
+    </div>
+
+</div>

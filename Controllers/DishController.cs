@@ -21,7 +21,7 @@ namespace ITStepFinalProject.Controllers {
                         string data = await Utils.Utils.GetFileContent("/dishes");
 
                         UserModel user = await db.GetUser((int)id);
-                        Utils.Utils.ApplyUserBarElement(ref data, user);
+                        //Utils.Utils.ApplyUserBarElement(ref data, user);
                         Utils.Utils._handleEntryInFile(ref data, user, "User");
 
                         return Results.Content(data, "text/html");
@@ -56,7 +56,7 @@ namespace ITStepFinalProject.Controllers {
 
                         UserModel user = await db.GetUser((int)id);
                         Utils.Utils._handleEntryInFile(ref data, user, "User");
-                        Utils.Utils.ApplyUserBarElement(ref data, user);
+                        //Utils.Utils.ApplyUserBarElement(ref data, user);
 
                         return Results.Content(data, "text/html");
 
@@ -89,7 +89,7 @@ namespace ITStepFinalProject.Controllers {
 
                         UserModel user = await db.GetUser((int)id);
                         Utils.Utils._handleEntryInFile(ref FileData, user, "User");
-                        Utils.Utils.ApplyUserBarElement(ref FileData, user);
+                        //Utils.Utils.ApplyUserBarElement(ref FileData, user);
 
 
                         return Results.Content(FileData, "text/html");

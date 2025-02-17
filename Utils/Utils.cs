@@ -4,6 +4,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Text;
 using ITStepFinalProject.Database;
 using System.Net;
+using System;
 
 namespace ITStepFinalProject.Utils {
     public class Utils {
@@ -52,42 +53,19 @@ namespace ITStepFinalProject.Utils {
 
         }
 
-        public static void ApplyUserBarElement(ref string data, UserModel user)
-        {
-            data = data.Replace("{{UserBar}}", @$"
-        <div class=""user"">
 
-               <button class=""navigation_button"" onclick=""goToCart()"">🛒</button>
-    
-           <button  class=""navigation_button"" onclick=""goToOrders()"">Orders</button>
-        
-             <button class=""navigation_button"" onclick=""goToDishes()"">Dishes</button>
-            
-            <div class=""profile"" onclick=""goToProfile()"">
-                
-                <img src=""{user.Image}"">
-                <p>{user.Username}</p>
-            </div>
-
-           
-             <div class=""logout"">
-                <button onclick=""Logout()"" id=""logout"">Log Out <img src=""https://cdn-icons-png.flaticon.com/512/1286/1286853.png "">  </button>
-             </div>
-
-        </div>
-");
-        }
 
         public static void ApplyRestorantAddress(ref string data, UserModel user)
         {
             List<ResturantAddressModel> filtered = new List<ResturantAddressModel>();
+            string[] fullAddress = user.FullAddress.Split(';');
 
             foreach (ResturantAddressModel restorantAddresses 
                 in Program.resturantAddresses)
             {
-                if (restorantAddresses.UserCity.Equals(user.City) &&
-                    restorantAddresses.UserCountry.Equals(user.Country) &&
-                    restorantAddresses.UserAddress.StartsWith(user.Address))
+                if (restorantAddresses.UserCity.Equals(fullAddress[1]) &&
+                    restorantAddresses.UserCountry.Equals(fullAddress[2]) &&
+                    restorantAddresses.UserAddress.StartsWith(fullAddress[0]))
                 {
                     filtered.Add(restorantAddresses);
                 }
@@ -162,6 +140,17 @@ value='{res.RestorantAddress+';'+res.RestorantCity+';'+res.RestorantCountry}' se
             return null;
         }
 
-        
+        public static UserModel GetUserModel(string username, string email, string password,
+            string fulladdress, string? phone, string? notes)
+        {
+            UserModel userModel = new UserModel();
+            userModel.FullAddress = fulladdress;
+            userModel.PhoneNumber = phone;
+            userModel.Username = username;
+            userModel.Notes = notes;
+            userModel._Email = email;
+            userModel._Password = password;
+            return userModel;
+        }
     }
 }

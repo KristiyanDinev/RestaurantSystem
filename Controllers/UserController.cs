@@ -46,7 +46,7 @@ namespace ITStepFinalProject.Controllers {
                         Utils.Utils._handleEntryInFile(ref FileData, model, "User");
 
                         UserModel user = await db.GetUser((int)id);
-                        Utils.Utils.ApplyUserBarElement(ref FileData, user);
+                        //Utils.Utils.ApplyUserBarElement(ref FileData, user);
 
                         return Results.Content(FileData, "text/html");
 
@@ -84,7 +84,7 @@ namespace ITStepFinalProject.Controllers {
 
 
             // get front-end login page
-            app.MapGet("/login", async (DatabaseManager db, HttpContext context) => {
+            app.MapGet("/login", async (HttpContext context) => {
 
                     try {
 
@@ -116,12 +116,12 @@ namespace ITStepFinalProject.Controllers {
                         ISession session = context.Session;
 
                         if (Utils.Utils.IsLoggedIn(session) != null) {
-                            throw new Exception();
+                            // user is logged in
+                            return Results.Redirect("/dishes");
                         }
 
                         UserModel user = await db.LoginUser(email, password);
                         Utils.Utils._handleRememberMe(ref session, rememberMe, user.__Id);
-
 
                         await session.CommitAsync();
 
@@ -158,29 +158,26 @@ namespace ITStepFinalProject.Controllers {
             app.MapPost("/register", async (DatabaseManager db, HttpContext context,
                 [FromForm] string username, [FromForm] string password, 
                 [FromForm] string email, [FromForm] string notes,
-                [FromForm] string phone, [FromForm] string address,
+                [FromForm] string phone, [FromForm] string fulladdress,
                 [FromForm] string image, [FromForm] string rememberMe) => {
 
-                    if (address.Equals("") || email.Equals("") || username.Equals("") ||
-                        password.Equals("")) {
+                    if (fulladdress.Length == 0 || email.Length == 0 || username.Length == 0 ||
+                        password.Length == 0) {
                         return Results.BadRequest();
                     }
-
 
                     try {
 
                         ISession session = context.Session;
 
                         if (Utils.Utils.IsLoggedIn(session) != null) {
-                            throw new Exception();
+                            // user is logged in
+                            return Results.Redirect("/dishes");
                         }
 
-                        UserModel userModel = new UserModel();
-                        userModel.Username = username;
-                        userModel.Email = email;
-                        userModel.Address = address;
-                        userModel.PhoneNumber = phone;
-                        userModel.Notes = notes;
+                        UserModel userModel =
+                        Utils.Utils.GetUserModel(username, email, 
+                        DatabaseManager._hashString(password), fulladdress, phone, notes);
 
 
                         // image => "someimage.png;BASE64=="
@@ -189,7 +186,16 @@ namespace ITStepFinalProject.Controllers {
                             userModel.Image = await Utils.Utils.UploadImage(image);
                         }
 
-                        UserModel user = await db.RegisterUser(userModel, password);
+                        db.InsertUser2(userModel);
+                        UserModel? user = await db.GetUser2(userModel, ["_Email", "Username"]);
+                        if (user == null)
+                        {
+                            if (userModel.Image != null && userModel.Image.Length > 0)
+                            {
+                                Utils.Utils.RemoveImage("wwwroot"+userModel.Image);
+                            }
+                            return Results.BadRequest();
+                        }
                         
                         Utils.Utils._handleRememberMe(ref session, rememberMe, user.__Id);
 
@@ -214,7 +220,7 @@ namespace ITStepFinalProject.Controllers {
                         session.Clear();
                         await session.CommitAsync();
 
-                    return Results.Redirect("/login");
+                        return Results.Redirect("/login");
 
                     } catch (Exception) {
                         return Results.Unauthorized();
@@ -226,14 +232,13 @@ namespace ITStepFinalProject.Controllers {
 
             //edit user profile
             app.MapPost("/profile/edit", async (DatabaseManager db, HttpContext context,
-                [FromForm] string username, 
-                [FromForm] string email, [FromForm] string? notes,
-                [FromForm] string? phone, [FromForm] string address,
+                [FromForm] string username, [FromForm] string? notes,
+                [FromForm] string? phone, [FromForm] string fulladdress,
                 [FromForm] string? image, [FromForm] string delete_image) =>
             {
                 try
                 {
-                    if (username.Length == 0 || address.Length == 0 || email.Length == 0) {
+                    if (username.Length == 0 || fulladdress.Length == 0) {
                         return Results.BadRequest();
                     }
 
@@ -244,63 +249,56 @@ namespace ITStepFinalProject.Controllers {
                         return Results.Unauthorized();
                     }
 
-                    int id = (int)userId;
+                    UserModel model = await db.GetUser((int)userId);
 
-                    UserModel model = await db.GetUser(id);
-
-                    UserModel user = new UserModel();
-                    user.__Id = (int) userId;
-
-                    user.Username = model.Username;
+                    string Username = model.Username;
                     if (!model.Username.Equals(username))
                     {
-                        user.Username = username;
+                        Username = username;
                     }
 
-                    user.Email = model.Email;
-                    if (!model.Email.Equals(email))
+                    string FullAddress = model.FullAddress;
+                    if (!model.FullAddress.Equals(fulladdress))
                     {
-                        user.Email = email;
-                    }
-
-                    user.Address = model.Address;
-                    if (!model.Address.Equals(address))
-                    {
-                        user.Address = address;
+                        FullAddress = fulladdress;
                     }
 
                     notes = notes?.Replace(" ","").Length == 0 ? null : notes;
 
-                    user.Notes = model.Notes;
+                    string? Notes = model.Notes;
                     if (model.Notes != notes)
                     {
-                        user.Notes = notes;
+                        Notes = notes;
                     }
 
-                    phone = phone?.Replace(" ", "").Length == 0 ? null : phone;
-
-                    user.PhoneNumber = model.PhoneNumber;
-                    if (model.PhoneNumber != phone)
-                    {
-                        user.PhoneNumber = phone;
-                    }
-
+                    string? Image = null;
                     if (delete_image.Equals("yes") && 
-                    model.Image != null && model.Image.Contains('.'))
+                        model.Image != null && model.Image.Contains('.'))
                     {
                         Utils.Utils.RemoveImage("wwwroot"+model.Image);
-                        user.Image = null;
+                        Image = null;
 
                     } else
                     {
                         image = image?.Replace(" ", "").Length == 0 ? null : image;
-                        user.Image = model.Image;
+                        Image = model.Image;
                         if (image != null)
                         {
-                            user.Image = await Utils.Utils.UploadImage(image);
+                            Image = await Utils.Utils.UploadImage(image);
                         }
                     }
 
+                    phone = phone?.Replace(" ", "").Length == 0 ? null : phone;
+                    string? PhoneNumber = model.PhoneNumber;
+                    if (model.PhoneNumber != phone)
+                    {
+                        PhoneNumber = phone;
+                    }
+
+                    UserModel user = Utils.Utils.GetUserModel(Username, 
+                        model._Email, model._Password, FullAddress, PhoneNumber, Notes);
+
+                    user.__Id = model.__Id;
 
                     db.UpdateUser2(user);
 

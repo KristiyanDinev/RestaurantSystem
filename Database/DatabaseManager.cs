@@ -2,7 +2,6 @@
 using ITStepFinalProject.Utils;
 using Npgsql;
 using NpgsqlTypes;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 
@@ -35,13 +34,11 @@ values
                 CREATE TABLE IF NOT EXISTS Users (
                     __Id SERIAL PRIMARY KEY,
                     Username VARCHAR(100) NOT NULL UNIQUE,
-                    Password VARCHAR(64) NOT NULL,
+                    _Password VARCHAR(64) NOT NULL,
                     Image TEXT,
-                    Address VARCHAR(255) NOT NULL,
-                    City VARCHAR(50) NOT NULL,
-                    Country VARCHAR(50) NOT NULL,
+                    FullAddress TEXT NOT NULL,
                     PhoneNumber VARCHAR(15),
-                    Email VARCHAR(50) NOT NULL UNIQUE,
+                    _Email VARCHAR(50) NOT NULL UNIQUE,
                     Notes VARCHAR(255)
                 );
 
@@ -126,13 +123,13 @@ values
 
         public async Task<UserModel> RegisterUser(UserModel model, string password) {
 
-            string email = _handleStrings(model.Email);
+            string email = _handleStrings(model._Email);
             string hashedPass = _hashString(password);
 
             string sql = @$"INSERT INTO Users 
     (Username, Password, Image, Address, City, Country, PhoneNumber, Email, Notes) VALUES 
     ({_handleStrings(model.Username)}, '{hashedPass}', {_handleStrings(model.Image)}, 
-    {_handleStrings(model.Address)}, {_handleStrings(model.City)}, {_handleStrings(model.Country)}
+    {_handleStrings(model.FullAddress)}, {_handleStrings(model.City)}, {_handleStrings(model.Country)}
     , {_handleStrings(model.PhoneNumber)}, 
     {email}, {_handleStrings(model.Notes)}); 
         SELECT * FROM Users WHERE Email = {email} AND Password = '{hashedPass}';
@@ -419,26 +416,14 @@ values
             StringBuilder stringBuilder = new StringBuilder("UPDATE ")
                 .Append(table).Append(" SET ");
 
-            List<string> properties = ModelUtils.Get_Update_Model_Property_Names(model);
+            List<string> properties = ModelUtils.Get_View_Model_Property_Names(model);
 
-            for (int i = 0; i < properties.Count; i++)
-            {
-                string property = properties[i];
-
-                _SetValue_With_Property(ref stringBuilder, property, model);
-
-                stringBuilder.Append(i == properties.Count - 1 ? " " : ", ");
-            }
+            _SetSQL_Values(ref stringBuilder, model, properties, ", ");
 
             stringBuilder.Append(" WHERE ");
-            for (int i = 0; i < identityProperties.Count; i++)
-            {
-                string property = identityProperties[i];
-                _SetValue_With_Property(ref stringBuilder, property, model);
 
-                stringBuilder.Append(i == properties.Count - 1 ? " " : ", ");
-            }
-            stringBuilder.Append(";");
+            _SetSQL_Values(ref stringBuilder, model, identityProperties, " AND ");
+            stringBuilder.Append(';');
 
             /*
                 string sql = @$"UPDATE Users SET 
@@ -463,14 +448,121 @@ values
 
             if (num <= 0)
             {
-                throw new Exception("Can't update user");
+                throw new Exception("Can't update model");
             }
         }
 
-        public async void UpdateUser2(object model)
+        private async void _InsertModel(object model, string table)
+        {
+            
+            StringBuilder stringBuilder = new StringBuilder("INSERT INTO ")
+                .Append(table).Append(" (");
+
+            List<string> properties = ModelUtils.Get_View_Model_Property_Names(model);
+            properties.AddRange(ModelUtils.Get_Exceptional_Model_Property_Names(model));
+            // username, address, _email, _password
+
+            _ListProperties(ref stringBuilder, properties);
+
+            stringBuilder.Append(") VALUES (");
+
+            _ListValues(ref stringBuilder, properties, model);
+
+            stringBuilder.Append(");");
+
+
+            Console.WriteLine("Insert Model SQL: " + stringBuilder.ToString());
+
+            /*
+             * string sql = @$"INSERT INTO Users 
+    (Username, Password, Image, Address, City, Country, PhoneNumber, Email, Notes) VALUES 
+    ({_handleStrings(model.Username)}, '{hashedPass}', {_handleStrings(model.Image)}, 
+    {_handleStrings(model.FullAddress)}, {_handleStrings(model.City)}, {_handleStrings(model.Country)}
+    , {_handleStrings(model.PhoneNumber)}, 
+    {email}, {_handleStrings(model.Notes)}); 
+        SELECT * FROM Users WHERE Email = {email} AND Password = '{hashedPass}'; */
+
+            var cmd = await DatabaseCommandBuilder.BuildCommand(
+                stringBuilder.ToString(), null);
+            int num = await cmd.ExecuteNonQueryAsync();
+
+            cmd.Connection?.Close();
+            cmd.Dispose();
+
+            if (num <= 0)
+            {
+                throw new Exception("Can't insert model");
+            }
+        }
+
+        private async void _DeleteModel(object model, string table)
+        {
+            StringBuilder stringBuilder = new StringBuilder("DELETE FROM ")
+                .Append(table).Append(" WHERE ");
+
+            _SetSQL_Values(ref stringBuilder, model, 
+                ModelUtils.Get_Identity_Model_Property_Names(model), " AND ");
+
+            Console.WriteLine("Delete Model SQL: "+stringBuilder.ToString());
+
+            var cmd = await DatabaseCommandBuilder.BuildCommand(
+                stringBuilder.ToString(), null);
+            int num = await cmd.ExecuteNonQueryAsync();
+
+            cmd.Connection?.Close();
+            cmd.Dispose();
+
+            if (num <= 0)
+            {
+                throw new Exception("Can't delete model");
+            }
+        }
+
+        private async Task<object?> _SelectModel(object model, string table, 
+            List<string> whereProperties)
+        {
+            // todo add checks for "where" and limiting and ordering
+            StringBuilder stringBuilder = new StringBuilder("SELECT * FROM ")
+                .Append(table).Append(" WHERE ");
+
+            _SetSQL_Values(ref stringBuilder, model,
+                whereProperties, " AND ");
+
+            Console.WriteLine("Select Model SQL: " + stringBuilder.ToString());
+
+            var cmd = await DatabaseCommandBuilder.BuildCommand(
+                stringBuilder.ToString(), null);
+            
+            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+            object? res = null;
+            while (await reader.ReadAsync())
+            {
+                res = ConvertToModel(reader, model);
+            }
+            reader.Close();
+            cmd.Connection?.Close();
+            cmd.Dispose();
+            return res;
+
+        }
+
+        public void UpdateUser2(object model)
         {
             _UpdateModel(model, "Users");
-        } 
+        }
+
+        public void InsertUser2(object model)
+        {
+            _InsertModel(model, "Users");
+        }
+
+        public async Task<UserModel?> GetUser2(object model, 
+            List<string> whereProperties)
+        {
+            object? obj = await _SelectModel(model, "Users", whereProperties);
+            return obj == null ? null : (UserModel) obj;
+        }
 
 
         public static string _hashString(string str) {
@@ -503,6 +595,63 @@ values
             stringBuilder.Append(_handlePropertyValue(model, property));
         }
 
+
+        private static void _ListProperties(ref StringBuilder stringBuilder, 
+            List<string> properties)
+        {
+            for (int i = 0; i < properties.Count; i++)
+            {
+                string property = properties[i];
+                stringBuilder.Append(property)
+                    .Append(i == properties.Count - 1 ? " " : ", ");
+            }
+        }
+
+        private static void _ListValues(ref StringBuilder stringBuilder,
+            List<string> properties, object model)
+        {
+            for (int i = 0; i < properties.Count; i++)
+            {
+                stringBuilder.Append(_handlePropertyValue(model, properties[i]))
+                    .Append(i == properties.Count - 1 ? " " : ", ");
+            }
+        }
+
+        private static void _SetSQL_Values(ref StringBuilder stringBuilder, object model, 
+            List<string> properties, string ending_suffix)
+        {
+            for (int i = 0; i < properties.Count; i++)
+            {
+                string property = properties[i];
+                _SetValue_With_Property(ref stringBuilder, property, model);
+                stringBuilder.Append(i == properties.Count - 1 ? " " : ending_suffix);
+            }
+        }
+
+        private static object? ConvertToModel(NpgsqlDataReader reader, object model)
+        {
+            object obj;
+            if (model is UserModel){
+
+                obj = new UserModel();
+
+            } else if (model is DishModel) {
+                obj = new DishModel();
+
+            } else if (model is CuponModel) {
+                obj = new CuponModel();
+
+            } else {
+                return null;
+            }
+
+            foreach (string property in ModelUtils.Get_All_Model_Property_Names(model))
+            {
+                ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
+            }
+            return obj;
+        }
+
         private static DishModel ConvertToDish(NpgsqlDataReader reader) {
             DishModel dish = new DishModel();
             dish.Id = Convert.ToInt32(reader["id"]);
@@ -519,6 +668,12 @@ values
 
         private static UserModel ConvertToUser(NpgsqlDataReader reader) {
             UserModel user = new UserModel();
+
+            foreach (string property in ModelUtils.Get_All_Model_Property_Names(user))
+            {
+                ModelUtils.Set_Property_Value(user, property, reader[property.ToLower()]);
+            }
+            /*
             user.Username = Convert.ToString(reader["username"]);
             user.Image = Convert.ToString(reader["image"]);
             user.Address = Convert.ToString(reader["address"]);
@@ -527,7 +682,7 @@ values
             user.PhoneNumber = Convert.ToString(reader["phonenumber"]);
             user.Email = Convert.ToString(reader["email"]);
             user.Notes = Convert.ToString(reader["notes"]);
-            user.__Id = Convert.ToInt32(reader["__id"]);
+            user.__Id = Convert.ToInt32(reader["__id"]);*/
             return user;
         }
 

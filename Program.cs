@@ -16,6 +16,9 @@ namespace ITStepFinalProject
             hashing = SHA256.Create();
             resturantAddresses = new List<ResturantAddressModel>();
 
+            Console.WriteLine("Current Working Directory: "+
+                Directory.GetCurrentDirectory());
+
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDistributedMemoryCache();
@@ -87,10 +90,7 @@ namespace ITStepFinalProject
                 }
             }
 
-
             var app = builder.Build();
-
-
 
             app.UseSession();
             app.UseStaticFiles();

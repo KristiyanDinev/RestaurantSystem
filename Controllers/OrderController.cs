@@ -25,7 +25,7 @@ namespace ITStepFinalProject.Controllers {
                     UserModel user = await db.GetUser((int)id);
 
                     Utils.Utils._handleEntryInFile(ref FileData, user, "User");
-                        Utils.Utils.ApplyUserBarElement(ref FileData, user);
+                        //Utils.Utils.ApplyUserBarElement(ref FileData, user);
 
                         return Results.Content(FileData, "text/html");
 

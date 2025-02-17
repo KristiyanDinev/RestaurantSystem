@@ -40,7 +40,7 @@ namespace ITStepFinalProject.Utils
             return _Get_Model_Property_Names_With_Prefix(model, null, false);
         }
 
-        public static List<string> Get_Update_Model_Property_Names(object model)
+        public static List<string> Get_View_Model_Property_Names(object model)
         {
             return _Get_Model_Property_Names_With_Prefix(model, null, true);
         }
@@ -48,6 +48,11 @@ namespace ITStepFinalProject.Utils
         public static object Get_Property_Value(object model, string property)
         {
             return model.GetType().GetProperty(property).GetValue(model);
+        }
+
+        public static void Set_Property_Value(object model, string property, object value)
+        {
+            model.GetType().GetProperty(property).SetValue(model, value, null);
         }
     }
 }
