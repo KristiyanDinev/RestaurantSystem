@@ -148,8 +148,8 @@ value='{res.RestorantAddress+';'+res.RestorantCity+';'+res.RestorantCountry}' se
             userModel.PhoneNumber = phone;
             userModel.Username = username;
             userModel.Notes = notes;
-            userModel._Email = email;
-            userModel._Password = password;
+            userModel.Email = email;
+            userModel.Password = password;
             return userModel;
         }
     }

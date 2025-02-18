@@ -68,11 +68,3 @@ files or anywhere where you can store data.
 
 ### Model system
 Think of this system as one class = one row
-- Model will be a class which has no methods, but only properties with get; and set;
-
-- Model's properties that won't be touched when updating in the database will start with `_property` . 
-  These are like constant properties, except if you edit them by yourself.
-
-- Model's property that is used to identify the model in the database when updating will start with `__property`. 
-  That property will also be included in the `SET`, but it's value won't change, because it will be the same.
-  Also when deleting this value will be used to identify the row.

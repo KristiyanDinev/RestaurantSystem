@@ -8,9 +8,7 @@
         public float TotalPrice { get; set; }
 
         public int UserId { get; set; }
-        public string ResturantAddress { get; set; }
-
-        public List<DishModel> Dishes { get; set; } = new List<DishModel>();
+        public string FullResturantAddress { get; set; } // address;city;country
 
     }
 }

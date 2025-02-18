@@ -120,8 +120,10 @@ namespace ITStepFinalProject.Controllers {
                             return Results.Redirect("/dishes");
                         }
 
-                        UserModel user = await db.LoginUser(email, password);
-                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.__Id);
+
+                        UserModel user = await db.LoginUser(new UserModel(email, password)) ?? throw new Exception("Didn't login");
+
+                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.Id);
 
                         await session.CommitAsync();
 
@@ -187,7 +189,7 @@ namespace ITStepFinalProject.Controllers {
                         }
 
                         db.InsertUser2(userModel);
-                        UserModel? user = await db.GetUser2(userModel, ["_Email", "Username"]);
+                        UserModel? user = await db.GetUser2(userModel, ["Email", "Username"]);
                         if (user == null)
                         {
                             if (userModel.Image != null && userModel.Image.Length > 0)
@@ -197,7 +199,7 @@ namespace ITStepFinalProject.Controllers {
                             return Results.BadRequest();
                         }
                         
-                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.__Id);
+                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.Id);
 
                         await session.CommitAsync();
 
@@ -296,9 +298,9 @@ namespace ITStepFinalProject.Controllers {
                     }
 
                     UserModel user = Utils.Utils.GetUserModel(Username, 
-                        model._Email, model._Password, FullAddress, PhoneNumber, Notes);
+                        model.Email, model.Password, FullAddress, PhoneNumber, Notes);
 
-                    user.__Id = model.__Id;
+                    user.Id = model.Id;
 
                     db.UpdateUser2(user);
 

@@ -2,6 +2,7 @@ using ITStepFinalProject.Controllers;
 using ITStepFinalProject.Database;
 using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.RateLimiting;
 
@@ -15,6 +16,14 @@ namespace ITStepFinalProject
         {
             hashing = SHA256.Create();
             resturantAddresses = new List<ResturantAddressModel>();
+
+            List<string> a = new UserModel().GetType().GetProperties().Select(s => s.Name).ToList();
+            foreach (string a2 in a)
+            {
+                Console.WriteLine(a2);
+            }
+
+            Console.WriteLine("Test: "+string.Join(", ", a));
 
             Console.WriteLine("Current Working Directory: "+
                 Directory.GetCurrentDirectory());
