@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Database;
+using ITStepFinalProject.Database.Models;
 using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,31 +20,31 @@ namespace ITStepFinalProject.Controllers {
 
             // get front-end searched user profile (full page)
             app.MapGet("/profile/{SearchUserIdStr}",
-                async (HttpContext context, DatabaseManager db, 
+                async (HttpContext context, UserDatabaseHandler db, 
                 string SearchUserIdStr) => {
 
-                    int? id = Utils.Utils.IsLoggedIn(context.Session);
+                    int? id = Utils.ControllerUtils.IsLoggedIn(context.Session);
                     if (id == null) {
                         return Results.Redirect("/login");
                     }
 
                     if (SearchUserIdStr.Contains('.')) {
-                        string a = await Utils.Utils.GetFileContent("/profile/" + SearchUserIdStr);
+                        string a = await Utils.ControllerUtils.GetFileContent("/profile/" + SearchUserIdStr);
                         return Results.Content(a);
                     }
 
                     try {
-                        string FileData = await Utils.Utils.GetFileContent(context.Request.Path);
+                        string FileData = await Utils.ControllerUtils.GetFileContent(context.Request.Path);
                         if (!int.TryParse(SearchUserIdStr, out int SearchUserId)) {
 
-                            Utils.Utils._handleEntryInFile(ref FileData, new UserModel(), "User");
+                            Utils.ControllerUtils._handleEntryInFile(ref FileData, new UserModel(), "User");
 
                             return Results.Content(FileData, "text/html");
                         }
 
                         UserModel model = await db.GetUser(SearchUserId);
 
-                        Utils.Utils._handleEntryInFile(ref FileData, model, "User");
+                        Utils.ControllerUtils._handleEntryInFile(ref FileData, model, "User");
 
                         UserModel user = await db.GetUser((int)id);
                         //Utils.Utils.ApplyUserBarElement(ref FileData, user);
@@ -59,20 +60,20 @@ namespace ITStepFinalProject.Controllers {
 
             // get front-end logged user profile (full page)
             app.MapGet("/profile",
-                async (HttpContext context, DatabaseManager db) => {
+                async (HttpContext context, UserDatabaseHandler db) => {
 
-                    int? userId = Utils.Utils.IsLoggedIn(context.Session);
+                    int? userId = Utils.ControllerUtils.IsLoggedIn(context.Session);
                     if (userId == null) {
                         return Results.Redirect("/login");
                     }
 
                     try {
 
-                        string FileData = await Utils.Utils.GetFileContent("/profile");
+                        string FileData = await Utils.ControllerUtils.GetFileContent("/profile");
 
                         UserModel model = await db.GetUser((int)userId);
 
-                        Utils.Utils._handleEntryInFile(ref FileData, model, "User");
+                        Utils.ControllerUtils._handleEntryInFile(ref FileData, model, "User");
 
                         return Results.Content(FileData, "text/html");
 
@@ -88,10 +89,10 @@ namespace ITStepFinalProject.Controllers {
 
                     try {
 
-                        string data = await Utils.Utils.GetFileContent("/login");
+                        string data = await Utils.ControllerUtils.GetFileContent("/login");
 
 
-                        return Utils.Utils.IsLoggedIn(context.Session) != null ?
+                        return Utils.ControllerUtils.IsLoggedIn(context.Session) != null ?
 
                         Results.Redirect("/dishes") :
                         Results.Content(data, "text/html");
@@ -104,7 +105,7 @@ namespace ITStepFinalProject.Controllers {
 
 
             // try loging in
-            app.MapPost("/login", async (DatabaseManager db, HttpContext context,
+            app.MapPost("/login", async (UserDatabaseHandler db, HttpContext context,
                 [FromForm] string email, [FromForm] string password,
                 [FromForm] string rememberMe) => {
 
@@ -115,7 +116,7 @@ namespace ITStepFinalProject.Controllers {
                     try {
                         ISession session = context.Session;
 
-                        if (Utils.Utils.IsLoggedIn(session) != null) {
+                        if (Utils.ControllerUtils.IsLoggedIn(session) != null) {
                             // user is logged in
                             return Results.Redirect("/dishes");
                         }
@@ -123,7 +124,7 @@ namespace ITStepFinalProject.Controllers {
 
                         UserModel user = await db.LoginUser(new UserModel(email, password)) ?? throw new Exception("Didn't login");
 
-                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.Id);
+                        Utils.ControllerUtils._handleRememberMe(ref session, rememberMe, user.Id);
 
                         await session.CommitAsync();
 
@@ -142,9 +143,9 @@ namespace ITStepFinalProject.Controllers {
 
                 try {
 
-                    string data = await Utils.Utils.GetFileContent("/register");
+                    string data = await Utils.ControllerUtils.GetFileContent("/register");
 
-                    return Utils.Utils.IsLoggedIn(context.Session) != null ?
+                    return Utils.ControllerUtils.IsLoggedIn(context.Session) != null ?
 
                     Results.Redirect("/dishes") :
                     Results.Content(data, "text/html");
@@ -157,7 +158,7 @@ namespace ITStepFinalProject.Controllers {
 
 
             // try registering
-            app.MapPost("/register", async (DatabaseManager db, HttpContext context,
+            app.MapPost("/register", async (UserDatabaseHandler db, HttpContext context,
                 [FromForm] string username, [FromForm] string password, 
                 [FromForm] string email, [FromForm] string notes,
                 [FromForm] string phone, [FromForm] string fulladdress,
@@ -172,34 +173,34 @@ namespace ITStepFinalProject.Controllers {
 
                         ISession session = context.Session;
 
-                        if (Utils.Utils.IsLoggedIn(session) != null) {
+                        if (Utils.ControllerUtils.IsLoggedIn(session) != null) {
                             // user is logged in
                             return Results.Redirect("/dishes");
                         }
 
                         UserModel userModel =
-                        Utils.Utils.GetUserModel(username, email, 
-                        DatabaseManager._hashString(password), fulladdress, phone, notes);
+                        Utils.ControllerUtils.GetUserModel(username, email, 
+                        password, fulladdress, phone, notes);
 
 
                         // image => "someimage.png;BASE64=="
 
                         if (image.Length > 0) {
-                            userModel.Image = await Utils.Utils.UploadImage(image);
+                            userModel.Image = await Utils.ControllerUtils.UploadImage(image);
                         }
 
-                        db.InsertUser2(userModel);
-                        UserModel? user = await db.GetUser2(userModel, ["Email", "Username"]);
+                        db.RegisterUser(userModel);
+                        UserModel? user = await db.LoginUser(userModel);
                         if (user == null)
                         {
                             if (userModel.Image != null && userModel.Image.Length > 0)
                             {
-                                Utils.Utils.RemoveImage("wwwroot"+userModel.Image);
+                                Utils.ControllerUtils.RemoveImage("wwwroot"+userModel.Image);
                             }
                             return Results.BadRequest();
                         }
                         
-                        Utils.Utils._handleRememberMe(ref session, rememberMe, user.Id);
+                        Utils.ControllerUtils._handleRememberMe(ref session, rememberMe, user.Id);
 
                         await session.CommitAsync();
 
@@ -215,7 +216,7 @@ namespace ITStepFinalProject.Controllers {
 
 
             // loggout from profile (by clearing session)
-            app.MapPost("/logout", async (DatabaseManager db, HttpContext context) => {
+            app.MapPost("/logout", async (HttpContext context) => {
 
                     try {
                         ISession session = context.Session;
@@ -233,7 +234,7 @@ namespace ITStepFinalProject.Controllers {
 
 
             //edit user profile
-            app.MapPost("/profile/edit", async (DatabaseManager db, HttpContext context,
+            app.MapPost("/profile/edit", async (UserDatabaseHandler db, HttpContext context,
                 [FromForm] string username, [FromForm] string? notes,
                 [FromForm] string? phone, [FromForm] string fulladdress,
                 [FromForm] string? image, [FromForm] string delete_image) =>
@@ -245,7 +246,7 @@ namespace ITStepFinalProject.Controllers {
                     }
 
                     ISession session = context.Session;
-                    int? userId = Utils.Utils.IsLoggedIn(session);
+                    int? userId = Utils.ControllerUtils.IsLoggedIn(session);
                     if (userId == null)
                     {
                         return Results.Unauthorized();
@@ -277,7 +278,7 @@ namespace ITStepFinalProject.Controllers {
                     if (delete_image.Equals("yes") && 
                         model.Image != null && model.Image.Contains('.'))
                     {
-                        Utils.Utils.RemoveImage("wwwroot"+model.Image);
+                        Utils.ControllerUtils.RemoveImage("wwwroot"+model.Image);
                         Image = null;
 
                     } else
@@ -286,7 +287,7 @@ namespace ITStepFinalProject.Controllers {
                         Image = model.Image;
                         if (image != null)
                         {
-                            Image = await Utils.Utils.UploadImage(image);
+                            Image = await Utils.ControllerUtils.UploadImage(image);
                         }
                     }
 
@@ -297,12 +298,12 @@ namespace ITStepFinalProject.Controllers {
                         PhoneNumber = phone;
                     }
 
-                    UserModel user = Utils.Utils.GetUserModel(Username, 
+                    UserModel user = Utils.ControllerUtils.GetUserModel(Username, 
                         model.Email, model.Password, FullAddress, PhoneNumber, Notes);
 
                     user.Id = model.Id;
 
-                    db.UpdateUser2(user);
+                    db.UpdateUser(user);
 
                     return Results.Ok();
 

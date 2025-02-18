@@ -7,7 +7,7 @@
             app.MapGet("/error", async () => {
                 try {
 
-                    string data = await Utils.Utils.GetFileContent("/error");
+                    string data = await Utils.ControllerUtils.GetFileContent("/error");
                     return Results.Content(data, "text/html");
 
                 } catch (Exception) {

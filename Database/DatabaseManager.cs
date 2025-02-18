@@ -89,39 +89,11 @@ values
                 """;
 
 
-            var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
+            var cmd = await DatabaseCommandBuilder.BuildCommand(sql);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
         }
 
-        private async Task<object?> _SelectModel(object model, string table, 
-            List<string> whereProperties)
-        {
-            // todo add checks for "where" and limiting and ordering
-            StringBuilder stringBuilder = new StringBuilder("SELECT * FROM ")
-                .Append(table).Append(" WHERE ");
-
-            _SetSQL_Values(ref stringBuilder, model,
-                whereProperties, " AND ");
-
-            Console.WriteLine("Select Model SQL: " + stringBuilder.ToString());
-
-            var cmd = await DatabaseCommandBuilder.BuildCommand(
-                stringBuilder.ToString(), null);
-            
-            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-            object? res = null;
-            while (await reader.ReadAsync())
-            {
-                res = ConvertToModel(reader, model);
-            }
-            reader.Close();
-            cmd.Connection?.Close();
-            cmd.Dispose();
-            return res;
-
-        }
 
         public static object ConvertToModel(NpgsqlDataReader reader, object model)
         {
@@ -142,13 +114,17 @@ values
 
             foreach (string property in ModelUtils.Get_Model_Property_Names(model))
             {
-                ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
+                try
+                {
+                    ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
+                } catch (Exception)
+                {}
             }
             return obj;
         }
 
         public static async void _ExecuteNonQuery(string sql) {
-            var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
+            var cmd = await DatabaseCommandBuilder.BuildCommand(sql);
             int num = await cmd.ExecuteNonQueryAsync();
 
             cmd.Connection?.Close();
@@ -163,7 +139,7 @@ values
         public static async Task<List<object>> _ExecuteQuery(string sql,
             object model, bool isPrepare)
         {
-            var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
+            var cmd = await DatabaseCommandBuilder.BuildCommand(sql);
 
             if (isPrepare)
             {
@@ -183,10 +159,12 @@ values
             return models;
         }
 
-        public static async void _UpdateModel(string table, Dictionary<string, object> values)
+        public static async void _UpdateModel(string table, Dictionary<string, object> set,
+            Dictionary<string, object> where)
         {
             string sql = new SqlBuilder()
-                .Update(table).Where_Set("SET", values).ToString();
+                .Update(table).Where_Set("SET", set)
+                .Where_Set("WHERE", where).ToString();
 
             Console.WriteLine("Update SQL: " + sql);
             _ExecuteNonQuery(sql);

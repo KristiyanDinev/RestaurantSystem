@@ -1,15 +1,14 @@
 ﻿using Npgsql;
+using System.Data.Common;
 
 namespace ITStepFinalProject.Database {
     public class DatabaseCommandBuilder {
-        public static async Task<NpgsqlCommand> BuildCommand(string sql, 
-            List<NpgsqlParameter>? args = null) {
+        public static string _connectionString = "";
+        public static async Task<NpgsqlCommand> BuildCommand(string sql) {
             var command = new NpgsqlCommand(sql);
-            if (args != null) {
-                command.Parameters.AddRange(args.ToArray());
-            }
-            DatabaseConnection databaseConnection = new DatabaseConnection();
-            command.Connection = await databaseConnection.GetConnectionAsync();
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+            command.Connection = connection;
             return command;
         }
 

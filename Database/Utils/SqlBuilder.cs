@@ -1,4 +1,5 @@
-﻿using ITStepFinalProject.Utils;
+﻿using ITStepFinalProject.Models;
+using ITStepFinalProject.Utils;
 using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
@@ -29,22 +30,39 @@ namespace ITStepFinalProject.Database.Utils
             return this;
         }
 
-        public SqlBuilder Insert(string table, object model)
+        public SqlBuilder Insert(string table, List<object> models)
         {
+            if (models.Count == 0)
+            {
+                return this;
+            }
             sql.Append("INSERT INTO ").Append(table).Append(" (");
 
-            List<string> properties = ModelUtils.Get_Model_Property_Names(model);
+            List<string> properties = ModelUtils.Get_Model_Property_Names(models[0]);
             sql.Append(string.Join(", ", properties))
-                .Append(") VALUES (");
+                .Append(") VALUES ");
 
-            List<object> values = new List<object>();
-            foreach (string property in properties)
+
+            for (int i = 0; i < models.Count; i++)
             {
-                values.Add(ValueHandler.GetModelPropertyValue(model, property));
+                object model = models[i];
+                sql.Append('(');
+                List<object> values = new List<object>();
+                foreach (string property in properties)
+                {
+                    values.Add(ValueHandler.GetModelPropertyValue(model, property));
+                }
+
+                sql.Append(string.Join(", ", values))
+                    .Append(')');
+
+                if (i < models.Count - 1)
+                {
+                    sql.Append(", ");
+                }
             }
 
-            sql.Append(string.Join(", ", values))
-                .Append(") ");
+            
             return this;
         }
 
@@ -78,5 +96,6 @@ namespace ITStepFinalProject.Database.Utils
             sql.Append("DELETE FROM ").Append(table).Append(' ');
             return this;
         }
+
     }
 }

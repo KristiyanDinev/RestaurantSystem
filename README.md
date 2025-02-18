@@ -34,4 +34,4 @@ The `User` is the model name.
 
 - Rework Utils.cs
 - Rework all controllers
-- add checks for "where" and limiting and ordering in DatabaseManager
+- maybe delete DeleteOrderDishes

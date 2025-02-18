@@ -1,44 +1,31 @@
 ﻿using ITStepFinalProject.Models;
+using ITStepFinalProject.Utils;
+using ITStepFinalProject.Database.Utils;
 using Npgsql;
+using System.Linq;
 
 namespace ITStepFinalProject.Database.Models
 {
     public class CuponDatabaseHandler
     {
-        public static async void DeleteCupon(string cuponCode)
+        public async void DeleteCupon(string cuponCode)
         {
-            string cuponSql = $"DELETE FROM Cupons WHERE CuponCode = {_handleStrings(cuponCode)};";
+            Dictionary<string, object> res = new Dictionary<string, object>();
+            res.Add("CuponCode", ValueHandler.Strings(cuponCode));
 
-            var cuponCMD = await DatabaseCommandBuilder.BuildCommand(cuponSql, null);
-            int num = await cuponCMD.ExecuteNonQueryAsync();
-
-            cuponCMD.Connection?.Close();
-            cuponCMD.Dispose();
-
-            if (num <= 0)
-            {
-                throw new Exception("Can't delete cupon");
-            }
+            DatabaseManager._ExecuteNonQuery(new SqlBuilder().Delete("Cupons")
+                .Where_Set("WHERE", res).ToString());
         }
 
-        public static async Task<CuponModel> GetCuponByCode(string cuponCode)
+        public async Task<CuponModel> GetCuponByCode(string cuponCode)
         {
-            string sql = $"SELECT * FROM Cupons WHERE CuponCode = {_handleStrings(cuponCode)}";
+            Dictionary<string, object> res = new Dictionary<string, object>();
+            res.Add("CuponCode", ValueHandler.Strings(cuponCode));
 
-            var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
+            List<object> objects = await DatabaseManager._ExecuteQuery(new SqlBuilder().Select("*", "Cupons")
+                .Where_Set("WHERE", res).ToString(), new CuponModel(), true);
 
-            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-            CuponModel model = new CuponModel();
-            while (await reader.ReadAsync())
-            {
-                model = ConvertToCupon(reader);
-            }
-            reader.Close();
-            cmd.Connection?.Close();
-            cmd.Dispose();
-
-            return model;
+            return (CuponModel)objects[0];
         }
     }
 }

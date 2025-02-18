@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Database;
+using ITStepFinalProject.Database.Models;
 using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -11,20 +12,20 @@ namespace ITStepFinalProject.Controllers {
 
             // get front-end display of your orders
             app.MapGet("/orders", async (HttpContext context, 
-                DatabaseManager db) => {
+                UserDatabaseHandler db) => {
 
                     try {
                         ISession session = context.Session;
-                    int? id = Utils.Utils.IsLoggedIn(session);
+                    int? id = Utils.ControllerUtils.IsLoggedIn(session);
                         if (id == null) {
                             return Results.Unauthorized();
                         }
 
-                        string FileData = await Utils.Utils.GetFileContent("/orders");
+                        string FileData = await Utils.ControllerUtils.GetFileContent("/orders");
 
                     UserModel user = await db.GetUser((int)id);
 
-                    Utils.Utils._handleEntryInFile(ref FileData, user, "User");
+                    Utils.ControllerUtils._handleEntryInFile(ref FileData, user, "User");
                         //Utils.Utils.ApplyUserBarElement(ref FileData, user);
 
                         return Results.Content(FileData, "text/html");
@@ -36,14 +37,14 @@ namespace ITStepFinalProject.Controllers {
 
             // get your own orders
             app.MapPost("/orders", async (HttpContext context,
-                DatabaseManager db) => {
+                OrderDatabaseHandler db) => {
 
                     Dictionary<string, object> data =
                         new Dictionary<string, object>();
 
                     try {
                         ISession session = context.Session;
-                        int? userId = Utils.Utils.IsLoggedIn(session);
+                        int? userId = Utils.ControllerUtils.IsLoggedIn(session);
                         if (userId == null) {
                             return data;
                         }
@@ -62,13 +63,13 @@ namespace ITStepFinalProject.Controllers {
 
             // add dish
             app.MapPost("/order/add", async (HttpContext context, 
-                DatabaseManager db, [FromForm] int dishId, 
+                 [FromForm] int dishId, 
                 [FromForm] float dishPrice) => {
 
                     try {
 
                         ISession session = context.Session;
-                        if (Utils.Utils.IsLoggedIn(session) == null) {
+                        if (Utils.ControllerUtils.IsLoggedIn(session) == null) {
                             return Results.Unauthorized();
                         }
 
@@ -88,11 +89,11 @@ namespace ITStepFinalProject.Controllers {
 
             // get current dishes about to order (not yet ordered)
             app.MapPost("/order/dish/current", async (HttpContext context,
-                DatabaseManager db) =>
+                DishDatabaseHandler db) =>
             {
                 Dictionary<string, object> res = new Dictionary<string, object>();
                 ISession session = context.Session;
-                if (Utils.Utils.IsLoggedIn(session) == null)
+                if (Utils.ControllerUtils.IsLoggedIn(session) == null)
                 {
                     return res;
                 }
@@ -121,12 +122,12 @@ namespace ITStepFinalProject.Controllers {
 
             // remove dish
             app.MapPost("/order/remove", async (HttpContext context,
-                DatabaseManager db, [FromForm] int dishId) => {
+               [FromForm] int dishId) => {
 
                     try {
 
                         ISession session = context.Session;
-                        if (Utils.Utils.IsLoggedIn(session) == null) {
+                        if (Utils.ControllerUtils.IsLoggedIn(session) == null) {
                             return Results.Unauthorized();
                         }
 
@@ -144,13 +145,14 @@ namespace ITStepFinalProject.Controllers {
 
             // start order
             app.MapPost("/order", async (HttpContext context,
-                DatabaseManager db, [FromForm] string notes,
+                CuponDatabaseHandler cuponDb, OrderDatabaseHandler orderDb, 
+                [FromForm] string notes,
                 [FromForm] string cuponCode, [FromForm] string resturantAddress) => {
 
                     try {
 
                         ISession session = context.Session;
-                        int? userId = Utils.Utils.IsLoggedIn(session);
+                        int? userId = Utils.ControllerUtils.IsLoggedIn(session);
                         if (userId == null) {
                             return Results.Unauthorized();
                         }
@@ -161,7 +163,7 @@ namespace ITStepFinalProject.Controllers {
 
                         CuponModel? cupon = null;
                         if (cuponCode.Length > 0) {
-                            cupon = await db.GetCuponByCode(cuponCode);
+                            cupon = await cuponDb.GetCuponByCode(cuponCode);
 
                             if (cupon.ExpirationDate.ToLocalTime() <= DateTime.Now) {
                                 return Results.BadRequest();
@@ -170,13 +172,13 @@ namespace ITStepFinalProject.Controllers {
                             TotalPrice = CalculateTotalPrice(currentPrices,
                                 cupon.DiscountPercent);
                         }
-
-                        db.AddOrder((int)userId,
+                        
+                        orderDb.AddOrder((int)userId,
                             GetDishesFromOrder(session), 
                             notes, TotalPrice, resturantAddress);
 
                         if (cupon != null) {
-                            db.DeleteCupon(cupon.Name);
+                            cuponDb.DeleteCupon(cupon.Name);
                         }
 
                         session.SetString("OrderDishes", "");
@@ -194,12 +196,12 @@ namespace ITStepFinalProject.Controllers {
 
             // stop order
             app.MapPost("/order/stop", async (HttpContext context,
-                DatabaseManager db, [FromForm] int orderId) => {
+                OrderDatabaseHandler db, [FromForm] int orderId) => {
 
                     try {
 
                         ISession session = context.Session;
-                        int? userId = Utils.Utils.IsLoggedIn(session);
+                        int? userId = Utils.ControllerUtils.IsLoggedIn(session);
                         if (userId == null) {
                             return Results.Unauthorized();
                         }

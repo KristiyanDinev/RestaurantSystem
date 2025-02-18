@@ -31,15 +31,12 @@ namespace ITStepFinalProject.Database.Models
             return (UserModel)user[0];
         }
 
-        public async Task<UserModel> RegisterUser(UserModel model)
+        public async void RegisterUser(UserModel model)
         {
             model.Password = ValueHandler.HashString(model.Password);
 
-            List<object> user = await DatabaseManager.
-                _ExecuteQuery(new SqlBuilder().Insert("User", model).ToString(),
-                model, false);
-            
-            return (UserModel)user[0];
+            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                .Insert("User", [model]).ToString());
         }
 
         public async Task<UserModel> LoginUser(UserModel loginUser)
@@ -74,7 +71,10 @@ namespace ITStepFinalProject.Database.Models
                 values.Add(property, ValueHandler.GetModelPropertyValue(model, property));
             }
 
-            DatabaseManager._UpdateModel("User", values);
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("Id", model.Id);
+
+            DatabaseManager._UpdateModel("User", values, where);
         }
 
         public async void DeleteUser(UserModel model)

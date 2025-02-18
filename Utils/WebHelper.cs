@@ -36,7 +36,7 @@ namespace ITStepFinalProject.Utils
             object model, string html)
         {
             foreach (string property in 
-                ModelUtils.Get_All_Model_Property_Names(model))
+                ModelUtils.Get_Model_Property_Names(model))
             {
                 html = html.Replace("{{" + modelName + "." + property + "}}", 
                     Convert.ToString(ModelUtils.Get_Property_Value(model, property)));

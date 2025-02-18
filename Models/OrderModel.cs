@@ -8,7 +8,7 @@
         public float TotalPrice { get; set; }
 
         public int UserId { get; set; }
-        public string FullResturantAddress { get; set; } // address;city;country
+        public string ResturantAddress { get; set; } // address;city;country
 
     }
 }

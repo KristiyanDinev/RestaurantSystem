@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Models;
+using ITStepFinalProject.Database.Utils;
 using Npgsql;
 using System.Text;
 
@@ -6,86 +7,65 @@ namespace ITStepFinalProject.Database.Models
 {
     public class OrderDatabaseHandler
     {
-        public async void AddOrder(int userId, List<int> dishesId,
-            string Notes, float TotalPrice, string ResturantAddress)
+        public async void AddOrder(UserModel user, List<int> dishesId, OrderModel order)
         {
+            order.CurrentStatus = "db";
+            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                .Insert("Orders", [order]).ToString());
 
-            string orderSql = @$"INSERT INTO Orders (CurrentStatus, Notes, TotalPrice, UserId, ResturantAddress) 
-        VALUES ('db', {_handleStrings(Notes)}, 
-        {TotalPrice}, {userId}, {_handleStrings(ResturantAddress)}); 
-            SELECT Id FROM Orders WHERE UserId = {userId} AND CurrentStatus = 'db' LIMIT 1;";
+            Dictionary<string, object> res = new Dictionary<string, object>();
+            res.Add("UserId", user.Id);
+            res.Add("CurrentStatus", "db");
 
-            var orderCMD = await DatabaseCommandBuilder.BuildCommand(orderSql, null);
-            using NpgsqlDataReader reader = await orderCMD.ExecuteReaderAsync();
+            List<object> ordersIdQ = await DatabaseManager._ExecuteQuery(
+                new SqlBuilder().Select("Id", "Orders")
+                .Where_Set("WHERE", res).ToString(), order, true);
 
-            int? orderId = null;
-            while (await reader.ReadAsync())
+            int orderId = int.Parse(Convert.ToString(ordersIdQ[0]));
+
+
+            List<OrderedDishesModel> orderedDishes = new List<OrderedDishesModel>();
+            foreach (int dishId in dishesId)
             {
-                orderId = Convert.ToInt32(reader["id"]);
+                orderedDishes.Add(new OrderedDishesModel(orderId, dishId));
             }
 
-            reader.Close();
-            orderCMD.Connection?.Close();
-            orderCMD.Dispose();
-
-            if (orderId == null)
+            try
             {
-                throw new Exception("Can't get ID of order");
+                DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                    .Insert("OrderedDishes", 
+                    orderedDishes.Cast<object>().ToList()).ToString());
+            } catch (Exception)
+            {
+                DeleteOrder(orderId);
+                throw;
             }
 
-            StringBuilder stringBuilder =
-                new StringBuilder("INSERT INTO OrderedDishes (OrderId, DishId) VALUES ");
+            Dictionary<string, object> set = new Dictionary<string, object>();
+            set.Add("CurrentStatus", "pending");
 
-            for (int i = 0; i < dishesId.Count - 1; i++)
-            {
-                stringBuilder.Append($" ({orderId}, {dishesId[i]}), ");
-            }
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("Id", orderId);
 
-            stringBuilder.Append($" ({orderId}, {dishesId[dishesId.Count - 1]});");
-
-            var dishesCMD = await DatabaseCommandBuilder
-                    .BuildCommand(stringBuilder.ToString(), null);
-            int num = await dishesCMD.ExecuteNonQueryAsync();
-
-            dishesCMD.Connection?.Close();
-            dishesCMD.Dispose();
-
-            if (num <= 0)
-            {
-                DeleteOrder((int)orderId);
-
-                throw new Exception("Did not insert dishes");
-            }
-
-            string updateOrderStatus = "UPDATE Orders SET CurrentStatus = 'pending' WHERE CurrentStatus = 'db' AND Id = " + orderId;
-            var updateCMD = await DatabaseCommandBuilder.BuildCommand(updateOrderStatus, null);
-            await updateCMD.ExecuteNonQueryAsync();
-
-            updateCMD.Connection?.Close();
-            updateCMD.Dispose();
+            DatabaseManager._UpdateModel("Orders", set, where);
         }
 
         public async void DeleteOrder(int orderId)
         {
-            string orderSql = $"DELETE FROM Orders WHERE Id = {orderId};";
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("Id", orderId);
 
-            var orderCMD = await DatabaseCommandBuilder.BuildCommand(orderSql, null);
-            int num = await orderCMD.ExecuteNonQueryAsync();
-
-            orderCMD.Connection?.Close();
-            orderCMD.Dispose();
-
-            if (num <= 0)
-            {
-                throw new Exception("Can't delete order");
-            }
+            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                .Delete("Orders").Where_Set("WHERE", where).ToString());
         }
 
+
+        // maybe delete DeleteOrderDishes
         public async void DeleteOrderDishes(int orderId)
         {
             string orderSql = $"DELETE FROM OrderedDishes WHERE OrderId = {orderId};";
 
-            var orderCMD = await DatabaseCommandBuilder.BuildCommand(orderSql, null);
+            var orderCMD = await DatabaseCommandBuilder.BuildCommand(orderSql);
             int num = await orderCMD.ExecuteNonQueryAsync();
 
             orderCMD.Connection?.Close();
@@ -97,62 +77,28 @@ namespace ITStepFinalProject.Database.Models
             }
         }
 
-        public async Task<List<OrderModel>> GetOrdersByUser(int id)
+        public async Task<List<OrderModel>> GetOrdersByUser(int userId)
         {
-            string sql = "SELECT * FROM Orders WHERE UserId = " + id + @"
-                JOIN OrderedDishes ON OrderedDishes.OrderId = Orders.Id
-                JOIN Dishes ON OrderedDishes.DishId = Dishes.Id";
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("UserId", userId);
 
-            var getOrdersCMD = await DatabaseCommandBuilder.BuildCommand(sql, null);
-            using NpgsqlDataReader reader = await getOrdersCMD.ExecuteReaderAsync();
+            List<object> orderObj = await DatabaseManager._ExecuteQuery(
+                new SqlBuilder().Select("*", "Orders")
+                .Where_Set("WHERE", where).ToString(), new OrderModel(), true);
 
-            List<OrderModel> orders = new List<OrderModel>();
-
-            OrderModel orderModel = new OrderModel();
-            while (await reader.ReadAsync())
-            {
-
-                int lookingAtOrderId = Convert.ToInt32(reader["id"]);
-
-                if (orderModel.Id != lookingAtOrderId)
-                {
-                    orders.Add(orderModel);
-                    orderModel.Dishes.Clear();
-                }
-
-                orderModel = ConvertToOrder(reader, orderModel);
-            }
-            reader.Close();
-            getOrdersCMD.Connection?.Close();
-            getOrdersCMD.Dispose();
-            return orders;
+            return orderObj.Cast<OrderModel>().ToList();
         }
 
-        public async Task<string> GetOrder_CurrentStatus_ById(int id)
+        public async Task<string> GetOrder_CurrentStatus_ById(int orderId)
         {
-            string sql = "SELECT CurrentStatus FROM Orders WHERE Id = " + id;
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("Id", orderId);
 
-            var cmd = await DatabaseCommandBuilder.BuildCommand(sql, null);
+            List<object> results = await DatabaseManager._ExecuteQuery(new SqlBuilder()
+                .Select("CurrentStatus", "Orders").Where_Set("WHERE", where)
+                .ToString(), new OrderModel(), true);
 
-            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-            string? CurrentStatus = null;
-            while (await reader.ReadAsync())
-            {
-                CurrentStatus = Convert.ToString(reader["currentstatus"]);
-            }
-            reader.Close();
-            cmd.Connection?.Close();
-            cmd.Dispose();
-
-            if (CurrentStatus == null)
-            {
-                throw new Exception("No such order");
-            }
-
-            return CurrentStatus;
+            return Convert.ToString(results[0]) ?? "";
         }
-
-
     }
 }

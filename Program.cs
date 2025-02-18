@@ -1,5 +1,6 @@
 using ITStepFinalProject.Controllers;
 using ITStepFinalProject.Database;
+using ITStepFinalProject.Database.Models;
 using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Reflection;
@@ -16,14 +17,6 @@ namespace ITStepFinalProject
         {
             hashing = SHA256.Create();
             resturantAddresses = new List<ResturantAddressModel>();
-
-            List<string> a = new UserModel().GetType().GetProperties().Select(s => s.Name).ToList();
-            foreach (string a2 in a)
-            {
-                Console.WriteLine(a2);
-            }
-
-            Console.WriteLine("Test: "+string.Join(", ", a));
 
             Console.WriteLine("Current Working Directory: "+
                 Directory.GetCurrentDirectory());
@@ -46,12 +39,15 @@ namespace ITStepFinalProject
 
             // postgresql 17 5432
             // postgresql 16 5433
-            DatabaseConnection._connectionString = 
+            DatabaseCommandBuilder._connectionString = 
                 builder.Configuration.GetValue<string>("ConnectionString") ?? "";
 
             DatabaseManager.Setup();
 
-            builder.Services.AddScoped<DatabaseManager>();
+            builder.Services.AddScoped<UserDatabaseHandler>();
+            builder.Services.AddScoped<DishDatabaseHandler>();
+            builder.Services.AddScoped<CuponDatabaseHandler>();
+            builder.Services.AddScoped<OrderDatabaseHandler>();
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
                     ?? "ugyw89ub9Y9H8OP9j1wsfwedS";
@@ -114,7 +110,7 @@ namespace ITStepFinalProject
                     return;
                 }
 
-                if (Utils.Utils.IsDateExpired(session,
+                if (Utils.ControllerUtils.IsDateExpired(session,
                     "UserId_ExpirationDate")) {
                     context.Response.Redirect(uri + "/login");
                     return;

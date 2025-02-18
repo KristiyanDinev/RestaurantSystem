@@ -1,13 +1,8 @@
 ﻿using ITStepFinalProject.Models;
-using System.Security.Claims;
-using static System.Net.Mime.MediaTypeNames;
 using System.Text;
-using ITStepFinalProject.Database;
-using System.Net;
-using System;
 
 namespace ITStepFinalProject.Utils {
-    public class Utils {
+    public class ControllerUtils {
 
         public static bool IsDateExpired(ISession session,
            string key) {

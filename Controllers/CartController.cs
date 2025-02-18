@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Database;
+using ITStepFinalProject.Database.Models;
 using ITStepFinalProject.Models;
 
 namespace ITStepFinalProject.Controllers
@@ -9,22 +10,22 @@ namespace ITStepFinalProject.Controllers
         public CartController(WebApplication app)
         {
             app.MapGet("/cart", async (HttpContext context, 
-                DatabaseManager db) =>
+                UserDatabaseHandler db) =>
             {
                
                 try
                 {
-                    int? id = Utils.Utils.IsLoggedIn(context.Session);
+                    int? id = Utils.ControllerUtils.IsLoggedIn(context.Session);
                     if (id == null)
                     {
                         return Results.Redirect("/login");
                     }
 
-                    string FileData = await Utils.Utils.GetFileContent("/cart");
+                    string FileData = await Utils.ControllerUtils.GetFileContent("/cart");
 
                     UserModel user = await db.GetUser((int)id);
 
-                    Utils.Utils._handleEntryInFile(ref FileData, user, "User");
+                    Utils.ControllerUtils._handleEntryInFile(ref FileData, user, "User");
                     //Utils.Utils.ApplyUserBarElement(ref FileData, user);
 
                     return Results.Content(FileData, "text/html");

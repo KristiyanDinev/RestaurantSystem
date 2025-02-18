@@ -1,6 +1,6 @@
 ﻿namespace ITStepFinalProject.Models
 {
-    public class OrderDishesModels
+    public class OrderJoinDishesModels
     {
         public int OrderId { get; set; }
         public string OrderCurrentStatus { get; set; }
