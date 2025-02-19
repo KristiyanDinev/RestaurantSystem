@@ -29,7 +29,7 @@ namespace ITStepFinalProject.Utils
 
         public static List<string> commonPlaceholders =
         [
-            "{{UserBar}}"
+            "{{UserBar}}", "{{Profile}}"
         ];
 
         public static string FillInPlaceholdersForModel(string modelName,
@@ -48,7 +48,7 @@ namespace ITStepFinalProject.Utils
         {
             try
             {
-                return File.ReadAllText("/Web/" + componet + ".html");
+                return File.ReadAllText("/WebComponent/" + componet + ".html");
             }
             catch (Exception)
             {

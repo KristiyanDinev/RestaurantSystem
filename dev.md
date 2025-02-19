@@ -10,7 +10,7 @@ in order to replace them with the html. How does that work?
 The backend will have a cicle which goes through the common placeholders and check
 whether or not they are in the main html page. If they are not then the 
 placeholders are skiped, because they will not have any effect. If the placeholder is in
-the main html page. It loads the html from the `/Web/Component.html` for that model 
+the main html page. It loads the html from the `/WebComponent/Component.html` for that model 
 and the model is gotten from the database if it has it not currently. Let me break it down.
 
 Model -> the C# class which is used in the backed and in returning results in `POST` endpoints.
@@ -25,7 +25,7 @@ reprecent the list of C# models. Like that you can use these html components to 
 You can use a placeholder which will be replaced with these multiple html components. And like that you have a dynamic Website with server rendering.
 
 Good to note here. The text: `UserBar` in placeholder `{{UserBar}}` will 
-be the component name and it will be searched in `/Web/UserBar.html`. 
+be the component name and it will be searched in `/WebComponent/UserBar.html`. 
 This is the same with all placeholders.
 
 Here is how it works in simple terms:

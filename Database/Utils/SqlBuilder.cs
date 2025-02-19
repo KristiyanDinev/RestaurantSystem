@@ -1,5 +1,4 @@
-﻿using ITStepFinalProject.Models;
-using ITStepFinalProject.Utils;
+﻿using ITStepFinalProject.Utils;
 using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
@@ -16,9 +15,18 @@ namespace ITStepFinalProject.Database.Utils
             return sql.Append(';').ToString();
         }
 
+        /*
+         * <summery> 
+         * fileds: 
+         * MySQL = "Name, Email"
+         * MySQL with aliases = "Users.Name As UserName, User.Email AS UserEmail"
+         * SqlServer = "TOP 3 Name, Email"
+         * 
+         * If you have a list of fields then you can do `string.Join(", ", List)` to get the string.
+         * </summery>
+        */
         public SqlBuilder Select(string fields, string table)
         {
-            // If you have a list of fields then you can do `string.Join(", ", List)` to get the string.
             sql.Append("SELECT ").Append(fields).Append(" FROM ")
                 .Append(table).Append(' ');
             return this;
@@ -66,18 +74,19 @@ namespace ITStepFinalProject.Database.Utils
             return this;
         }
 
-        public SqlBuilder Where_Set(string keyword, Dictionary<string, object> values)
+
+        /*
+         * <summery>
+         * All the vules must be handled and set.
+         * 
+         * conditions -> a list of conditions. A condition is this:
+         * "Username = 'Hi' AND " or "Email = 'something@example.com'"
+         * </summery>
+         */
+        public SqlBuilder Where_Set_On_Having(string keyword, List<string> conditions)
         {
-            // key = Field ; value = Field condition (the value it needs to be handled before passing it here)
-            sql.Append(' ').Append(keyword).Append(' ');
-            int i = 0;
-            foreach (string key in values.Keys)
-            {
-                sql.Append(key).Append(" = ")
-                    .Append(values[key])
-                    .Append(i == values.Keys.Count - 1 ? " " : " AND ");
-                i++;
-            }
+            sql.Append(' ').Append(keyword).Append(' ')
+                .Append(string.Join(", ", conditions)).Append(' ');
             return this;
         }
         
@@ -97,5 +106,22 @@ namespace ITStepFinalProject.Database.Utils
             return this;
         }
 
+        public SqlBuilder Group_By(string fields)
+        {
+            sql.Append(" GROUP BY ").Append(fields).Append(' ');
+            return this;
+        }
+
+        public SqlBuilder Join(string table, string type_of_join)
+        {
+            sql.Append($" {type_of_join} JOIN ").Append(table).Append(' ');
+            return this;
+        }
+
+        public SqlBuilder Order_By(string fields)
+        {
+            sql.Append(" ORDER BY ").Append(fields).Append(' ');
+            return this;
+        }
     }
 }

@@ -4,7 +4,7 @@ using ITStepFinalProject.Utils;
 using Npgsql;
 using System.Reflection;
 
-namespace ITStepFinalProject.Database.Models
+namespace ITStepFinalProject.Database.Handlers
 {
     public class UserDatabaseHandler
     {
@@ -20,13 +20,13 @@ namespace ITStepFinalProject.Database.Models
 
             //string sql = "SELECT * FROM Users WHERE Id = @Id";*/
 
-            Dictionary<string, object> values = new Dictionary<string, object>();
-            values.Add("Id", id);
+            List<string> values = new List<string>();
+            values.Add("Id = "+ id);
 
             List<object> user = await 
                 DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", "User")
-                .Where_Set("WHERE", values).ToString(), new UserModel(), true);
+                .Where_Set_On_Having("WHERE", values).ToString(), new UserModel(), true);
 
             return (UserModel)user[0];
         }
@@ -41,13 +41,13 @@ namespace ITStepFinalProject.Database.Models
 
         public async Task<UserModel> LoginUser(UserModel loginUser)
         {
-            Dictionary<string, object> values = new Dictionary<string, object>();
-            values.Add("Email", ValueHandler.Strings(loginUser.Email));
-            values.Add("Password", '\'' + ValueHandler.HashString(loginUser.Password) + '\'');
+            List<string> values = new List<string>();
+            values.Add("Email = "+ ValueHandler.Strings(loginUser.Email)+" AND ");
+            values.Add("Password = '" + ValueHandler.HashString(loginUser.Password) + '\'');
 
             SqlBuilder sqlBuilder = new SqlBuilder()
                 .Select("*", "Users")
-                .Where_Set("WHERE", values);
+                .Where_Set_On_Having("WHERE", values);
 
             string v = sqlBuilder.ToString();
 
@@ -58,33 +58,43 @@ namespace ITStepFinalProject.Database.Models
             return (UserModel)user[0];
         }
 
+        /*
+         * <summery>
+         * `model` must have one or more properties/fields
+         * </summery>
+         */
         public async void UpdateUser(UserModel model)
         {
-            Dictionary<string, object> values = new Dictionary<string, object>();
-            values.Add("Password", '\'' + ValueHandler.HashString(model.Password) + '\'');
-            foreach (string property in ModelUtils.Get_Model_Property_Names(model))
+            List<string> values = new List<string>();
+            values.Add("Password = '" + ValueHandler.HashString(model.Password) + "' AND ");
+
+            List<string> names = ModelUtils.Get_Model_Property_Names(model);
+            for (int i = 0; i < names.Count; i++)
             {
-                if (property.Equals("Password"))
+                string property = names[i];
+                if (property.Equals("Password") || property.Equals("Id"))
                 {
                     continue;
                 }
-                values.Add(property, ValueHandler.GetModelPropertyValue(model, property));
+                values.Add(property + 
+                    " = "+ ValueHandler.GetModelPropertyValue(model, property) +
+                    (i == names.Count - 1 ? "" : " AND "));
             }
 
-            Dictionary<string, object> where = new Dictionary<string, object>();
-            where.Add("Id", model.Id);
+            List<string> where = new List<string>();
+            where.Add("Id = "+model.Id);
 
             DatabaseManager._UpdateModel("User", values, where);
         }
 
         public async void DeleteUser(UserModel model)
         {
-            Dictionary<string, object> values = new Dictionary<string, object>();
-            values.Add("Id", model.Id);
+            List<string> values = new List<string>();
+            values.Add("Id = " + model.Id);
 
             DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder().Delete("User")
-                .Where_Set("WHERE", values).ToString());
+                .Where_Set_On_Having("WHERE", values).ToString());
         }
     }
 }

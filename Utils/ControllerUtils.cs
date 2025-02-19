@@ -1,4 +1,5 @@
-﻿using ITStepFinalProject.Models;
+﻿using ITStepFinalProject.Database.Handlers;
+using ITStepFinalProject.Models;
 using System.Text;
 
 namespace ITStepFinalProject.Utils {
@@ -146,6 +147,33 @@ value='{res.RestorantAddress+';'+res.RestorantCity+';'+res.RestorantCountry}' se
             userModel.Email = email;
             userModel.Password = password;
             return userModel;
+        }
+
+
+        public static async Task<IResult> HandleDefaultPage(string path, HttpContext context, 
+            UserDatabaseHandler db, bool redirectToError)
+        {
+            try
+            {
+                int? id = IsLoggedIn(context.Session);
+                if (id == null)
+                {
+                    return Results.Redirect("/login");
+                }
+
+                string FileData = await GetFileContent(path);
+
+                UserModel user = await db.GetUser((int)id);
+
+                FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
+
+                return Results.Content(FileData, "text/html");
+
+            }
+            catch (Exception)
+            {
+                return redirectToError ? Results.Redirect("/error") : Results.BadRequest();
+            }
         }
     }
 }

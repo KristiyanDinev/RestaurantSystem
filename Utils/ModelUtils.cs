@@ -4,7 +4,6 @@ namespace ITStepFinalProject.Utils
 {
     public class ModelUtils
     {
-
         private static List<string> _Get_Model_Property_Names(object model)
         {
             List<string> names = new List<string>();
@@ -15,7 +14,6 @@ namespace ITStepFinalProject.Utils
             return names;
         }
 
-  
         public static List<string> Get_Model_Property_Names(object model)
         {
             return _Get_Model_Property_Names(model);

@@ -8,49 +8,7 @@
     </head>
     <body> 
 
-        <label id="profile_value">Image</label>
-        <br>
-        <image id="image" src="{{User.Image}}" alt="user image">
-            <br>
-
-            <input type="file" accept="image/*" id="_image">
-            <br>
-            <label id="profile_value">Preview</label>
-            <br>
-            <img id="review" alt="your image" />
-<br>
-<label id="delete_image_status"></label>
-<br>
-<button onclick="toggleDeleteImage()">Toggle Delete Image</button>
-<br>
-        <label id="profile_value">Username: {{User.Username}}</label>
-        <br>
-        <input class="user-input" type="text" id="username" 
-        maxlength="255" value="{{User.Username}}" placeholder="Username" required>
-        <br>
-
-        <label id="profile_value">Email: {{User.Email}}</label>
-        <br>
-        <input class="user-input" 
-        type="email" id="email" maxlength="50" value="{{User.Email}}" placeholder="Email" required>
-        <br>
-
-        <label id="profile_value">Address: {{User.Address}}</label>
-        <br>
-        <input class="user-input" 
-        type="text" id="address" value="{{User.Address}}" placeholder="Address" required>
-        <br>
-
-        <label id="profile_value">Notes: {{User.Notes}}</p>
-        <br>
-        <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">{{User.Notes}}</textarea>
-        <br>
-
-        <label id="profile_value">Phone Number: {{User.PhoneNumber}}</p>
-            <br>
-            <input class="user-input" 
-            type="phone" id="phone" value="{{User.PhoneNumber}}" maxlength="15" placeholder="Phone Number">
-            <br>
+        {{Profile}}
 
             <p id="Stats"></p>
             <br>

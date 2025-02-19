@@ -1,6 +1,6 @@
 using ITStepFinalProject.Controllers;
 using ITStepFinalProject.Database;
-using ITStepFinalProject.Database.Models;
+using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Reflection;
@@ -16,7 +16,7 @@ namespace ITStepFinalProject
         public static void Main(string[] args)
         {
             hashing = SHA256.Create();
-            resturantAddresses = new List<ResturantAddressModel>();
+            resturantAddresses = new List<ResturantAddressModel>(); 
 
             Console.WriteLine("Current Working Directory: "+
                 Directory.GetCurrentDirectory());
@@ -103,7 +103,14 @@ namespace ITStepFinalProject
 
 
             app.Use(async (HttpContext context, RequestDelegate next) => {
+                Console.WriteLine(context.Request.Path.Value);
 
+                string? v = context.Request.Path.Value;
+                if (v != null && v.Contains('.'))
+                {
+                    await next.Invoke(context);
+                    return;
+                }
                 ISession session = context.Session;
                 await session.LoadAsync();
                 if (!session.IsAvailable) {

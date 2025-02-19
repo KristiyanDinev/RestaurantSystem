@@ -2,8 +2,6 @@
 using ITStepFinalProject.Models;
 using ITStepFinalProject.Utils;
 using Npgsql;
-using NpgsqlTypes;
-using System.Text;
 
 namespace ITStepFinalProject.Database {
     public class DatabaseManager {
@@ -159,12 +157,12 @@ values
             return models;
         }
 
-        public static async void _UpdateModel(string table, Dictionary<string, object> set,
-            Dictionary<string, object> where)
+        public static async void _UpdateModel(string table, List<string> set,
+            List<string> where)
         {
             string sql = new SqlBuilder()
-                .Update(table).Where_Set("SET", set)
-                .Where_Set("WHERE", where).ToString();
+                .Update(table).Where_Set_On_Having("SET", set)
+                .Where_Set_On_Having("WHERE", where).ToString();
 
             Console.WriteLine("Update SQL: " + sql);
             _ExecuteNonQuery(sql);

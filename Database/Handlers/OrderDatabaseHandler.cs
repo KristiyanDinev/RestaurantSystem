@@ -3,7 +3,7 @@ using ITStepFinalProject.Database.Utils;
 using Npgsql;
 using System.Text;
 
-namespace ITStepFinalProject.Database.Models
+namespace ITStepFinalProject.Database.Handlers
 {
     public class OrderDatabaseHandler
     {
@@ -13,13 +13,13 @@ namespace ITStepFinalProject.Database.Models
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Insert("Orders", [order]).ToString());
 
-            Dictionary<string, object> res = new Dictionary<string, object>();
-            res.Add("UserId", user.Id);
-            res.Add("CurrentStatus", "db");
+            List<string> res = new List<string>();
+            res.Add("UserId = "+ user.Id + " AND ");
+            res.Add("CurrentStatus = 'db'");
 
             List<object> ordersIdQ = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder().Select("Id", "Orders")
-                .Where_Set("WHERE", res).ToString(), order, true);
+                .Where_Set_On_Having("WHERE", res).ToString(), order, true);
 
             int orderId = int.Parse(Convert.ToString(ordersIdQ[0]));
 
@@ -41,61 +41,49 @@ namespace ITStepFinalProject.Database.Models
                 throw;
             }
 
-            Dictionary<string, object> set = new Dictionary<string, object>();
-            set.Add("CurrentStatus", "pending");
+            List<string> set = new List<string>();
+            set.Add("CurrentStatus = 'pending'");
 
-            Dictionary<string, object> where = new Dictionary<string, object>();
-            where.Add("Id", orderId);
+            List<string> where = new List<string>();
+            where.Add("Id = "+ orderId);
 
             DatabaseManager._UpdateModel("Orders", set, where);
         }
 
         public async void DeleteOrder(int orderId)
         {
-            Dictionary<string, object> where = new Dictionary<string, object>();
-            where.Add("Id", orderId);
+            List<string> where = new List<string>();
+            where.Add("Id = "+ orderId);
 
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Delete("Orders").Where_Set("WHERE", where).ToString());
-        }
+                .Delete("Orders").Where_Set_On_Having("WHERE", where).ToString());
 
+            List<string> where2 = new List<string>();
+            where2.Add("OrderId = " + orderId);
 
-        // maybe delete DeleteOrderDishes
-        public async void DeleteOrderDishes(int orderId)
-        {
-            string orderSql = $"DELETE FROM OrderedDishes WHERE OrderId = {orderId};";
-
-            var orderCMD = await DatabaseCommandBuilder.BuildCommand(orderSql);
-            int num = await orderCMD.ExecuteNonQueryAsync();
-
-            orderCMD.Connection?.Close();
-            orderCMD.Dispose();
-
-            if (num <= 0)
-            {
-                throw new Exception("Can't delete order");
-            }
+            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                .Delete("OrderedDishes").Where_Set_On_Having("WHERE", where2).ToString());
         }
 
         public async Task<List<OrderModel>> GetOrdersByUser(int userId)
         {
-            Dictionary<string, object> where = new Dictionary<string, object>();
-            where.Add("UserId", userId);
+            List<string> where = new List<string>();
+            where.Add("UserId = "+userId);
 
             List<object> orderObj = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder().Select("*", "Orders")
-                .Where_Set("WHERE", where).ToString(), new OrderModel(), true);
+                .Where_Set_On_Having("WHERE", where).ToString(), new OrderModel(), true);
 
             return orderObj.Cast<OrderModel>().ToList();
         }
 
         public async Task<string> GetOrder_CurrentStatus_ById(int orderId)
         {
-            Dictionary<string, object> where = new Dictionary<string, object>();
-            where.Add("Id", orderId);
+            List<string> where = new List<string>();
+            where.Add("Id = "+ orderId);
 
             List<object> results = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("CurrentStatus", "Orders").Where_Set("WHERE", where)
+                .Select("CurrentStatus", "Orders").Where_Set_On_Having("WHERE", where)
                 .ToString(), new OrderModel(), true);
 
             return Convert.ToString(results[0]) ?? "";
