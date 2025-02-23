@@ -1,0 +1,38 @@
+﻿<div class="menu">
+    <p id="name">{{Dish.Name}}</p>
+
+    <p id="grams">grams /{{Dish.Grams}}/</p>
+
+    <p id="ingr">Ingredients: {{Dish.Ingredients}}</p>
+
+    <image src="{{Dish.Image}}" id="image" alt="No image for now"></image>
+
+    <p id="is_available">"</p>
+
+    <p id="avg_time_to_took">Avrage time to cook: {{Dish.AvrageTimeToCook}} minute/s</p>
+
+    <p id="price">{{Dish.Price}} lv.</p>
+
+    <button id="order" onclick="addToOrder('{{Dish.Id}}', '{{Dish.Price}}', '{{Dish.Name}}')">Add to order</button>
+
+    <script>
+        document.getElementById("is_available").innerHTML = "{{Dish.IsAvailable}}" == "True" ? "Currently Available" : "Currently Not Avaliable"
+        let order = document.getElementById("order")
+        order.onclick = async () => {
+            var formData = new FormData()
+            formData.append("dishId", Number("{{Dish.Id}}"))
+            formData.append("dishPrice", parseFloat("{{Dish.Price}}"))
+
+            const res = await fetch(Host + "/order/add", {
+                method: "POST",
+                body: formData,
+                redirect: 'follow',
+            })
+
+            if (res.status === 200) {
+                alert("Added 1 {{Dish.Name}} dish to your cart.")
+            }
+        }
+
+    </script>
+</div>

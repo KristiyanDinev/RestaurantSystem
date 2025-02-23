@@ -27,10 +27,7 @@ namespace ITStepFinalProject.Utils
          * 
          */
 
-        public static List<string> commonPlaceholders =
-        [
-            "{{UserBar}}", "{{Profile}}"
-        ];
+        public static Dictionary<string, List<string>> commonPlaceholders;
 
         public static string FillInPlaceholdersForModel(string modelName,
             object model, string html)
@@ -48,10 +45,11 @@ namespace ITStepFinalProject.Utils
         {
             try
             {
-                return File.ReadAllText("/WebComponent/" + componet + ".html");
+                return File.ReadAllText("WebComponent/" + componet + ".html");
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return "";
             }
         }
@@ -64,13 +62,14 @@ namespace ITStepFinalProject.Utils
                 return html;
             }
 
+            string fullPlaceholder = componentName;
             componentName = componentName.Remove(0, 2);
             componentName = componentName.Remove(componentName.Length - 2, 2);
 
             string modelHtml = GetHTMLForModel(componentName);
             if (modelHtml.Length == 0)
             {
-                return html.Replace(componentName, "");
+                return html.Replace(fullPlaceholder, "");
             }
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -79,14 +78,14 @@ namespace ITStepFinalProject.Utils
                 stringBuilder.AppendLine(FillInPlaceholdersForModel(modelName, model, modelHtml));
             }
 
-            return html.Replace(componentName, stringBuilder.ToString());
+            return html.Replace(fullPlaceholder, stringBuilder.ToString());
         }
 
 
         public static string HandleCommonPlaceholders(string html, string modelName, 
             List<object> models) { 
         // will the component name be the placeholder the one that is for a whole model? yes
-            foreach (string placeholder in commonPlaceholders)
+            foreach (string placeholder in commonPlaceholders[modelName])
             {
                 html = GetModelsHTML(modelName, models, html, placeholder);
             }

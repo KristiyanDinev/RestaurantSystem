@@ -17,6 +17,7 @@
     <p id="dish_stats"></p>
 
     <div id="dishes">
+        {{DishCart}}
     </div>
 
     <div>
@@ -31,10 +32,9 @@
 
     <div>
         <p id="p_for_order">Resturant Address</p>
-        <select id="resturant_address">
-            <option value="" selected="selected">Address1</option>
+        <select id="restorant_address">
+            {{RestorantAddress}}
         </select>
-        <input id="resturant_address" placeholder="Address1">
     </div>
 
     <button class="start_order" onclick="startOrder()">Order</button>

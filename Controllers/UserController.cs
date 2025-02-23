@@ -22,8 +22,8 @@ namespace ITStepFinalProject.Controllers {
             app.MapGet("/profile",
                 async (HttpContext context, UserDatabaseHandler db) => {
 
-                    return await ControllerUtils.HandleDefaultPage("/profile",
-                        context, db, true);
+                    return await ControllerUtils.HandleDefaultPage_WithUserModel("/profile",
+                        context, db);
 
             }).RequireRateLimiting("fixed");
 
@@ -67,7 +67,8 @@ namespace ITStepFinalProject.Controllers {
                         UserModel user = await db.LoginUser(new UserModel(email, password)) 
                             ?? throw new Exception("Didn't login");
 
-                        ControllerUtils._handleRememberMe(ref session, rememberMe, user.Id);
+                        ControllerUtils.HandleRememberMe(ref session, rememberMe, user.Id);
+                        ControllerUtils.SaveModelToSession(ref session, "User", user);
 
                         await session.CommitAsync();
 
@@ -129,8 +130,8 @@ namespace ITStepFinalProject.Controllers {
                         if (image.Length > 0) {
                             userModel.Image = await ControllerUtils.UploadImage(image);
                         }
+                        db.RegisterUser(new InsertUserModel(userModel));
 
-                        db.RegisterUser(userModel);
                         UserModel? user = await db.LoginUser(userModel);
                         if (user == null)
                         {
@@ -141,7 +142,8 @@ namespace ITStepFinalProject.Controllers {
                             return Results.BadRequest();
                         }
                         
-                        ControllerUtils._handleRememberMe(ref session, rememberMe, user.Id);
+                        ControllerUtils.HandleRememberMe(ref session, rememberMe, user.Id);
+                        ControllerUtils.SaveModelToSession(ref session, "User", user);
 
                         await session.CommitAsync();
 

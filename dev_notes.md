@@ -30,3 +30,40 @@ The name `Handlers` means to handle a specific area or problem, while the `Manag
 it is repeated for all handlers.
 
 What about the `Helpers`. Like `WebHelper.cs`. I like to think of helpers as of 
+
+
+
+### DB
+If you have a `float` or `double` property in your model in C# class that points to a `decimal` field in the DB.
+Please change it, because it won't convert. Change th property to a `decimal`. Decimal can still have a floating point and
+it is used like `1.23m`.
+
+### Controllers
+If you want to use simple body post form `[FromForm] class something` or more simpler `[FromForm] string username`
+The same thing applies to queries which is `search?id=....&title=...` in the url `[FromQuery] class/string type`.
+How about uploading files? Use `[FromFrom] string base64File` then decode it. 
+**Be of warning to set upload limits or else you service may crash or slow down, because of large files.**
+I usualy DisableAntiforgery(), because that key work like this: User sends request to your server. You server has a job to check if that request was 
+intentional made from the original website or app or was it send by someone who is trying to break through. 
+And basicly if the request has this key it is verified and can continue, but I say no, because first the guy may have the key, 
+because it may got exposed or the guy can simply redirect the user's requests so the key can be autofilled. So I don't trust it
+completely. I say a better way is to use `Encryption`. If you get an request that contains the data in an valid `encrypted` state,
+then it is most likely the original user who is making that requst, because how can the guy who is trying to manipulate the server
+into making his request accepted if he doesn't have the `encryption key`? Here we apply the same idea of an identifer for validation, but
+in our case only the server knows that this data actually came from the user. I say that you use this method if you need to send
+a protected request to your server and if you don't know much about the framework you use it still works fine as long as you hide that key.
+See the guy may get the `encrypted` data, but he can't decrypt it, because he doesn't have the key, while in the `Antiforgery` situation
+he can get the get and manipulate the server if he is skilled enough. What if he resends the same request he recored with the same encrypted data?
+When then that request will be accepted, but here is more of a question on how do you handle your request. Does it just do the action it is
+expected to do or does it check the data on the server and user and then do what it is expected to do.
+
+
+### Tips
+Please keep your code clean and small. By `small` I mean no more then 500 to 1000 lines per file. I myself am still trying to keep it this way.
+If you file is more then these lines then consider making another file that handles the other part of it. Don't use too much abstraction. Here is how 
+you would know if you use too much abstraction or not. `Abstraction` is like a library or framework or a class you made yourself that takes care of helping you in your project 
+and you use that `abstraction` turn big parts of your code to smaller parts of your code. Too much abstraction is when you basicly have to edit the `abstraction` class more then the classes in 
+your project. Like the `abstraction` classes become a large amout of your project as files and libraries and you basicly edit the `abstraction` rather then the code for the project itself.
+The main idea of `abstraction` is to make your code smaller by handling often used statements. Too little abstraction is when you repeat yourself too much and after a month you can't understand 
+a thing of what you wrote, because it is so much code or poor variable and class names.
+

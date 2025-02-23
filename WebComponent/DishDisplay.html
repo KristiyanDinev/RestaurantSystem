@@ -1,0 +1,60 @@
+﻿<div id="whole_food">
+
+
+    <div class="food" style="opacity: 50%;">
+        <p class="food_name">{{Dish.Name}}</p>
+        <p class="food_grams">grams: /{{Dish.Grams}}/</p>
+        <img id="desasadw">
+        <p class="food_price">{{Dish.Price}} lv.</p>
+    </div>
+
+    <div>
+        <button id="order" style="opacity: 50%;" onclick="">Add to order</button>
+    </div>
+
+    <script>
+        if ("{{Dish.Image}}".length > 0) {
+            let imageI = document.getElementById("desasadw")
+            imageI.className = "food_image"
+            imageI.src = Host + "{{Dish.Image}}"
+        }
+
+            let orderDiv = document.createElement('div')
+            let order = document.createElement('button')
+            order.id = "order"
+            order.innerHTML = "Add to order"
+            order.style.opacity = "50%"
+        orderDiv.onclick = () => { }
+
+
+        if ("{{Dish.IsAvailable}}" == "True") {
+            let foodDiv = document.getElementsByClassName("food")[0]
+            foodDiv.style.opacity = "100%"
+            foodDiv.onclick = () => {
+                let params = new URLSearchParams()
+                params.append("dishId", "{{Dish.Id}}")
+                window.location.href = "/dish/id?" + params.toString()
+            }
+
+            let order = document.getElementById("order")
+                order.style.opacity = "100%"
+                order.onclick = async () => {
+                    var formData = new FormData()
+                    formData.append("dishId", Number("{{Dish.Id}}"))
+                    formData.append("dishPrice", parseFloat("{{Dish.Price}}"))
+
+                    const res = await fetch(Host + "/order/add", {
+                        method: "POST",
+                        body: formData,
+                        redirect: 'follow',
+                    })
+
+                    if (res.status === 200) {
+                        alert("Added 1 {{Dish.Name}} dish to your cart.")
+                    }
+                }
+            }
+    </script>
+
+
+</div>

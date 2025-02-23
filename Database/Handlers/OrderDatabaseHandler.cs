@@ -1,24 +1,23 @@
 ﻿using ITStepFinalProject.Models;
 using ITStepFinalProject.Database.Utils;
-using Npgsql;
-using System.Text;
 
 namespace ITStepFinalProject.Database.Handlers
 {
     public class OrderDatabaseHandler
     {
-        public async void AddOrder(UserModel user, List<int> dishesId, OrderModel order)
+        private static readonly string table = "Orders";
+        public async void AddOrder(UserModel user, List<int> dishesId, InsertOrderModel order)
         {
             order.CurrentStatus = "db";
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert("Orders", [order]).ToString());
+                .Insert(table, [order]).ToString());
 
             List<string> res = new List<string>();
             res.Add("UserId = "+ user.Id + " AND ");
             res.Add("CurrentStatus = 'db'");
 
             List<object> ordersIdQ = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder().Select("Id", "Orders")
+                new SqlBuilder().Select("Id", table)
                 .Where_Set_On_Having("WHERE", res).ToString(), order, true);
 
             int orderId = int.Parse(Convert.ToString(ordersIdQ[0]));
@@ -37,7 +36,11 @@ namespace ITStepFinalProject.Database.Handlers
                     orderedDishes.Cast<object>().ToList()).ToString());
             } catch (Exception)
             {
-                DeleteOrder(orderId);
+                List<string> where2 = new List<string>();
+                where2.Add("Id = " + orderId);
+
+                DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                    .Delete(table).Where_Set_On_Having("WHERE", where2).ToString());
                 throw;
             }
 
@@ -47,7 +50,7 @@ namespace ITStepFinalProject.Database.Handlers
             List<string> where = new List<string>();
             where.Add("Id = "+ orderId);
 
-            DatabaseManager._UpdateModel("Orders", set, where);
+            DatabaseManager._UpdateModel(table, set, where);
         }
 
         public async void DeleteOrder(int orderId)
@@ -56,7 +59,7 @@ namespace ITStepFinalProject.Database.Handlers
             where.Add("Id = "+ orderId);
 
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Delete("Orders").Where_Set_On_Having("WHERE", where).ToString());
+                .Delete(table).Where_Set_On_Having("WHERE", where).ToString());
 
             List<string> where2 = new List<string>();
             where2.Add("OrderId = " + orderId);
@@ -71,7 +74,7 @@ namespace ITStepFinalProject.Database.Handlers
             where.Add("UserId = "+userId);
 
             List<object> orderObj = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder().Select("*", "Orders")
+                new SqlBuilder().Select("*", table)
                 .Where_Set_On_Having("WHERE", where).ToString(), new OrderModel(), true);
 
             return orderObj.Cast<OrderModel>().ToList();
@@ -83,10 +86,10 @@ namespace ITStepFinalProject.Database.Handlers
             where.Add("Id = "+ orderId);
 
             List<object> results = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("CurrentStatus", "Orders").Where_Set_On_Having("WHERE", where)
+                .Select("CurrentStatus", table).Where_Set_On_Having("WHERE", where)
                 .ToString(), new OrderModel(), true);
 
-            return Convert.ToString(results[0]) ?? "";
+            return ((OrderModel)results[0]).CurrentStatus;
         }
     }
 }

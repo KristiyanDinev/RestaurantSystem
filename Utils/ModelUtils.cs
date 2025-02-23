@@ -21,12 +21,17 @@ namespace ITStepFinalProject.Utils
 
         public static object Get_Property_Value(object model, string property)
         {
-            return model.GetType().GetProperty(property).GetValue(model);
+            return Get_PropertyInfo(model, property).GetValue(model);
         }
 
         public static void Set_Property_Value(object model, string property, object value)
         {
-            model.GetType().GetProperty(property).SetValue(model, value, null);
+            Get_PropertyInfo(model, property).SetValue(model, value, null);
+        }
+
+        public static PropertyInfo? Get_PropertyInfo(object model, string property)
+        {
+            return model.GetType().GetProperty(property);
         }
     }
 }

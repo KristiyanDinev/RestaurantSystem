@@ -9,12 +9,12 @@ namespace ITStepFinalProject.Database.Utils
 
         public static string HashString(string str)
         {
-            return Encoding.ASCII.GetString(
+            return Convert.ToBase64String(
                 Program.hashing?.ComputeHash(
-                    Encoding.ASCII.GetBytes(str + _hashingSlat)) ?? []);
+                    Encoding.UTF8.GetBytes(str + _hashingSlat)) ?? []);
         }
 
-        public static string Strings(object str)
+        public static string Strings(object? str)
         {
             return str == null || ((string)str).Replace(" ", "").Length == 0 ?
                 "null" : "'" + ((string)str).Replace("'", "''") + "'";
@@ -23,7 +23,7 @@ namespace ITStepFinalProject.Database.Utils
         public static object GetModelPropertyValue(object model, string property)
         {
             object value = ModelUtils.Get_Property_Value(model, property);
-            if (value is string)
+            if (value is string || value == null)
             {
                 value = Strings(value);
             }

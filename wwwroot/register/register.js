@@ -50,22 +50,21 @@ function submit() {
         country.value.replace(" ", "").length === 0 ||
         email.value.replace(" ", "").length === 0) {
         
-        document.getElementById("Stats").innerHTML = "Requred Inputs: Username, Email and Address"
+        document.getElementById("Stats").innerHTML = "Requred Inputs: Username, Password, Email, Address, City and Country."
        return;
     }
 
-
+    let v = document.getElementById("State")
     let formData = new FormData()
     formData.append("username", username.value)
     formData.append("password", password.value)
     formData.append("email", email.value)
     formData.append("notes", document.getElementById("Notes").value)
-    formData.append("address", address.value)
-    formData.append("city", city.value)
-    formData.append("country", country.value)
+    formData.append("fulladdress", address.value + ";"+ city.value+";" + v.value + ";"+ country.value)
     formData.append("phone", document.getElementById("Phone").value)
-    formData.append("rememberMe", document.getElementById("RememberMe").value)
     formData.append("image", ImageFile)
+    formData.append("rememberMe", document.querySelector('#RememberMe:checked') === null ?
+                                 "off" : "on")
 
     fetch(Host + "/register", {
         method: "POST",

@@ -2,8 +2,8 @@ using ITStepFinalProject.Controllers;
 using ITStepFinalProject.Database;
 using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
+using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.RateLimiting;
 
@@ -12,14 +12,16 @@ namespace ITStepFinalProject
     public class Program
     {
         public static HashAlgorithm hashing;
-        public static List<ResturantAddressModel> resturantAddresses;
+        public static List<RestorantAddressModel> resturantAddresses;
+        public static string currentDir;
         public static void Main(string[] args)
         {
             hashing = SHA256.Create();
-            resturantAddresses = new List<ResturantAddressModel>(); 
+            resturantAddresses = new List<RestorantAddressModel>();
+            currentDir = Directory.GetCurrentDirectory();
 
-            Console.WriteLine("Current Working Directory: "+
-                Directory.GetCurrentDirectory());
+
+            Console.WriteLine("Current Working Directory: "+ currentDir);
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,13 @@ namespace ITStepFinalProject
             // postgresql 16 5433
             DatabaseCommandBuilder._connectionString = 
                 builder.Configuration.GetValue<string>("ConnectionString") ?? "";
+
+            WebHelper.commonPlaceholders = new Dictionary<string, List<string>>{
+                                                {"User", ["{{UserBar}}", "{{Profile}}"]},
+                                                {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}"]},
+                                                {"Order", ["{{OrderDisplay}}"]},
+                                                {"Restorant", ["{{RestorantAddress}}"] }, 
+                };
 
             DatabaseManager.Setup();
 
@@ -76,16 +85,18 @@ namespace ITStepFinalProject
 
                     string[] userAddressParts = parts[0].Split(';');
 
-                    ResturantAddressModel resturant = new ResturantAddressModel();
+                    RestorantAddressModel resturant = new RestorantAddressModel();
                     resturant.AvrageTime = parts[1];
                     resturant.UserAddress = userAddressParts[0];
                     resturant.UserCity = userAddressParts[1];
-                    resturant.UserCountry = userAddressParts[2];
+                    resturant.UserState = userAddressParts[2];
+                    resturant.UserCountry = userAddressParts[3];
 
                     string[] restorantAddressParts = parts[2].Split(';');
                     resturant.RestorantAddress = restorantAddressParts[0];
                     resturant.RestorantCity = restorantAddressParts[1];
-                    resturant.RestorantCountry = restorantAddressParts[2];
+                    resturant.RestorantState = restorantAddressParts[2];
+                    resturant.RestorantCountry = restorantAddressParts[3];
 
                     resturantAddresses.Add(resturant);
 
@@ -98,26 +109,35 @@ namespace ITStepFinalProject
             var app = builder.Build();
 
             app.UseSession();
-            app.UseStaticFiles();
             app.UseRateLimiter();
+            app.UseStaticFiles();
 
 
             app.Use(async (HttpContext context, RequestDelegate next) => {
-                Console.WriteLine(context.Request.Path.Value);
 
+                /* something like: /login/login.js
                 string? v = context.Request.Path.Value;
                 if (v != null && v.Contains('.'))
                 {
-                    await next.Invoke(context);
-                    return;
-                }
+                    context.Response.Clear();
+                    string s = await ControllerUtils.GetFileContent(v);
+                    if (!v.EndsWith(".js") && !v.EndsWith(".css") && !v.EndsWith(".html"))
+                    {
+                        await context.Response.WriteAsync(s);
+                        
+                    } else
+                    {
+                        await context.Response.WriteAsync(s);
+                    }
+                        return;
+                }*/
                 ISession session = context.Session;
                 await session.LoadAsync();
                 if (!session.IsAvailable) {
                     return;
                 }
 
-                if (Utils.ControllerUtils.IsDateExpired(session,
+                if (ControllerUtils.IsDateExpired(session,
                     "UserId_ExpirationDate")) {
                     context.Response.Redirect(uri + "/login");
                     return;

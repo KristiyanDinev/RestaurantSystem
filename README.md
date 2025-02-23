@@ -24,14 +24,9 @@ The `User` is the model name.
  but if the CurrentStatus is `pending` thne the order is ready to be accepted and it can be cancelled
 
 
-- `ResturantAddressAvrageDeliverTime` -> has format of `ul. User;Sofia;Bulgaria|5m - 10m|ul. Resturatn;Sofia;Bulgaria---ul. User2;Sofia;Bulgaria|1m - 2m|ul. Resturatn;Sofia;Bulgaria`
+- `ResturantAddressAvrageDeliverTime` -> has format of `ul. User;Sofia;;Bulgaria|5m - 10m|ul. Resturatn;Sofia;;Bulgaria---ul. User2;Sofia;;Bulgaria|1m - 2m|ul. Resturatn;Sofia;;Bulgaria`
+  `local user address;user City;user State (can be empty if none);user Country|Avrage Time to Deliver|local restorant address;restorant city;restorant state;resturant country`
 
 ### TODO
 - Maybe Cupon Controller. We will see.
-- The user to be able to start orders and to see all his orders
-- RestorantAddress builder for appsettings.json
-- Update all things with the new Model System and WebHelper.
-
-- Rework Utils.cs
-- Rework all controllers
-- maybe delete DeleteOrderDishes
+- InsertRestorantModel.

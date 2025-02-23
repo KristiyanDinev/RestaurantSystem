@@ -12,7 +12,9 @@ namespace ITStepFinalProject.Database.Utils
 
         public override string ToString()
         {
-            return sql.Append(';').ToString();
+            string v = sql.Append(';').ToString();
+            Console.WriteLine("SQL Builder: " + v);
+            return v;
         }
 
         /*
@@ -85,8 +87,13 @@ namespace ITStepFinalProject.Database.Utils
          */
         public SqlBuilder Where_Set_On_Having(string keyword, List<string> conditions)
         {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (string condition in conditions)
+            {
+                stringBuilder.Append(condition);
+            }
             sql.Append(' ').Append(keyword).Append(' ')
-                .Append(string.Join(", ", conditions)).Append(' ');
+                .Append(stringBuilder.ToString()).Append(' ');
             return this;
         }
         

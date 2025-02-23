@@ -6,6 +6,9 @@ using Npgsql;
 namespace ITStepFinalProject.Database {
     public class DatabaseManager {
         // Username, password and email are required
+        // Username: 123
+        // email: 123@example.com
+        // password: 123
 
         /*
          * 
@@ -33,7 +36,7 @@ values
                     Id SERIAL PRIMARY KEY,
                     Username VARCHAR(100) NOT NULL UNIQUE,
                     Password VARCHAR(64) NOT NULL,
-                    Image TEXT,
+                    Image VARCHAR(255),
                     FullAddress TEXT NOT NULL,
                     PhoneNumber VARCHAR(15),
                     Email VARCHAR(50) NOT NULL UNIQUE,
@@ -59,7 +62,7 @@ values
                     Notes VARCHAR(255),
                     OrderedAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
                     UserId INT REFERENCES Users(Id),
-                    ResturantAddress TEXT NOT NULL,
+                    RestorantAddress TEXT NOT NULL,
                     TotalPrice NUMERIC(10, 2) NOT NULL
                 );
 
@@ -115,7 +118,7 @@ values
                 try
                 {
                     ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
-                } catch (Exception)
+                } catch (Exception e)
                 {}
             }
             return obj;

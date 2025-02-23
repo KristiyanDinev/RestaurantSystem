@@ -1,6 +1,7 @@
 ﻿using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
 using System.Text;
+using System.Text.Json;
 
 namespace ITStepFinalProject.Utils {
     public class ControllerUtils {
@@ -25,7 +26,7 @@ namespace ITStepFinalProject.Utils {
             return byteArray;
         }
 
-        public static void _handleRememberMe(ref ISession session,
+        public static void HandleRememberMe(ref ISession session,
             string remeberMe, int Id) {
 
             session.SetInt32("UserId", Id);
@@ -45,50 +46,6 @@ namespace ITStepFinalProject.Utils {
 
             } else {
                 return await File.ReadAllTextAsync($"wwwroot{path}/Index.html");
-            }
-
-        }
-
-
-
-        public static void ApplyRestorantAddress(ref string data, UserModel user)
-        {
-            List<ResturantAddressModel> filtered = new List<ResturantAddressModel>();
-            string[] fullAddress = user.FullAddress.Split(';');
-
-            foreach (ResturantAddressModel restorantAddresses 
-                in Program.resturantAddresses)
-            {
-                if (restorantAddresses.UserCity.Equals(fullAddress[1]) &&
-                    restorantAddresses.UserCountry.Equals(fullAddress[2]) &&
-                    restorantAddresses.UserAddress.StartsWith(fullAddress[0]))
-                {
-                    filtered.Add(restorantAddresses);
-                }
-            }
-
-            StringBuilder stringBuilder = new StringBuilder("<select id=\"resturant_address\">");
-
-            foreach (ResturantAddressModel res in filtered)
-            {
-                stringBuilder.AppendLine($@"<option 
-value='{res.RestorantAddress+';'+res.RestorantCity+';'+res.RestorantCountry}' selected='selected'>{
-                    res.RestorantAddress +", "+res.RestorantCity+", "+res.RestorantCountry + " : "+res.AvrageTime
-                    }</option>");
-            }
-
-            stringBuilder.Append("</select>");
-            data = data.Replace("{{ResturantAddress}}", stringBuilder.ToString());
-        }
-
-        public static void _handleEntryInFile(ref string FileData, 
-            object model, string prefix) {
-            Type type = model.GetType();
-            foreach (string property in
-                    type.GetProperties().Select(f => f.Name).ToList()) {
-
-                FileData = FileData.Replace("{{" +prefix +"."+ property + "}}",
-                    Convert.ToString(type.GetProperty(property).GetValue(model)));
             }
 
         }
@@ -150,11 +107,80 @@ value='{res.RestorantAddress+';'+res.RestorantCity+';'+res.RestorantCountry}' se
         }
 
 
-        public static async Task<IResult> HandleDefaultPage(string path, HttpContext context, 
-            UserDatabaseHandler db, bool redirectToError)
+        public static List<RestorantAddressModel> GetRestorantsForUser(UserModel user)
+        {
+            List<RestorantAddressModel> resturantAddressModels = new List<RestorantAddressModel>();
+            // of the user by himself
+            string[] parts = user.FullAddress.Split(";");
+            string address = parts[0];
+            string city = parts[1];
+            string state = parts[2];
+            string country = parts[3];
+
+            // get resurant addresses that serve to user address
+            foreach (RestorantAddressModel addressOnServer in Program.resturantAddresses)
+            {
+                // restorant address - the location of the restorant from where they serve
+                // user addres - the location of the user which the restoract can serve
+                // we check if the restorant can serve the user
+                // of the server by the admins
+                if (addressOnServer.UserCity.Equals(city) &&
+                    addressOnServer.UserCountry.Equals(country) &&
+                    addressOnServer.UserAddress.StartsWith(address))
+                {
+                    // is State is provided on user end, but the restorant doesn't serve in that State then skip.
+                    // State is optional
+                    if (state.Length > 0 && !addressOnServer.UserState.Equals(state))
+                    {
+                        continue;
+                    }
+
+                    resturantAddressModels.Add(addressOnServer);
+                }
+            }
+            return resturantAddressModels;
+        }
+
+        public static JsonElement GetModelFromSession(ISession session, string modelName)
+        {
+            return JsonSerializer.Deserialize<JsonElement>(session.GetString(modelName));
+            /*
+            string key = modelName+":" + modelID + ":";
+            foreach (string property in ModelUtils.Get_Model_Property_Names(model))
+            {
+                if (ModelUtils.Get_PropertyInfo(model, property).PropertyType is int)
+                {
+                    ModelUtils.Set_Property_Value(model, property,
+                        session.Get(key + property));
+                } else
+                {
+                    ModelUtils.Set_Property_Value(model, property,
+                        session.GetString(key + property));
+                }
+                    
+            }
+            return model;*/
+        }
+
+        public static void SaveModelToSession(ref ISession session,
+            string modelName, object model)
+        {
+            /*
+            string key = modelName + ":" + modelID + ":";
+            foreach (string property in ModelUtils.Get_Model_Property_Names(model))
+            {
+                session.SetString(key+property, 
+                    Convert.ToString(ModelUtils.Get_Property_Value(model, property) ?? ""));
+            }*/
+            session.SetString(modelName, JsonSerializer.Serialize(model));
+        }
+
+        public static async Task<IResult> HandleDefaultPage_WithUserModel(string path, HttpContext context, 
+            UserDatabaseHandler db)
         {
             try
             {
+                ISession session = context.Session;
                 int? id = IsLoggedIn(context.Session);
                 if (id == null)
                 {
@@ -163,7 +189,7 @@ value='{res.RestorantAddress+';'+res.RestorantCity+';'+res.RestorantCountry}' se
 
                 string FileData = await GetFileContent(path);
 
-                UserModel user = await db.GetUser((int)id);
+                UserModel user = GetModelFromSession(session, "User").Deserialize<UserModel>();
 
                 FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
 
@@ -172,7 +198,7 @@ value='{res.RestorantAddress+';'+res.RestorantCity+';'+res.RestorantCountry}' se
             }
             catch (Exception)
             {
-                return redirectToError ? Results.Redirect("/error") : Results.BadRequest();
+                return Results.Redirect("/error");
             }
         }
     }

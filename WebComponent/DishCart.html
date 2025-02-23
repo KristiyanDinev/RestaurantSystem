@@ -1,0 +1,15 @@
+﻿<div id="whole_food">
+    <div class="food" onclick="goToDishByID('{{Dish.Id}}')">
+        <p class="food_name">{{Dish.Name}}</p>
+        <p class="food_grams">grams: /{{Dish.Grams}}/</p>
+        <img id="{{Dish.Id}}img" class="food_image" src="{{Dish.Image}}">
+        <p class="food_price">{{Dish.Price}} lv.</p>
+    </div>
+
+    <div class="quantity">
+        <label>Quantity: {{Dish.Amount}}</label>
+
+        <button class="remove_dish" onclick="rmDish('{{Dish.Name}}', '{{Dish.Id}}')">Remove Dish</button>
+        <button class="add_dish" onclick="addDishToOrder('{{Dish.Price}}', '{{Dish.Id}}')">+</button>
+    </div>
+</div>

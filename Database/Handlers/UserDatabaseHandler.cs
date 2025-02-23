@@ -1,13 +1,12 @@
 ﻿using ITStepFinalProject.Database.Utils;
 using ITStepFinalProject.Models;
 using ITStepFinalProject.Utils;
-using Npgsql;
-using System.Reflection;
 
 namespace ITStepFinalProject.Database.Handlers
 {
     public class UserDatabaseHandler
     {
+        private static readonly string table = "Users";
         public async Task<UserModel> GetUser(int id)
         {
             /*
@@ -25,18 +24,17 @@ namespace ITStepFinalProject.Database.Handlers
 
             List<object> user = await 
                 DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("*", "User")
+                .Select("*", table)
                 .Where_Set_On_Having("WHERE", values).ToString(), new UserModel(), true);
 
             return (UserModel)user[0];
         }
 
-        public async void RegisterUser(UserModel model)
+        public async void RegisterUser(InsertUserModel model)
         {
             model.Password = ValueHandler.HashString(model.Password);
-
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert("User", [model]).ToString());
+                .Insert(table, [model]).ToString());
         }
 
         public async Task<UserModel> LoginUser(UserModel loginUser)
@@ -45,16 +43,11 @@ namespace ITStepFinalProject.Database.Handlers
             values.Add("Email = "+ ValueHandler.Strings(loginUser.Email)+" AND ");
             values.Add("Password = '" + ValueHandler.HashString(loginUser.Password) + '\'');
 
-            SqlBuilder sqlBuilder = new SqlBuilder()
-                .Select("*", "Users")
-                .Where_Set_On_Having("WHERE", values);
 
-            string v = sqlBuilder.ToString();
-
-            Console.WriteLine("Sql Builder: " + v);
-
-            List<object> user = await DatabaseManager.
-                _ExecuteQuery(v, loginUser, false);
+            List<object> user = await DatabaseManager
+                ._ExecuteQuery(new SqlBuilder()
+                .Select("*", table)
+                .Where_Set_On_Having("WHERE", values).ToString(), loginUser, true);
             return (UserModel)user[0];
         }
 
@@ -84,7 +77,7 @@ namespace ITStepFinalProject.Database.Handlers
             List<string> where = new List<string>();
             where.Add("Id = "+model.Id);
 
-            DatabaseManager._UpdateModel("User", values, where);
+            DatabaseManager._UpdateModel(table, values, where);
         }
 
         public async void DeleteUser(UserModel model)
@@ -93,7 +86,7 @@ namespace ITStepFinalProject.Database.Handlers
             values.Add("Id = " + model.Id);
 
             DatabaseManager._ExecuteNonQuery(
-                new SqlBuilder().Delete("User")
+                new SqlBuilder().Delete(table)
                 .Where_Set_On_Having("WHERE", values).ToString());
         }
     }

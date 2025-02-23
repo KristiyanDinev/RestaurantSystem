@@ -1,34 +1,34 @@
 ﻿using ITStepFinalProject.Database.Utils;
 using ITStepFinalProject.Models;
-using Npgsql;
 using System.Linq;
 
 namespace ITStepFinalProject.Database.Handlers
 {
     public class DishDatabaseHandler
     {
+        private static readonly string table = "Dishes";
         public async Task<List<DishModel>> GetDishes(string type)
         {
             List<string> res = new List<string>();
-            res.Add("CuponCode = " + ValueHandler.Strings(type));
+            res.Add("Type_Of_Dish = " + ValueHandler.Strings(type));
 
             List<object> objects = await DatabaseManager.
-                _ExecuteQuery(new SqlBuilder().Select("*", "Dishes")
+                _ExecuteQuery(new SqlBuilder().Select("*", table)
                 .Where_Set_On_Having("WHERE", res).ToString(), new DishModel(), true);
 
             return objects.Cast<DishModel>().ToList();
         }
 
-        public async Task<DishModel> GetDishById(int id)
+        public async Task<List<DishModel>> GetDishesByIds(List<int> IDs)
         {
             List<string> res = new List<string>();
-            res.Add("Id = "+ id);
+            res.Add("Id in ("+string.Join(", ", IDs)+")");
 
             List<object> dishes = 
-                await DatabaseManager._ExecuteQuery(new SqlBuilder().Select("*", "Dishes")
+                await DatabaseManager._ExecuteQuery(new SqlBuilder().Select("*", table)
                 .Where_Set_On_Having("WHERE", res).ToString(), new DishModel(), true);
 
-            return (DishModel)dishes[0];
+            return dishes.Cast<DishModel>().ToList();
         }
 
     }

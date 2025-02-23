@@ -11,28 +11,8 @@
 
     {{UserBar}}
 
-    <div class="menu">
-        <p id="name">{{Dish.Name}}</p>
+    {{WholeDish}}
 
-        <p id="grams">grams /{{Dish.Grams}}/</p>
-
-        <p id="ingr">Ingredients: {{Dish.Ingredients}}</p>
-
-        <image src="{{Dish.Image}}" id="image" alt="No image for now"></image>
-
-        <p id="is_available"></p>
-
-        <p id="avg_time_to_took">Avrage time to cook: {{Dish.AvrageTimeToCook}} minute/s</p>
-
-        <p id="price">{{Dish.Price}} lv.</p>
-    </div>
-
-    <button id="order" onclick="addToOrder('{{Dish.Id}}', '{{Dish.Price}}', '{{Dish.Name}}')">Add to order</button>
-
-    <script>
-    let availabel = document.getElementById("is_available")
-        availabel.innerHTML = "{{Dish.IsAvailable}}" === "True" ? "Currently Available" : "Currently Not Avaliable"
-        </script>
 
 <link rel='stylesheet' type='text/css' media='screen' href='../../Index.css'>
     <link rel='stylesheet' type='text/css' media='screen' href='../../single_dish/single_dish.css'>

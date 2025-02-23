@@ -1,8 +1,10 @@
-﻿using ITStepFinalProject.Database;
-using ITStepFinalProject.Database.Handlers;
+﻿using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
+using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Xml.Linq;
 
 namespace ITStepFinalProject.Controllers {
     public class DishController {
@@ -11,68 +13,51 @@ namespace ITStepFinalProject.Controllers {
 
 
             app.MapGet("/dishes", async (HttpContext context,
-                UserDatabaseHandler db) => {
+                UserDatabaseHandler db) =>
+            {
 
-                    int? id = Utils.ControllerUtils.IsLoggedIn(context.Session);
-                    if (id == null) {
+                return await ControllerUtils.HandleDefaultPage_WithUserModel("/dishes",
+                          context, db);
+            });
+
+
+
+            app.MapGet("/dish/", async (HttpContext context,
+                DishDatabaseHandler db, [FromQuery(Name = "type")] string type) => {
+
+                    ISession session = context.Session;
+                    int? id = ControllerUtils.IsLoggedIn(context.Session);
+                    if (id == null)
+                    {
                         return Results.Redirect("/login");
                     }
 
-                    try {
-                        string data = await Utils.ControllerUtils.GetFileContent("/dishes");
+                    try
+                    {
+                        List<DishModel> dishes = await db.GetDishes(type);
+                        string FileData = await ControllerUtils.GetFileContent("/dishes/" + type);
 
-                        UserModel user = await db.GetUser((int)id);
-                        //Utils.Utils.ApplyUserBarElement(ref data, user);
-                        Utils.ControllerUtils._handleEntryInFile(ref data, user, "User");
+                        UserModel user = ControllerUtils.GetModelFromSession(session, "User").Deserialize<UserModel>(); ;
 
-                        return Results.Content(data, "text/html");
+                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
+                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "Dish", dishes.Cast<object>()
+                            .ToList());
 
-                    } catch (Exception) {
-                        return Results.Redirect("/error");
-                    }
-                    
-
-                }).RequireRateLimiting("fixed");
-
-
-
-
-            app.MapGet("/dishes/{type}", async (HttpContext context,
-                UserDatabaseHandler db, string type) => {
-
-                    int? id = Utils.ControllerUtils.IsLoggedIn(context.Session);
-                    if (id == null) {
-                        return Results.Redirect("/login");
-                    }
-
-                    if (type.Contains('.')) {
-                        // just static file
-                        string a = await Utils.ControllerUtils.GetFileContent("/dishes/" + type);
-                        return Results.Content(a);
-                    }
-
-                    try {
-
-                        string data = await Utils.ControllerUtils.GetFileContent("/dishes/" + type);
-
-                        UserModel user = await db.GetUser((int)id);
-                        Utils.ControllerUtils._handleEntryInFile(ref data, user, "User");
-                        //Utils.Utils.ApplyUserBarElement(ref data, user);
-
-                        return Results.Content(data, "text/html");
-
-                    } catch (Exception) {
+                        return Results.Content(FileData, "text/html");
+                    } catch (Exception)
+                    {
                         return Results.Redirect("/error");
                     }
 
-                });
+            }).RequireRateLimiting("fixed");
 
 
 
-            app.MapGet("/dishes/id/{dishId}", async (HttpContext context,
-                UserDatabaseHandler userDb, DishDatabaseHandler dishDb, string dishId) => {
+            app.MapGet("/dish/id", async (HttpContext context,
+                DishDatabaseHandler dishDb, [FromQuery(Name = "dishId")] string dishId) => {
 
-                    int? id = Utils.ControllerUtils.IsLoggedIn(context.Session);
+                    ISession session = context.Session;
+                    int? id = ControllerUtils.IsLoggedIn(session);
                     if (id == null) {
                         return Results.Redirect("/login");
                     }
@@ -82,16 +67,20 @@ namespace ITStepFinalProject.Controllers {
                     }
 
                     try {
-                        string FileData = await Utils.ControllerUtils.GetFileContent("/single_dish");
 
-                        DishModel dish = await dishDb.GetDishById(Id);
+                        List<DishModel> dishes = await dishDb.GetDishesByIds([Id]);
+                        if (dishes.Count == 0)
+                        {
+                            throw new Exception();
+                        }
 
-                        Utils.ControllerUtils._handleEntryInFile(ref FileData, dish, "Dish");
+                        DishModel dish = dishes[0];
+                        string FileData = await ControllerUtils.GetFileContent("/single_dish");
 
-                        UserModel user = await userDb.GetUser((int)id);
-                        Utils.ControllerUtils._handleEntryInFile(ref FileData, user, "User");
-                        //Utils.Utils.ApplyUserBarElement(ref FileData, user);
+                        UserModel user = ControllerUtils.GetModelFromSession(session, "User").Deserialize<UserModel>(); ;
 
+                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
+                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "Dish", [dish]);
 
                         return Results.Content(FileData, "text/html");
 
@@ -99,32 +88,7 @@ namespace ITStepFinalProject.Controllers {
                         return Results.Redirect("/error");
                     }
 
-                }).RequireRateLimiting("fixed");
-
-
-
-
-            app.MapPost("/dishes", async (HttpContext context,
-                DishDatabaseHandler db, [FromForm] string type) => {
-
-                    Dictionary<string, List<DishModel>> data = 
-                    new Dictionary<string, List<DishModel>>();
-
-                    try {
-
-                        if (type.Equals("") || Utils.ControllerUtils.IsLoggedIn(context.Session) == null) {
-                            throw new Exception();
-                        }
-
-                        List<DishModel> dishes = await db.GetDishes(type);
-                        data.Add("dishes", dishes);
-                        return data;
-
-                    } catch (Exception) {
-                        return data;
-                    }
-                }).RequireRateLimiting("fixed")
-                .DisableAntiforgery();
+            }).RequireRateLimiting("fixed");
         }
     }
 }
