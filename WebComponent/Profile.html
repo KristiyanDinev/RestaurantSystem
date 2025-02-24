@@ -26,10 +26,28 @@
                type="email" id="email" maxlength="50" value="{{User.Email}}" placeholder="Email" required>
         <br>
 
-        <label id="profile_value">Address: {{User.Address}}</label>
+        <label id="profile_value">Address</label>
         <br>
         <input class="user-input"
-               type="text" id="address" value="{{User.Address}}" placeholder="Address" required>
+               type="text" id="address" placeholder="Address" required>
+        <br>
+
+        <label id="profile_value">City</label>
+        <br>
+        <input class="user-input"
+               type="text" id="city" placeholder="City" required>
+        <br>
+
+        <label id="profile_value">State</label>
+        <br>
+        <input class="user-input"
+               type="text" id="state" placeholder="State (leave it empty if you don't live in a State')" required>
+        <br>
+
+        <label id="profile_value">Country</label>
+        <br>
+        <input class="user-input"
+               type="text" id="country" placeholder="Country" required>
         <br>
 
         <label id="profile_value">Notes: {{User.Notes}}</label>
@@ -42,4 +60,13 @@
         <input class="user-input"
                type="phone" id="phone" value="{{User.PhoneNumber}}" maxlength="15" placeholder="Phone Number">
         <br>
+
+        <script>
+            let parts = "{{User.FullAddress}}".split(';')
+            document.getElementById('address').value = parts[0]
+            document.getElementById('city').value = parts[1]
+            document.getElementById('state').value = parts[2]
+            document.getElementById('country').value = parts[3]
+
+        </script>
 </div>

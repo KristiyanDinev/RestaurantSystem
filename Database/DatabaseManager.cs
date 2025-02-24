@@ -12,7 +12,7 @@ namespace ITStepFinalProject.Database {
 
         /*
          * 
-         * insert into Dishes (Name, Price, Ingredients, Grams, Type_Of_Dish, IsAvailable, AvrageTimeToCook, Image)
+          insert into Dishes (Name, Price, Ingredients, Grams, Type_Of_Dish, IsAvailable, AvrageTimeToCook, Image)
 values
 ('Salad 1', 10.99, 'some stuff in it and this and that', 440, 'salad', true, '3', '/images/salad/1.png'),
 ('Salad 2', 12.99, 'some stuff in it and this and that', 500, 'salad', false, '2', null),
@@ -24,11 +24,18 @@ values
 ('Desserts 2', 30.20, 'some stuff in it and this and that', 120, 'desserts', false, '4', null),
 ('Dishes 1', 21.19, 'some stuff in it and this and that', 142, 'dishes', true, '2', null),
 ('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3', null)
-         * 
-         * 
+       
+        -- year-month-day
+          insert into Cupons (CuponCode, DiscountPercent, ExpirationDate, Name) VALUES
+          ('Code', 5.99, '2022-01-01', 'Expired'),
+          ('Summer', 6.10, '2025-05-01', 'Summer Cupon'),
+          ('Winter', 12.99, '2025-12-01', 'Winter Cupon');
+
+
+        -- MM/DD/YYYYTHH:mm:ssZ
          */
 
-        
+
 
         public static async void Setup() {
             string sql = """
@@ -83,7 +90,7 @@ values
                 CREATE TABLE IF NOT EXISTS Cupons (
                     CuponCode VARCHAR(25) NOT NULL UNIQUE,
                     DiscountPercent NUMERIC(10, 2) NOT NULL,
-                    ExpirationDate TIMESTAMP WITH TIME ZONE NOT NULL,
+                    ExpirationDate DATE NOT NULL,
                     Name VARCHAR(100) NOT NULL
                 );
 
@@ -98,9 +105,9 @@ values
 
         public static object ConvertToModel(NpgsqlDataReader reader, object model)
         {
-            object obj;
-            if (model is UserModel){
-
+            object obj = Activator.CreateInstance(model.GetType());
+            /*
+            if (model is UserModel) {
                 obj = new UserModel();
 
             } else if (model is DishModel) {
@@ -109,18 +116,26 @@ values
             } else if (model is CuponModel) {
                 obj = new CuponModel();
 
-            } else {
-                return model;
-            }
+            } else if (model is OrderModel) {
+                obj = new OrderModel();
 
-            foreach (string property in ModelUtils.Get_Model_Property_Names(model))
+            } else if (model is OrderedDishesModel) {
+                obj = new OrderedDishesModel();
+
+            } else
             {
-                try
+                throw new Exception("No such model!");
+            }*/
+
+                foreach (string property in ModelUtils.Get_Model_Property_Names(model))
                 {
-                    ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
-                } catch (Exception e)
-                {}
-            }
+                    try
+                    {
+                        ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
+                    }
+                    catch (Exception e)
+                    { }
+                }
             return obj;
         }
 

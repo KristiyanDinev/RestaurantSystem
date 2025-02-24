@@ -68,7 +68,7 @@ namespace ITStepFinalProject.Utils {
             }
         }
 
-       public static async Task<string?> UploadImage(string image)
+        public static async Task<string?> UploadImage(string image)
         {
             string[] imageParts = image.Split(';');
             string imageName = imageParts[0];

@@ -37,7 +37,7 @@ namespace ITStepFinalProject.Database.Handlers
                 .Insert(table, [model]).ToString());
         }
 
-        public async Task<UserModel> LoginUser(UserModel loginUser)
+        public async Task<UserModel?> LoginUser(UserModel loginUser)
         {
             List<string> values = new List<string>();
             values.Add("Email = "+ ValueHandler.Strings(loginUser.Email)+" AND ");
@@ -48,7 +48,7 @@ namespace ITStepFinalProject.Database.Handlers
                 ._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
                 .Where_Set_On_Having("WHERE", values).ToString(), loginUser, true);
-            return (UserModel)user[0];
+            return user.Count == 0 ? null : (UserModel)user[0];
         }
 
         /*

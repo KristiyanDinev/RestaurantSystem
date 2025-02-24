@@ -15,6 +15,7 @@
     flex-direction: row-reverse;
     display: flex;
     flex: 1;
+    cursor: pointer;
 }
 
 
@@ -42,6 +43,7 @@
     height: 10px;
     width: 10px;
     padding: 10px;
+    cursor: pointer;
 }
 
 
@@ -88,6 +90,7 @@
     margin-right: 20px;
     margin-left: 20px;
     padding: 10px;
+    cursor: pointer;
 }
 
 
@@ -96,4 +99,56 @@
     background-color: white;
     display: flex;
     flex-direction: row;
+}
+
+.order_view {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin: 10px;
+}
+
+.order_view .status {
+    font-size: 27px;
+    font-style: italic;
+}
+
+.order_view .notes_view {
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.order_view .notes_view .notes_title {
+    font-size: 20px;
+    font-style: italic;
+}
+
+.order_view .notes_view .notes {
+    font-size: 18px;
+    background-color: bisque;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.order_view .part {
+    font-size: 20px;
+    font-style: italic;
+}
+
+.order_view .dish_list {
+    font-size: 18px;
+    background-color: rgb(188, 188, 188);
+    border-radius: 2px;
+    padding: 10px;
+}
+
+
+.order_view .cancel {
+    background-color: rgb(204, 56, 56);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    width: 100px;
+    cursor: pointer;
 }

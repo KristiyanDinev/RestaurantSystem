@@ -52,7 +52,6 @@ namespace ITStepFinalProject.Controllers
                         }
                     }
 
-
                     FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
                     FileData = WebHelper.HandleCommonPlaceholders(FileData, "Dish", displayDishModels.Cast<object>()
                         .ToList());

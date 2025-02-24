@@ -75,7 +75,7 @@ namespace ITStepFinalProject.Utils
             StringBuilder stringBuilder = new StringBuilder();
             foreach (object model in models)
             {
-                stringBuilder.AppendLine(FillInPlaceholdersForModel(modelName, model, modelHtml));
+               stringBuilder.AppendLine(FillInPlaceholdersForModel(modelName, model, modelHtml));
             }
 
             return html.Replace(fullPlaceholder, stringBuilder.ToString());

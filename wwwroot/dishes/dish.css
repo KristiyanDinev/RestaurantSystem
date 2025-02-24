@@ -10,6 +10,7 @@ body {
     border-radius: 20px;
     text-align: center;
     color: white;
+    
 }
 
 
@@ -21,7 +22,7 @@ body {
 
     padding-top: 20px;
     padding-bottom: 20px;
-
+    cursor: pointer;
     font-size: 20px;
     margin: 20px;
     color: white;

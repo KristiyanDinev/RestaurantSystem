@@ -5,10 +5,10 @@
         public string CurrentStatus { get; set; }
         public string? Notes { get; set; }
         public DateTime OrderedAt { get; set; }
-        public float TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
 
         public int UserId { get; set; }
-        public string ResturantAddress { get; set; } // address;city;country
+        public string RestorantAddress { get; set; } // address;city;country
 
     }
 }

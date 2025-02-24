@@ -4,6 +4,7 @@ using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
 using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.RateLimiting;
 
@@ -19,7 +20,6 @@ namespace ITStepFinalProject
             hashing = SHA256.Create();
             resturantAddresses = new List<RestorantAddressModel>();
             currentDir = Directory.GetCurrentDirectory();
-
 
             Console.WriteLine("Current Working Directory: "+ currentDir);
 

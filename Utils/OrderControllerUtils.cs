@@ -104,11 +104,11 @@ namespace ITStepFinalProject.Utils
             return dishes;
         }
 
-        public static float CalculateTotalPrice(List<float> prices, float discount_percent)
+        public static decimal CalculateTotalPrice(List<float> prices, decimal discount_percent)
         {
             float totalPrice = prices.Sum();
 
-            return totalPrice - (totalPrice * (discount_percent / 100));
+            return (decimal)(totalPrice - (totalPrice * (((float)discount_percent) / 100)));
         }
 
         public static void DeleteOrderFromSession(ref ISession session)

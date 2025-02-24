@@ -4,10 +4,10 @@
     {
         public string CurrentStatus { get; set; }
         public string? Notes { get; set; }
-        public float TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
 
         public int UserId { get; set; }
-        public string ResturantAddress { get; set; } // address;city;country
+        public string RestorantAddress { get; set; } // address;city;country
         public InsertOrderModel() { }
         public InsertOrderModel(OrderModel order)
         {
@@ -15,7 +15,7 @@
             Notes = order.Notes;
             TotalPrice = order.TotalPrice;
             UserId = order.UserId;
-            ResturantAddress = order.ResturantAddress;
+            RestorantAddress = order.RestorantAddress;
         }
     }
 }

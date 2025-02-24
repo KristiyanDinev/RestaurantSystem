@@ -50,13 +50,33 @@ function toggleDeleteImage() {
 }
 
 async function updateUser() {
+    let addr = document.getElementById('address').value
+    let city = document.getElementById('city').value
+    let state = document.getElementById('state').value
+    let country = document.getElementById('country').value
+
     let status = document.getElementById('Stats')
+    if (addr.replace(" ", "").length == 0 || city.replace(" ", "").length == 0 ||
+         country.replace(" ", "").length == 0) {
+        status.innerHTML = "Fill the address, city and country inputs."
+        return;
+    }
+
+    if (addr.includes(';') || city.includes(';') || country.includes(';') || 
+        state.includes(';') ||
+    
+        addr.includes('|') || city.includes('|') || country.includes('|') || 
+        state.includes('|')) {
+            status.innerHTML = "No ; or | in the address, city, state or country input."
+        return;
+    }
+
     status.innerHTML = "Updating..."
 
     let formData = new FormData()
     formData.append('username', document.getElementById('username').value)
     formData.append('email', document.getElementById('email').value)
-    formData.append('address', document.getElementById('address').value)
+    formData.append('fulladdress', addr+ ';'+city+';'+state+';'+country)
     formData.append('notes', document.getElementById('notes').value)
     formData.append('phone', document.getElementById('phone').value)
     formData.append('image', ImageFile)

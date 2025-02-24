@@ -19,7 +19,7 @@ namespace ITStepFinalProject.Controllers {
 
                         int? id = ControllerUtils.IsLoggedIn(session);
                         if (id == null) {
-                            return Results.Unauthorized();
+                            return Results.Redirect("/login");
                         }
 
                         List<OrderModel> orders = await db.GetOrdersByUser((int)id);
@@ -29,9 +29,7 @@ namespace ITStepFinalProject.Controllers {
                         UserModel user = ControllerUtils.GetModelFromSession(session, "User").Deserialize<UserModel>(); ;
 
                         FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
-                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "Order", orders.Cast<object>()
-                            .ToList());
-
+                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "Order", orders.Cast<object>().ToList());
 
                         return Results.Content(FileData, "text/html");
 
@@ -39,6 +37,35 @@ namespace ITStepFinalProject.Controllers {
                         return Results.BadRequest();
                     }
             }).RequireRateLimiting("fixed");
+
+
+            app.MapPost("/order/dishes", async (HttpContext context,
+                OrderDatabaseHandler db, [FromForm] int orderId) => {
+
+                    try
+                    {
+                        ISession session = context.Session;
+
+                        int? id = ControllerUtils.IsLoggedIn(session);
+                        if (id == null)
+                        {
+                            return Results.Redirect("/login");
+                        }
+
+                        List<DishModel> dishes = await db.GetAllDishesFromOrder(orderId);
+
+                        return Results.Ok(new Dictionary<string, List<DishModel>>
+                        {
+                            {"dishes", dishes }
+                        });
+
+                    } catch (Exception)
+                    {
+                        return Results.BadRequest();
+                    }
+
+            }).RequireRateLimiting("fixed")
+              .DisableAntiforgery();
 
 
             // add dish
@@ -107,22 +134,25 @@ namespace ITStepFinalProject.Controllers {
 
                         
                         List<float> currentPrices = OrderControllerUtils.GetPricesFromOrder(session);
-                        float TotalPrice = OrderControllerUtils.CalculateTotalPrice(currentPrices, 0);
+                        decimal TotalPrice = OrderControllerUtils.CalculateTotalPrice(currentPrices, 0);
 
                         CuponModel? cupon = null;
                         if (cuponCode.Length > 0) {
                             cupon = await cuponDb.GetCuponByCode(cuponCode);
 
-                            if (cupon.ExpirationDate.ToLocalTime() <= DateTime.Now) {
-                                return Results.BadRequest();
-                            }
+                            if (cupon != null)
+                            {
+                                if (cupon.ExpirationDate.ToLocalTime() <= DateTime.Now) {
+                                    return Results.BadRequest();
+                                }
 
-                            TotalPrice = OrderControllerUtils.CalculateTotalPrice(currentPrices,
-                                cupon.DiscountPercent);
+                                TotalPrice = OrderControllerUtils.CalculateTotalPrice(currentPrices,
+                                    cupon.DiscountPercent);
+                            }
                         }
 
                         InsertOrderModel order = new InsertOrderModel();
-                        order.ResturantAddress = restorantAddress;
+                        order.RestorantAddress = restorantAddress;
                         order.UserId = (int)userId;
                         order.TotalPrice = TotalPrice;
                         order.Notes = notes;
@@ -132,7 +162,7 @@ namespace ITStepFinalProject.Controllers {
                             OrderControllerUtils.GetDishesFromOrder(session), order);
 
                         if (cupon != null) {
-                            cuponDb.DeleteCupon(cupon.Name);
+                            cuponDb.DeleteCupon(cupon.CuponCode);
                         }
 
                         OrderControllerUtils.DeleteOrderFromSession(ref session);
@@ -160,10 +190,11 @@ namespace ITStepFinalProject.Controllers {
                             return Results.Unauthorized();
                         }
 
-                        string status = 
+                        string? status = 
                             await db.GetOrder_CurrentStatus_ById(orderId);
 
-                        if (!status.Equals("pending") || !status.Equals("db")) {
+                        if (status == null || !(status.Equals("pending") || 
+                            status.Equals("db"))) {
                             return Results.BadRequest();
                         }
 

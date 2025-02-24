@@ -15,7 +15,7 @@ namespace ITStepFinalProject.Database.Handlers
                 .Where_Set_On_Having("WHERE", res).ToString());
         }
 
-        public async Task<CuponModel> GetCuponByCode(string cuponCode)
+        public async Task<CuponModel?> GetCuponByCode(string cuponCode)
         {
             List<string> res = new List<string>();
             res.Add("CuponCode = " + ValueHandler.Strings(cuponCode));
@@ -24,7 +24,7 @@ namespace ITStepFinalProject.Database.Handlers
                 new SqlBuilder().Select("*", table)
                 .Where_Set_On_Having("WHERE", res).ToString(), new CuponModel(), true);
 
-            return (CuponModel)objects[0];
+            return objects.Count == 0 ? null : (CuponModel)objects[0];
         }
     }
 }
