@@ -1,13 +1,15 @@
-﻿namespace ITStepFinalProject.Controllers {
+﻿using ITStepFinalProject.Utils;
+
+namespace ITStepFinalProject.Controllers {
     public class ErrorController {
 
 
         public ErrorController(WebApplication app) {
 
-            app.MapGet("/error", async () => {
+            app.MapGet("/error", async (ControllerUtils controllerUtils) => {
                 try {
 
-                    string data = await Utils.ControllerUtils.GetFileContent("/error");
+                    string data = await controllerUtils.GetFileContent("/error");
                     return Results.Content(data, "text/html");
 
                 } catch (Exception) {

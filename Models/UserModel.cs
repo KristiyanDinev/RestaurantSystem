@@ -1,4 +1,6 @@
-﻿namespace ITStepFinalProject.Models {
+﻿using System.Numerics;
+
+namespace ITStepFinalProject.Models {
     public class UserModel {
 
         public int Id { get; set; }
@@ -16,6 +18,17 @@
         public UserModel() {}
 
         public UserModel(string email, string password) {
+            Email = email;
+            Password = password;
+        }
+
+        public UserModel(string fulladdress, string? phone, 
+            string username, string? notes, string email, string password)
+        {
+            FullAddress = fulladdress;
+            PhoneNumber = phone;
+            Username = username;
+            Notes = notes;
             Email = email;
             Password = password;
         }

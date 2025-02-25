@@ -11,33 +11,31 @@ namespace ITStepFinalProject.Controllers {
 
         public DishController(WebApplication app) {
 
-
+           
             app.MapGet("/dishes", async (HttpContext context,
-                UserDatabaseHandler db) =>
+                ControllerUtils controllerUtils) =>
             {
 
-                return await ControllerUtils.HandleDefaultPage_WithUserModel("/dishes",
-                          context, db);
+                return await controllerUtils.HandleDefaultPage_WithUserModel("/dishes",
+                          context);
             });
 
 
-
+            
             app.MapGet("/dish/", async (HttpContext context,
-                DishDatabaseHandler db, [FromQuery(Name = "type")] string type) => {
-
-                    ISession session = context.Session;
-                    int? id = ControllerUtils.IsLoggedIn(context.Session);
-                    if (id == null)
-                    {
-                        return Results.Redirect("/login");
-                    }
+                DishDatabaseHandler db, ControllerUtils controllerUtils, 
+                [FromQuery(Name = "type")] string type) => {
 
                     try
                     {
-                        List<DishModel> dishes = await db.GetDishes(type);
-                        string FileData = await ControllerUtils.GetFileContent("/dishes/" + type);
+                        UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                        if (user == null)
+                        {
+                            return Results.Redirect("/login");
+                        }
 
-                        UserModel user = ControllerUtils.GetModelFromSession(session, "User").Deserialize<UserModel>(); ;
+                        List<DishModel> dishes = await db.GetDishes(type);
+                        string FileData = await controllerUtils.GetFileContent("/dishes/" + type);
 
                         FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
                         FileData = WebHelper.HandleCommonPlaceholders(FileData, "Dish", dishes.Cast<object>()
@@ -54,19 +52,20 @@ namespace ITStepFinalProject.Controllers {
 
 
             app.MapGet("/dish/id", async (HttpContext context,
-                DishDatabaseHandler dishDb, [FromQuery(Name = "dishId")] string dishId) => {
-
-                    ISession session = context.Session;
-                    int? id = ControllerUtils.IsLoggedIn(session);
-                    if (id == null) {
-                        return Results.Redirect("/login");
-                    }
+                DishDatabaseHandler dishDb, ControllerUtils controllerUtils, 
+                [FromQuery(Name = "dishId")] string dishId) => {
 
                     if (!int.TryParse(dishId, out int Id)) {
                         return Results.Redirect("/dishes");
                     }
 
                     try {
+                        
+                        UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                        if (user == null)
+                        {
+                            return Results.Redirect("/login");
+                        }
 
                         List<DishModel> dishes = await dishDb.GetDishesByIds([Id]);
                         if (dishes.Count == 0)
@@ -75,9 +74,9 @@ namespace ITStepFinalProject.Controllers {
                         }
 
                         DishModel dish = dishes[0];
-                        string FileData = await ControllerUtils.GetFileContent("/single_dish");
+                        string FileData = await controllerUtils.GetFileContent("/single_dish");
 
-                        UserModel user = ControllerUtils.GetModelFromSession(session, "User").Deserialize<UserModel>(); ;
+                        
 
                         FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
                         FileData = WebHelper.HandleCommonPlaceholders(FileData, "Dish", [dish]);

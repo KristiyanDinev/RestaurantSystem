@@ -2,6 +2,8 @@
 
 ### Dependencies
 - Npgsql
+- System.IdentityModel.Tokens.Jwt
+- Microsoft.IdentityModel.Tokens
 
 ### Database
 - database: Restorant
@@ -26,6 +28,9 @@ The `User` is the model name.
 
 - `ResturantAddressAvrageDeliverTime` -> has format of `ul. User;Sofia;;Bulgaria|5m - 10m|ul. Resturatn;Sofia;;Bulgaria---ul. User2;Sofia;;Bulgaria|1m - 2m|ul. Resturatn;Sofia;;Bulgaria`
   `local user address;user City;user State (can be empty if none);user Country|Avrage Time to Deliver|local restorant address;restorant city;restorant state;resturant country`
+
+- `Auth` header will contain a encrypted JWT token representing the user's data.
+- 
 
 ### TODO
 - Maybe Cupon Controller. We will see.

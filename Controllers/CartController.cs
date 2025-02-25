@@ -10,17 +10,12 @@ namespace ITStepFinalProject.Controllers
 
         public CartController(WebApplication app)
         {
+            /*
             // get current dishes about to order
-            app.MapGet("/cart", async (HttpContext context, DishDatabaseHandler db) =>
+            app.MapGet("/cart", async (HttpContext context, DishDatabaseHandler db,
+                ControllerUtils controllerUtils) =>
             {
-                try
-                {
-                    ISession session = context.Session;
-                    int? id = ControllerUtils.IsLoggedIn(context.Session);
-                    if (id == null)
-                    {
-                        return Results.Redirect("/login");
-                    }
+                try {
 
                     List<int> dishesIds = OrderControllerUtils.GetDishesFromOrder(session);
                     if (dishesIds.Count == 0)
@@ -28,7 +23,7 @@ namespace ITStepFinalProject.Controllers
                         return Results.Redirect("/dishes");
                     }
 
-                    string FileData = await ControllerUtils.GetFileContent("/cart");
+                    string FileData = await controllerUtils.GetFileContent("/cart");
 
                     UserModel user = ControllerUtils.GetModelFromSession(session, "User").Deserialize<UserModel>(); ;
 
@@ -56,8 +51,8 @@ namespace ITStepFinalProject.Controllers
                     FileData = WebHelper.HandleCommonPlaceholders(FileData, "Dish", displayDishModels.Cast<object>()
                         .ToList());
 
-                    FileData = WebHelper.HandleCommonPlaceholders(FileData, "Restorant", 
-                        ControllerUtils.GetRestorantsForUser(user).Cast<object>().ToList());
+                    FileData = WebHelper.HandleCommonPlaceholders(FileData, "Restorant",
+                        controllerUtils.GetRestorantsForUser(user).Cast<object>().ToList());
 
                     return Results.Content(FileData, "text/html");
 
@@ -67,7 +62,7 @@ namespace ITStepFinalProject.Controllers
                     return Results.Redirect("/error");
                 }
             }).RequireRateLimiting("fixed")
-            .DisableAntiforgery();
+            .DisableAntiforgery();*/
         }
     }
 }

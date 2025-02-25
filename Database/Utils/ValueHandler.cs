@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Utils;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
@@ -9,9 +10,8 @@ namespace ITStepFinalProject.Database.Utils
 
         public static string HashString(string str)
         {
-            return Convert.ToBase64String(
-                Program.hashing?.ComputeHash(
-                    Encoding.UTF8.GetBytes(str + _hashingSlat)) ?? []);
+            using var hashing = SHA256.Create();
+            return Convert.ToBase64String(EncryptionHandler.HashIt(str + _hashingSlat));
         }
 
         public static string Strings(object? str)

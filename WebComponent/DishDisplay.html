@@ -9,7 +9,7 @@
     </div>
 
     <div>
-        <button id="order" style="opacity: 50%;" onclick="">Add to order</button>
+        <button id="order{{Dish.Id}}" style="opacity: 50%;">Add to order</button>
     </div>
 
     <script>
@@ -19,12 +19,8 @@
             imageI.src = Host + "{{Dish.Image}}"
         }
 
-            let orderDiv = document.createElement('div')
-            let order = document.createElement('button')
-            order.id = "order"
-            order.innerHTML = "Add to order"
+        var order = document.getElementById("order{{Dish.Id}}")
             order.style.opacity = "50%"
-        orderDiv.onclick = () => { }
 
 
         if ("{{Dish.IsAvailable}}" == "True") {
@@ -36,12 +32,10 @@
                 window.location.href = "/dish/id?" + params.toString()
             }
 
-            let order = document.getElementById("order")
                 order.style.opacity = "100%"
                 order.onclick = async () => {
                     var formData = new FormData()
                     formData.append("dishId", Number("{{Dish.Id}}"))
-                    formData.append("dishPrice", parseFloat("{{Dish.Price}}"))
 
                     const res = await fetch(Host + "/order/add", {
                         method: "POST",

@@ -12,45 +12,36 @@ namespace ITStepFinalProject.Controllers {
 
             // get front-end display of your orders
             app.MapGet("/orders", async (HttpContext context, 
-                OrderDatabaseHandler db) => {
+                OrderDatabaseHandler db, ControllerUtils controllerUtils) => {
 
                 try {
-                        ISession session = context.Session;
-
-                        int? id = ControllerUtils.IsLoggedIn(session);
-                        if (id == null) {
+                        UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                        if (user == null)
+                        {
                             return Results.Redirect("/login");
                         }
 
-                        List<OrderModel> orders = await db.GetOrdersByUser((int)id);
+                        List<OrderModel> orders = await db.GetOrdersByUser(user.Id);
 
-                        string FileData = await ControllerUtils.GetFileContent("/orders");
-
-                        UserModel user = ControllerUtils.GetModelFromSession(session, "User").Deserialize<UserModel>(); ;
+                        string FileData = await controllerUtils.GetFileContent("/orders");
 
                         FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
                         FileData = WebHelper.HandleCommonPlaceholders(FileData, "Order", orders.Cast<object>().ToList());
 
-                        return Results.Content(FileData, "text/html");
+                    return Results.Content(FileData, "text/html");
 
-                    } catch (Exception) {
-                        return Results.BadRequest();
-                    }
+                } catch (Exception) {
+                    return Results.BadRequest();
+                }
             }).RequireRateLimiting("fixed");
 
 
             app.MapPost("/order/dishes", async (HttpContext context,
-                OrderDatabaseHandler db, [FromForm] int orderId) => {
+                OrderDatabaseHandler db,
+                [FromForm] int orderId) => {
 
                     try
                     {
-                        ISession session = context.Session;
-
-                        int? id = ControllerUtils.IsLoggedIn(session);
-                        if (id == null)
-                        {
-                            return Results.Redirect("/login");
-                        }
 
                         List<DishModel> dishes = await db.GetAllDishesFromOrder(orderId);
 
@@ -68,22 +59,13 @@ namespace ITStepFinalProject.Controllers {
               .DisableAntiforgery();
 
 
-            // add dish
+            // add dish  (depricated/maybe replace it with cookies on the client side)
             app.MapPost("/order/add", async (HttpContext context, 
-                 [FromForm] int dishId, 
-                [FromForm] float dishPrice) => {
+                 [FromForm] int dishId) => {
 
                     try {
+                        
 
-                        ISession session = context.Session;
-                        if (ControllerUtils.IsLoggedIn(session) == null) {
-                            return Results.Unauthorized();
-                        }
-
-                        OrderControllerUtils.AddDishToOrder(ref session, dishId,
-                            dishPrice);
-
-                        await session.CommitAsync();
 
                         return Results.Ok();
 
@@ -95,19 +77,11 @@ namespace ITStepFinalProject.Controllers {
               .DisableAntiforgery();
 
 
-            // remove dish
+            // remove dish (depricated/maybe replace it with cookies on the client side)
             app.MapPost("/order/remove", async (HttpContext context,
                [FromForm] int dishId) => {
 
                     try {
-
-                        ISession session = context.Session;
-                        if (ControllerUtils.IsLoggedIn(session) == null) {
-                            return Results.Unauthorized();
-                        }
-
-                        OrderControllerUtils.RemoveOneDishByIDFromOrder(ref session, dishId);
-                        await session.CommitAsync();
 
                         return Results.Ok();
 
@@ -118,21 +92,18 @@ namespace ITStepFinalProject.Controllers {
                 }).RequireRateLimiting("fixed")
               .DisableAntiforgery();
 
+            /*
             // start order
             app.MapPost("/order", async (HttpContext context,
-                CuponDatabaseHandler cuponDb, OrderDatabaseHandler orderDb, 
+                CuponDatabaseHandler cuponDb, OrderDatabaseHandler orderDb,
+                ControllerUtils controllerUtils,
                 [FromForm] string notes,
                 [FromForm] string cuponCode, [FromForm] string restorantAddress) => {
 
                     try {
 
-                        ISession session = context.Session;
-                        int? userId = ControllerUtils.IsLoggedIn(session);
-                        if (userId == null) {
-                            return Results.Unauthorized();
-                        }
+                        UserModel user = await controllerUtils.GetUserModelFromAuth(context);
 
-                        
                         List<float> currentPrices = OrderControllerUtils.GetPricesFromOrder(session);
                         decimal TotalPrice = OrderControllerUtils.CalculateTotalPrice(currentPrices, 0);
 
@@ -153,7 +124,7 @@ namespace ITStepFinalProject.Controllers {
 
                         InsertOrderModel order = new InsertOrderModel();
                         order.RestorantAddress = restorantAddress;
-                        order.UserId = (int)userId;
+                        order.UserId = user.Id;
                         order.TotalPrice = TotalPrice;
                         order.Notes = notes;
 
@@ -177,19 +148,13 @@ namespace ITStepFinalProject.Controllers {
 
                 }).RequireRateLimiting("fixed")
               .DisableAntiforgery();
+            */
 
             // stop order
             app.MapPost("/order/stop", async (HttpContext context,
                 OrderDatabaseHandler db, [FromForm] int orderId) => {
 
                     try {
-
-                        ISession session = context.Session;
-                        int? userId = ControllerUtils.IsLoggedIn(session);
-                        if (userId == null) {
-                            return Results.Unauthorized();
-                        }
-
                         string? status = 
                             await db.GetOrder_CurrentStatus_ById(orderId);
 

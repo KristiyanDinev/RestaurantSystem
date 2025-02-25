@@ -37,11 +37,13 @@ namespace ITStepFinalProject.Database.Handlers
                 .Insert(table, [model]).ToString());
         }
 
-        public async Task<UserModel?> LoginUser(UserModel loginUser)
+        public async Task<UserModel?> LoginUser(UserModel loginUser, bool hashPassword)
         {
             List<string> values = new List<string>();
             values.Add("Email = "+ ValueHandler.Strings(loginUser.Email)+" AND ");
-            values.Add("Password = '" + ValueHandler.HashString(loginUser.Password) + '\'');
+            values.Add("Password = '" + 
+                (hashPassword ? ValueHandler.HashString(loginUser.Password) :
+                    loginUser.Password) + '\'');
 
 
             List<object> user = await DatabaseManager
@@ -50,6 +52,7 @@ namespace ITStepFinalProject.Database.Handlers
                 .Where_Set_On_Having("WHERE", values).ToString(), loginUser, true);
             return user.Count == 0 ? null : (UserModel)user[0];
         }
+
 
         /*
          * <summery>

@@ -20,24 +20,24 @@ namespace ITStepFinalProject.Controllers {
 
             // get front-end logged in user profile (full page)
             app.MapGet("/profile",
-                async (HttpContext context, UserDatabaseHandler db) => {
+                async (HttpContext context, UserDatabaseHandler db,
+                ControllerUtils controllerUtils) => {
 
-                    return await ControllerUtils.HandleDefaultPage_WithUserModel("/profile",
-                        context, db);
+                    return await controllerUtils.HandleDefaultPage_WithUserModel("/profile",
+                        context);
 
             }).RequireRateLimiting("fixed");
 
 
 
             // get front-end login page
-            app.MapGet("/login", async (HttpContext context) => {
+            app.MapGet("/login", async (HttpContext context, ControllerUtils controllerUtils) => {
                     try {
-                        string data = await ControllerUtils.GetFileContent("/login");
+                        UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                        string data = await controllerUtils.GetFileContent("/login");
 
-                        return ControllerUtils.IsLoggedIn(context.Session) != null ?
-
-                        Results.Redirect("/dishes") :
-                        Results.Content(data, "text/html");
+                    return user == null ? Results.Content(data, "text/html") :
+                        Results.Redirect("/dishes");
 
                     } catch (Exception) {
                         return Results.Redirect("/error");
@@ -48,6 +48,7 @@ namespace ITStepFinalProject.Controllers {
 
             // try loging in
             app.MapPost("/login", async (UserDatabaseHandler db, HttpContext context,
+                ControllerUtils controllerUtils,
                 [FromForm] string email, [FromForm] string password,
                 [FromForm] string rememberMe) => {
 
@@ -57,20 +58,20 @@ namespace ITStepFinalProject.Controllers {
                     }
 
                     try {
-                        ISession session = context.Session;
-
-                        if (ControllerUtils.IsLoggedIn(session) != null) {
-                            // user is logged in
+                        UserModel? _user = await controllerUtils.GetUserModelFromAuth(context);
+                        if (_user != null)
+                        {
                             return Results.Redirect("/dishes");
                         }
 
-                        UserModel user = await db.LoginUser(new UserModel(email, password)) 
+                        UserModel user = new UserModel(email, password);
+                        user = await db.LoginUser(user, true) 
                             ?? throw new Exception("Didn't login");
 
-                        ControllerUtils.HandleRememberMe(ref session, rememberMe, user.Id);
-                        ControllerUtils.SaveModelToSession(ref session, "User", user);
+                        string authString = controllerUtils.HandleAuth(user, rememberMe);
 
-                        await session.CommitAsync();
+                        context.Response.Cookies.Delete("Auth");
+                        context.Response.Cookies.Append("Auth", authString);
 
                         return Results.Ok();
 
@@ -83,14 +84,13 @@ namespace ITStepFinalProject.Controllers {
 
 
             // get front-end register page
-            app.MapGet("/register", async (HttpContext context) => {
+            app.MapGet("/register", async (HttpContext context, ControllerUtils controllerUtils) => {
                 try {
-                    string data = await ControllerUtils.GetFileContent("/register");
+                    UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                    string data = await controllerUtils.GetFileContent("/register");
 
-                    return ControllerUtils.IsLoggedIn(context.Session) != null ?
-
-                    Results.Redirect("/dishes") :
-                    Results.Content(data, "text/html");
+                    return user == null ? Results.Content(data, "text/html") :
+                        Results.Redirect("/dishes");
 
                 } catch (Exception) {
                     return Results.Redirect("/error");
@@ -101,6 +101,7 @@ namespace ITStepFinalProject.Controllers {
 
             // try registering
             app.MapPost("/register", async (UserDatabaseHandler db, HttpContext context,
+                ControllerUtils controllerUtils,
                 [FromForm] string username, [FromForm] string password, 
                 [FromForm] string email, [FromForm] string notes,
                 [FromForm] string phone, [FromForm] string fulladdress,
@@ -113,39 +114,38 @@ namespace ITStepFinalProject.Controllers {
 
                     try {
 
-                        ISession session = context.Session;
-
-                        if (ControllerUtils.IsLoggedIn(session) != null) {
-                            // user is logged in
+                        UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                        if (user != null)
+                        {
                             return Results.Redirect("/dishes");
                         }
 
-                        UserModel userModel =
-                            ControllerUtils.GetUserModel(username, email, 
-                        password, fulladdress, phone, notes);
+                        UserModel userModel = new UserModel(fulladdress, phone, 
+                            username, notes, email, password);
 
 
                         // image => "someimage.png;BASE64=="
 
                         if (image.Length > 0) {
-                            userModel.Image = await ControllerUtils.UploadImage(image);
+                            userModel.Image = await controllerUtils.UploadImage(image);
                         }
+
                         db.RegisterUser(new InsertUserModel(userModel));
 
-                        UserModel? user = await db.LoginUser(userModel);
+                        UserModel? user = await db.LoginUser(userModel, true);
                         if (user == null)
                         {
                             if (userModel.Image != null && userModel.Image.Length > 0)
                             {
-                                ControllerUtils.RemoveImage("wwwroot"+userModel.Image);
+                                controllerUtils.RemoveImage("wwwroot"+userModel.Image);
                             }
                             return Results.BadRequest();
                         }
-                        
-                        ControllerUtils.HandleRememberMe(ref session, rememberMe, user.Id);
-                        ControllerUtils.SaveModelToSession(ref session, "User", user);
 
-                        await session.CommitAsync();
+                        string authString = controllerUtils.HandleAuth(user, rememberMe);
+
+                        context.Response.Cookies.Delete("Auth");
+                        context.Response.Cookies.Append("Auth", authString);
 
                         return Results.Ok();
 
@@ -159,23 +159,26 @@ namespace ITStepFinalProject.Controllers {
 
             // loggout from profile (by clearing session)
             app.MapPost("/logout", async (HttpContext context) => {
-                    try {
-                        ISession session = context.Session;
-                        session.Clear();
-                        await session.CommitAsync();
+                try {
 
-                        return Results.Redirect("/login");
-
-                    } catch (Exception) {
-                        return Results.Unauthorized();
+                    List<string> keys = new List<string>(context.Request.Cookies.Keys);
+                    foreach (string key in keys)
+                    {
+                        context.Response.Cookies.Delete(key);
                     }
+                    return Results.Redirect("/login");
 
-                }).RequireRateLimiting("fixed")
+                } catch (Exception) {
+                    return Results.Unauthorized();
+                }
+
+            }).RequireRateLimiting("fixed")
             .DisableAntiforgery();
 
 
             //edit user profile
             app.MapPost("/profile/edit", async (UserDatabaseHandler db, HttpContext context,
+                ControllerUtils controllerUtils,
                 [FromForm] string username, [FromForm] string? notes,
                 [FromForm] string? phone, [FromForm] string fulladdress,
                 [FromForm] string? image, [FromForm] string delete_image) =>
@@ -187,40 +190,25 @@ namespace ITStepFinalProject.Controllers {
                         return Results.BadRequest();
                     }
 
-                    ISession session = context.Session;
-                    int? userId = ControllerUtils.IsLoggedIn(session);
-                    if (userId == null)
+                    UserModel? model = await controllerUtils.GetUserModelFromAuth(context);
+                    if (model == null)
                     {
-                        return Results.Unauthorized();
+                        return Results.Redirect("/login");
                     }
 
-                    UserModel model = await db.GetUser((int)userId);
-
-                    string Username = model.Username;
-                    if (!model.Username.Equals(username))
-                    {
-                        Username = username;
-                    }
-
-                    string FullAddress = model.FullAddress;
-                    if (!model.FullAddress.Equals(fulladdress))
-                    {
-                        FullAddress = fulladdress;
-                    }
+                    string Username = !model.Username.Equals(username) ? username : model.Username;
+                    
+                    string FullAddress = !model.FullAddress.Equals(fulladdress) ? fulladdress : model.FullAddress;
 
                     notes = notes?.Replace(" ","").Length == 0 ? null : notes;
 
-                    string? Notes = model.Notes;
-                    if (model.Notes != notes)
-                    {
-                        Notes = notes;
-                    }
+                    string? Notes = model.Notes != notes ? notes : model.Notes;
 
                     string? Image = null;
                     if (delete_image.Equals("yes") && 
                         model.Image != null && model.Image.Contains('.'))
                     {
-                        ControllerUtils.RemoveImage("wwwroot"+model.Image);
+                        controllerUtils.RemoveImage("wwwroot"+model.Image);
                         Image = null;
 
                     } else
@@ -229,23 +217,24 @@ namespace ITStepFinalProject.Controllers {
                         Image = model.Image;
                         if (image != null)
                         {
-                            Image = await ControllerUtils.UploadImage(image);
+                            Image = await controllerUtils.UploadImage(image);
                         } 
                     }
 
                     phone = phone?.Replace(" ", "").Length == 0 ? null : phone;
-                    string? PhoneNumber = model.PhoneNumber;
-                    if (model.PhoneNumber != phone)
-                    {
-                        PhoneNumber = phone;
-                    }
+                    string? PhoneNumber = model.PhoneNumber != phone ? phone : model.PhoneNumber;
 
-                    UserModel user = ControllerUtils.GetUserModel(Username, 
-                        model.Email, model.Password, FullAddress, PhoneNumber, Notes);
+                    UserModel user = new UserModel(FullAddress, PhoneNumber, Username, Notes, 
+                        model.Email, model.Password);
 
                     user.Id = model.Id;
 
                     db.UpdateUser(user);
+
+                    string authString = controllerUtils.HandleAuth(user, "off");
+
+                    context.Response.Cookies.Delete("Auth");
+                    context.Response.Cookies.Append("Auth", authString);
 
                     return Results.Ok();
 

@@ -1,23 +1,45 @@
 ﻿using ITStepFinalProject.Database.Handlers;
+using ITStepFinalProject.Database.Utils;
 using ITStepFinalProject.Models;
+using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
 namespace ITStepFinalProject.Utils {
     public class ControllerUtils {
 
-        public static bool IsDateExpired(ISession session,
-           string key) {
-            try {
-                return DateTime.Parse(session.GetString(key)) <= DateTime.Now;
+        private EncryptionHandler _encryptionHandler;
+        private JWTHandler _jwtHandler;
 
-            } catch (Exception) {
-                return false;
+        public ControllerUtils(EncryptionHandler encryptionHandler, JWTHandler jwtHandler)
+        {
+            _encryptionHandler = encryptionHandler;
+            _jwtHandler = jwtHandler;
+        }
+
+        public async Task<UserModel?> GetLoginUserFromCookie(HttpContext context, 
+            UserDatabaseHandler userDB)
+        {
+            try
+            {
+                UserModel? user = await GetUserModelFromAuth(context);
+                return user == null ? null : await userDB.LoginUser(user, false);
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 
 
-        public static byte[] FromStringToUint8Array(string data) {
+        public async void VerifyLogin(HttpContext context)
+        {
+        
+        }
+
+
+        public byte[] FromStringToUint8Array(string data) {
             string[] dataNumbers = data.Split(",");
             byte[] byteArray = new byte[dataNumbers.Length];
             for (int i = 0; i < dataNumbers.Length; i++) {
@@ -26,20 +48,8 @@ namespace ITStepFinalProject.Utils {
             return byteArray;
         }
 
-        public static void HandleRememberMe(ref ISession session,
-            string remeberMe, int Id) {
 
-            session.SetInt32("UserId", Id);
-            if (remeberMe.Equals("off")) {
-
-                session.SetString("UserId_ExpirationDate",
-                    DateTime.Now.AddDays(1.0).ToString());
-            }
-        }
-
-
-
-        public static async Task<string> GetFileContent(string path) {
+        public async Task<string> GetFileContent(string path) {
             // path => /login => /dishes
             if (path.Contains('.')) {
                 return await File.ReadAllTextAsync($"wwwroot{path}");
@@ -51,16 +61,7 @@ namespace ITStepFinalProject.Utils {
         }
 
 
-        public static int? IsLoggedIn(ISession session) {
-            try {
-                return session.GetInt32("UserId");
-
-            } catch (Exception) {
-                return null;
-            }
-        }
-
-        public static void RemoveImage(string image)
+        public void RemoveImage(string image)
         {
             if (File.Exists(image))
             {
@@ -68,7 +69,7 @@ namespace ITStepFinalProject.Utils {
             }
         }
 
-        public static async Task<string?> UploadImage(string image)
+        public async Task<string?> UploadImage(string image)
         {
             string[] imageParts = image.Split(';');
             string imageName = imageParts[0];
@@ -93,21 +94,8 @@ namespace ITStepFinalProject.Utils {
             return null;
         }
 
-        public static UserModel GetUserModel(string username, string email, string password,
-            string fulladdress, string? phone, string? notes)
-        {
-            UserModel userModel = new UserModel();
-            userModel.FullAddress = fulladdress;
-            userModel.PhoneNumber = phone;
-            userModel.Username = username;
-            userModel.Notes = notes;
-            userModel.Email = email;
-            userModel.Password = password;
-            return userModel;
-        }
 
-
-        public static List<RestorantAddressModel> GetRestorantsForUser(UserModel user)
+        public List<RestorantAddressModel> GetRestorantsForUser(UserModel user)
         {
             List<RestorantAddressModel> resturantAddressModels = new List<RestorantAddressModel>();
             // of the user by himself
@@ -141,7 +129,7 @@ namespace ITStepFinalProject.Utils {
             return resturantAddressModels;
         }
 
-        public static JsonElement GetModelFromSession(ISession session, string modelName)
+        public JsonElement GetModelFromSession(ISession session, string modelName)
         {
             return JsonSerializer.Deserialize<JsonElement>(session.GetString(modelName));
             /*
@@ -162,35 +150,56 @@ namespace ITStepFinalProject.Utils {
             return model;*/
         }
 
-        public static void SaveModelToSession(ref ISession session,
-            string modelName, object model)
+       
+        // <summary>The Password in the model can be hashed</summary>
+        public string HandleAuth(UserModel model, string remeberMe)
         {
-            /*
-            string key = modelName + ":" + modelID + ":";
+            List<Claim> claims = new List<Claim>();
             foreach (string property in ModelUtils.Get_Model_Property_Names(model))
             {
-                session.SetString(key+property, 
-                    Convert.ToString(ModelUtils.Get_Property_Value(model, property) ?? ""));
-            }*/
-            session.SetString(modelName, JsonSerializer.Serialize(model));
+                claims.Add(new Claim(property,
+                    Convert.ToString(ModelUtils.Get_Property_Value(model, property) ?? "")));
+            }
+
+            return _encryptionHandler.Encrypt(
+                _jwtHandler.GenerateJwtToken(claims,
+               
+                remeberMe.Equals("off") ? DateTime.Now.AddDays(1.0) : null)
+                );
         }
 
-        public static async Task<IResult> HandleDefaultPage_WithUserModel(string path, HttpContext context, 
-            UserDatabaseHandler db)
+        public async Task<UserModel?> GetUserModelFromAuth(HttpContext context)
+        {
+            Dictionary<string, object>? claims = await _jwtHandler.VerifyJWT(
+                   _encryptionHandler.Decrypt(context.Request.Cookies["Auth"]));
+
+            if (claims == null)
+            {
+                return null;
+            }
+
+            UserModel userModel = new UserModel();
+            userModel.Id = int.Parse(claims["Id"].ToString());
+            userModel.Notes = claims["Notes"].ToString();
+            userModel.Email = claims["Email"].ToString();
+            userModel.Username = claims["Username"].ToString();
+            userModel.Image = claims["Image"].ToString();
+            userModel.FullAddress = claims["FullAddress"].ToString();
+            userModel.Password = claims["Password"].ToString();
+            return userModel;
+        }
+
+        public async Task<IResult> HandleDefaultPage_WithUserModel(string path, HttpContext context)
         {
             try
             {
-                ISession session = context.Session;
-                int? id = IsLoggedIn(context.Session);
-                if (id == null)
+                UserModel? user = await GetUserModelFromAuth(context);
+                if (user == null)
                 {
                     return Results.Redirect("/login");
                 }
 
                 string FileData = await GetFileContent(path);
-
-                UserModel user = GetModelFromSession(session, "User").Deserialize<UserModel>();
-
                 FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
 
                 return Results.Content(FileData, "text/html");
