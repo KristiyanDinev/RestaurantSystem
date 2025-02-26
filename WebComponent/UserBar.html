@@ -7,8 +7,12 @@
     <button class="navigation_button" onclick="goToDishes()">Dishes</button>
 
     <div class="profile" onclick="goToProfile()">
-
+        {% if "{{User.Image}}".length > 0 %}
         <img src="http://127.0.0.1:7278{{User.Image}}">
+
+        {% else %}
+        <img>
+        {% endif %}
         <p>{{User.Username}}</p>
     </div>
 
@@ -16,5 +20,4 @@
     <div class="logout">
         <button onclick="Logout()" id="logout">Log Out <img src="https://cdn-icons-png.flaticon.com/512/1286/1286853.png"></button>
     </div>
-
 </div>

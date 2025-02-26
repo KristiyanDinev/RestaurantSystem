@@ -8,7 +8,10 @@
         public decimal TotalPrice { get; set; }
 
         public int UserId { get; set; }
-        public string RestorantAddress { get; set; } // address;city;country
+        public string RestorantAddress { get; set; }
+        public string RestorantCity{ get; set; }
+        public string? RestorantState { get; set; } 
+        public string RestorantCountry { get; set; } 
 
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.Metrics;
+using System.Net;
+using System.Numerics;
 
 namespace ITStepFinalProject.Models {
     public class UserModel {
@@ -13,7 +15,10 @@ namespace ITStepFinalProject.Models {
         public string? Notes { get; set; }
         public string? PhoneNumber { get; set; }
         public string Email { get; set; }
-        public string FullAddress { get; set; } // address;city;country
+        public string Address { get; set; }
+        public string City { get; set; } 
+        public string? State { get; set; } 
+        public string Country { get; set; }
 
         public UserModel() {}
 
@@ -22,15 +27,31 @@ namespace ITStepFinalProject.Models {
             Password = password;
         }
 
-        public UserModel(string fulladdress, string? phone, 
-            string username, string? notes, string email, string password)
+        public UserModel(RegisterUserModel registerUserModel)
         {
-            FullAddress = fulladdress;
-            PhoneNumber = phone;
-            Username = username;
-            Notes = notes;
-            Email = email;
-            Password = password;
+            PhoneNumber = registerUserModel.PhoneNumber;
+            Username = registerUserModel.Username;
+            Notes = registerUserModel.Notes;
+            Email = registerUserModel.Email;
+            Password = registerUserModel.Password;
+            Address = registerUserModel.Address;
+            City = registerUserModel.City;
+            State = registerUserModel.State;
+            Country = registerUserModel.Country;
+            Image = registerUserModel.Image;
+        }
+        public UserModel(InsertUserModel insertUserModel)
+        {
+            PhoneNumber = insertUserModel.PhoneNumber;
+            Username = insertUserModel.Username;
+            Notes = insertUserModel.Notes;
+            Email = insertUserModel.Email;
+            Password = insertUserModel.Password;
+            Address = insertUserModel.Address;
+            City = insertUserModel.City;
+            State = insertUserModel.State;
+            Country = insertUserModel.Country;
+            Image = insertUserModel.Image;
         }
     }
 }

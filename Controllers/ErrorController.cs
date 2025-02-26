@@ -9,7 +9,7 @@ namespace ITStepFinalProject.Controllers {
             app.MapGet("/error", async (ControllerUtils controllerUtils) => {
                 try {
 
-                    string data = await controllerUtils.GetFileContent("/error");
+                    string data = await controllerUtils.GetHTMLFromWWWROOT("/error");
                     return Results.Content(data, "text/html");
 
                 } catch (Exception) {

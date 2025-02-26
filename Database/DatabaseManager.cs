@@ -23,7 +23,7 @@ values
 ('Desserts 1', 23.19, 'some stuff in it and this and that', 140, 'desserts', true, '1', null),
 ('Desserts 2', 30.20, 'some stuff in it and this and that', 120, 'desserts', false, '4', null),
 ('Dishes 1', 21.19, 'some stuff in it and this and that', 142, 'dishes', true, '2', null),
-('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3', null)
+('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3', null);
        
         -- year-month-day
           insert into Cupons (CuponCode, DiscountPercent, ExpirationDate, Name) VALUES
@@ -35,6 +35,16 @@ values
         -- MM/DD/YYYYTHH:mm:ssZ
          */
 
+        public static string _connectionString = "";
+        public static async Task<NpgsqlCommand> BuildCommand(string sql)
+        {
+            var command = new NpgsqlCommand(sql);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+            command.Connection = connection;
+            return command;
+        }
+
 
 
         public static async void Setup() {
@@ -44,7 +54,10 @@ values
                     Username VARCHAR(100) NOT NULL UNIQUE,
                     Password VARCHAR(64) NOT NULL,
                     Image VARCHAR(255),
-                    FullAddress TEXT NOT NULL,
+                    Address TEXT NOT NULL,
+                    City VARCHAR(100) NOT NULL,
+                    State VARCHAR(100),
+                    Country VARCHAR(100) NOT NULL,
                     PhoneNumber VARCHAR(15),
                     Email VARCHAR(50) NOT NULL UNIQUE,
                     Notes VARCHAR(255)
@@ -70,6 +83,9 @@ values
                     OrderedAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
                     UserId INT REFERENCES Users(Id),
                     RestorantAddress TEXT NOT NULL,
+                    RestorantCity VARCHAR(100) NOT NULL,
+                    RestorantState VARCHAR(100),
+                    RestorantCountry VARCHAR(100) NOT NULL,
                     TotalPrice NUMERIC(10, 2) NOT NULL
                 );
 
@@ -97,7 +113,7 @@ values
                 """;
 
 
-            var cmd = await DatabaseCommandBuilder.BuildCommand(sql);
+            var cmd = await BuildCommand(sql);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
         }
@@ -106,41 +122,21 @@ values
         public static object ConvertToModel(NpgsqlDataReader reader, object model)
         {
             object obj = Activator.CreateInstance(model.GetType());
-            /*
-            if (model is UserModel) {
-                obj = new UserModel();
 
-            } else if (model is DishModel) {
-                obj = new DishModel();
-
-            } else if (model is CuponModel) {
-                obj = new CuponModel();
-
-            } else if (model is OrderModel) {
-                obj = new OrderModel();
-
-            } else if (model is OrderedDishesModel) {
-                obj = new OrderedDishesModel();
-
-            } else
-            {
-                throw new Exception("No such model!");
-            }*/
-
-                foreach (string property in ModelUtils.Get_Model_Property_Names(model))
-                {
-                    try
-                    {
-                        ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
-                    }
-                    catch (Exception e)
-                    { }
-                }
+           foreach (string property in ModelUtils.Get_Model_Property_Names(model))
+           {
+               try
+               {
+                  ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
+               }
+               catch (Exception)
+               { }
+           }
             return obj;
         }
 
         public static async void _ExecuteNonQuery(string sql) {
-            var cmd = await DatabaseCommandBuilder.BuildCommand(sql);
+            var cmd = await BuildCommand(sql);
             int num = await cmd.ExecuteNonQueryAsync();
 
             cmd.Connection?.Close();
@@ -155,7 +151,7 @@ values
         public static async Task<List<object>> _ExecuteQuery(string sql,
             object model, bool isPrepare)
         {
-            var cmd = await DatabaseCommandBuilder.BuildCommand(sql);
+            var cmd = await BuildCommand(sql);
 
             if (isPrepare)
             {

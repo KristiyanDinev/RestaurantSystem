@@ -41,7 +41,7 @@ function toggleDeleteImage() {
     if (delete_image_data === "no") {
         delete_image_data = "yes"
         doc.innerHTML = "Delete Image: Yes"
-        document.getElementsByClassName('review')[0].src = ""
+        document.getElementById("review").src = ""
 
     } else {
         delete_image_data = "no"
@@ -56,31 +56,19 @@ async function updateUser() {
     let country = document.getElementById('country').value
 
     let status = document.getElementById('Stats')
-    if (addr.replace(" ", "").length == 0 || city.replace(" ", "").length == 0 ||
-         country.replace(" ", "").length == 0) {
-        status.innerHTML = "Fill the address, city and country inputs."
-        return;
-    }
-
-    if (addr.includes(';') || city.includes(';') || country.includes(';') || 
-        state.includes(';') ||
-    
-        addr.includes('|') || city.includes('|') || country.includes('|') || 
-        state.includes('|')) {
-            status.innerHTML = "No ; or | in the address, city, state or country input."
-        return;
-    }
-
     status.innerHTML = "Updating..."
 
     let formData = new FormData()
-    formData.append('username', document.getElementById('username').value)
-    formData.append('email', document.getElementById('email').value)
-    formData.append('fulladdress', addr+ ';'+city+';'+state+';'+country)
-    formData.append('notes', document.getElementById('notes').value)
-    formData.append('phone', document.getElementById('phone').value)
-    formData.append('image', ImageFile)
-    formData.append('delete_image', delete_image_data)
+    formData.append('Username', document.getElementById('username').value)
+    formData.append('Email', document.getElementById('email').value)
+    formData.append('Address', addr)
+    formData.append('City', city)
+    formData.append('State', state)
+    formData.append('Country', country)
+    formData.append('Notes', document.getElementById('notes').value)
+    formData.append('PhoneNumber', document.getElementById('phone').value)
+    formData.append('Image', ImageFile)
+    formData.append('DeleteImage', delete_image_data)
 
     const res = await fetch(Host + '/profile/edit', {
         method: 'POST',

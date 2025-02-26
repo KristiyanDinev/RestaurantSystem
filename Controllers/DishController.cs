@@ -2,9 +2,6 @@
 using ITStepFinalProject.Models;
 using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
-using System.Xml.Linq;
 
 namespace ITStepFinalProject.Controllers {
     public class DishController {
@@ -13,32 +10,36 @@ namespace ITStepFinalProject.Controllers {
 
            
             app.MapGet("/dishes", async (HttpContext context,
-                ControllerUtils controllerUtils) =>
+                ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils) =>
             {
 
                 return await controllerUtils.HandleDefaultPage_WithUserModel("/dishes",
-                          context);
+                          context, userUtils, webUtils);
             });
 
 
             
             app.MapGet("/dish/", async (HttpContext context,
                 DishDatabaseHandler db, ControllerUtils controllerUtils, 
+                UserUtils userUtils, WebUtils webUtils,
                 [FromQuery(Name = "type")] string type) => {
 
                     try
                     {
-                        UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
                         if (user == null)
                         {
                             return Results.Redirect("/login");
                         }
 
                         List<DishModel> dishes = await db.GetDishes(type);
-                        string FileData = await controllerUtils.GetFileContent("/dishes/" + type);
+                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/dishes/" + type);
 
-                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
-                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "Dish", dishes.Cast<object>()
+                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
+                            controllerUtils.UserModelName, [user]);
+
+                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
+                            controllerUtils.DishModelName, dishes.Cast<object>()
                             .ToList());
 
                         return Results.Content(FileData, "text/html");
@@ -53,6 +54,7 @@ namespace ITStepFinalProject.Controllers {
 
             app.MapGet("/dish/id", async (HttpContext context,
                 DishDatabaseHandler dishDb, ControllerUtils controllerUtils, 
+                UserUtils userUtils, WebUtils webUtils,
                 [FromQuery(Name = "dishId")] string dishId) => {
 
                     if (!int.TryParse(dishId, out int Id)) {
@@ -61,7 +63,7 @@ namespace ITStepFinalProject.Controllers {
 
                     try {
                         
-                        UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
                         if (user == null)
                         {
                             return Results.Redirect("/login");
@@ -74,12 +76,15 @@ namespace ITStepFinalProject.Controllers {
                         }
 
                         DishModel dish = dishes[0];
-                        string FileData = await controllerUtils.GetFileContent("/single_dish");
+                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/single_dish");
 
                         
 
-                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
-                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "Dish", [dish]);
+                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
+                            controllerUtils.UserModelName, [user]);
+
+                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
+                            controllerUtils.DishModelName, [dish]);
 
                         return Results.Content(FileData, "text/html");
 

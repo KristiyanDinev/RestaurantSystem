@@ -2,6 +2,7 @@ using ITStepFinalProject.Controllers;
 using ITStepFinalProject.Database;
 using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
+using ITStepFinalProject.Services;
 using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
@@ -38,27 +39,34 @@ namespace ITStepFinalProject
 
             // postgresql 17 5432
             // postgresql 16 5433
-            DatabaseCommandBuilder._connectionString = 
+            DatabaseManager._connectionString = 
                 builder.Configuration.GetValue<string>("ConnectionString") ?? "";
 
-            string key = builder.Configuration.GetValue<string>("Encryption_Key") ?? "D471E0624EA5A7FFFC68180CD647828FF230D5C333ADF529DE0135ABAA918E87";
-
-
-            WebHelper.commonPlaceholders = new Dictionary<string, List<string>>{
-                                                {"User", ["{{UserBar}}", "{{Profile}}"]},
-                                                {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}"]},
-                                                {"Order", ["{{OrderDisplay}}"]},
-                                                {"Restorant", ["{{RestorantAddress}}"] }, 
-                };
+            string key = builder.Configuration.GetValue<string>("Encryption_Key") ?? "D471E0624EA5A7FFFABAA918E87";
 
             DatabaseManager.Setup();
+
+            EncryptionHandler encryptionHandler = new EncryptionHandler(key);
+            JWTHandler jwtHandler = new JWTHandler(key);
 
             builder.Services.AddScoped<UserDatabaseHandler>();
             builder.Services.AddScoped<DishDatabaseHandler>();
             builder.Services.AddScoped<CuponDatabaseHandler>();
             builder.Services.AddScoped<OrderDatabaseHandler>();
+
+            builder.Services.AddSingleton<WebUtils>(new WebUtils(
+                new Dictionary<string, List<string>>{
+                       {"User", ["{{UserBar}}", "{{Profile}}"]},
+                       {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}"]},
+                       {"Order", ["{{OrderDisplay}}"]},
+                       {"Restorant", ["{{RestorantAddress}}"] },
+                }));
+
             builder.Services.AddSingleton<ControllerUtils>(
-                new ControllerUtils(new EncryptionHandler(key), new JWTHandler(key)));
+                new ControllerUtils(encryptionHandler, jwtHandler));
+
+            builder.Services.AddSingleton<UserUtils>(
+                new UserUtils(encryptionHandler, jwtHandler));
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
                     ?? "ugyw89ub9Y9H8OP9j1wsfwedS";
@@ -114,44 +122,9 @@ namespace ITStepFinalProject
             app.UseRateLimiter();
             app.UseStaticFiles();
 
-            ControllerUtils controllerUtils = new ControllerUtils(new EncryptionHandler(key), new JWTHandler(key));
-            UserDatabaseHandler userDatabaseHanlder = new UserDatabaseHandler();
-
-
-
-            app.Use(async (HttpContext context, RequestDelegate next) => {
-
-                Console.WriteLine("Cookies:");
-                foreach (var cookie in context.Request.Cookies)
-                {
-                    Console.WriteLine(cookie);
-                }
-                Console.WriteLine("----\n");
-
-
-                // context.Request.Path.Value something like: /login/login.js
-                string? path = context.Request.Path.Value;
-                Console.WriteLine(context.Request.Method);
-
-                UserModel? user = await controllerUtils.GetLoginUserFromCookie(context, userDatabaseHanlder);
-                if (path != null) {
-                    // user is not logged in, so send it to be logged in.
-                    if (user == null && !(path.Equals("/login") || path.Equals("/register")))
-                    {
-                        context.Response.Redirect(uri + "/login");
-                        return;
-                    }
-
-                    if (user != null && (path.Equals("/login") || path.Equals("/register")))
-                    {
-                        context.Response.Redirect(uri + "/dishes");
-                        return;
-                    }
-                }
-
-
-                await next.Invoke(context);
-            });
+            new RequestMiddlewareService().RegisterMiddlewarePerService(app,
+                new AuthenticationService(new ControllerUtils(encryptionHandler, jwtHandler), 
+                    new UserDatabaseHandler(), new UserUtils(encryptionHandler, jwtHandler)));
 
             new UserController(app);
             new DishController(app);

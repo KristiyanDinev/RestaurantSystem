@@ -11,7 +11,10 @@
         public string? Notes { get; set; }
         public string? PhoneNumber { get; set; }
         public string Email { get; set; }
-        public string FullAddress { get; set; }
+        public string City { get; set; }
+        public string Address { get; set; }
+        public string? State { get; set; }
+        public string Country { get; set; }
 
         public InsertUserModel() { }
         public InsertUserModel(UserModel model)
@@ -22,7 +25,24 @@
             Notes = model.Notes;
             PhoneNumber = model.PhoneNumber;
             Email = model.Email;
-            FullAddress = model.FullAddress;
+            City = model.City;
+            Address = model.Address;
+            State = model.State;
+            Country = model.Country;
+        }
+
+        public InsertUserModel(RegisterUserModel registerUserModel)
+        {
+            PhoneNumber = registerUserModel.PhoneNumber;
+            Username = registerUserModel.Username;
+            Notes = registerUserModel.Notes;
+            Email = registerUserModel.Email;
+            Password = registerUserModel.Password;
+            Address = registerUserModel.Address;
+            City = registerUserModel.City;
+            State = registerUserModel.State;
+            Country = registerUserModel.Country;
+            Image = registerUserModel.Image;
         }
     }
 }

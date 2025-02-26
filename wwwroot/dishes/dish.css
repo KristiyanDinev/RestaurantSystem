@@ -76,6 +76,7 @@ body {
     padding-left: 30px;
     padding-right: 30px;
     text-align: center;
+    cursor: pointer;
 }
 
 #whole_food {
@@ -123,5 +124,9 @@ body {
     display: inline-block;
     color: white;
     font-weight: 700;
+    cursor: pointer;
+}
+
+.food {
     cursor: pointer;
 }

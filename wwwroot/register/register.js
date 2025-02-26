@@ -43,38 +43,19 @@ function submit() {
     let country = document.getElementById("Country")
     let email = document.getElementById("Email")
     
-    if (username.value.replace(" ", "").length === 0 ||
-        password.value.replace(" ", "").length === 0 ||
-        address.value.replace(" ", "").length === 0 ||
-        city.value.replace(" ", "").length === 0 ||
-        country.value.replace(" ", "").length === 0 ||
-        email.value.replace(" ", "").length === 0) {
-        
-        document.getElementById("Stats").innerHTML = "Requred Inputs: Username, Password, Email, Address, City and Country."
-       return;
-    }
-
-    let state = document.getElementById("State")
-
-    if (address.value.includes(';') || city.value.includes(';') || country.value.includes(';') || 
-        state.value.includes(';') ||
-    
-        address.value.includes('|') || city.value.includes('|') || country.value.includes('|') || 
-        state.value.includes('|')) {
-            document.getElementById("Stats").innerHTML = "No ; or | in the address, city, state or country input."
-        return;
-    }
-
     
     let formData = new FormData()
-    formData.append("username", username.value)
-    formData.append("password", password.value)
-    formData.append("email", email.value)
-    formData.append("notes", document.getElementById("Notes").value)
-    formData.append("fulladdress", address.value + ";"+ city.value+";" + state.value + ";"+ country.value)
-    formData.append("phone", document.getElementById("Phone").value)
-    formData.append("image", ImageFile)
-    formData.append("rememberMe", document.querySelector('#RememberMe:checked') === null ?
+    formData.append("Username", username.value)
+    formData.append("Password", password.value)
+    formData.append("Email", email.value)
+    formData.append("Notes", document.getElementById("Notes").value)
+    formData.append("Address", address.value)
+    formData.append("City", city.value)
+    formData.append("State", document.getElementById("State").value)
+    formData.append("Country", country.value)
+    formData.append("PhoneNumber", document.getElementById("Phone").value)
+    formData.append("Image", ImageFile)
+    formData.append("RememberMe", document.querySelector('#RememberMe:checked') === null ?
                                  "off" : "on")
 
     fetch(Host + "/register", {

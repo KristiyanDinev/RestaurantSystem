@@ -7,10 +7,6 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <script src='../Index.js'></script>
     <script>
-        function formatAddress(addr) {
-            // address;city;state;country
-            return addr.split(';').join(' - ')
-        }
         async function putOrderDishes(id) {
             let formData = new FormData();
             formData.append('orderId', Number(id))

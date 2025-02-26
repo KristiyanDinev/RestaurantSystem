@@ -1,11 +1,36 @@
 var Host = "http://127.0.0.1:7278"
 
-function addDishToCart(id) {
-    document.cookie = "cart."+id +'='+id;
+function addDishToCart(id, name) {
+    let cart = getCookie("cart")
+    if (cart.length == 0) {
+        document.cookie = "cart="+id;
+
+    } else {
+        document.cookie = "cart="+cart +"-"+ id;
+    }
+    alert("Added 1 x "+name+" to your cart")
+    window.location.reload()
 }
 
-function removeDishFromCart(id) {
-    document.cookie = "cart."+id +'=; path=/; domain=127.0.0.1; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+function removeDishFromCart(id, name) {
+    let cart = getCookie("cart")
+    if (cart.length > 0) {
+        let dishes = cart.split('-')
+        var index = dishes.indexOf(id);
+        if (index > -1) {
+            dishes.splice(index, 1);
+        }
+        document.cookie = "cart="+dishes.join('-')
+    }
+    alert("Removed 1 x "+name+" from your cart")
+    window.location.reload()
+    //document.cookie = "cart."+id +'=; path=/; domain=127.0.0.1; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+}
+
+function goToDish(id) {
+    let params = new URLSearchParams()
+    params.append("dishId", String(id))
+    window.location.href = "/dish/id?" + params.toString()
 }
 
 function goToSalads() {

@@ -1,54 +1,31 @@
 ﻿<div id="whole_food">
 
+    {% if "{{Dish.IsAvailable}}" == "True" %}
 
+    <div class="food" style="opacity: 100%;" onclick="goToDish('{{Dish.Id}}')">
+    {% else %}
     <div class="food" style="opacity: 50%;">
+    {% endif %}
         <p class="food_name">{{Dish.Name}}</p>
         <p class="food_grams">grams: /{{Dish.Grams}}/</p>
-        <img id="desasadw">
+        {% if "{{Dish.Image}}".length > 0 %}
+        <img class="food_image" src="{{Dish.Image}}">
+
+        {% else %}
+        <img>
+        {% endif %}
         <p class="food_price">{{Dish.Price}} lv.</p>
     </div>
 
     <div>
-        <button id="order{{Dish.Id}}" style="opacity: 50%;">Add to order</button>
+        {% if "{{Dish.IsAvailable}}" == "True" %}
+        <button id="order" style="opacity: 100%;"
+                onclick="addDishToCart('{{Dish.Id}}', '{{Dish.Name}}')">
+            Add to order
+        </button>
+
+        {% else %}
+        <button id="order" style="opacity: 50%;">Add to order</button>
+        {% endif %}
     </div>
-
-    <script>
-        if ("{{Dish.Image}}".length > 0) {
-            let imageI = document.getElementById("desasadw")
-            imageI.className = "food_image"
-            imageI.src = Host + "{{Dish.Image}}"
-        }
-
-        var order = document.getElementById("order{{Dish.Id}}")
-            order.style.opacity = "50%"
-
-
-        if ("{{Dish.IsAvailable}}" == "True") {
-            let foodDiv = document.getElementsByClassName("food")[0]
-            foodDiv.style.opacity = "100%"
-            foodDiv.onclick = () => {
-                let params = new URLSearchParams()
-                params.append("dishId", "{{Dish.Id}}")
-                window.location.href = "/dish/id?" + params.toString()
-            }
-
-                order.style.opacity = "100%"
-                order.onclick = async () => {
-                    var formData = new FormData()
-                    formData.append("dishId", Number("{{Dish.Id}}"))
-
-                    const res = await fetch(Host + "/order/add", {
-                        method: "POST",
-                        body: formData,
-                        redirect: 'follow',
-                    })
-
-                    if (res.status === 200) {
-                        alert("Added 1 {{Dish.Name}} dish to your cart.")
-                    }
-                }
-            }
-    </script>
-
-
 </div>

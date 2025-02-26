@@ -2,7 +2,7 @@
 
 namespace ITStepFinalProject.Utils
 {
-    public class WebHelper
+    public class WebUtils
     {
 
         /* whole page html
@@ -27,21 +27,36 @@ namespace ITStepFinalProject.Utils
          * 
          */
 
-        public static Dictionary<string, List<string>> commonPlaceholders;
+        private Dictionary<string, List<string>> commonPlaceholders;
+        private TemplateRenderer _templateRenderer;
 
-        public static string FillInPlaceholdersForModel(string modelName,
+        public WebUtils(Dictionary<string, List<string>>  _commonPlaceholders)
+        {
+            commonPlaceholders = _commonPlaceholders;
+            _templateRenderer = new TemplateRenderer();
+        }
+
+        public string FillInPlaceholdersForModel(string modelName,
             object model, string html)
         {
-            foreach (string property in 
+            Dictionary<string, object> variables = new Dictionary<string, object>();
+            foreach (string property in
                 ModelUtils.Get_Model_Property_Names(model))
             {
-                html = html.Replace("{{" + modelName + "." + property + "}}", 
+                variables.Add("{{" + modelName + "." + property + "}}", 
                     Convert.ToString(ModelUtils.Get_Property_Value(model, property)));
+            }
+
+            html = _templateRenderer.Render(html, variables);
+
+            foreach (string key in variables.Keys)
+            {
+                html = html.Replace(key, Convert.ToString(variables[key]));
             }
             return html;
         }
 
-        public static string GetHTMLForModel(string componet)
+        public string GetHTMLForModel(string componet)
         {
             try
             {
@@ -54,7 +69,7 @@ namespace ITStepFinalProject.Utils
             }
         }
 
-        public static string GetModelsHTML(string modelName, List<object> models, string html,
+        public string GetModelsHTML(string modelName, List<object> models, string html,
             string componentName)
         {  // componentName will be the placeholder {{UserBar}}
             if (!html.Contains(componentName))
@@ -82,7 +97,7 @@ namespace ITStepFinalProject.Utils
         }
 
 
-        public static string HandleCommonPlaceholders(string html, string modelName, 
+        public string HandleCommonPlaceholders(string html, string modelName, 
             List<object> models) { 
         // will the component name be the placeholder the one that is for a whole model? yes
             foreach (string placeholder in commonPlaceholders[modelName])

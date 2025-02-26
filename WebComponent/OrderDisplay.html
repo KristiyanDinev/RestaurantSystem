@@ -8,25 +8,18 @@
 
     <div class="dish_list" id="{{Order.Id}}dish_list">
     </div>
-    
+
     <p class="part">TotalPrice: {{Order.TotalPrice}} lv.</p>
-    <p class="part" id="{{Order.Id}}restaddr"></p>
+    <p class="part">Restorant Address: {{Order.RestorantAddress}}</p>
     <p class="part" id="{{Order.Id}}orderedat"></p>
 
-    <button class="cancel" id="{{Order.Id}}cancel">Cancel</button>
-
+    {% if "{{Order.CurrentStatus}}" != "pending" %}
+    <button class="cancel" style="opacity: 50%">Cancel</button>
+    {% else %}
+    <button class="cancel" style="opacity: 100%" onclick="cancelOrder('{{Order.Id}}')">Cancel</button>
+    {% endif %}
     <!-- MM/DD/YYYYTHH:mm:ssZ -->
     <script>
-        if ("{{Order.CurrentStatus}}" != "pending") {
-            document.getElementById("{{Order.Id}}cancel").onclick = () => { }
-            document.getElementById("{{Order.Id}}cancel").style.opacity = "50%"
-
-        } else {
-            document.getElementById("{{Order.Id}}cancel").onclick = async () => { await cancelOrder('{{Order.Id}}') }
-            document.getElementById("{{Order.Id}}cancel").style.opacity = "100%"
-        }
-
-        document.getElementById("{{Order.Id}}restaddr").innerHTML = "RestorantAddess: " + formatAddress("{{Order.RestorantAddress}}")
         document.getElementById("{{Order.Id}}orderedat").innerHTML = "OrderedAt: " + new Date(Date.parse("{{Order.OrderedAt}}")).toString()
 
         putOrderDishes('{{Order.Id}}')

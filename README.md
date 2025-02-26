@@ -30,7 +30,19 @@ The `User` is the model name.
   `local user address;user City;user State (can be empty if none);user Country|Avrage Time to Deliver|local restorant address;restorant city;restorant state;resturant country`
 
 - `Auth` header will contain a encrypted JWT token representing the user's data.
-- 
+
+- If statement supported for comparing numbers and lenght of strings. Example:
+```
+{% if "{{User.Image}}".length > 0 %}
+    <img src="{{User.Image}}">
+
+{% elseif "{{User.Image}}".length == 0 %}
+   <img>
+{% else %}
+    <p>idk</p>
+{% endif %}
+```
+You open it with `{% if ... %}` and close it with `{% endif %}`. The `{% elseif ... %}` and `{% else %}` is optional
 
 ### TODO
 - Maybe Cupon Controller. We will see.

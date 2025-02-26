@@ -62,7 +62,7 @@ namespace ITStepFinalProject.Database.Handlers
         public async void UpdateUser(UserModel model)
         {
             List<string> values = new List<string>();
-            values.Add("Password = '" + ValueHandler.HashString(model.Password) + "' AND ");
+            values.Add("Password = '" + ValueHandler.HashString(model.Password) + "', ");
 
             List<string> names = ModelUtils.Get_Model_Property_Names(model);
             for (int i = 0; i < names.Count; i++)
@@ -74,7 +74,7 @@ namespace ITStepFinalProject.Database.Handlers
                 }
                 values.Add(property + 
                     " = "+ ValueHandler.GetModelPropertyValue(model, property) +
-                    (i == names.Count - 1 ? "" : " AND "));
+                    (i == names.Count - 1 ? "" : ", "));
             }
 
             List<string> where = new List<string>();

@@ -2,7 +2,6 @@
 using ITStepFinalProject.Models;
 using ITStepFinalProject.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace ITStepFinalProject.Controllers {
     public class OrderController {
@@ -12,21 +11,29 @@ namespace ITStepFinalProject.Controllers {
 
             // get front-end display of your orders
             app.MapGet("/orders", async (HttpContext context, 
-                OrderDatabaseHandler db, ControllerUtils controllerUtils) => {
+                OrderDatabaseHandler db, ControllerUtils controllerUtils, 
+                UserUtils userUtils, WebUtils webUtils) => {
 
                 try {
-                        UserModel? user = await controllerUtils.GetUserModelFromAuth(context);
+                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
                         if (user == null)
                         {
                             return Results.Redirect("/login");
                         }
 
                         List<OrderModel> orders = await db.GetOrdersByUser(user.Id);
+                        foreach (OrderModel order in orders)
+                        {
+                            order.RestorantAddress = string.Join(" - ", order.RestorantAddress.Split(';'));
+                        }
 
-                        string FileData = await controllerUtils.GetFileContent("/orders");
+                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/orders");
 
-                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "User", [user]);
-                        FileData = WebHelper.HandleCommonPlaceholders(FileData, "Order", orders.Cast<object>().ToList());
+                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
+                            controllerUtils.UserModelName, [user]);
+
+                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
+                            controllerUtils.OrderModelName, orders.Cast<object>().ToList());
 
                     return Results.Content(FileData, "text/html");
 
@@ -38,7 +45,12 @@ namespace ITStepFinalProject.Controllers {
 
             app.MapPost("/order/dishes", async (HttpContext context,
                 OrderDatabaseHandler db,
-                [FromForm] int orderId) => {
+                [FromForm] string orderIdStr) => {
+
+                    if (!int.TryParse(orderIdStr, out int orderId))
+                    {
+                        return Results.BadRequest();
+                    }
 
                     try
                     {
@@ -59,50 +71,30 @@ namespace ITStepFinalProject.Controllers {
               .DisableAntiforgery();
 
 
-            // add dish  (depricated/maybe replace it with cookies on the client side)
-            app.MapPost("/order/add", async (HttpContext context, 
-                 [FromForm] int dishId) => {
+           
 
-                    try {
-                        
-
-
-                        return Results.Ok();
-
-                    } catch (Exception) {
-                        return Results.BadRequest();
-                    }
-                     
-            }).RequireRateLimiting("fixed")
-              .DisableAntiforgery();
-
-
-            // remove dish (depricated/maybe replace it with cookies on the client side)
-            app.MapPost("/order/remove", async (HttpContext context,
-               [FromForm] int dishId) => {
-
-                    try {
-
-                        return Results.Ok();
-
-                    } catch (Exception) {
-                        return Results.BadRequest();
-                    }
-
-                }).RequireRateLimiting("fixed")
-              .DisableAntiforgery();
-
-            /*
+            
             // start order
             app.MapPost("/order", async (HttpContext context,
                 CuponDatabaseHandler cuponDb, OrderDatabaseHandler orderDb,
-                ControllerUtils controllerUtils,
+                ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string notes,
                 [FromForm] string cuponCode, [FromForm] string restorantAddress) => {
 
                     try {
 
-                        UserModel user = await controllerUtils.GetUserModelFromAuth(context);
+                        if (string.IsNullOrWhiteSpace(restorantAddress))
+                        {
+                            return Results.BadRequest();
+                        }
+
+                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                        if (user == null)
+                        {
+                            return Results.Redirect("/login");
+                        }
+
+                        controllerUtils.GetCartItems()
 
                         List<float> currentPrices = OrderControllerUtils.GetPricesFromOrder(session);
                         decimal TotalPrice = OrderControllerUtils.CalculateTotalPrice(currentPrices, 0);
@@ -136,9 +128,7 @@ namespace ITStepFinalProject.Controllers {
                             cuponDb.DeleteCupon(cupon.CuponCode);
                         }
 
-                        OrderControllerUtils.DeleteOrderFromSession(ref session);
-
-                        await session.CommitAsync();
+                        context.Response.Cookies.Delete("cart");
 
                         return Results.Ok();
 
@@ -148,11 +138,16 @@ namespace ITStepFinalProject.Controllers {
 
                 }).RequireRateLimiting("fixed")
               .DisableAntiforgery();
-            */
+            
 
             // stop order
             app.MapPost("/order/stop", async (HttpContext context,
-                OrderDatabaseHandler db, [FromForm] int orderId) => {
+                OrderDatabaseHandler db, [FromForm] string orderIdStr) => {
+
+                    if (!int.TryParse(orderIdStr, out int orderId))
+                    {
+                        return Results.BadRequest();
+                    }
 
                     try {
                         string? status = 
