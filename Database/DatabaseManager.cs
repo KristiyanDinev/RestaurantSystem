@@ -1,6 +1,5 @@
 ﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Utils;
+using ITStepFinalProject.Utils.Utils;
 using Npgsql;
 
 namespace ITStepFinalProject.Database {
@@ -123,11 +122,11 @@ values
         {
             object obj = Activator.CreateInstance(model.GetType());
 
-           foreach (string property in ModelUtils.Get_Model_Property_Names(model))
+           foreach (string property in ObjectUtils.Get_Model_Property_Names(model))
            {
                try
                {
-                  ModelUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
+                  ObjectUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
                }
                catch (Exception)
                { }

@@ -1,4 +1,6 @@
-﻿namespace ITStepFinalProject.Models
+﻿using ITStepFinalProject.Models.DatabaseModels;
+
+namespace ITStepFinalProject.Models.WebModels
 {
     public class DisplayDishModel
     {

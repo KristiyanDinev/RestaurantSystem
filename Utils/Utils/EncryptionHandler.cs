@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace ITStepFinalProject.Utils
+namespace ITStepFinalProject.Utils.Utils
 {
     public class EncryptionHandler
     {

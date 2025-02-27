@@ -1,8 +1,9 @@
-﻿using System.Text;
+﻿using ITStepFinalProject.Models.DatabaseModels;
+using System.Text;
 
-namespace ITStepFinalProject.Utils
+namespace ITStepFinalProject.Utils.Controller
 {
-    public class OrderControllerUtils
+    public class OrderUtils
     {
         public static void AddDishToOrder(ref ISession session,
             int dishId, float dishPrice)
@@ -104,11 +105,22 @@ namespace ITStepFinalProject.Utils
             return dishes;
         }
 
-        public static decimal CalculateTotalPrice(List<float> prices, decimal discount_percent)
+        public static decimal CalculateTotalPrice(List<DishModel> dishes, decimal discount_percent)
         {
-            float totalPrice = prices.Sum();
+            decimal totalPrice = 0;
+            foreach (DishModel dish in dishes)
+            {
+                totalPrice += dish.Price;
+            }
 
-            return (decimal)(totalPrice - (totalPrice * (((float)discount_percent) / 100)));
+            if (discount_percent == 0)
+            {
+                return totalPrice;
+
+            } else
+            {
+                return totalPrice - totalPrice * (discount_percent / 100);
+            }
         }
 
         public static void DeleteOrderFromSession(ref ISession session)

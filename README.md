@@ -45,5 +45,8 @@ The `User` is the model name.
 You open it with `{% if ... %}` and close it with `{% endif %}`. The `{% elseif ... %}` and `{% else %}` is optional
 
 ### TODO
-- Maybe Cupon Controller. We will see.
-- InsertRestorantModel.
+- Staff page for seeing orders, reservations and updating / cancelling them.
+- Admin page for adding staff.
+- Websocket for order status.
+- Server has to send "PING" messages (empty) to the client in websockets so it can keep the connection alive. 
+ The websocket connection for the orders will be opened as long as there are orders to be displayed.

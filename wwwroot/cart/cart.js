@@ -1,20 +1,29 @@
+var restorantAddressIndexes = {}
+
+function addRestorantIndex(index, addr, city, state, country) {
+    restorantAddressIndexes[index] = [addr, city, state, country]
+}
 
 async function startOrder() {
-    let restorant_add = document.getElementById("restorant_address").value;
-    if (restorant_add.length == 0) {
+    let restorantIndex = document.getElementById("restorant_address").value;
+    if (restorantIndex.length == 0) {
         alert("You can't order without restorant address.")
         return;
     }
 
-    if (restorant_add === undefined || restorant_add.length === 0) {
-        document.getElementById("dish_stats").innerHTML = "Restorant Address is required."
+    let cartCookie = getCookie('cart')
+    if (cartCookie.length == 0) {
+        alert("You don't have any dishes to order as of now.")
         return;
     }
 
     var formData = new FormData()
     formData.append("notes", document.getElementById("notes").value)
     formData.append("cuponCode", document.getElementById("cupon_input").value)
-    formData.append("restorantAddress", restorant_add)
+    formData.append("restorantAddress", restorantAddressIndexes[restorantIndex][0])
+    formData.append("restorantCity", restorantAddressIndexes[restorantIndex][1])
+    formData.append("restorantState", restorantAddressIndexes[restorantIndex][2])
+    formData.append("restorantCountry", restorantAddressIndexes[restorantIndex][3])
 
     const res = await fetch(Host + '/order', {
         method: 'POST',

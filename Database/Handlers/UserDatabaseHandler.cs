@@ -1,6 +1,7 @@
 ﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Utils;
+using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
+using ITStepFinalProject.Utils.Utils;
 
 namespace ITStepFinalProject.Database.Handlers
 {
@@ -64,7 +65,7 @@ namespace ITStepFinalProject.Database.Handlers
             List<string> values = new List<string>();
             values.Add("Password = '" + ValueHandler.HashString(model.Password) + "', ");
 
-            List<string> names = ModelUtils.Get_Model_Property_Names(model);
+            List<string> names = ObjectUtils.Get_Model_Property_Names(model);
             for (int i = 0; i < names.Count; i++)
             {
                 string property = names[i];

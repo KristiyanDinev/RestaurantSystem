@@ -1,8 +1,10 @@
-﻿using System.Diagnostics.Metrics;
+﻿using ITStepFinalProject.Models.Controller;
+using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
+using System.Diagnostics.Metrics;
 using System.Net;
 using System.Numerics;
 
-namespace ITStepFinalProject.Models {
+namespace ITStepFinalProject.Models.DatabaseModels {
     public class UserModel {
 
         public int Id { get; set; }

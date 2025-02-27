@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-namespace ITStepFinalProject.Utils
+namespace ITStepFinalProject.Utils.Utils
 {
-    public class ModelUtils
+    public class ObjectUtils
     {
         private static List<string> _Get_Model_Property_Names(object model)
         {

@@ -1,5 +1,5 @@
-﻿using ITStepFinalProject.Models;
-using ITStepFinalProject.Database.Utils;
+﻿using ITStepFinalProject.Database.Utils;
+using ITStepFinalProject.Models.DatabaseModels;
 
 namespace ITStepFinalProject.Database.Handlers
 {

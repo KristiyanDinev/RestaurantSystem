@@ -1,7 +1,10 @@
 ﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Utils;
-using ITStepFinalProject.Models;
 using Microsoft.AspNetCore.Mvc;
+using ITStepFinalProject.Utils.Web;
+using ITStepFinalProject.Utils.Controller;
+using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
+using ITStepFinalProject.Models.Controller;
 
 namespace ITStepFinalProject.Controllers {
     public class UserController {

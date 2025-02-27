@@ -1,4 +1,4 @@
-﻿namespace ITStepFinalProject.Models {
+﻿namespace ITStepFinalProject.Models.DatabaseModels {
     public class DishModel {
 
         public int Id { get; set; }

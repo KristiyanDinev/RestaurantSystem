@@ -1,4 +1,4 @@
-﻿using ITStepFinalProject.Utils;
+﻿using ITStepFinalProject.Utils.Controller;
 
 namespace ITStepFinalProject.Controllers {
     public class ErrorController {

@@ -1,6 +1,8 @@
 ﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Utils;
+using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
+using ITStepFinalProject.Utils.Controller;
+using ITStepFinalProject.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ITStepFinalProject.Controllers {
@@ -77,13 +79,24 @@ namespace ITStepFinalProject.Controllers {
             // start order
             app.MapPost("/order", async (HttpContext context,
                 CuponDatabaseHandler cuponDb, OrderDatabaseHandler orderDb,
+                DishDatabaseHandler dishDb,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string notes,
-                [FromForm] string cuponCode, [FromForm] string restorantAddress) => {
+                [FromForm] string cuponCode, [FromForm] string restorantAddress,
+                [FromForm] string restorantCity, [FromForm] string? restorantState, 
+                [FromForm] string restorantCountry) => {
 
                     try {
 
-                        if (string.IsNullOrWhiteSpace(restorantAddress))
+                        if (string.IsNullOrWhiteSpace(restorantAddress) ||
+                            string.IsNullOrWhiteSpace(restorantCity) ||
+                            string.IsNullOrWhiteSpace(restorantCountry))
+                        {
+                            return Results.BadRequest();
+                        }
+
+                        List<int> dishesIds = controllerUtils.GetCartItems(context);
+                        if (dishesIds.Count == 0)
                         {
                             return Results.BadRequest();
                         }
@@ -94,10 +107,9 @@ namespace ITStepFinalProject.Controllers {
                             return Results.Redirect("/login");
                         }
 
-                        controllerUtils.GetCartItems()
+                        List<DishModel> dishes = await dishDb.GetDishesByIds(dishesIds.ToHashSet().ToList());
 
-                        List<float> currentPrices = OrderControllerUtils.GetPricesFromOrder(session);
-                        decimal TotalPrice = OrderControllerUtils.CalculateTotalPrice(currentPrices, 0);
+                        decimal TotalPrice = OrderUtils.CalculateTotalPrice(dishes, 0);
 
                         CuponModel? cupon = null;
                         if (cuponCode.Length > 0) {
@@ -109,26 +121,27 @@ namespace ITStepFinalProject.Controllers {
                                     return Results.BadRequest();
                                 }
 
-                                TotalPrice = OrderControllerUtils.CalculateTotalPrice(currentPrices,
+                                TotalPrice = OrderUtils.CalculateTotalPrice(dishes,
                                     cupon.DiscountPercent);
                             }
                         }
 
                         InsertOrderModel order = new InsertOrderModel();
                         order.RestorantAddress = restorantAddress;
+                        order.RestorantCity = restorantCity;
+                        order.RestorantCountry = restorantCountry;
+                        order.RestorantState = restorantState;
                         order.UserId = user.Id;
                         order.TotalPrice = TotalPrice;
                         order.Notes = notes;
 
-                        orderDb.AddOrder(ControllerUtils.GetModelFromSession(session, "User").Deserialize<UserModel>(),
-                            
-                            OrderControllerUtils.GetDishesFromOrder(session), order);
+                        orderDb.AddOrder(user, dishesIds, order);
 
                         if (cupon != null) {
                             cuponDb.DeleteCupon(cupon.CuponCode);
                         }
 
-                        context.Response.Cookies.Delete("cart");
+                        context.Response.Cookies.Delete(controllerUtils.CartHeaderName);
 
                         return Results.Ok();
 

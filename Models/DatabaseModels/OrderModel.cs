@@ -1,4 +1,4 @@
-﻿namespace ITStepFinalProject.Models {
+﻿namespace ITStepFinalProject.Models.DatabaseModels {
     public class OrderModel {
 
         public int Id { get; set; }

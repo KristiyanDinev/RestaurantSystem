@@ -1,8 +1,10 @@
 ﻿using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
+using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Utils.Utils;
 using System.Security.Claims;
 
-namespace ITStepFinalProject.Utils
+namespace ITStepFinalProject.Utils.Controller
 {
     public class UserUtils
     {
@@ -20,10 +22,10 @@ namespace ITStepFinalProject.Utils
         public string HandleAuth(UserModel model, string remeberMe)
         {
             List<Claim> claims = new List<Claim>();
-            foreach (string property in ModelUtils.Get_Model_Property_Names(model))
+            foreach (string property in ObjectUtils.Get_Model_Property_Names(model))
             {
                 claims.Add(new Claim(property,
-                    Convert.ToString(ModelUtils.Get_Property_Value(model, property) ?? "")));
+                    Convert.ToString(ObjectUtils.Get_Property_Value(model, property) ?? "")));
             }
 
             return _encryptionHandler.Encrypt(

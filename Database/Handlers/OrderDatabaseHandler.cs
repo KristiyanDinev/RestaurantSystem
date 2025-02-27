@@ -1,6 +1,7 @@
-﻿using ITStepFinalProject.Models;
-using ITStepFinalProject.Database.Utils;
+﻿using ITStepFinalProject.Database.Utils;
 using System.Linq;
+using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
 
 namespace ITStepFinalProject.Database.Handlers
 {
@@ -14,8 +15,7 @@ namespace ITStepFinalProject.Database.Handlers
                 .Insert(table, [order]).ToString());
 
             List<string> res = new List<string>();
-            res.Add("UserId = "+ user.Id + " AND ");
-            res.Add("CurrentStatus = 'db'");
+            res.Add("UserId = "+ user.Id + " AND CurrentStatus = 'db'");
 
             List<object> ordersIdQ = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder().Select("Id", table)

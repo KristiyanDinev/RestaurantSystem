@@ -1,7 +1,9 @@
-﻿using ITStepFinalProject.Models;
+﻿using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Utils.Utils;
+using ITStepFinalProject.Utils.Web;
 using System.Text;
 
-namespace ITStepFinalProject.Utils {
+namespace ITStepFinalProject.Utils.Controller {
     public class ControllerUtils
     {
 
@@ -12,6 +14,7 @@ namespace ITStepFinalProject.Utils {
         public readonly string OrderModelName = "Order";
         public readonly string DishModelName = "Dish";
         public readonly string RestorantModelName = "Restorant";
+        public readonly string CartHeaderName = "cart";
 
         public ControllerUtils(EncryptionHandler encryptionHandler, JWTHandler jwtHandler)
         {

@@ -1,4 +1,4 @@
-﻿using ITStepFinalProject.Utils;
+﻿using ITStepFinalProject.Utils.Utils;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -22,7 +22,7 @@ namespace ITStepFinalProject.Database.Utils
 
         public static object GetModelPropertyValue(object model, string property)
         {
-            object value = ModelUtils.Get_Property_Value(model, property);
+            object value = ObjectUtils.Get_Property_Value(model, property);
             if (value is string || value == null)
             {
                 value = Strings(value);

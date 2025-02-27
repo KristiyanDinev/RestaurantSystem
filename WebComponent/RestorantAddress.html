@@ -1,1 +1,4 @@
-﻿<option value="{{Restorant.RestorantAddress}};{{Restorant.RestorantCity}};{{Restorant.RestorantState}};{{Restorant.RestorantCountry}}" selected="">{{Restorant.RestorantAddress}} - {{Restorant.RestorantCity}} - {{Restorant.RestorantState}} - {{Restorant.RestorantCountry}} | {{Restorant.AvrageTime}}</option>
+﻿<option value="{{Restorant.Index}}" selected="">{{Restorant.RestorantAddress}} - {{Restorant.RestorantCity}} - {{Restorant.RestorantState}} - {{Restorant.RestorantCountry}} | {{Restorant.AvrageTime}}</option>
+<script>
+    addRestorantIndex('{{Restorant.Index}}', '{{Restorant.RestorantAddress}}', '{{Restorant.RestorantCity}}', '{{Restorant.RestorantState}}', '{{Restorant.RestorantCountry}}')
+</script>

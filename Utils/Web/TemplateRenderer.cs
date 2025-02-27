@@ -1,7 +1,6 @@
-﻿using System.Reflection;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace ITStepFinalProject.Utils
+namespace ITStepFinalProject.Utils.Web
 {
     public class TemplateRenderer
     {

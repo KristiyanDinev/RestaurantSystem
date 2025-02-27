@@ -6,10 +6,11 @@
     <title id="name">Orders</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <script src='../Index.js'></script>
+    <script src='../orders/orders.js'></script>
     <script>
         async function putOrderDishes(id) {
             let formData = new FormData();
-            formData.append('orderId', Number(id))
+            formData.append('orderIdStr', String(id))
 
             const res = await fetch(Host + '/order/dishes', {
                 method: 'POST',
@@ -63,7 +64,7 @@
             }
 
             let formData = new FormData();
-            formData.append('orderId', Number(id))
+            formData.append('orderIdStr', String(id))
 
             const res = await fetch(Host + '/order/stop', {
                 method: 'POST',
@@ -79,6 +80,8 @@
             alert("Cancelled the order")
             window.location.reload()
         }
+
+
     </script>
 </head>
 
@@ -98,5 +101,11 @@
     <link rel='stylesheet' type='text/css' media='screen' href='../Index.css'>
     <link rel='stylesheet' type='text/css' media='screen' href='../dishes/dish.css'>
     <script src='../dishes/dish.js'></script>
+
+    <script>
+        if (regiseredOrders.length > 0) {
+            startWebSocket()
+        }
+    </script>
 </body>
 </html>

@@ -1,6 +1,9 @@
 ﻿using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
-using ITStepFinalProject.Utils;
+using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Models.WebModels;
+using ITStepFinalProject.Utils.Controller;
+using ITStepFinalProject.Utils.Web;
 using System.Text.Json;
 
 namespace ITStepFinalProject.Controllers
@@ -50,6 +53,12 @@ namespace ITStepFinalProject.Controllers
                         }
                     }
 
+                    List<RestorantAddressModel> restorantAddressModels = userUtils.GetRestorantsForUser(user);
+                    for (int i = 0; i < restorantAddressModels.Count; i++)
+                    {
+                        restorantAddressModels[i].Index = i; 
+                    }
+
                     FileData = webUtils.HandleCommonPlaceholders(FileData, 
                         controllerUtils.UserModelName, [user]);
 
@@ -58,13 +67,13 @@ namespace ITStepFinalProject.Controllers
                         .ToList());
 
                     FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                        controllerUtils.RestorantModelName,
-                        userUtils.GetRestorantsForUser(user).Cast<object>().ToList());
+                        controllerUtils.RestorantModelName, 
+                        restorantAddressModels.Cast<object>().ToList());
 
                     return Results.Content(FileData, "text/html");
 
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     return Results.Redirect("/dishes");
                 }

@@ -1,4 +1,7 @@
-﻿namespace ITStepFinalProject.Models
+﻿using ITStepFinalProject.Models.Controller;
+using ITStepFinalProject.Models.DatabaseModels;
+
+namespace ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels
 {
     public class InsertUserModel
     {

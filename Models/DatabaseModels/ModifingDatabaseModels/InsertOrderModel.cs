@@ -1,4 +1,6 @@
-﻿namespace ITStepFinalProject.Models
+﻿using ITStepFinalProject.Models.DatabaseModels;
+
+namespace ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels
 {
     public class InsertOrderModel
     {

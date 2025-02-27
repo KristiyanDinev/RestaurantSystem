@@ -1,6 +1,7 @@
 ﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Utils;
+using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Utils.Controller;
+using ITStepFinalProject.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ITStepFinalProject.Controllers {

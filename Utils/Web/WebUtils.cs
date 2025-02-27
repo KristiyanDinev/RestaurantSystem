@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using ITStepFinalProject.Utils.Utils;
+using System.Text;
 
-namespace ITStepFinalProject.Utils
+namespace ITStepFinalProject.Utils.Web
 {
     public class WebUtils
     {
@@ -41,10 +42,10 @@ namespace ITStepFinalProject.Utils
         {
             Dictionary<string, object> variables = new Dictionary<string, object>();
             foreach (string property in
-                ModelUtils.Get_Model_Property_Names(model))
+                ObjectUtils.Get_Model_Property_Names(model))
             {
                 variables.Add("{{" + modelName + "." + property + "}}", 
-                    Convert.ToString(ModelUtils.Get_Property_Value(model, property)));
+                    Convert.ToString(ObjectUtils.Get_Property_Value(model, property)));
             }
 
             html = _templateRenderer.Render(html, variables);

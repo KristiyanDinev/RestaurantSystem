@@ -3,8 +3,11 @@ using ITStepFinalProject.Database;
 using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models;
 using ITStepFinalProject.Services;
-using ITStepFinalProject.Utils;
+using ITStepFinalProject.Utils.Controller;
+using ITStepFinalProject.Utils.Utils;
+using ITStepFinalProject.Utils.Web;
 using Microsoft.AspNetCore.RateLimiting;
+using System;
 using System.Threading.RateLimiting;
 
 namespace ITStepFinalProject
@@ -33,7 +36,7 @@ namespace ITStepFinalProject
             });*/
 
             string uri = builder.Configuration.GetValue<string>("Uri")
-                    ?? "https://127.0.0.1:7278";
+                    ?? "http://127.0.0.1:7278";
 
             builder.WebHost.UseUrls([uri]);
 
@@ -119,20 +122,50 @@ namespace ITStepFinalProject
             var app = builder.Build();
 
             //app.UseSession();
+            var webSocketOptions = new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2),
+            };
+
+            webSocketOptions.AllowedOrigins.Add(uri);
+
+            app.UseWebSockets(webSocketOptions);
             app.UseRateLimiter();
             app.UseStaticFiles();
+            app.UseAuthenticationMiddleware();
 
-            new RequestMiddlewareService().RegisterMiddlewarePerService(app,
-                new AuthenticationService(new ControllerUtils(encryptionHandler, jwtHandler), 
-                    new UserDatabaseHandler(), new UserUtils(encryptionHandler, jwtHandler)));
+            
 
+            app.Use(async (HttpContext context, RequestDelegate next) =>
+            {
+                Console.WriteLine("\n"+context.Request.Method + ": " + context.Request.Path.Value);
+                Console.WriteLine("\n----\nCookies:");
+                foreach (var cookie in context.Request.Cookies)
+                {
+                    Console.WriteLine(cookie);
+                }
+                Console.WriteLine("----\n");
+
+                await next(context);
+            });
+
+
+
+            new WebSocketController(app);
             new UserController(app);
             new DishController(app);
             new ErrorController(app);
             new OrderController(app);
             new CartController(app);
 
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
+
             app.Run();
+        }
+
+        public static void OnApplicationExit(object sender, EventArgs e)
+        {
+            Console.WriteLine("The application is shutting down.");
         }
     }
 }

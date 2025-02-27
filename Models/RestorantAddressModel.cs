@@ -11,5 +11,6 @@
         public string UserState { get; set; }
         public string UserCountry { get; set; }
         public string AvrageTime { get; set; }
+        public int Index { get; set; }
     }
 }

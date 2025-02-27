@@ -10,7 +10,7 @@
     </div>
 
     <p class="part">TotalPrice: {{Order.TotalPrice}} lv.</p>
-    <p class="part">Restorant Address: {{Order.RestorantAddress}}</p>
+    <p class="part">Restorant Address: {{Order.RestorantAddress}} - {{Order.RestorantCity}} - {{Order.RestorantState}} - {{Order.RestorantCountry}}</p>
     <p class="part" id="{{Order.Id}}orderedat"></p>
 
     {% if "{{Order.CurrentStatus}}" != "pending" %}
@@ -21,6 +21,7 @@
     <!-- MM/DD/YYYYTHH:mm:ssZ -->
     <script>
         document.getElementById("{{Order.Id}}orderedat").innerHTML = "OrderedAt: " + new Date(Date.parse("{{Order.OrderedAt}}")).toString()
+        regiseredOrders.push('{{Order.Id}}')
 
         putOrderDishes('{{Order.Id}}')
     </script>

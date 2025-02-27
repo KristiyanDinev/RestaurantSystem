@@ -1,4 +1,4 @@
-﻿using ITStepFinalProject.Utils;
+﻿using ITStepFinalProject.Utils.Utils;
 using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
@@ -48,7 +48,7 @@ namespace ITStepFinalProject.Database.Utils
             }
             sql.Append("INSERT INTO ").Append(table).Append(" (");
 
-            List<string> properties = ModelUtils.Get_Model_Property_Names(models[0]);
+            List<string> properties = ObjectUtils.Get_Model_Property_Names(models[0]);
             sql.Append(string.Join(", ", properties))
                 .Append(") VALUES ");
 
