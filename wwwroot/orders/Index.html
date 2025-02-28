@@ -11,8 +11,7 @@
         async function putOrderDishes(id) {
             let formData = new FormData();
             formData.append('orderIdStr', String(id))
-
-            const res = await fetch(Host + '/order/dishes', {
+            const res = await fetch(getDataFromLocalStorage("Host") + '/order/dishes', {
                 method: 'POST',
                 body: formData,
                 redirect: 'follow'
@@ -66,7 +65,7 @@
             let formData = new FormData();
             formData.append('orderIdStr', String(id))
 
-            const res = await fetch(Host + '/order/stop', {
+            const res = await fetch(getDataFromLocalStorage("Host") + '/order/stop', {
                 method: 'POST',
                 body: formData,
                 redirect: 'follow'

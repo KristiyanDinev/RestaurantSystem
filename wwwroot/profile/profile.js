@@ -70,7 +70,7 @@ async function updateUser() {
     formData.append('Image', ImageFile)
     formData.append('DeleteImage', delete_image_data)
 
-    const res = await fetch(Host + '/profile/edit', {
+    const res = await fetch(getDataFromLocalStorage("Host") + '/profile/edit', {
         method: 'POST',
         body: formData,
         redirect: 'follow',

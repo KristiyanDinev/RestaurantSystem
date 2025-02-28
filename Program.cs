@@ -7,7 +7,6 @@ using ITStepFinalProject.Utils.Controller;
 using ITStepFinalProject.Utils.Utils;
 using ITStepFinalProject.Utils.Web;
 using Microsoft.AspNetCore.RateLimiting;
-using System;
 using System.Threading.RateLimiting;
 
 namespace ITStepFinalProject
@@ -70,6 +69,8 @@ namespace ITStepFinalProject
 
             builder.Services.AddSingleton<UserUtils>(
                 new UserUtils(encryptionHandler, jwtHandler));
+
+            builder.Services.AddSingleton<WebSocketUtils>();
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
                     ?? "ugyw89ub9Y9H8OP9j1wsfwedS";

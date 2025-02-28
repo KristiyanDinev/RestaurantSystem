@@ -1,20 +1,4 @@
-var Host = "http://127.0.0.1:7278"
-var __scheme = document.location.protocol === "https:" ? "wss" : "ws";
-var __port = document.location.port ? (":" + document.location.port) : "";
 
-var __connectionUrl = __scheme + "://" + document.location.hostname + __port ;
-
-function Logout() {
-    fetch(Host + "/logout", {
-        method: "POST",
-        redirect: 'follow',
-
-    }).then((res) => {
-        if (res.status === 200) {
-            goToLogin()
-        }
-    })
-}
 
 function getCookie(cname) {
     let name = cname + "=";
@@ -29,7 +13,7 @@ function getCookie(cname) {
       }
     }
     return "";
-  }
+}
 
 
 function UseWebSockets(url, onopen, onclose, onerror, onmessage) {
@@ -42,6 +26,7 @@ function UseWebSockets(url, onopen, onclose, onerror, onmessage) {
     socket.onopen = onopen
     socket.onclose = onclose
     socket.onerror = onerror
+    
 
     // event.data -> retuns the message
     socket.onmessage = onmessage
@@ -49,38 +34,76 @@ function UseWebSockets(url, onopen, onclose, onerror, onmessage) {
     return socket
 }
 
+function setDataToLocalStorage(key, value) {
+    window.sessionStorage.setItem(key, value);
+}
+
+function getDataFromLocalStorage(key) {
+    return window.sessionStorage.getItem(key);
+}
+
+function removeDataFromLocalStorage(key) {
+    window.sessionStorage.removeItem(key);
+}
+
+function clearAllDataFromLocalStorage() {
+    window.sessionStorage.clear();
+}
+
+var __port = ":"+ (document.location.port.length == 0 ? "80" : document.location.port)
+
+setDataToLocalStorage("WebSocketHost", (document.location.protocol === "https:" ? "wss" : "ws") +
+     "://" + document.location.hostname + __port)
+
+setDataToLocalStorage("Host", document.location.protocol+"//" + document.location.hostname + __port)
+
+
 function startOrderWebSocket(onopen, onclose, onerror, onmessage) {
-    return UseWebSockets(__connectionUrl + "/ws/orders", onopen, onclose, onerror, onmessage)
+    return UseWebSockets(getDataFromLocalStorage("WebSocketHost") + "/ws/orders", 
+        onopen, onclose, onerror, onmessage)
 }
 
 function startReservationWebSocket(onopen, onclose, onerror, onmessage) {
-    return UseWebSockets(__connectionUrl + "/ws/reservations", onopen, onclose, onerror, onmessage)
+    return UseWebSockets(getDataFromLocalStorage("WebSocketHost") + "/ws/reservations", 
+        onopen, onclose, onerror, onmessage)
 }
 
+
 function goToProfile() {
-    window.location.href = Host + "/profile"
+    window.location.href = getDataFromLocalStorage("Host") + "/profile"
 }
 
 
 
 function goToRegister() {
-    window.location.href = Host + '/register'
+    window.location.href = getDataFromLocalStorage("Host") + '/register'
 }
 
 
 function goToLogin() {
-    window.location.href = Host + '/login'
+    window.location.href = getDataFromLocalStorage("Host") + '/login'
 }
 
 function goToDishes() {
-    window.location.href = Host + '/dishes'
+    window.location.href = getDataFromLocalStorage("Host") + '/dishes'
 }
 
 function goToCart() {
-    window.location.href = Host + '/cart'
+    window.location.href = getDataFromLocalStorage("Host") + '/cart'
 }
 
 function goToOrders() {
-    window.location.href = Host + '/orders'
+    window.location.href = getDataFromLocalStorage("Host") + '/orders'
 }
 
+function Logout() {
+    fetch(getDataFromLocalStorage("Host")  + "/logout", {
+        method: "POST",
+        redirect: 'follow',
+
+    }).then((res) => {
+        if (res.status === 200) {
+            goToLogin()
+        }
+    })
+}

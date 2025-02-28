@@ -1,4 +1,4 @@
-var Host = "http://127.0.0.1:7278"
+
 
 function addDishToCart(id, name) {
     let cart = getCookie("cart")

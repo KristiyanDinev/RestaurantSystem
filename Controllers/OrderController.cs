@@ -95,8 +95,8 @@ namespace ITStepFinalProject.Controllers {
                             return Results.BadRequest();
                         }
 
-                        List<int> dishesIds = controllerUtils.GetCartItems(context);
-                        if (dishesIds.Count == 0)
+                        List<int>? dishesIds = controllerUtils.GetCartItems(context);
+                        if (dishesIds == null && dishesIds.Count == 0)
                         {
                             return Results.BadRequest();
                         }
@@ -155,7 +155,8 @@ namespace ITStepFinalProject.Controllers {
 
             // stop order
             app.MapPost("/order/stop", async (HttpContext context,
-                OrderDatabaseHandler db, [FromForm] string orderIdStr) => {
+                OrderDatabaseHandler db, WebSocketUtils webSocketUtils,
+                [FromForm] string orderIdStr) => {
 
                     if (!int.TryParse(orderIdStr, out int orderId))
                     {
@@ -172,6 +173,8 @@ namespace ITStepFinalProject.Controllers {
                         }
 
                         db.DeleteOrder(orderId);
+
+                        webSocketUtils.RemoveModelIdFromOrderSubscribtion(orderId);
 
                         return Results.Ok();
 

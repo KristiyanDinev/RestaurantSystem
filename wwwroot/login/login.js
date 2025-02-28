@@ -20,7 +20,7 @@ async function submit() {
     formData.append("rememberMe", document.querySelector('#RememberMe:checked') === null ?
                                  "off" : "on")
 
-    const res = await fetch(Host + "/login", {
+    const res = await fetch(getDataFromLocalStorage("Host") + "/login", {
         method: "POST",
         body: formData,
         redirect: 'follow',

@@ -1,16 +1,16 @@
-var socket = null;
+var socket = null
 var regiseredOrders = [];
 
-async function onopen(event) {
+function onopen() {
     console.log('Connected')
-    socket.send("subscribtion_ids="+regiseredOrders.join(';'))
+    socket.send("subscribtion_ids;"+regiseredOrders.join(';'))
 }
 
-async function onclose(event) {
+function onclose() {
     console.log('Closed')
 }
 
-async function onmessage(event) {
+function onmessage(event) {
     const data = event.data
     if (data.length == 0) {
         return;
@@ -18,14 +18,10 @@ async function onmessage(event) {
     console.log('message: '+data)
 }
 
-async function onerror(event) {
+function onerror(event) {
     console.log('error: '+event.data)
 }
 
 function startWebSocket() {
     socket = startOrderWebSocket(onopen, onclose, onerror, onmessage)
-}
-
-function closeWebSocket() {
-   socket.close(1000, "Closing from client")
 }

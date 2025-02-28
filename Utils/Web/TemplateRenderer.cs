@@ -140,6 +140,7 @@ namespace ITStepFinalProject.Utils.Web
                 else if (condition.Contains("&&"))
                 {
                     string[] parts = SplitByOperator(condition, "&&", variables);
+
                     bool left = Convert.ToBoolean(EvaluateCondition(parts[0], variables));
                     bool right = Convert.ToBoolean(EvaluateCondition(parts[1], variables));
                     return left && right;
@@ -147,6 +148,7 @@ namespace ITStepFinalProject.Utils.Web
                 else if (condition.Contains("||"))
                 {
                     string[] parts = SplitByOperator(condition, "||", variables);
+
                     bool left = Convert.ToBoolean(EvaluateCondition(parts[0], variables));
                     bool right = Convert.ToBoolean(EvaluateCondition(parts[1], variables));
                     return left || right;

@@ -58,7 +58,7 @@ function submit() {
     formData.append("RememberMe", document.querySelector('#RememberMe:checked') === null ?
                                  "off" : "on")
 
-    fetch(Host + "/register", {
+    fetch(getDataFromLocalStorage("Host") + "/register", {
         method: "POST",
         body: formData,
         redirect: 'follow',

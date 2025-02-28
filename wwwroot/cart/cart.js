@@ -25,7 +25,7 @@ async function startOrder() {
     formData.append("restorantState", restorantAddressIndexes[restorantIndex][2])
     formData.append("restorantCountry", restorantAddressIndexes[restorantIndex][3])
 
-    const res = await fetch(Host + '/order', {
+    const res = await fetch(getDataFromLocalStorage("Host") + '/order', {
         method: 'POST',
         body: formData,
         redirect: 'follow',

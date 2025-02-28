@@ -1,6 +1,5 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ITStepFinalProject.Models
 {
@@ -8,16 +7,15 @@ namespace ITStepFinalProject.Models
     {
         public string subscribedTo { get; set; }
         public WebSocket webSocket { get; set; }
-        public List<int> Ids { get; set; }
+        public List<int> ModelIds { get; set; }
         public bool IsRunning { get; set; }
         public TaskCompletionSource<object> taskCompletionSource { get; set; }
 
-        public SubscribtionModel(string _subscribedTo, WebSocket _webSocket, List<int> _ids, 
+        public SubscribtionModel(string _subscribedTo, WebSocket _webSocket,
             TaskCompletionSource<object> taskCompletionSource)
         {
             subscribedTo = _subscribedTo;
             webSocket = _webSocket;
-            Ids = _ids;
             this.taskCompletionSource = taskCompletionSource;
         }
 
@@ -65,6 +63,7 @@ namespace ITStepFinalProject.Models
                 if (receiveResult.MessageType.Equals(WebSocketMessageType.Close))
                 {
                     Console.WriteLine("Client Closes WebSocket connection");
+                    return null;
                 }
 
                 return Encoding.UTF8.GetString(bytes, 0, receiveResult.Count);
@@ -74,6 +73,25 @@ namespace ITStepFinalProject.Models
                 CloseWebSocket();
                 return null;
             }
+        }
+
+
+        public void HandleUpdateModelIds(List<string> values)
+        {
+            try
+            {
+                List<int> Ids = new List<int>();
+                foreach (string IdStr in values)
+                {
+                    if (int.TryParse(IdStr, out int Id))
+                    {
+                        Ids.Add(Id);
+                    }
+                }
+                ModelIds = Ids;
+
+            }
+            catch (Exception) { }
         }
 
         public async void CloseWebSocket()

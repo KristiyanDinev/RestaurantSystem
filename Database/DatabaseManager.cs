@@ -96,6 +96,12 @@ values
                 CREATE TABLE IF NOT EXISTS Reservations (
                     Id SERIAL PRIMARY KEY,
                     ReservatorId INT REFERENCES Users(Id),
+                    Notes VARCHAR(255),
+                    CurrentStatus VARCHAR(100) NOT NULL,
+                    RestorantAddress TEXT NOT NULL,
+                    RestorantCity VARCHAR(100) NOT NULL,
+                    RestorantState VARCHAR(100),
+                    RestorantCountry VARCHAR(100) NOT NULL,
                     Amount_Of_Adults SMALLINT NOT NULL DEFAULT 0,
                     Amount_Of_Children SMALLINT NOT NULL DEFAULT 0,
                     At_Date TIMESTAMP WITH TIME ZONE NOT NULL,
