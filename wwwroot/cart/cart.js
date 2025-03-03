@@ -4,6 +4,12 @@ function addRestorantIndex(index, addr, city, state, country) {
     restorantAddressIndexes[index] = [addr, city, state, country]
 }
 
+
+/*
+formData.append("restorantCity", restorantAddressIndexes[restorantIndex][1])
+    formData.append("restorantState", restorantAddressIndexes[restorantIndex][2])
+    formData.append("restorantCountry", restorantAddressIndexes[restorantIndex][3])*/
+    
 async function startOrder() {
     let restorantIndex = document.getElementById("restorant_address").value;
     if (restorantIndex.length == 0) {
@@ -20,10 +26,7 @@ async function startOrder() {
     var formData = new FormData()
     formData.append("notes", document.getElementById("notes").value)
     formData.append("cuponCode", document.getElementById("cupon_input").value)
-    formData.append("restorantAddress", restorantAddressIndexes[restorantIndex][0])
-    formData.append("restorantCity", restorantAddressIndexes[restorantIndex][1])
-    formData.append("restorantState", restorantAddressIndexes[restorantIndex][2])
-    formData.append("restorantCountry", restorantAddressIndexes[restorantIndex][3])
+    formData.append("restorantIdStr", String(document.getElementById('restorant_address').value))
 
     const res = await fetch(getDataFromLocalStorage("Host") + '/order', {
         method: 'POST',

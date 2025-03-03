@@ -13,11 +13,9 @@ namespace ITStepFinalProject
 {
     public class Program
     {
-        public static List<RestorantAddressModel> resturantAddresses;
         public static string currentDir;
         public static void Main(string[] args)
         {
-            resturantAddresses = new List<RestorantAddressModel>();
             currentDir = Directory.GetCurrentDirectory();
 
             Console.WriteLine("Current Working Directory: "+ currentDir);
@@ -44,17 +42,19 @@ namespace ITStepFinalProject
             DatabaseManager._connectionString = 
                 builder.Configuration.GetValue<string>("ConnectionString") ?? "";
 
-            string key = builder.Configuration.GetValue<string>("Encryption_Key") ?? "D471E0624EA5A7FFFABAA918E87";
+            string encryption_key = builder.Configuration.GetValue<string>("Encryption_Key") ?? "D471E0624EA5A7FFFABAA918E87";
+            string jwt_key = builder.Configuration.GetValue<string>("JWT_Key") ?? "234w13543ewf53erdfa";
 
             DatabaseManager.Setup();
 
-            EncryptionHandler encryptionHandler = new EncryptionHandler(key);
-            JWTHandler jwtHandler = new JWTHandler(key);
+            EncryptionHandler encryptionHandler = new EncryptionHandler(encryption_key);
+            JWTHandler jwtHandler = new JWTHandler(jwt_key);
 
             builder.Services.AddScoped<UserDatabaseHandler>();
             builder.Services.AddScoped<DishDatabaseHandler>();
             builder.Services.AddScoped<CuponDatabaseHandler>();
             builder.Services.AddScoped<OrderDatabaseHandler>();
+            builder.Services.AddScoped<ReservationDatabaseHandler>();
 
             builder.Services.AddSingleton<WebUtils>(new WebUtils(
                 new Dictionary<string, List<string>>{
@@ -62,10 +62,10 @@ namespace ITStepFinalProject
                        {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}"]},
                        {"Order", ["{{OrderDisplay}}"]},
                        {"Restorant", ["{{RestorantAddress}}"] },
+                       {"Reservation", ["{{ReservationDisplay}}"] },
                 }));
 
-            builder.Services.AddSingleton<ControllerUtils>(
-                new ControllerUtils(encryptionHandler, jwtHandler));
+            builder.Services.AddSingleton<ControllerUtils>();
 
             builder.Services.AddSingleton<UserUtils>(
                 new UserUtils(encryptionHandler, jwtHandler));
@@ -83,42 +83,6 @@ namespace ITStepFinalProject
                     options.QueueLimit = 1;
                 })
             );
-
-            foreach (string resturantAddress in 
-                (builder.Configuration.GetValue<string>("ResturantAddressAvrageDeliverTime")
-                ?? "Missing Resturant Address").Split("---"))
-            {
-                if (resturantAddress.Length == 0)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    string[] parts = resturantAddress.Split('|');
-
-                    string[] userAddressParts = parts[0].Split(';');
-
-                    RestorantAddressModel resturant = new RestorantAddressModel();
-                    resturant.AvrageTime = parts[1];
-                    resturant.UserAddress = userAddressParts[0];
-                    resturant.UserCity = userAddressParts[1];
-                    resturant.UserState = userAddressParts[2];
-                    resturant.UserCountry = userAddressParts[3];
-
-                    string[] restorantAddressParts = parts[2].Split(';');
-                    resturant.RestorantAddress = restorantAddressParts[0];
-                    resturant.RestorantCity = restorantAddressParts[1];
-                    resturant.RestorantState = restorantAddressParts[2];
-                    resturant.RestorantCountry = restorantAddressParts[3];
-
-                    resturantAddresses.Add(resturant);
-
-                } catch (Exception)
-                {
-                    continue;
-                }
-            }
 
             var app = builder.Build();
 
@@ -147,12 +111,15 @@ namespace ITStepFinalProject
                 }
                 Console.WriteLine("----\n");
 
+
+
                 await next(context);
             });
 
 
 
             new WebSocketController(app);
+            new ReservationsController(app);
             new UserController(app);
             new DishController(app);
             new ErrorController(app);

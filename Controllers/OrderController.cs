@@ -1,6 +1,7 @@
 ﻿using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
+using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Controller;
 using ITStepFinalProject.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +24,7 @@ namespace ITStepFinalProject.Controllers {
                             return Results.Redirect("/login");
                         }
 
-                        List<OrderModel> orders = await db.GetOrdersByUser(user.Id);
-                        foreach (OrderModel order in orders)
-                        {
-                            order.RestorantAddress = string.Join(" - ", order.RestorantAddress.Split(';'));
-                        }
+                        List<DisplayOrderModel> orders = await db.GetOrdersByUser(user.Id);
 
                         string FileData = await controllerUtils.GetHTMLFromWWWROOT("/orders");
 
@@ -82,15 +79,11 @@ namespace ITStepFinalProject.Controllers {
                 DishDatabaseHandler dishDb,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string notes,
-                [FromForm] string cuponCode, [FromForm] string restorantAddress,
-                [FromForm] string restorantCity, [FromForm] string? restorantState, 
-                [FromForm] string restorantCountry) => {
+                [FromForm] string cuponCode, [FromForm] string restorantIdStr) => {
 
                     try {
 
-                        if (string.IsNullOrWhiteSpace(restorantAddress) ||
-                            string.IsNullOrWhiteSpace(restorantCity) ||
-                            string.IsNullOrWhiteSpace(restorantCountry))
+                        if (!int.TryParse(restorantIdStr, out int restorantId))
                         {
                             return Results.BadRequest();
                         }
@@ -127,15 +120,12 @@ namespace ITStepFinalProject.Controllers {
                         }
 
                         InsertOrderModel order = new InsertOrderModel();
-                        order.RestorantAddress = restorantAddress;
-                        order.RestorantCity = restorantCity;
-                        order.RestorantCountry = restorantCountry;
-                        order.RestorantState = restorantState;
+                        order.RestorantId = restorantId;
                         order.UserId = user.Id;
                         order.TotalPrice = TotalPrice;
                         order.Notes = notes;
 
-                        orderDb.AddOrder(user, dishesIds, order);
+                        orderDb.AddOrder(user, dishesIds, order, controllerUtils);
 
                         if (cupon != null) {
                             cuponDb.DeleteCupon(cupon.CuponCode);
@@ -156,6 +146,7 @@ namespace ITStepFinalProject.Controllers {
             // stop order
             app.MapPost("/order/stop", async (HttpContext context,
                 OrderDatabaseHandler db, WebSocketUtils webSocketUtils,
+                ControllerUtils controllerUtils,
                 [FromForm] string orderIdStr) => {
 
                     if (!int.TryParse(orderIdStr, out int orderId))
@@ -167,8 +158,8 @@ namespace ITStepFinalProject.Controllers {
                         string? status = 
                             await db.GetOrder_CurrentStatus_ById(orderId);
 
-                        if (status == null || !(status.Equals("pending") || 
-                            status.Equals("db"))) {
+                        if (status == null || !(status.Equals(controllerUtils.PendingStatus) || 
+                            status.Equals(controllerUtils.DBStatus))) {
                             return Results.BadRequest();
                         }
 

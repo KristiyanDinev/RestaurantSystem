@@ -1,10 +1,8 @@
 ﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models;
 using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Controller;
 using ITStepFinalProject.Utils.Web;
-using System.Text.Json;
 
 namespace ITStepFinalProject.Controllers
 {
@@ -16,6 +14,7 @@ namespace ITStepFinalProject.Controllers
             
             // get current dishes about to order
             app.MapGet("/cart", async (HttpContext context, DishDatabaseHandler db,
+                OrderDatabaseHandler orderDB,
                 ControllerUtils controllerUtils, WebUtils webUtils, UserUtils userUtils) =>
             {
                 try {
@@ -53,11 +52,8 @@ namespace ITStepFinalProject.Controllers
                         }
                     }
 
-                    List<RestorantAddressModel> restorantAddressModels = userUtils.GetRestorantsForUser(user);
-                    for (int i = 0; i < restorantAddressModels.Count; i++)
-                    {
-                        restorantAddressModels[i].Index = i; 
-                    }
+                    List<TimeTableJoinRestorantModel> timeTableWithRestorantAddresses = 
+                        await orderDB.GetRestorantsAddressesForUser(user);
 
                     FileData = webUtils.HandleCommonPlaceholders(FileData, 
                         controllerUtils.UserModelName, [user]);
@@ -67,13 +63,13 @@ namespace ITStepFinalProject.Controllers
                         .ToList());
 
                     FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                        controllerUtils.RestorantModelName, 
-                        restorantAddressModels.Cast<object>().ToList());
+                        controllerUtils.RestorantModelName,
+                        timeTableWithRestorantAddresses.Cast<object>().ToList());
 
                     return Results.Content(FileData, "text/html");
 
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return Results.Redirect("/dishes");
                 }

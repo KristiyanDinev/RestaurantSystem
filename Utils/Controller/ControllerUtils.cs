@@ -7,19 +7,17 @@ namespace ITStepFinalProject.Utils.Controller {
     public class ControllerUtils
     {
 
-        private EncryptionHandler _encryptionHandler;
-        private JWTHandler _jwtHandler;
-
         public readonly string UserModelName = "User";
         public readonly string OrderModelName = "Order";
         public readonly string DishModelName = "Dish";
         public readonly string RestorantModelName = "Restorant";
+        public readonly string ReservationModelName = "Reservation";
         public readonly string CartHeaderName = "cart";
+        public readonly string PendingStatus = "pending";
+        public readonly string DBStatus = "db";
 
-        public ControllerUtils(EncryptionHandler encryptionHandler, JWTHandler jwtHandler)
+        public ControllerUtils()
         {
-            _encryptionHandler = encryptionHandler;
-            _jwtHandler = jwtHandler;
         }
 
 

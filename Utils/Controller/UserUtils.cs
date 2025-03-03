@@ -1,5 +1,4 @@
 ﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models;
 using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Utils.Utils;
 using System.Security.Claims;
@@ -74,34 +73,6 @@ namespace ITStepFinalProject.Utils.Controller
             return userModel;
         }
 
-        public List<RestorantAddressModel> GetRestorantsForUser(UserModel user)
-        {
-            List<RestorantAddressModel> resturantAddressModels = new List<RestorantAddressModel>();
-            // of the user by himself
-
-            // get resurant addresses that serve to user address
-            foreach (RestorantAddressModel addressOnServer in Program.resturantAddresses)
-            {
-                // restorant address - the location of the restorant from where they serve
-                // user addres - the location of the user which the restoract can serve
-                // we check if the restorant can serve the user
-                // of the server by the admins
-                if (addressOnServer.UserCity.Equals(user.City) &&
-                    addressOnServer.UserCountry.Equals(user.Country) &&
-                    addressOnServer.UserAddress.StartsWith(user.Address))
-                {
-                    // is State is provided on user end, but the restorant doesn't serve in that State then skip.
-                    // State is optional
-                    if (user.State != null && user.State.Length > 0 
-                        && !addressOnServer.UserState.Equals(user.State))
-                    {
-                        continue;
-                    }
-
-                    resturantAddressModels.Add(addressOnServer);
-                }
-            }
-            return resturantAddressModels;
-        }
+        
     }
 }

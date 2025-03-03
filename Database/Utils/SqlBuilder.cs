@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Utils.Utils;
+using Microsoft.Extensions.Primitives;
 using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
@@ -6,8 +7,11 @@ namespace ITStepFinalProject.Database.Utils
     public class SqlBuilder
     {
         private readonly StringBuilder sql;
-        public SqlBuilder() {
+        private bool _isPostgresql;
+
+        public SqlBuilder(bool isPostgresql = true) {
             sql = new StringBuilder();
+            _isPostgresql = isPostgresql;
         }
 
         public override string ToString()
@@ -15,6 +19,19 @@ namespace ITStepFinalProject.Database.Utils
             string v = sql.Append(';').ToString();
             Console.WriteLine("SQL Builder: " + v);
             return v;
+        }
+
+        private string _handleTableNames(string table)
+        {
+            return table.Length == 0 ? table : (_isPostgresql ? '"' + table.Replace(".", "\".\"") + '"' : table);
+        }
+
+        private string _handlePropertyNames(List<string> properties)
+        {
+            // ["Id", "Name", "Email"]
+            // "Id", "Name", "Email"
+            return _isPostgresql ? '"'+string.Join("\", \"", properties)+'"' : 
+                string.Join(", ", properties);
         }
 
         /*
@@ -30,13 +47,13 @@ namespace ITStepFinalProject.Database.Utils
         public SqlBuilder Select(string fields, string table)
         {
             sql.Append("SELECT ").Append(fields).Append(" FROM ")
-                .Append(table).Append(' ');
+                .Append(_handleTableNames(table)).Append(' ');
             return this;
         }
 
         public SqlBuilder Update(string table)
         {
-            sql.Append("UPDATE ").Append(table).Append(' ');
+            sql.Append("UPDATE ").Append(_handleTableNames(table)).Append(' ');
             return this;
         }
 
@@ -46,10 +63,10 @@ namespace ITStepFinalProject.Database.Utils
             {
                 return this;
             }
-            sql.Append("INSERT INTO ").Append(table).Append(" (");
+            sql.Append("INSERT INTO ").Append(_handleTableNames(table)).Append(" (");
 
             List<string> properties = ObjectUtils.Get_Model_Property_Names(models[0]);
-            sql.Append(string.Join(", ", properties))
+            sql.Append(_handlePropertyNames(properties))
                 .Append(") VALUES ");
 
 
@@ -79,24 +96,24 @@ namespace ITStepFinalProject.Database.Utils
 
         /*
          * <summery>
-         * All the vules must be handled and set.
-         * 
-         * conditions -> a list of conditions. A condition is this:
-         * "Username = 'Hi' AND " or "Email = 'something@example.com'"
+         * Keyword can be: WHERE, SET, ON, HAVING
          * </summery>
          */
-        public SqlBuilder Where_Set_On_Having(string keyword, List<string> conditions)
+        public SqlBuilder ConditionKeyword(string keyword)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (string condition in conditions)
-            {
-                stringBuilder.Append(condition);
-            }
-            sql.Append(' ').Append(keyword).Append(' ')
-                .Append(stringBuilder.ToString()).Append(' ');
+            sql.Append(' ').Append(keyword).Append(' ');
             return this;
         }
-        
+
+        public SqlBuilder BuildCondition(string property, object value, string condition = "=",
+            string endingCondtion = "")
+        {
+            sql.Append(' ').Append(_handleTableNames(property)).Append(' ')
+                .Append(condition).Append(' ').Append(value)
+                .Append(' ').Append(endingCondtion);
+            return this;
+        }
+
         public SqlBuilder Limit(int limit, int? offset)
         {
             sql.Append(" LIMIT ").Append(limit);
@@ -109,10 +126,13 @@ namespace ITStepFinalProject.Database.Utils
 
         public SqlBuilder Delete(string table)
         {
-            sql.Append("DELETE FROM ").Append(table).Append(' ');
+            sql.Append("DELETE FROM ").Append(_handleTableNames(table)).Append(' ');
             return this;
         }
 
+        /*
+         * Note: The "case-sensitive" of the database fields/properties will no automatily apply here
+         */
         public SqlBuilder Group_By(string fields)
         {
             sql.Append(" GROUP BY ").Append(fields).Append(' ');
@@ -121,10 +141,13 @@ namespace ITStepFinalProject.Database.Utils
 
         public SqlBuilder Join(string table, string type_of_join)
         {
-            sql.Append($" {type_of_join} JOIN ").Append(table).Append(' ');
+            sql.Append($" {type_of_join} JOIN ").Append(_handleTableNames(table)).Append(' ');
             return this;
         }
 
+        /*
+         * Note: The "case-sensitive" of the database fields/properties will no automatily apply here
+         */
         public SqlBuilder Order_By(string fields)
         {
             sql.Append(" ORDER BY ").Append(fields).Append(' ');

@@ -15,24 +15,24 @@
 
     <h1>Your Cart</h1>
 
-    <p id="dish_stats"></p>
-
     <div id="dishes">
         {{DishCart}}
     </div>
 
-    <div>
-        <p id="p_for_order">Notes for the order</p>
+    <p id="dish_stats"></p>
+
+    <div class="input_center">
+        <p>Notes for the order</p>
         <textarea  id="notes" cols="40" rows="6" maxlength="255" placeholder="Notes"></textarea>
     </div>
 
-    <div>
-        <p id="p_for_order">Cupon Code</p>
+    <div class="input_center">
+        <p>Cupon Code</p>
         <input id="cupon_input" maxlength="25" placeholder="Cupon Code">
     </div>
 
-    <div>
-        <p id="p_for_order">Restorant Address</p>
+    <div class="input_center">
+        <p>Restorant Address</p>
         <select id="restorant_address">
             {{RestorantAddress}}
         </select>

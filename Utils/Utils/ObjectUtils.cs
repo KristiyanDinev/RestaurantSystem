@@ -19,14 +19,14 @@ namespace ITStepFinalProject.Utils.Utils
             return _Get_Model_Property_Names(model);
         }
 
-        public static object Get_Property_Value(object model, string property)
+        public static object? Get_Property_Value(object model, string property)
         {
-            return Get_PropertyInfo(model, property).GetValue(model);
+            return Get_PropertyInfo(model, property)?.GetValue(model) ?? null;
         }
 
-        public static void Set_Property_Value(object model, string property, object value)
+        public static void Set_Property_Value(object model, string property, object? value)
         {
-            Get_PropertyInfo(model, property).SetValue(model, value, null);
+            Get_PropertyInfo(model, property)?.SetValue(model, value, null);
         }
 
         public static PropertyInfo? Get_PropertyInfo(object model, string property)

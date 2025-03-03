@@ -96,6 +96,15 @@ function goToOrders() {
     window.location.href = getDataFromLocalStorage("Host") + '/orders'
 }
 
+function goToReservations() {
+    window.location.href = getDataFromLocalStorage("Host") + '/reservations'
+}
+
+function goToReservationsToCreate() {
+    window.location.href = getDataFromLocalStorage("Host") + '/reservations/create'
+}
+
+
 function Logout() {
     fetch(getDataFromLocalStorage("Host")  + "/logout", {
         method: "POST",

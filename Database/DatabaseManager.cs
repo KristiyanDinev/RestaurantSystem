@@ -1,6 +1,6 @@
-﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Utils.Utils;
+﻿using ITStepFinalProject.Utils.Utils;
 using Npgsql;
+using Npgsql.Schema;
 
 namespace ITStepFinalProject.Database {
     public class DatabaseManager {
@@ -11,7 +11,8 @@ namespace ITStepFinalProject.Database {
 
         /*
          * 
-          insert into Dishes (Name, Price, Ingredients, Grams, Type_Of_Dish, IsAvailable, AvrageTimeToCook, Image)
+          insert into "Dishes" ("Name", "Price", "Ingredients", "Grams", "Type_Of_Dish", 
+        "IsAvailable", "AvrageTimeToCook", "Image")
 values
 ('Salad 1', 10.99, 'some stuff in it and this and that', 440, 'salad', true, '3', '/images/salad/1.png'),
 ('Salad 2', 12.99, 'some stuff in it and this and that', 500, 'salad', false, '2', null),
@@ -24,14 +25,35 @@ values
 ('Dishes 1', 21.19, 'some stuff in it and this and that', 142, 'dishes', true, '2', null),
 ('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3', null);
        
-        -- year-month-day
-          insert into Cupons (CuponCode, DiscountPercent, ExpirationDate, Name) VALUES
+        -- year-month-day MM/DD/YYYYTHH:mm:ssZ
+          insert into "Cupons" ("CuponCode", "DiscountPercent", "ExpirationDate", "Name") VALUES
           ('Code', 5.99, '2022-01-01', 'Expired'),
           ('Summer', 6.10, '2025-05-01', 'Summer Cupon'),
           ('Winter', 12.99, '2025-12-01', 'Winter Cupon');
 
 
-        -- MM/DD/YYYYTHH:mm:ssZ
+        insert into "Restorant" ("RestorantAddress", "RestorantCity", "RestorantState", 
+            "RestorantCountry", "DoDelivery", "ServeCustomersInPlace") values 
+            ('ul. Restorant', 'Sofia', null, 'Bulgaria', true, false),
+            ('ul. Restorant2', 'Sofia', null, 'Bulgaria', true, false),
+            ('ul. Restorant2 alt', 'Sofia', null, 'Bulgaria', true, true),
+            ('ul. Restorant3 alt', 'Sofia', null, 'Bulgaria', true, true),
+            ('ul. Restorant3', 'Sofia', null, 'Bulgaria', false, true),
+            ('ul. Restorant4', 'Sofia', null, 'Bulgaria', false, true),
+            ('ul. Restorant5', 'Sofia', 'Some State', 'Bulgaria', false, true),
+            ('ul. Restorant7', 'Sofia', 'Some State', 'Bulgaria', true, false),
+            ('ul. Restorant6', 'Sofia', 'Some State', 'Bulgaria', true, false);
+
+        insert into "TimeTable" ("RestorantId", "UserAddress", "UserCity", "UserState",
+            "UserCountry", "AvrageDeliverTime") values 
+            (1, 'ul. User', 'Sofia', null, 'Bulgaria', '5m - 10m'),
+            (2, 'ul. User', 'Sofia', null, 'Bulgaria', '7m - 8m'),
+            (2, 'ul. User2', 'Sofia', null, 'Bulgaria', '2m - 3m+'),
+            (3, 'ul. User', 'Sofia', null, 'Bulgaria', '2m - 3m'),
+            (4, 'ul. User', 'Sofia', null, 'Bulgaria', '1m - 2m'),
+            (4, 'ul. User3', 'Sofia', null, 'Bulgaria', '1m - 2m+'),
+            (5, 'ul. User', 'Sofia', 'Some State', 'Bulgaria', '3m - 5m'),
+            (6, 'ul. User', 'Sofia', 'Some State', 'Bulgaria', '2m - 4m');
          */
 
         public static string _connectionString = "";
@@ -48,71 +70,95 @@ values
 
         public static async void Setup() {
             string sql = """
-                CREATE TABLE IF NOT EXISTS Users (
-                    Id SERIAL PRIMARY KEY,
-                    Username VARCHAR(100) NOT NULL UNIQUE,
-                    Password VARCHAR(64) NOT NULL,
-                    Image VARCHAR(255),
-                    Address TEXT NOT NULL,
-                    City VARCHAR(100) NOT NULL,
-                    State VARCHAR(100),
-                    Country VARCHAR(100) NOT NULL,
-                    PhoneNumber VARCHAR(15),
-                    Email VARCHAR(50) NOT NULL UNIQUE,
-                    Notes VARCHAR(255)
+                CREATE TABLE IF NOT EXISTS "Users" (
+                    "Id" SERIAL PRIMARY KEY,
+                    "Username" VARCHAR(100) NOT NULL,
+                    "Password" VARCHAR(64) NOT NULL,
+                    "Image" VARCHAR(255),
+                    "Address" TEXT NOT NULL,
+                    "City" VARCHAR(100) NOT NULL,
+                    "State" VARCHAR(100),
+                    "Country" VARCHAR(100) NOT NULL,
+                    "PhoneNumber" VARCHAR(15),
+                    "Email" VARCHAR(50) NOT NULL UNIQUE,
+                    "Notes" VARCHAR(255),
+                    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
                 );
 
-                CREATE TABLE IF NOT EXISTS Dishes (
-                    Id SERIAL PRIMARY KEY,
-                    Name VARCHAR(100) NOT NULL,
-                    Price NUMERIC(10, 2) NOT NULL,
-                    Ingredients TEXT NOT NULL,
-                    Grams SMALLINT NOT NULL,
-                    Type_Of_Dish VARCHAR(50) NOT NULL,
-                    IsAvailable BOOLEAN NOT NULL DEFAULT TRUE,
-                    AvrageTimeToCook VARCHAR(20) NOT NULL,
-                    Image TEXT
+                CREATE TABLE IF NOT EXISTS "Restorant" (
+                    "Id" SERIAL PRIMARY KEY,
+                    "RestorantAddress" TEXT NOT NULL,
+                    "RestorantCity" VARCHAR(100) NOT NULL,
+                    "RestorantState" VARCHAR(100),
+                    "RestorantCountry" VARCHAR(100) NOT NULL,
+                    "DoDelivery" BOOL NOT NULL,
+                    "ServeCustomersInPlace" BOOL NOT NULL,
+                    "ReservationMaxChildren" SMALLINT NOT NULL DEFAULT -1,
+                    "ReservationMinChildren" SMALLINT NOT NULL DEFAULT 0,
+                    "ReservationMaxAdults" SMALLINT NOT NULL DEFAULT -1,
+                    "ReservationMinAdults" SMALLINT NOT NULL DEFAULT 1
+                );
+
+                CREATE TABLE IF NOT EXISTS "Staff"(
+                    "UserId" INT REFERENCES "Users"("Id"),
+                    "RestorantId" INT REFERENCES "Restorant"("Id"),
+                    "IsManager" BOOL NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS "TimeTable" (
+                    "RestorantId" INT REFERENCES "Restorant"("Id"),
+                    "UserAddress" TEXT NOT NULL,
+                    "UserCity" VARCHAR(100) NOT NULL,
+                    "UserState" VARCHAR(100),
+                    "UserCountry" VARCHAR(100) NOT NULL,
+                    "AvrageDeliverTime" VARCHAR(50) NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS "Dishes" (
+                    "Id" SERIAL PRIMARY KEY,
+                    "Name" VARCHAR(100) NOT NULL,
+                    "Price" NUMERIC(10, 2) NOT NULL,
+                    "Ingredients" TEXT NOT NULL,
+                    "Grams" SMALLINT NOT NULL,
+                    "Type_Of_Dish" VARCHAR(50) NOT NULL,
+                    "IsAvailable" BOOLEAN NOT NULL DEFAULT TRUE,
+                    "AvrageTimeToCook" VARCHAR(20) NOT NULL,
+                    "Image" TEXT
                 );
 
 
-                CREATE TABLE IF NOT EXISTS Orders (
-                    Id SERIAL PRIMARY KEY,
-                    CurrentStatus VARCHAR(100) NOT NULL,
-                    Notes VARCHAR(255),
-                    OrderedAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-                    UserId INT REFERENCES Users(Id),
-                    RestorantAddress TEXT NOT NULL,
-                    RestorantCity VARCHAR(100) NOT NULL,
-                    RestorantState VARCHAR(100),
-                    RestorantCountry VARCHAR(100) NOT NULL,
-                    TotalPrice NUMERIC(10, 2) NOT NULL
+                CREATE TABLE IF NOT EXISTS "Orders" (
+                    "Id" SERIAL PRIMARY KEY,
+                    "CurrentStatus" VARCHAR(100) NOT NULL,
+                    "Notes" VARCHAR(255),
+                    "OrderedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                    "UserId" INT REFERENCES "Users"("Id"),
+                    "RestorantId" INT REFERENCES "Restorant"("Id"),
+                    "TotalPrice" NUMERIC(10, 2) NOT NULL
                 );
 
-                CREATE TABLE IF NOT EXISTS OrderedDishes (
-                    OrderId INT REFERENCES Orders(Id),
-                    DishId INT REFERENCES Dishes(Id)
+                CREATE TABLE IF NOT EXISTS "OrderedDishes" (
+                    "OrderId" INT REFERENCES "Orders"("Id"),
+                    "DishId" INT REFERENCES "Dishes"("Id")
                 );
 
-                CREATE TABLE IF NOT EXISTS Reservations (
-                    Id SERIAL PRIMARY KEY,
-                    ReservatorId INT REFERENCES Users(Id),
-                    Notes VARCHAR(255),
-                    CurrentStatus VARCHAR(100) NOT NULL,
-                    RestorantAddress TEXT NOT NULL,
-                    RestorantCity VARCHAR(100) NOT NULL,
-                    RestorantState VARCHAR(100),
-                    RestorantCountry VARCHAR(100) NOT NULL,
-                    Amount_Of_Adults SMALLINT NOT NULL DEFAULT 0,
-                    Amount_Of_Children SMALLINT NOT NULL DEFAULT 0,
-                    At_Date TIMESTAMP WITH TIME ZONE NOT NULL,
-                    Created_At TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                CREATE TABLE IF NOT EXISTS "Reservations" (
+                    "Id" SERIAL PRIMARY KEY,
+                    "ReservatorId" INT REFERENCES "Users"("Id"),
+                    "Notes" VARCHAR(255),
+                    "CurrentStatus" VARCHAR(100) NOT NULL,
+                    "RestorantId" INT REFERENCES "Restorant"("Id"),
+                    "Amount_Of_Adults" SMALLINT NOT NULL DEFAULT 0,
+                    "Amount_Of_Children" SMALLINT NOT NULL DEFAULT 0,
+                    "At_Date" TIMESTAMP WITH TIME ZONE NOT NULL,
+                    "Created_At" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
                 );
 
-                CREATE TABLE IF NOT EXISTS Cupons (
-                    CuponCode VARCHAR(25) NOT NULL UNIQUE,
-                    DiscountPercent NUMERIC(10, 2) NOT NULL,
-                    ExpirationDate DATE NOT NULL,
-                    Name VARCHAR(100) NOT NULL
+                CREATE TABLE IF NOT EXISTS "Cupons" (
+                    "CuponCode" VARCHAR(25) NOT NULL UNIQUE,
+                    "DiscountPercent" NUMERIC(10, 2) NOT NULL,
+                    "ExpirationDate" DATE NOT NULL,
+                    "Name" VARCHAR(100) NOT NULL
                 );
 
                 """;
@@ -124,11 +170,55 @@ values
         }
 
 
-        public static object ConvertToModel(NpgsqlDataReader reader, object model)
+        // the model shall not be null
+        public static async Task<List<object>> ConvertToModels(NpgsqlDataReader reader, object model)
         {
-            object obj = Activator.CreateInstance(model.GetType());
+            List<object> objects = new List<object>();
+            if (!reader.HasRows)
+            {
+                return objects;
+            }
 
-           foreach (string property in ObjectUtils.Get_Model_Property_Names(model))
+            //DataTable ? dataTable = reader.GetSchemaTable();
+
+            // create mapping for the columns
+            Dictionary<string, string> columnMapping = new Dictionary<string, string>();
+            foreach (NpgsqlDbColumn col in reader.GetColumnSchema())
+            {
+                string dataColumnName = col.ColumnName;
+                if (columnMapping.ContainsKey(dataColumnName))
+                {
+                    continue;
+                }
+
+                if (dataColumnName.Contains('.'))
+                {
+                    columnMapping.Add(dataColumnName, dataColumnName.Split('.')[1]);
+
+                } else
+                {
+                    columnMapping.Add(dataColumnName, dataColumnName);
+                }
+            }
+
+
+            // while (await reader.ReadAsync())
+            while (await reader.ReadAsync())
+            {
+                object obj = Activator.CreateInstance(model.GetType());
+                // every record
+                foreach (string key in columnMapping.Keys)
+                {
+                    try
+                    {
+                        ObjectUtils.Set_Property_Value(obj,
+                            columnMapping[key], reader[key]);
+                    } catch (Exception) { }
+                }
+                objects.Add(obj);
+            }
+            /*
+            foreach (string property in ObjectUtils.Get_Model_Property_Names(model))
            {
                try
                {
@@ -136,8 +226,8 @@ values
                }
                catch (Exception)
                { }
-           }
-            return obj;
+           }*/
+            return objects;
         }
 
         public static async void _ExecuteNonQuery(string sql) {
@@ -165,26 +255,11 @@ values
 
             using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-            List<object> models = new List<object>();
-            while (await reader.ReadAsync())
-            {
-                models.Add(ConvertToModel(reader, model));
-            }
+            List<object> models = await ConvertToModels(reader, model);
             reader.Close();
             cmd.Connection?.Close();
             cmd.Dispose();
             return models;
-        }
-
-        public static async void _UpdateModel(string table, List<string> set,
-            List<string> where)
-        {
-            string sql = new SqlBuilder()
-                .Update(table).Where_Set_On_Having("SET", set)
-                .Where_Set_On_Having("WHERE", where).ToString();
-
-            Console.WriteLine("Update SQL: " + sql);
-            _ExecuteNonQuery(sql);
         }
     }
 }

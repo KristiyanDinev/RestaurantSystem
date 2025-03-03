@@ -80,16 +80,20 @@ namespace ITStepFinalProject.Utils.Web
         {
             try
             {
+                condition = condition.Trim();
                 // Handle boolean literals
-                if (condition.Trim().Equals("true", StringComparison.OrdinalIgnoreCase))
+                string tempCondition = SetVariables(condition, variables).ToLower();
+                if (tempCondition.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
 
-                if (condition.Trim().Equals("false", StringComparison.OrdinalIgnoreCase))
+                if (tempCondition.Equals("false", StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }
+
+
 
                 // Parse operators
                 if (condition.Contains("=="))

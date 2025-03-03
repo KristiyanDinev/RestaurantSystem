@@ -1,25 +1,31 @@
 ﻿using ITStepFinalProject.Database.Utils;
-using System.Linq;
 using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
+using ITStepFinalProject.Models.WebModels;
+using ITStepFinalProject.Utils.Controller;
 
 namespace ITStepFinalProject.Database.Handlers
 {
     public class OrderDatabaseHandler
     {
         private static readonly string table = "Orders";
-        public async void AddOrder(UserModel user, List<int> dishesId, InsertOrderModel order)
+        private static readonly string tableRestorant = "Restorant";
+        private static readonly string tableOrderedDishes = "OrderedDishes";
+        private static readonly string tableTimeTable = "TimeTable";
+
+        public async void AddOrder(UserModel user, List<int> dishesId, InsertOrderModel order, 
+            ControllerUtils utils)
         {
-            order.CurrentStatus = "db";
+            order.CurrentStatus = utils.DBStatus;
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Insert(table, [order]).ToString());
 
-            List<string> res = new List<string>();
-            res.Add("UserId = "+ user.Id + " AND CurrentStatus = 'db'");
-
             List<object> ordersIdQ = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder().Select("Id", table)
-                .Where_Set_On_Having("WHERE", res).ToString(), new OrderModel(), true);
+                new SqlBuilder().Select("\"Id\"", table)
+                .ConditionKeyword("WHERE")
+                .BuildCondition("UserId", user.Id, "=", "AND")
+                .BuildCondition("CurrentStatus", "'"+utils.DBStatus+"'")
+                .ToString(), new OrderModel(), true);
 
             int orderId = ((OrderModel)ordersIdQ[0]).Id;
 
@@ -37,58 +43,69 @@ namespace ITStepFinalProject.Database.Handlers
                     orderedDishes.Cast<object>().ToList()).ToString());
             } catch (Exception)
             {
-                List<string> where2 = new List<string>();
-                where2.Add("Id = " + orderId);
-
                 DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                    .Delete(table).Where_Set_On_Having("WHERE", where2).ToString());
+                    .Delete(table)
+                    .ConditionKeyword("WHERE")
+                    .BuildCondition("Id", orderId)
+                    .ToString());
                 throw;
             }
 
-            List<string> set = new List<string>();
-            set.Add("CurrentStatus = 'pending'");
-
-            List<string> where = new List<string>();
-            where.Add("Id = "+ orderId);
-
-            DatabaseManager._UpdateModel(table, set, where);
+            UpdateOrderCurrentStatusById(orderId, utils.PendingStatus);
         }
 
         public async void DeleteOrder(int orderId)
         {
-
-            List<string> where2 = new List<string>();
-            where2.Add("OrderId = " + orderId);
+            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                .Delete(tableOrderedDishes)
+                .ConditionKeyword("WHERE")
+                .BuildCondition("Id", orderId)
+                .ToString());
 
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Delete("OrderedDishes").Where_Set_On_Having("WHERE", where2).ToString());
-
-            List<string> where = new List<string>();
-            where.Add("Id = "+ orderId);
-
-            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Delete(table).Where_Set_On_Having("WHERE", where).ToString());
+                .Delete(table)
+                .ConditionKeyword("WHERE")
+                .BuildCondition("OrderId", orderId)
+                .ToString());
         }
 
-        public async Task<List<OrderModel>> GetOrdersByUser(int userId)
+        public async void UpdateOrderCurrentStatusById(int orderId, string newStatus)
         {
-            List<string> where = new List<string>();
-            where.Add("UserId = "+userId);
+            DatabaseManager._ExecuteNonQuery(
+                new SqlBuilder()
+                .Update(table)
 
+                .ConditionKeyword("SET")
+                .BuildCondition("CurrentStatus", "'"+newStatus+"'")
+
+                .ConditionKeyword("WHERE")
+                .BuildCondition("Id", orderId)
+                .ToString()
+                );
+        }
+
+        public async Task<List<DisplayOrderModel>> GetOrdersByUser(int userId)
+        {
             List<object> orderObj = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder().Select("*", table)
-                .Where_Set_On_Having("WHERE", where).ToString(), new OrderModel(), true);
+                .Join(tableRestorant, "INNER")
+                .ConditionKeyword("ON")
+                .BuildCondition(tableRestorant+".Id", '"'+table + "\".\"RestorantId\"")
 
-            return orderObj.Cast<OrderModel>().ToList();
+                .ConditionKeyword("WHERE")
+                .BuildCondition("UserId", userId)
+                .ToString(), new DisplayOrderModel(), true);
+
+            return orderObj.Cast<DisplayOrderModel>().ToList();
         }
 
         public async Task<string?> GetOrder_CurrentStatus_ById(int orderId)
         {
-            List<string> where = new List<string>();
-            where.Add("Id = "+ orderId);
 
             List<object> results = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("CurrentStatus", table).Where_Set_On_Having("WHERE", where)
+                .Select("\"CurrentStatus\"", table)
+                .ConditionKeyword("WHERE")
+                .BuildCondition("Id", orderId)
                 .ToString(), new OrderModel(), true);
 
             return results.Count == 0 ? null : ((OrderModel)results[0]).CurrentStatus;
@@ -96,20 +113,57 @@ namespace ITStepFinalProject.Database.Handlers
 
         public async Task<List<DishModel>> GetAllDishesFromOrder(int orderId)
         {
-            List<string> joinCondition = new List<string>();
-            joinCondition.Add("OrderedDishes.DishId = Dishes.Id");
-
-            List<string> where = new List<string>();
-            where.Add("OrderedDishes.OrderId = "+ orderId);
-
             List<object> objs = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("Dishes.Id AS id, Dishes.Name AS name, Dishes.Price AS price, Dishes.AvrageTimeToCook AS avragetimetocook", 
-                "OrderedDishes")
+                .Select("*", tableOrderedDishes)
                 .Join("Dishes", "INNER")
-                .Where_Set_On_Having("ON", joinCondition)
-                .Where_Set_On_Having("WHERE", where).ToString(), new DishModel(), true);
+
+                .ConditionKeyword("ON")
+                .BuildCondition(tableOrderedDishes + ".DishId", "\"Dishes\".\"Id\"")
+
+                .ConditionKeyword("WHERE")
+                .BuildCondition(tableOrderedDishes + ".OrderId", orderId)
+
+                .ToString(), new DishModel(), true);
 
             return objs.Cast<DishModel>().ToList();
+        }
+
+
+        public async Task<List<TimeTableJoinRestorantModel>> GetRestorantsAddressesForUser(UserModel user)
+        {
+            string city = ValueHandler.Strings(user.City);
+            string country = ValueHandler.Strings(user.Country);
+
+            SqlBuilder sqlBuilder = new SqlBuilder()
+                .Select("*", tableTimeTable)
+                .Join(tableRestorant, "INNER")
+                .ConditionKeyword("ON")
+                .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
+
+                .ConditionKeyword("WHERE")
+                .BuildCondition("DoDelivery", "'1'", "=", "AND")
+                .BuildCondition("UserCity", city, "=", "AND")
+                .BuildCondition("RestorantCity", city, "=", "AND")
+                .BuildCondition("UserCountry", country, "=", "AND")
+                .BuildCondition("RestorantCountry", country, "=", "AND")
+                .BuildCondition("UserAddress", ValueHandler.Strings('%' + user.Address + '%'), "LIKE", "AND");
+
+            string state = ValueHandler.Strings(user.State);
+            if (state.Equals("null"))
+            {
+                sqlBuilder.BuildCondition("UserState", "NULL", "IS", "AND");
+                sqlBuilder.BuildCondition("RestorantState", "NULL", "IS");
+
+            } else
+            {
+                sqlBuilder.BuildCondition("UserState", state, "=", "AND");
+                sqlBuilder.BuildCondition("RestorantState", state, "=");
+            }
+
+            List<object> objs = await DatabaseManager._ExecuteQuery(sqlBuilder
+                .ToString(), new TimeTableJoinRestorantModel(), true);
+
+            return objs.Cast<TimeTableJoinRestorantModel>().ToList();
         }
     }
 }

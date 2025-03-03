@@ -1,0 +1,12 @@
+.reservation_navigation {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    margin: 10px;
+}
+
+
+.reservation_navigation button {
+    border-radius: 10px;
+    background-color: rgb(52, 200, 19);
+}

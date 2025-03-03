@@ -1,12 +1,14 @@
 ﻿<div class="user">
 
-    <button class=" navigation_button" onclick="goToCart()">🛒</button>
+    <button class="navigation_button" onclick="goToCart()">🛒</button>
 
     <button class="navigation_button" onclick="goToOrders()">Orders</button>
 
     <button class="navigation_button" onclick="goToDishes()">Dishes</button>
 
-    <div class="profile" onclick="goToProfile()">
+    <button class="navigation_button" onclick="goToReservations()">Reservations</button>
+
+    <button class="navigation_button_column" onclick="goToProfile()">
         {% if "{{User.Image}}".length > 0 %}
         <img src="http://127.0.0.1:7278{{User.Image}}">
 
@@ -14,7 +16,7 @@
         <img>
         {% endif %}
         <p>{{User.Username}}</p>
-    </div>
+    </button>
 
 
     <div class="logout">

@@ -20,13 +20,11 @@ namespace ITStepFinalProject.Database.Handlers
 
             //string sql = "SELECT * FROM Users WHERE Id = @Id";*/
 
-            List<string> values = new List<string>();
-            values.Add("Id = "+ id);
-
             List<object> user = await 
                 DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
-                .Where_Set_On_Having("WHERE", values).ToString(), new UserModel(), true);
+                .ConditionKeyword("WHERE")
+                .BuildCondition("Id", id).ToString(), new UserModel(), true);
 
             return (UserModel)user[0];
         }
@@ -40,17 +38,16 @@ namespace ITStepFinalProject.Database.Handlers
 
         public async Task<UserModel?> LoginUser(UserModel loginUser, bool hashPassword)
         {
-            List<string> values = new List<string>();
-            values.Add("Email = "+ ValueHandler.Strings(loginUser.Email)+" AND ");
-            values.Add("Password = '" + 
-                (hashPassword ? ValueHandler.HashString(loginUser.Password) :
-                    loginUser.Password) + '\'');
-
-
             List<object> user = await DatabaseManager
                 ._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
-                .Where_Set_On_Having("WHERE", values).ToString(), loginUser, true);
+                .ConditionKeyword("WHERE")
+                .BuildCondition("Email", ValueHandler.Strings(loginUser.Email), "=", "AND")
+                .BuildCondition("Password",
+               "'"+ (hashPassword ? ValueHandler.HashString(loginUser.Password) :
+                    loginUser.Password)+"'")
+                .ToString(), loginUser, true);
+
             return user.Count == 0 ? null : (UserModel)user[0];
         }
 
@@ -62,8 +59,10 @@ namespace ITStepFinalProject.Database.Handlers
          */
         public async void UpdateUser(UserModel model)
         {
-            List<string> values = new List<string>();
-            values.Add("Password = '" + ValueHandler.HashString(model.Password) + "', ");
+            SqlBuilder sqlBuilder = new SqlBuilder()
+                .Update(table)
+                .ConditionKeyword("SET")
+                .BuildCondition("Password", ValueHandler.HashString(model.Password), ", ");
 
             List<string> names = ObjectUtils.Get_Model_Property_Names(model);
             for (int i = 0; i < names.Count; i++)
@@ -73,25 +72,23 @@ namespace ITStepFinalProject.Database.Handlers
                 {
                     continue;
                 }
-                values.Add(property + 
-                    " = "+ ValueHandler.GetModelPropertyValue(model, property) +
-                    (i == names.Count - 1 ? "" : ", "));
+                sqlBuilder.BuildCondition(property, ValueHandler.GetModelPropertyValue(model, property),
+                    i == names.Count - 1 ? "" : ", ");
             }
 
-            List<string> where = new List<string>();
-            where.Add("Id = "+model.Id);
+            sqlBuilder.ConditionKeyword("WHERE")
+                .BuildCondition("Id", model.Id);
 
-            DatabaseManager._UpdateModel(table, values, where);
+            DatabaseManager._ExecuteNonQuery(sqlBuilder.ToString());
         }
 
         public async void DeleteUser(UserModel model)
         {
-            List<string> values = new List<string>();
-            values.Add("Id = " + model.Id);
-
             DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder().Delete(table)
-                .Where_Set_On_Having("WHERE", values).ToString());
+                .ConditionKeyword("WHERE")
+                .BuildCondition("Id", model.Id)
+                .ToString());
         }
     }
 }

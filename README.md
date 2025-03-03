@@ -10,6 +10,25 @@
 - user: ResturantUser
 - password: password123
 
+The `Orders` table reprecents all the orders that were done. When the `CurrentStatus` of an order is
+`db` then either it is in the prosses of being added to the database or it failed to be added in the database,
+so you can delete it if it failed to do so.
+The `CurrectStatus` will be `pending` when the order was added successfully to the database and it is waiting to
+ be accepted by staff.
+The `CurrectStatus` will be `completed` when the order has been completed and delivered to the user and if there is any
+ payment to be made. It is made, but there maybe will be exceptions based on the restorant's politics.
+
+In case the restorant has a physical place to go eat. Then there also the staff has to create an online order, from his staff
+ account. This is done, because the total sales will be calculated based on the amount of completed orders and also the manager of 
+ the restorant to see how many orders have a staff done in his worktime.
+
+The `CurrectStatus` will be `stopped` if it got cancelled by the user only when the status is `db` or `pending` which should be when the
+ order has not yet been accepted.
+
+- `ReservationMaxAdults` and `ReservationMaxChildren` are set to `-1` by default which means no limit. if the number is `-1` or bellow `-1` then no limit should be used.
+- If you want to disable reservations then set `ReservationMaxAdults` and `ReservationMaxChildren` to `0` and `ReservationMinAdults` and `ReservationMinChildren` to `-1`
+ This can be done from the UI as planned or from the database.
+
 ### Git access token
 - `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`
 
@@ -22,12 +41,7 @@ The `User` is the model name.
 - Global elements to replace in static files. User bar -> `{{UserBar}}`. 
  This can be replaced by a html component which the server generates.
 
-- The Order's CurrentStatus will be `db` when it is being prossesed by the server,
- but if the CurrentStatus is `pending` thne the order is ready to be accepted and it can be cancelled
-
-
-- `ResturantAddressAvrageDeliverTime` -> has format of `ul. User;Sofia;;Bulgaria|5m - 10m|ul. Resturatn;Sofia;;Bulgaria---ul. User2;Sofia;;Bulgaria|1m - 2m|ul. Resturatn;Sofia;;Bulgaria`
-  `local user address;user City;user State (can be empty if none);user Country|Avrage Time to Deliver|local restorant address;restorant city;restorant state;resturant country`
+- See the `Orders`'s `CurrentStatus` in the DB notes.
 
 - `Auth` header will contain a encrypted JWT token representing the user's data.
 
@@ -44,7 +58,8 @@ The `User` is the model name.
 ```
 You open it with `{% if ... %}` and close it with `{% endif %}`. The `{% elseif ... %}` and `{% else %}` is optional
 
+
 ### TODO
 - Staff page for seeing orders, reservations and updating / cancelling them.
 - Admin page for adding staff.
-- Websocket for order status.
+- Frontend for reservations

@@ -45,7 +45,7 @@ namespace ITStepFinalProject.Utils.Web
                 ObjectUtils.Get_Model_Property_Names(model))
             {
                 variables.Add("{{" + modelName + "." + property + "}}", 
-                    Convert.ToString(ObjectUtils.Get_Property_Value(model, property)));
+                    Convert.ToString(ObjectUtils.Get_Property_Value(model, property) ?? ""));
             }
 
             html = _templateRenderer.Render(html, variables);
