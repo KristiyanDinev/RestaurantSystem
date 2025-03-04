@@ -11,32 +11,40 @@ namespace ITStepFinalProject.Database.Handlers
         private static readonly string tableRestorant = "Restorant";
         private static readonly string tableTimeTable = "TimeTable";
 
-        public async void CreateReservation(InsertReservationModel model, string currentStatus)
+        public async Task<bool> CreateReservation(InsertReservationModel model, string currentStatus)
         {
             List<object> restorant = await DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", tableRestorant)
                 .ConditionKeyword("WHERE")
-                .BuildCondition("Id", model.RestorantId)
-                .BuildCondition("ReservationMaxAdults", model.Amount_Of_Adults, ">=", "AND")
-                .BuildCondition("ReservationMaxAdults", 0, ">=", "AND")
-                .BuildCondition("ReservationMaxChildren", model.Amount_Of_Children, ">=", "AND")
-                .BuildCondition("ReservationMaxChildren", 0, ">=", "AND")
+                .BuildCondition("Id", model.RestorantId, "=", "AND")
+                .BuildCondition("ReservationMaxAdults", model.Amount_Of_Adults, ">=", "AND", " ((")
+                .BuildCondition("ReservationMaxAdults", 0, ">=", "OR", "", ") ")
+                .BuildCondition("ReservationMaxAdults", 0, "<", "AND", "", ") ")
 
-                .BuildCondition("ReservationMinAdults", 0, ">=", "AND")
-                .BuildCondition("ReservationMinAdults", model.Amount_Of_Adults, "<=", "AND")
-                .BuildCondition("ReservationMinChildren", 0, ">=", "AND")
-                .BuildCondition("ReservationMinChildren", model.Amount_Of_Children, "<=")
+
+                .BuildCondition("ReservationMaxChildren", model.Amount_Of_Children, ">=", "AND", " ((")
+                .BuildCondition("ReservationMaxChildren", 0, ">=", "OR", "", ") ")
+                .BuildCondition("ReservationMaxChildren", 0, "<", "AND", "", ") ")
+
+                .BuildCondition("ReservationMinAdults", model.Amount_Of_Adults, "<=", "AND", " ((")
+                .BuildCondition("ReservationMinAdults", 0, ">=", "OR", "", ")")
+                .BuildCondition("ReservationMinAdults", 0, "<", "AND", "", ")")
+
+                .BuildCondition("ReservationMinChildren", model.Amount_Of_Children, "<=", "AND", " ((")
+                .BuildCondition("ReservationMinChildren", 0, ">=", "OR", "", ") ")
+                .BuildCondition("ReservationMinChildren", 0, "<", "", "", ") ")
                 .ToString(),
                 new RestorantModel(), true);
             
             if (restorant.Count == 0)
             {
-                throw new Exception("Restorant's limit of reservation is reached");
+                return false;
             }
 
             model.CurrentStatus = currentStatus;
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Insert(table, [model]).ToString());
+            return true;
         }
 
         public async Task<List<DisplayReservationModel>> GetReservationsByUser(UserModel model)

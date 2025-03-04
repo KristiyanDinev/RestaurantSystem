@@ -6,6 +6,7 @@
         <title id="name">Cart</title>
         <meta name='viewport' content='width=device-width, initial-scale=1'>
         <script src='../../Index.js'></script>
+        <script src='reservations/reservations.js'></script>
     </head>
 
     <body>
@@ -21,7 +22,13 @@
             {{ReservationDisplay}}
         </div>
 
+        <script>
+            if (regiseredReservations.length > 0) {
+                startWebSocket()
+            }
+        </script>
+
         <link rel='stylesheet' type='text/css' media='screen' href='../../Index.css'>
-        <link rel='stylesheet' type='text/css' media='screen' href='reservations.css'>
+        <link rel='stylesheet' type='text/css' media='screen' href='reservations/reservations.css'>
     </body>
 </html>

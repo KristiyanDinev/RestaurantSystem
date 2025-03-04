@@ -36,6 +36,7 @@ namespace ITStepFinalProject.Models
                     WebSocketMessageType.Text, true,
                     CancellationToken.None);
 
+                Console.WriteLine("\n WebSocket Server sent to Client: " + text);
                 return true;
 
             }
@@ -62,7 +63,7 @@ namespace ITStepFinalProject.Models
 
                 if (receiveResult.MessageType.Equals(WebSocketMessageType.Close))
                 {
-                    Console.WriteLine("Client Closes WebSocket connection");
+                    Console.WriteLine("\nClient Closes WebSocket connection");
                     return null;
                 }
 
@@ -105,7 +106,7 @@ namespace ITStepFinalProject.Models
             webSocket.Dispose();
             IsRunning = false;
             taskCompletionSource.TrySetResult(webSocket);
-            Console.WriteLine("Closing WebSocket connection.");
+            Console.WriteLine("\nClosing WebSocket connection.");
         }
 
         public async void WhileOpen(Func<WebSocket, Task> action)
@@ -117,11 +118,11 @@ namespace ITStepFinalProject.Models
                 //Console.WriteLine("\nWebSocket message from client: " + text + "\n");
                 await action(webSocket);
             }
-            Console.WriteLine(webSocket.State);
+            Console.WriteLine("\n"+webSocket.State);
             webSocket.Dispose();
             IsRunning = false;
             taskCompletionSource.TrySetResult(webSocket);
-            Console.WriteLine("WhileOpen Closing WebSocket connection.");
+            Console.WriteLine("\nWhileOpen Closing WebSocket connection.");
         }
     }
 }

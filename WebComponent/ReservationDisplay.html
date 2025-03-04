@@ -1,6 +1,28 @@
-﻿<div>
-    <p>CurrentStatus: {{Reservation.CurrentStatus}}</p>
-    <p>RestorantAddress: {{Reservation.RestorantAddress}} - {{Reservation.RestorantCity}} - {{Reservation.RestorantState}} - {{Reservation.RestorantCountry}}</p>
-    <p>Amount Of Adults: {{Reservation.Amount_Of_Adults}}</p>
-    <p>Amount Of Children: {{Reservation.Amount_Of_Children}}</p>
+﻿<div class="reservation_view">
+
+    <p class="status">CurrentStatus: {{Reservation.CurrentStatus}}</p>
+
+    <div class="notes_view">
+        <p class="notes_title">Notes: </p>
+        <p class="notes">{{Reservation.Notes}}</p>
+    </div>
+
+    <p class="part">RestorantAddress: {{Reservation.RestorantAddress}} - {{Reservation.RestorantCity}} - {{Reservation.RestorantState}} - {{Reservation.RestorantCountry}}</p>
+    <p class="part">Amount Of Adults: {{Reservation.Amount_Of_Adults}}</p>
+    <p class="part">Amount Of Children: {{Reservation.Amount_Of_Children}}</p>
+    <p class="part" id="{{Reservation.Id}}atdate"></p>
+    <p class="part" id="{{Reservation.Id}}createdat"></p>
+
+    {% if "{{Reservation.CurrentStatus}}" != "pending" %}
+    <button class="cancel" style="opacity: 50%">Cancel</button>
+    {% else %}
+    <button class="cancel" style="opacity: 100%" onclick="cancelReservation('{{Reservation.Id}}')">Cancel</button>
+    {% endif %}
+
+    <script>
+        document.getElementById("{{Reservation.Id}}createdat").innerHTML = "Created At: " + new Date(Date.parse("{{Reservation.Created_At}}")).toLocaleString()
+        document.getElementById("{{Reservation.Id}}atdate").innerHTML = "At Date: " + new Date(Date.parse("{{Reservation.At_Date}}")).toLocaleString()
+
+        regiseredReservations.push('{{Reservation.Id}}')
+    </script>
 </div>

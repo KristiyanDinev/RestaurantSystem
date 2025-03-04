@@ -59,13 +59,13 @@ namespace ITStepFinalProject.Database.Handlers
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(tableOrderedDishes)
                 .ConditionKeyword("WHERE")
-                .BuildCondition("Id", orderId)
+                .BuildCondition("OrderId", orderId)
                 .ToString());
 
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(table)
                 .ConditionKeyword("WHERE")
-                .BuildCondition("OrderId", orderId)
+                .BuildCondition("Id", orderId)
                 .ToString());
         }
 

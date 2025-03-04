@@ -14,16 +14,22 @@ namespace ITStepFinalProject.Database.Utils
             return Convert.ToBase64String(EncryptionHandler.HashIt(str + _hashingSlat));
         }
 
-        public static string Strings(object? str)
+        public static string Strings(object? obj)
         {
-            return str == null || ((string)str).Replace(" ", "").Length == 0 ?
-                "null" : "'" + ((string)str).Replace("'", "''") + "'";
+            string? str = obj?.ToString();
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                return "null";
+            }
+
+            return "'"+str.Replace("'", "''")+"'";
         }
 
         public static object GetModelPropertyValue(object model, string property)
         {
             object? value = ObjectUtils.Get_Property_Value(model, property);
-            if (value is string || value == null)
+            if ((value is string || value == null) || 
+                (value is DateOnly || value is DateTime || value is DateTimeOffset || value is DateTimeKind))
             {
                 value = Strings(value);
             }

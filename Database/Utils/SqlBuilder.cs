@@ -106,11 +106,11 @@ namespace ITStepFinalProject.Database.Utils
         }
 
         public SqlBuilder BuildCondition(string property, object value, string condition = "=",
-            string endingCondtion = "")
+            string endingCondtion = "", string groupStart = " ", string groupEnd = " ")
         {
-            sql.Append(' ').Append(_handleTableNames(property)).Append(' ')
+            sql.Append(groupStart).Append(_handleTableNames(property)).Append(' ')
                 .Append(condition).Append(' ').Append(value)
-                .Append(' ').Append(endingCondtion);
+                .Append(groupEnd).Append(endingCondtion);
             return this;
         }
 

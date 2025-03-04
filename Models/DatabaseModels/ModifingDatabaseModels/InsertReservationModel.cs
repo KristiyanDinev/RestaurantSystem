@@ -18,7 +18,7 @@ namespace ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels
             RestorantId = registerReservationModel.RestorantId;
             Amount_Of_Children = registerReservationModel.Amount_Of_Children;
             Amount_Of_Adults = registerReservationModel.Amount_Of_Adults;
-            At_Date = DateTime.Parse(registerReservationModel.At_Date);
+            At_Date = DateTime.ParseExact(registerReservationModel.At_Date, "yyyy-dd-MM HH:mm", null);
             ReservatorId = userId;
         }
     }

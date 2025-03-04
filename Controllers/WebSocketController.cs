@@ -1,5 +1,6 @@
 ﻿using ITStepFinalProject.Models;
 using System.Net.WebSockets;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ITStepFinalProject.Controllers
 {
@@ -10,6 +11,11 @@ namespace ITStepFinalProject.Controllers
         public WebSocketController(WebApplication app)
         {
             app.MapGet("/ws/orders", async (HttpContext context) =>
+            {
+                await HandleWholeRequest(context);
+            }).RequireRateLimiting("fixed");
+
+            app.MapGet("/ws/reservations", async (HttpContext context) =>
             {
                 await HandleWholeRequest(context);
             }).RequireRateLimiting("fixed");
@@ -33,8 +39,11 @@ namespace ITStepFinalProject.Controllers
 
             var socketFinishedTcs = new TaskCompletionSource<object>();
 
-            SubscribtionModel subscribtionModel = new SubscribtionModel("/orders", webSocket,
-                socketFinishedTcs);
+            SubscribtionModel subscribtionModel = new SubscribtionModel(context.Request.Path.Value ?? "", 
+                webSocket,
+            socketFinishedTcs);
+
+            Console.WriteLine("\nNew WebSocket Connection.");
 
             subscribtionModel.WhileOpen(async (WebSocket socket) =>
             {
@@ -49,6 +58,7 @@ namespace ITStepFinalProject.Controllers
                 {
                     return;
                 }
+                Console.WriteLine("\nWebSocket Message from Client: " + text);
 
                 string title = parts[0];
                 parts.RemoveAt(0);

@@ -42,12 +42,14 @@
                 <input type="time" id="at_time"/>
             </div>
 
-            <button onclick="submitCreation()">Reserve<button>
+            <div class="noselect reserve">
+                <button onclick="submitCreation()">Reserve</button>
+                <p id="reservation_status"></p>
+            </div>
         </div>
 
-        <p id="reservation_status"></p>
-
         <link rel='stylesheet' type='text/css' media='screen' href='../../Index.css'>
-        <script src='../reservations.js'></script>
+        <link rel='stylesheet' type='text/css' media='screen' href='reservations.css'>
+        <script src='reservations.js'></script>
     </body>
 </html>

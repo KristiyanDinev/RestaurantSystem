@@ -56,7 +56,7 @@ namespace ITStepFinalProject.Controllers
 
                     List<TimeTableJoinRestorantModel> timeTableJoinRestorantModels = await reservationDB.GetRestorantsAddressesForReservation(user);
 
-                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/reservations");
+                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/reservations/create");
                     FileData = webUtils.HandleCommonPlaceholders(FileData, controllerUtils.UserModelName, [user]);
                     FileData = webUtils.HandleCommonPlaceholders(FileData, controllerUtils.RestorantModelName,
                         timeTableJoinRestorantModels.Cast<object>().ToList());
@@ -78,15 +78,27 @@ namespace ITStepFinalProject.Controllers
             {
                 try
                 {
+                    if (registerReservationModel.Amount_Of_Children < 0 ||
+                        registerReservationModel.Amount_Of_Adults < 0 ||
+                        string.IsNullOrWhiteSpace(registerReservationModel.At_Date))
+                    {
+                        return Results.BadRequest();
+                    }
+
                     UserModel? user = await userUtils.GetUserModelFromAuth(context);
                     if (user == null)
                     {
                         return Results.Unauthorized();
                     }
 
-                    reservationsDB.CreateReservation(new InsertReservationModel(registerReservationModel, 
+                    bool IsCreated = await reservationsDB.CreateReservation(new InsertReservationModel(registerReservationModel, 
                         user.Id),
                         controllerUtils.PendingStatus);
+
+                    if (!IsCreated)
+                    {
+                        throw new Exception("Limit reached or failed to create it.");
+                    }
 
                     return Results.Ok();
 
