@@ -50,7 +50,7 @@ function clearAllDataFromLocalStorage() {
     window.sessionStorage.clear();
 }
 
-var __port = ":"+ (document.location.port.length == 0 ? "80" : document.location.port)
+var __port = (document.location.port.length == 0 ? "" : ":"+ document.location.port)
 
 setDataToLocalStorage("WebSocketHost", (document.location.protocol === "https:" ? "wss" : "ws") +
      "://" + document.location.hostname + __port)
