@@ -1,8 +1,6 @@
 ﻿<div id="whole_food">
 
-    {% if "{{Dish.IsAvailable}}" == "True" %}
-
-    <div class="food" style="opacity: 100%;" onclick="goToDish('{{Dish.Id}}')">
+    {% if "{{Dish.IsAvailable}}" == "True" %}<div class="food" style="opacity: 100%;" onclick="goToDish('{{Dish.Id}}')">
     {% else %}
     <div class="food" style="opacity: 50%;">
     {% endif %}
