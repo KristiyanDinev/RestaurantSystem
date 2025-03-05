@@ -13,17 +13,17 @@ namespace ITStepFinalProject.Database.Handlers
         private static readonly string tableOrderedDishes = "OrderedDishes";
         private static readonly string tableTimeTable = "TimeTable";
 
-        public async void AddOrder(UserModel user, List<int> dishesId, InsertOrderModel order, 
+        public async void AddOrder(int userId, List<int> dishesId, InsertOrderModel order, 
             ControllerUtils utils)
         {
             order.CurrentStatus = utils.DBStatus;
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [order]).ToString());
+                .Insert(table, [order]).ToString(), true);
 
             List<object> ordersIdQ = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder().Select("\"Id\"", table)
                 .ConditionKeyword("WHERE")
-                .BuildCondition("UserId", user.Id, "=", "AND")
+                .BuildCondition("UserId", userId, "=", "AND")
                 .BuildCondition("CurrentStatus", "'"+utils.DBStatus+"'")
                 .ToString(), new OrderModel(), true);
 
@@ -40,14 +40,14 @@ namespace ITStepFinalProject.Database.Handlers
             {
                 DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                     .Insert("OrderedDishes", 
-                    orderedDishes.Cast<object>().ToList()).ToString());
+                    orderedDishes.Cast<object>().ToList()).ToString(), true);
             } catch (Exception)
             {
                 DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                     .Delete(table)
                     .ConditionKeyword("WHERE")
                     .BuildCondition("Id", orderId)
-                    .ToString());
+                    .ToString(), true);
                 throw;
             }
 
@@ -60,13 +60,13 @@ namespace ITStepFinalProject.Database.Handlers
                 .Delete(tableOrderedDishes)
                 .ConditionKeyword("WHERE")
                 .BuildCondition("OrderId", orderId)
-                .ToString());
+                .ToString(), true);
 
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(table)
                 .ConditionKeyword("WHERE")
                 .BuildCondition("Id", orderId)
-                .ToString());
+                .ToString(), true);
         }
 
         public async void UpdateOrderCurrentStatusById(int orderId, string newStatus)
@@ -81,7 +81,7 @@ namespace ITStepFinalProject.Database.Handlers
                 .ConditionKeyword("WHERE")
                 .BuildCondition("Id", orderId)
                 .ToString()
-                );
+                , true);
         }
 
         public async Task<List<DisplayOrderModel>> GetOrdersByUser(int userId)

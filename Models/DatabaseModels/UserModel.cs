@@ -1,8 +1,4 @@
 ﻿using ITStepFinalProject.Models.Controller;
-using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
-using System.Diagnostics.Metrics;
-using System.Net;
-using System.Numerics;
 
 namespace ITStepFinalProject.Models.DatabaseModels {
     public class UserModel {
@@ -42,19 +38,6 @@ namespace ITStepFinalProject.Models.DatabaseModels {
             State = registerUserModel.State;
             Country = registerUserModel.Country;
             Image = registerUserModel.Image;
-        }
-        public UserModel(InsertUserModel insertUserModel)
-        {
-            PhoneNumber = insertUserModel.PhoneNumber;
-            Username = insertUserModel.Username;
-            Notes = insertUserModel.Notes;
-            Email = insertUserModel.Email;
-            Password = insertUserModel.Password;
-            Address = insertUserModel.Address;
-            City = insertUserModel.City;
-            State = insertUserModel.State;
-            Country = insertUserModel.Country;
-            Image = insertUserModel.Image;
         }
     }
 }

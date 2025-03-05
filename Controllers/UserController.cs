@@ -72,6 +72,7 @@ namespace ITStepFinalProject.Controllers {
                         user = await db.LoginUser(user, true) 
                             ?? throw new Exception("Didn't login");
 
+                        // the user.Password is hashed
                         string authString = userUtils.HandleAuth(user, rememberMe);
 
                         context.Response.Cookies.Delete(userUtils.authHeader);
@@ -150,6 +151,7 @@ namespace ITStepFinalProject.Controllers {
                             return Results.BadRequest();
                         }
 
+                        // the user.Password is hashed
                         string authString = userUtils.HandleAuth(user, registerUserModel.RememberMe);
 
                         context.Response.Cookies.Delete(userUtils.authHeader);
@@ -213,7 +215,7 @@ namespace ITStepFinalProject.Controllers {
                     string Country = !model.Country.Equals(updateUserModel.Country) ? updateUserModel.Country : model.Country;
                     string Email = !model.Email.Equals(updateUserModel.Email) ? updateUserModel.Email : model.Email;
 
-                    string _notes = updateUserModel.Notes?.Replace(" ","").Length == 0 ? null : updateUserModel.Notes;
+                    string? _notes = updateUserModel.Notes?.Replace(" ","").Length == 0 ? null : updateUserModel.Notes;
 
                     string? Notes = model.Notes != _notes ? _notes : model.Notes;
 
@@ -247,6 +249,7 @@ namespace ITStepFinalProject.Controllers {
                     user.Image = Image;
                     user.PhoneNumber = PhoneNumber;
                     user.Email = Email;
+                    // you can't change your password as of now.
                     user.Id = model.Id;
 
                     db.UpdateUser(user);

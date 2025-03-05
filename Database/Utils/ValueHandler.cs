@@ -1,6 +1,4 @@
 ﻿using ITStepFinalProject.Utils.Utils;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
 {
@@ -10,14 +8,13 @@ namespace ITStepFinalProject.Database.Utils
 
         public static string HashString(string str)
         {
-            using var hashing = SHA256.Create();
             return Convert.ToBase64String(EncryptionHandler.HashIt(str + _hashingSlat));
         }
 
-        public static string Strings(object? obj)
+        public static string Strings(object? obj, bool allowEmptyStrings = false)
         {
             string? str = obj?.ToString();
-            if (string.IsNullOrWhiteSpace(str))
+            if (str == null || (string.IsNullOrWhiteSpace(str) && !allowEmptyStrings))
             {
                 return "null";
             }

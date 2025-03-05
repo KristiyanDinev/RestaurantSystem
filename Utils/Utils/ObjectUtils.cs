@@ -26,7 +26,31 @@ namespace ITStepFinalProject.Utils.Utils
 
         public static void Set_Property_Value(object model, string property, object? value)
         {
-            Get_PropertyInfo(model, property)?.SetValue(model, value, null);
+            PropertyInfo? info = Get_PropertyInfo(model, property);
+            if (info == null)
+            {
+                return;
+            }
+
+            if (info.PropertyType == typeof(int) && value is string)
+            {
+                value = int.Parse(Convert.ToString(value));
+
+            } else if (info.PropertyType == typeof(DateTime) && value is string)
+            {
+                value = DateTime.Parse(Convert.ToString(value));
+
+            }
+            else if (info.PropertyType == typeof(DateOnly) && value is string)
+            {
+                value = DateOnly.Parse(Convert.ToString(value));
+
+            }
+            else if (info.PropertyType == typeof(decimal) && (value is double || value is float))
+            {
+                value = decimal.Parse(Convert.ToString(value));
+            }
+            info.SetValue(model, value, null);
         }
 
         public static PropertyInfo? Get_PropertyInfo(object model, string property)

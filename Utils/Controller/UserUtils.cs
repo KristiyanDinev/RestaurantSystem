@@ -59,6 +59,11 @@ namespace ITStepFinalProject.Utils.Controller
             }
 
             UserModel userModel = new UserModel();
+            foreach (string property in ObjectUtils.Get_Model_Property_Names(userModel))
+            {
+                ObjectUtils.Set_Property_Value(userModel, property, claims[property]);
+            }
+            /*
             userModel.Id = int.Parse(claims["Id"].ToString());
             userModel.Notes = claims["Notes"].ToString();
             userModel.Email = claims["Email"].ToString();
@@ -69,10 +74,9 @@ namespace ITStepFinalProject.Utils.Controller
             userModel.State = claims["State"].ToString();
             userModel.Country = claims["Country"].ToString();
             userModel.PhoneNumber = claims["PhoneNumber"].ToString();
-            userModel.Password = claims["Password"].ToString();
+            userModel.Password = claims["Password"].ToString();*/
             return userModel;
         }
 
-        
     }
 }

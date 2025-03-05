@@ -54,6 +54,18 @@ values
             (4, 'ul. User3', 'Sofia', null, 'Bulgaria', '1m - 2m+'),
             (5, 'ul. User', 'Sofia', 'Some State', 'Bulgaria', '3m - 5m'),
             (6, 'ul. User', 'Sofia', 'Some State', 'Bulgaria', '2m - 4m');
+
+        insert into "Services" ("Role", "Service") values
+            ('staff', ''),
+            ('waitress', '/orders'),
+            ('cook', '/dishes'),
+            ('delivery', '/delivery'),
+            ('owner', '/owner');
+
+
+
+        insert into "Roles" ("UserId", "Role") values
+            (1, 'staff');
          */
 
         public static string _connectionString = "";
@@ -99,10 +111,14 @@ values
                     "ReservationMinAdults" SMALLINT NOT NULL DEFAULT 1
                 );
 
-                CREATE TABLE IF NOT EXISTS "Staff"(
-                    "UserId" INT REFERENCES "Users"("Id"),
-                    "RestorantId" INT REFERENCES "Restorant"("Id"),
-                    "IsManager" BOOL NOT NULL
+                CREATE TABLE IF NOT EXISTS "Services" (
+                    "Role" VARCHAR(100) NOT NULL,
+                    "Service" VARCHAR(100) NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS "Roles" (
+                    "UserId" INT REFERENCES "Users"("Id") NOT NULL,
+                    "Role" VARCHAR(100) NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS "TimeTable" (
@@ -230,8 +246,13 @@ values
             return objects;
         }
 
-        public static async void _ExecuteNonQuery(string sql) {
+        public static async void _ExecuteNonQuery(string sql, bool isPrepare) {
             var cmd = await BuildCommand(sql);
+            if (isPrepare)
+            {
+                cmd.Prepare();
+            }
+            
             int num = await cmd.ExecuteNonQueryAsync();
 
             cmd.Connection?.Close();

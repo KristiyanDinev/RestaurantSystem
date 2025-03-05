@@ -8,8 +8,19 @@
     </div>
 
     <p class="part">RestorantAddress: {{Reservation.RestorantAddress}} - {{Reservation.RestorantCity}} - {{Reservation.RestorantState}} - {{Reservation.RestorantCountry}}</p>
+
+    {% if {{Reservation.DoDelivery}} %}
+    <p class="part">Does home delivery</p>
+    {% else %}
+    {% endif %}
+
     <p class="part">Amount Of Adults: {{Reservation.Amount_Of_Adults}}</p>
     <p class="part">Amount Of Children: {{Reservation.Amount_Of_Children}}</p>
+    <p class="part">
+        Total People:
+        <script>{{Reservation.Amount_Of_Adults}} + {{Reservation.Amount_Of_Children}}</script>
+    </p>
+
     <p class="part" id="{{Reservation.Id}}atdate"></p>
     <p class="part" id="{{Reservation.Id}}createdat"></p>
 

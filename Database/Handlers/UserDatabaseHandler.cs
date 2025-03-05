@@ -29,11 +29,11 @@ namespace ITStepFinalProject.Database.Handlers
             return (UserModel)user[0];
         }
 
-        public async void RegisterUser(InsertUserModel model)
+        public void RegisterUser(InsertUserModel model)
         {
             model.Password = ValueHandler.HashString(model.Password);
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [model]).ToString());
+                .Insert(table, [model]).ToString(), true);
         }
 
         public async Task<UserModel?> LoginUser(UserModel loginUser, bool hashPassword)
@@ -57,7 +57,7 @@ namespace ITStepFinalProject.Database.Handlers
          * `model` must have one or more properties/fields
          * </summery>
          */
-        public async void UpdateUser(UserModel model)
+        public void UpdateUser(UserModel model)
         {
             SqlBuilder sqlBuilder = new SqlBuilder()
                 .Update(table)
@@ -79,16 +79,16 @@ namespace ITStepFinalProject.Database.Handlers
             sqlBuilder.ConditionKeyword("WHERE")
                 .BuildCondition("Id", model.Id);
 
-            DatabaseManager._ExecuteNonQuery(sqlBuilder.ToString());
+            DatabaseManager._ExecuteNonQuery(sqlBuilder.ToString(), true);
         }
 
-        public async void DeleteUser(UserModel model)
+        public void DeleteUser(int userId)
         {
             DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder().Delete(table)
                 .ConditionKeyword("WHERE")
-                .BuildCondition("Id", model.Id)
-                .ToString());
+                .BuildCondition("Id", userId)
+                .ToString(), false);
         }
     }
 }

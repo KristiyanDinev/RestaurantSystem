@@ -54,6 +54,7 @@ namespace ITStepFinalProject
             builder.Services.AddScoped<DishDatabaseHandler>();
             builder.Services.AddScoped<CuponDatabaseHandler>();
             builder.Services.AddScoped<OrderDatabaseHandler>();
+            builder.Services.AddScoped<ServiceDatabaseHandler>();
             builder.Services.AddScoped<ReservationDatabaseHandler>();
 
             builder.Services.AddSingleton<WebUtils>(new WebUtils(
@@ -120,6 +121,7 @@ namespace ITStepFinalProject
 
             new WebSocketController(app);
             new ReservationsController(app);
+            new AdminController(app);
             new UserController(app);
             new DishController(app);
             new ErrorController(app);

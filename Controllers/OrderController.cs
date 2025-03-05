@@ -125,7 +125,7 @@ namespace ITStepFinalProject.Controllers {
                         order.TotalPrice = TotalPrice;
                         order.Notes = notes;
 
-                        orderDb.AddOrder(user, dishesIds, order, controllerUtils);
+                        orderDb.AddOrder(user.Id, dishesIds, order, controllerUtils);
 
                         if (cupon != null) {
                             cuponDb.DeleteCupon(cupon.CuponCode);

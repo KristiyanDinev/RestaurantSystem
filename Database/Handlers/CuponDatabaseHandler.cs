@@ -11,7 +11,7 @@ namespace ITStepFinalProject.Database.Handlers
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(table)
                 .ConditionKeyword("WHERE")
-                .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode)).ToString());
+                .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode)).ToString(), true);
         }
 
         public async Task<CuponModel?> GetCuponByCode(string cuponCode)

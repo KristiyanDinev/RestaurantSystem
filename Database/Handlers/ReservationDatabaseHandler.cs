@@ -43,7 +43,7 @@ namespace ITStepFinalProject.Database.Handlers
 
             model.CurrentStatus = currentStatus;
             DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [model]).ToString());
+                .Insert(table, [model]).ToString(), true);
             return true;
         }
 
@@ -68,7 +68,7 @@ namespace ITStepFinalProject.Database.Handlers
                 .Delete(table)
                 .ConditionKeyword("WHERE")
                 .BuildCondition("Id", reservationId).ToString()
-                );
+                , true);
         }
 
         public async Task<List<TimeTableJoinRestorantModel>> GetRestorantsAddressesForReservation(UserModel user)
