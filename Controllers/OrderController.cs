@@ -31,45 +31,33 @@ namespace ITStepFinalProject.Controllers {
                         FileData = webUtils.HandleCommonPlaceholders(FileData, 
                             controllerUtils.UserModelName, [user]);
 
-                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                            controllerUtils.OrderModelName, orders.Cast<object>().ToList());
 
-                    return Results.Content(FileData, "text/html");
+                        foreach (DisplayOrderModel order in orders)
+                        {
+                            List<DishModel> dishes = await db.GetAllDishesFromOrder(order.Id);
+
+                            FileData = webUtils.HandleCommonPlaceholders(FileData,
+                                controllerUtils.OrderModelName, [order]);
+
+                            FileData = webUtils.HandleCommonPlaceholders(FileData,
+                                controllerUtils.DishModelName,
+
+                                controllerUtils.ConvertToDisplayDish(dishes)
+                                .Cast<object>().ToList());
+                        }
+
+                        if (orders.Count == 0)
+                        {
+                            FileData = webUtils.HandleCommonPlaceholders(FileData,
+                                controllerUtils.OrderModelName, []);
+                        }
+
+                            return Results.Content(FileData, "text/html");
 
                 } catch (Exception) {
                     return Results.BadRequest();
                 }
             }).RequireRateLimiting("fixed");
-
-
-            app.MapPost("/order/dishes", async (HttpContext context,
-                OrderDatabaseHandler db,
-                [FromForm] string orderIdStr) => {
-
-                    if (!int.TryParse(orderIdStr, out int orderId))
-                    {
-                        return Results.BadRequest();
-                    }
-
-                    try
-                    {
-
-                        List<DishModel> dishes = await db.GetAllDishesFromOrder(orderId);
-
-                        return Results.Ok(new Dictionary<string, List<DishModel>>
-                        {
-                            {"dishes", dishes }
-                        });
-
-                    } catch (Exception)
-                    {
-                        return Results.BadRequest();
-                    }
-
-            }).RequireRateLimiting("fixed")
-              .DisableAntiforgery();
-
-
            
 
             
@@ -79,11 +67,12 @@ namespace ITStepFinalProject.Controllers {
                 DishDatabaseHandler dishDb,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string notes,
-                [FromForm] string cuponCode, [FromForm] string restorantIdStr) => {
+                [FromForm] string cuponCode) => {
 
                     try {
 
-                        if (!int.TryParse(restorantIdStr, out int restorantId))
+                        string? value = context.Request.Cookies[controllerUtils.RestoratIdHeaderName];
+                        if (!int.TryParse(value, out int restorantId))
                         {
                             return Results.BadRequest();
                         }
@@ -132,6 +121,7 @@ namespace ITStepFinalProject.Controllers {
                         }
 
                         context.Response.Cookies.Delete(controllerUtils.CartHeaderName);
+                        context.Response.Cookies.Delete(controllerUtils.RestoratIdHeaderName);
 
                         return Results.Ok();
 
@@ -146,7 +136,7 @@ namespace ITStepFinalProject.Controllers {
             // stop order
             app.MapPost("/order/stop", async (HttpContext context,
                 OrderDatabaseHandler db, WebSocketUtils webSocketUtils,
-                ControllerUtils controllerUtils,
+                ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string orderIdStr) => {
 
                     if (!int.TryParse(orderIdStr, out int orderId))
@@ -155,6 +145,13 @@ namespace ITStepFinalProject.Controllers {
                     }
 
                     try {
+
+                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                        if (user == null)
+                        {
+                            return Results.Redirect("/login");
+                        }
+
                         string? status = 
                             await db.GetOrder_CurrentStatus_ById(orderId);
 
@@ -163,7 +160,7 @@ namespace ITStepFinalProject.Controllers {
                             return Results.BadRequest();
                         }
 
-                        db.DeleteOrder(orderId);
+                        db.DeleteOrder(orderId, user);
 
                         webSocketUtils.RemoveModelIdFromOrderSubscribtion(orderId);
 

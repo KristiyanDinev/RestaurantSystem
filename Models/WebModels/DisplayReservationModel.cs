@@ -23,5 +23,9 @@
         public int ReservationMinChildren { get; set; }
         public int ReservationMaxAdults { get; set; }
         public int ReservationMinAdults { get; set; }
+
+        public decimal Price_Per_Adult { get; set; }
+
+        public decimal Price_Per_Children { get; set; }
     }
 }

@@ -1,7 +1,6 @@
 using ITStepFinalProject.Controllers;
 using ITStepFinalProject.Database;
 using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models;
 using ITStepFinalProject.Services;
 using ITStepFinalProject.Utils.Controller;
 using ITStepFinalProject.Utils.Utils;
@@ -59,8 +58,9 @@ namespace ITStepFinalProject
 
             builder.Services.AddSingleton<WebUtils>(new WebUtils(
                 new Dictionary<string, List<string>>{
-                       {"User", ["{{UserBar}}", "{{Profile}}"]},
-                       {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}"]},
+                       {"User", ["{{UserBar}}", "{{Profile}}", "{{UserStaff}}"]},
+                       {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}", 
+                           "{{CookDishes}}", "{{MinimalDishOrder}}"]},
                        {"Order", ["{{OrderDisplay}}"]},
                        {"Restorant", ["{{RestorantAddress}}"] },
                        {"Reservation", ["{{ReservationDisplay}}"] },
@@ -99,7 +99,6 @@ namespace ITStepFinalProject
             app.UseRateLimiter();
             app.UseStaticFiles();
             app.UseAuthenticationMiddleware();
-
             
 
             app.Use(async (HttpContext context, RequestDelegate next) =>
@@ -135,7 +134,9 @@ namespace ITStepFinalProject
 
         public static void OnApplicationExit(object sender, EventArgs e)
         {
-            Console.WriteLine("The application is shutting down.");
+            WebSocketUtils.CloseAllReservationSubscribtion();
+            WebSocketUtils.CloseAllOrderSubscribtion();
+            Console.WriteLine("Closed websockets.");
         }
     }
 }

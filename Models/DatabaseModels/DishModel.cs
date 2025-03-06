@@ -10,6 +10,15 @@
         public string Type_Of_Dish { get; set; }
         public bool IsAvailable { get; set; }
         public string AvrageTimeToCook { get; set; }
+        public int RestorantId { get; set; }
 
+
+        public DishModel()
+        {
+        }
+        public DishModel(int id)
+        {
+            Id = id;
+        }
     }
 }

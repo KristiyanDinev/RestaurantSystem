@@ -16,10 +16,9 @@
 
     <p class="part">Amount Of Adults: {{Reservation.Amount_Of_Adults}}</p>
     <p class="part">Amount Of Children: {{Reservation.Amount_Of_Children}}</p>
-    <p class="part">
-        Total People:
-        <script>{{Reservation.Amount_Of_Adults}} + {{Reservation.Amount_Of_Children}}</script>
-    </p>
+    <p class="part" id="{{Reservation.Id}}total"></p>
+
+    <p class="part" id="{{Reservation.Id}}totalprice">Amount Of Children: {{Reservation.Amount_Of_Children}}</p>
 
     <p class="part" id="{{Reservation.Id}}atdate"></p>
     <p class="part" id="{{Reservation.Id}}createdat"></p>
@@ -31,8 +30,19 @@
     {% endif %}
 
     <script>
+
+        let amountChildren = Number('{{Reservation.Amount_Of_Children}}')
+        let amountAdults = Number('{{Reservation.Amount_Of_Adults}}')
+
+        let pricePerAdults = Number('{{Reservation.Price_Per_Adult}}')
+        let pricePerChildren = Number('{{Reservation.Price_Per_Children}}')
+
         document.getElementById("{{Reservation.Id}}createdat").innerHTML = "Created At: " + new Date(Date.parse("{{Reservation.Created_At}}")).toLocaleString()
         document.getElementById("{{Reservation.Id}}atdate").innerHTML = "At Date: " + new Date(Date.parse("{{Reservation.At_Date}}")).toLocaleString()
+        document.getElementById("{{Reservation.Id}}total").innerHTML = "Total People: "+ (amountAdults + amountChildren)
+
+        document.getElementById("{{Reservation.Id}}total").innerHTML = "Total Price: "+ 
+            Number(((pricePerAdults * amountAdults) + (pricePerChildren * amountChildren)).toFixed(2)) + ' lv.'
 
         regiseredReservations.push('{{Reservation.Id}}')
     </script>

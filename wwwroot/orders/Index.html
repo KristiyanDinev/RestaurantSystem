@@ -8,54 +8,6 @@
     <script src='../Index.js'></script>
     <script src='../orders/orders.js'></script>
     <script>
-        async function putOrderDishes(id) {
-            let formData = new FormData();
-            formData.append('orderIdStr', String(id))
-            const res = await fetch(getDataFromLocalStorage("Host") + '/order/dishes', {
-                method: 'POST',
-                body: formData,
-                redirect: 'follow'
-            })
-
-            if (res.status !== 200) {
-                alert("Can't get ordered dishes.")
-                return;
-            }
-
-            const data = await res.json()
-            const dishes = data.dishes
-            if (dishes === undefined || dishes.length == 0) {
-                alert("No dishes ordered. Strange.")
-                return;
-            }
-
-            var counter = {}
-
-            for (let i in dishes) {
-                let id = dishes[i].id
-                if (counter[id] === undefined) {
-                    counter[id] = 1
-                } else {
-                    counter[id] += 1
-                }
-            }
-
-            var alreadyDisplayed = []
-
-            for (let i in dishes) {
-                let dishList = document.getElementById(id+'dish_list')
-                let dishData = dishes[i]
-                if (alreadyDisplayed.includes(dishData.id)) {
-                    continue
-                }
-                alreadyDisplayed.push(dishData.id)
-
-                let p = document.createElement('p')
-                p.className = "list_dish"
-                p.innerHTML = " x "+counter[dishData.id] + ' ' + dishData.name + ' - ' + dishData.avrageTimeToCook + ' minute/s'
-                dishList.appendChild(p)
-            }
-        }
 
         async function cancelOrder(id) {
             if (!confirm("Do you really want to cancel the order?")) {
@@ -79,7 +31,6 @@
             alert("Cancelled the order")
             window.location.reload()
         }
-
 
     </script>
 </head>

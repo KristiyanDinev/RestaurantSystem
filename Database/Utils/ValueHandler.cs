@@ -18,7 +18,7 @@ namespace ITStepFinalProject.Database.Utils
             {
                 return "null";
             }
-
+            // Users   'User"s'  User"s"  // 'User"s"' 
             return "'"+str.Replace("'", "''")+"'";
         }
 

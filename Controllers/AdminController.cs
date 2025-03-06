@@ -7,9 +7,19 @@ namespace ITStepFinalProject.Controllers
     {
         public AdminController(WebApplication app)
         {
+            
             app.MapGet("/admin", async (HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils) => {
+                    
                     return await controllerUtils.HandleDefaultPage_WithUserModel("/admin",
+                          context, userUtils, webUtils);
+            });
+
+
+            app.MapGet("/admin/cook", async (HttpContext context,
+                ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils) => {
+
+                    return await controllerUtils.HandleDefaultPage_WithUserModel("/admin/cook",
                           context, userUtils, webUtils);
                 });
         }

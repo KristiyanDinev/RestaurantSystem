@@ -16,6 +16,14 @@ namespace ITStepFinalProject.Utils.Controller
             }
         }
 
+        private static void CloseAllSubscribtions(List<SubscribtionModel> subscribtionModels)
+        {
+            foreach (SubscribtionModel subscribtionModel in subscribtionModels)
+            {
+                subscribtionModel.CloseWebSocket();
+            }
+        }
+
         public void RemoveModelIdFromOrderSubscribtion(int id)
         {
             RemoveModelIdFromSubscribtion(id, WebSocketController.orderSubscribtions);
@@ -24,6 +32,17 @@ namespace ITStepFinalProject.Utils.Controller
         public void RemoveModelIdFromReservationSubscribtion(int id)
         {
             RemoveModelIdFromSubscribtion(id, WebSocketController.reservationSubscribtions);
+        }
+
+
+        public static void CloseAllOrderSubscribtion()
+        {
+            CloseAllSubscribtions(WebSocketController.orderSubscribtions);
+        }
+
+        public static void CloseAllReservationSubscribtion()
+        {
+            CloseAllSubscribtions(WebSocketController.reservationSubscribtions);
         }
     }
 }

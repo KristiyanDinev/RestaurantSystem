@@ -1,6 +1,12 @@
 
 
 function addDishToCart(id, name) {
+    let restorantId = getCookie("RestorantId")
+    if (restorantId === '') {
+        alert("You can't add dishes to your cart except you first select a restorant in /dishes.")
+        return
+    }
+
     let cart = getCookie("cart")
     if (cart.length == 0) {
         document.cookie = "cart="+id;
@@ -27,39 +33,41 @@ function removeDishFromCart(id, name) {
     //document.cookie = "cart."+id +'=; path=/; domain=127.0.0.1; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 }
 
+function restorantAddressChange() {
+    document.cookie = "RestorantId="+document.getElementById('restorant_address').value;
+}
+
+
+
+var params = new URLSearchParams()
+
 function goToDish(id) {
-    let params = new URLSearchParams()
     params.append("dishId", String(id))
-    window.location.href = "/dish/id?" + params.toString()
+    window.location.href = "/single_dish?" + params.toString()
 }
 
 function goToSalads() {
-    let params = new URLSearchParams()
     params.append("type", "salad")
     window.location.href = "/dish?" + params.toString()
 }
 
 function goToAppetizers() {
-    //window.location.href = Host + '/dishes/appetizers'
-    let params = new URLSearchParams()
     params.append("type", "appetizers")
     window.location.href = "/dish?" + params.toString()
 }
 
 function goToDishesFood() {
-    let params = new URLSearchParams()
     params.append("type", "dishes")
     window.location.href = "/dish?" + params.toString()
 }
 
 function goToDrinks() {
-    let params = new URLSearchParams()
     params.append("type", "drink")
+    params.append("restorant_id", String(document.getElementById('restorant_address').value))
     window.location.href = "/dish?" + params.toString()
 }
 
 function goToDesserts() {
-    let params = new URLSearchParams()
     params.append("type", "desserts")
     window.location.href = "/dish?" + params.toString()
 }

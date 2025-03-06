@@ -20,25 +20,25 @@ namespace ITStepFinalProject.Database.Handlers
 
             //string sql = "SELECT * FROM Users WHERE Id = @Id";*/
 
-            List<object> user = await 
+            ResultSqlQuery user = await 
                 DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
                 .ConditionKeyword("WHERE")
-                .BuildCondition("Id", id).ToString(), new UserModel(), true);
+                .BuildCondition("Id", id).ToString(), new UserModel());
 
-            return (UserModel)user[0];
+            return (UserModel)user.Models[0];
         }
 
-        public void RegisterUser(InsertUserModel model)
+        public async void RegisterUser(InsertUserModel model)
         {
             model.Password = ValueHandler.HashString(model.Password);
-            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [model]).ToString(), true);
+            await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                .Insert(table, [model]).ToString());
         }
 
         public async Task<UserModel?> LoginUser(UserModel loginUser, bool hashPassword)
         {
-            List<object> user = await DatabaseManager
+            ResultSqlQuery user = await DatabaseManager
                 ._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
                 .ConditionKeyword("WHERE")
@@ -46,9 +46,9 @@ namespace ITStepFinalProject.Database.Handlers
                 .BuildCondition("Password",
                "'"+ (hashPassword ? ValueHandler.HashString(loginUser.Password) :
                     loginUser.Password)+"'")
-                .ToString(), loginUser, true);
+                .ToString(), loginUser);
 
-            return user.Count == 0 ? null : (UserModel)user[0];
+            return user.Models.Count == 0 ? null : (UserModel)user.Models[0];
         }
 
 
@@ -57,7 +57,7 @@ namespace ITStepFinalProject.Database.Handlers
          * `model` must have one or more properties/fields
          * </summery>
          */
-        public void UpdateUser(UserModel model)
+        public async void UpdateUser(UserModel model)
         {
             SqlBuilder sqlBuilder = new SqlBuilder()
                 .Update(table)
@@ -79,16 +79,16 @@ namespace ITStepFinalProject.Database.Handlers
             sqlBuilder.ConditionKeyword("WHERE")
                 .BuildCondition("Id", model.Id);
 
-            DatabaseManager._ExecuteNonQuery(sqlBuilder.ToString(), true);
+            await DatabaseManager._ExecuteNonQuery(sqlBuilder.ToString());
         }
 
-        public void DeleteUser(int userId)
+        public async void DeleteUser(int userId)
         {
-            DatabaseManager._ExecuteNonQuery(
+            await DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder().Delete(table)
                 .ConditionKeyword("WHERE")
                 .BuildCondition("Id", userId)
-                .ToString(), false);
+                .ToString());
         }
     }
 }

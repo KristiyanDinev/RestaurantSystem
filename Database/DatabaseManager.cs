@@ -1,4 +1,5 @@
-﻿using ITStepFinalProject.Utils.Utils;
+﻿using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Utils.Utils;
 using Npgsql;
 using Npgsql.Schema;
 
@@ -11,19 +12,6 @@ namespace ITStepFinalProject.Database {
 
         /*
          * 
-          insert into "Dishes" ("Name", "Price", "Ingredients", "Grams", "Type_Of_Dish", 
-        "IsAvailable", "AvrageTimeToCook", "Image")
-values
-('Salad 1', 10.99, 'some stuff in it and this and that', 440, 'salad', true, '3', '/images/salad/1.png'),
-('Salad 2', 12.99, 'some stuff in it and this and that', 500, 'salad', false, '2', null),
-('Drink 1', 13.99, 'some stuff in it and this and that', 100, 'drink', true, '1', null),
-('Drink 2', 10.00, 'some stuff in it and this and that', 100, 'drink', false, '1', null),
-('Appetizer 1', 10.09, 'some stuff in it and this and that', 440, 'appetizers', true, '3', null),
-('Appetizer 2', 20.19, 'some stuff in it and this and that', 140, 'appetizers', false, '4', null),
-('Desserts 1', 23.19, 'some stuff in it and this and that', 140, 'desserts', true, '1', null),
-('Desserts 2', 30.20, 'some stuff in it and this and that', 120, 'desserts', false, '4', null),
-('Dishes 1', 21.19, 'some stuff in it and this and that', 142, 'dishes', true, '2', null),
-('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3', null);
        
         -- year-month-day MM/DD/YYYYTHH:mm:ssZ
           insert into "Cupons" ("CuponCode", "DiscountPercent", "ExpirationDate", "Name") VALUES
@@ -43,6 +31,20 @@ values
             ('ul. Restorant5', 'Sofia', 'Some State', 'Bulgaria', false, true),
             ('ul. Restorant7', 'Sofia', 'Some State', 'Bulgaria', true, false),
             ('ul. Restorant6', 'Sofia', 'Some State', 'Bulgaria', true, false);
+
+        insert into "Dishes" ("Name", "Price", "Ingredients", "Grams", "Type_Of_Dish", 
+        "IsAvailable", "AvrageTimeToCook", "Image", "RestorantId")
+values
+('Salad 1', 10.99, 'some stuff in it and this and that', 440, 'salad', true, '3', '/images/salad/1.png', 4),
+('Salad 2', 12.99, 'some stuff in it and this and that', 500, 'salad', false, '2', null, 1),
+('Drink 1', 13.99, 'some stuff in it and this and that', 100, 'drink', true, '1', null, 2),
+('Drink 2', 10.00, 'some stuff in it and this and that', 100, 'drink', false, '1', null, 3),
+('Appetizer 1', 10.09, 'some stuff in it and this and that', 440, 'appetizers', true, '3', null, 4),
+('Appetizer 2', 20.19, 'some stuff in it and this and that', 140, 'appetizers', false, '4', null, 1),
+('Desserts 1', 23.19, 'some stuff in it and this and that', 140, 'desserts', true, '1', null, 2),
+('Desserts 2', 30.20, 'some stuff in it and this and that', 120, 'desserts', false, '4', null, 3),
+('Dishes 1', 21.19, 'some stuff in it and this and that', 142, 'dishes', true, '2', null, 5),
+('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3', null, 5);
 
         insert into "TimeTable" ("RestorantId", "UserAddress", "UserCity", "UserState",
             "UserCountry", "AvrageDeliverTime") values 
@@ -69,12 +71,25 @@ values
          */
 
         public static string _connectionString = "";
-        public static async Task<NpgsqlCommand> BuildCommand(string sql)
+
+
+
+        private static async Task<NpgsqlCommand> BuildCommand(string sql, 
+            NpgsqlConnection? connection = null, bool beginTransaction = false)
         {
-            var command = new NpgsqlCommand(sql);
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-            command.Connection = connection;
+            if (connection == null)
+            {
+                connection = new NpgsqlConnection(_connectionString);
+                await connection.OpenAsync();
+            }
+
+            NpgsqlTransaction? transaction = null;
+            if (beginTransaction)
+            {
+                transaction = await connection.BeginTransactionAsync();
+            }
+
+            var command = new NpgsqlCommand(sql, connection, transaction);
             return command;
         }
 
@@ -122,7 +137,7 @@ values
                 );
 
                 CREATE TABLE IF NOT EXISTS "TimeTable" (
-                    "RestorantId" INT REFERENCES "Restorant"("Id"),
+                    "RestorantId" INT REFERENCES "Restorant"("Id") NOT NULL,
                     "UserAddress" TEXT NOT NULL,
                     "UserCity" VARCHAR(100) NOT NULL,
                     "UserState" VARCHAR(100),
@@ -138,6 +153,7 @@ values
                     "Grams" SMALLINT NOT NULL,
                     "Type_Of_Dish" VARCHAR(50) NOT NULL,
                     "IsAvailable" BOOLEAN NOT NULL DEFAULT TRUE,
+                    "RestorantId" INT REFERENCES "Restorant"("Id") NOT NULL,
                     "AvrageTimeToCook" VARCHAR(20) NOT NULL,
                     "Image" TEXT
                 );
@@ -148,14 +164,14 @@ values
                     "CurrentStatus" VARCHAR(100) NOT NULL,
                     "Notes" VARCHAR(255),
                     "OrderedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-                    "UserId" INT REFERENCES "Users"("Id"),
-                    "RestorantId" INT REFERENCES "Restorant"("Id"),
+                    "UserId" INT REFERENCES "Users"("Id") NOT NULL,
+                    "RestorantId" INT REFERENCES "Restorant"("Id") NOT NULL,
                     "TotalPrice" NUMERIC(10, 2) NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS "OrderedDishes" (
-                    "OrderId" INT REFERENCES "Orders"("Id"),
-                    "DishId" INT REFERENCES "Dishes"("Id")
+                    "OrderId" INT REFERENCES "Orders"("Id") NOT NULL,
+                    "DishId" INT REFERENCES "Dishes"("Id") NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS "Reservations" (
@@ -163,11 +179,13 @@ values
                     "ReservatorId" INT REFERENCES "Users"("Id"),
                     "Notes" VARCHAR(255),
                     "CurrentStatus" VARCHAR(100) NOT NULL,
-                    "RestorantId" INT REFERENCES "Restorant"("Id"),
+                    "RestorantId" INT REFERENCES "Restorant"("Id") NOT NULL,
                     "Amount_Of_Adults" SMALLINT NOT NULL DEFAULT 0,
                     "Amount_Of_Children" SMALLINT NOT NULL DEFAULT 0,
                     "At_Date" TIMESTAMP WITH TIME ZONE NOT NULL,
-                    "Created_At" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                    "Created_At" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                    "Price_Per_Adult" NUMERIC(10, 2) NOT NULL DEFAULT 0,
+                    "Price_Per_Children" NUMERIC(10, 2) NOT NULL DEFAULT 0
                 );
 
                 CREATE TABLE IF NOT EXISTS "Cupons" (
@@ -246,41 +264,47 @@ values
             return objects;
         }
 
-        public static async void _ExecuteNonQuery(string sql, bool isPrepare) {
-            var cmd = await BuildCommand(sql);
-            if (isPrepare)
-            {
-                cmd.Prepare();
-            }
-            
+        public static async Task<NpgsqlCommand?> _ExecuteNonQuery(string sql,
+            bool beginTransaction = false, NpgsqlConnection? connection = null) {
+
+            var cmd = await BuildCommand(sql, connection, beginTransaction);
+            cmd.Prepare();
+
             int num = await cmd.ExecuteNonQueryAsync();
+
+            if (connection != null || beginTransaction)
+            {
+                return cmd;
+            }
 
             cmd.Connection?.Close();
             cmd.Dispose();
-
-            if (num <= 0)
-            {
-                throw new Exception();
-            }
+            return null;
         }
 
-        public static async Task<List<object>> _ExecuteQuery(string sql,
-            object model, bool isPrepare)
+        public static async Task<ResultSqlQuery> _ExecuteQuery(string sql,
+            object model, bool beginTransaction = false, NpgsqlConnection? connection = null)
         {
-            var cmd = await BuildCommand(sql);
 
-            if (isPrepare)
-            {
-                cmd.Prepare();
-            }
+            ResultSqlQuery res = new ResultSqlQuery();
+
+            var cmd = await BuildCommand(sql, connection, beginTransaction);
+            cmd.Prepare();
 
             using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
 
             List<object> models = await ConvertToModels(reader, model);
             reader.Close();
-            cmd.Connection?.Close();
-            cmd.Dispose();
-            return models;
+
+            res.Models = models;
+            res.Cmd = cmd;
+
+            if (connection == null)
+            {
+                cmd.Connection?.Close();
+                cmd.Dispose();
+            }
+            return res;
         }
     }
 }

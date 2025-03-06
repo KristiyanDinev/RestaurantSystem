@@ -14,12 +14,26 @@ $("#_image").change(function () {
     readURL(this);
 });
 
+
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            document.getElementById('review').src = e.target.result
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 var ImageFile = ""
 let fileSelection = document.getElementById("_image")
 fileSelection.addEventListener('change', async function (e) {
     let targetFile = e.target.files[0]
     ImageFile = ""
     if (targetFile) {
+        readURL(e.target);
 
         ImageFile += targetFile.name + ';'
 

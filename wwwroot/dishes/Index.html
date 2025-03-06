@@ -15,6 +15,13 @@
     <div class="menu">
         <h1>Dishes</h1>
 
+        <h3>Restorant:</h3>
+        <div class="restorant">
+            <select id="restorant_address" onchange="restorantAddressChange()">
+                {{RestorantAddress}}
+            </select>
+        </div>
+
         <button onclick="goToSalads()" id="dish">Salads</button>
         <button onclick="goToAppetizers()" id="dish">Appetizers</button>
         <button onclick="goToDishesFood()" id="dish">Dishes</button>

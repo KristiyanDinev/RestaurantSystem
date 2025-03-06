@@ -4,16 +4,17 @@ function readURL(input) {
         var reader = new FileReader();
 
         reader.onload = function (e) {
-            $('#review').attr('src', e.target.result);
+            document.getElementById('review').src = e.target.result
         }
 
         reader.readAsDataURL(input.files[0]);
     }
 }
 
-$("#Image").change(function () {
-    readURL(this);
-});
+document.getElementById('Image').onchange = (e) => {
+    readURL(e.target);
+}
+
 
 var ImageFile = ""
 let fileSelection = document.getElementById("Image")

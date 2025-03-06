@@ -7,6 +7,7 @@
     </div>
 
     <div class="dish_list" id="{{Order.Id}}dish_list">
+        {{MinimalDishOrder}}
     </div>
 
     <p class="part">TotalPrice: {{Order.TotalPrice}} lv.</p>
@@ -23,6 +24,6 @@
         document.getElementById("{{Order.Id}}orderedat").innerHTML = "OrderedAt: " + new Date(Date.parse("{{Order.OrderedAt}}")).toLocaleString()
         regiseredOrders.push('{{Order.Id}}')
 
-        putOrderDishes('{{Order.Id}}')
+        //putOrderDishes('{{Order.Id}}')
     </script>
 </div>

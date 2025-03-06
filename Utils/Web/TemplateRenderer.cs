@@ -81,7 +81,7 @@ namespace ITStepFinalProject.Utils.Web
             try
             {
                 condition = condition.Trim();
-                // Handle boolean literals
+                // Handle boolean literals  | DataTables Do not support strings.
                 string tempCondition = SetVariables(condition, variables).ToLower();
                 if (tempCondition.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {

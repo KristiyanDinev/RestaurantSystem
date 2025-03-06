@@ -11,5 +11,9 @@
         public int Amount_Of_Children { get; set; }
         public DateTime At_Date { get; set; }
         public DateTime Created_At { get; set; }
+
+        public decimal Price_Per_Adult { get; set; }
+
+        public decimal Price_Per_Children { get; set; }
     }
 }

@@ -15,7 +15,6 @@ namespace ITStepFinalProject.Models.WebModels
         public string AvrageTimeToCook { get; set; }
         public int Amount { get; set; }
 
-        public DisplayDishModel() { }
 
         public DisplayDishModel(DishModel model) {
             Id = model.Id;
@@ -27,7 +26,7 @@ namespace ITStepFinalProject.Models.WebModels
             Type_Of_Dish = model.Type_Of_Dish;
             IsAvailable = model.IsAvailable;
             AvrageTimeToCook = model.AvrageTimeToCook;
-            Amount = 0;
+            Amount = 1;
         }
     }
 }

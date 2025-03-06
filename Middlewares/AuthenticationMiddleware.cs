@@ -18,7 +18,7 @@ namespace ITStepFinalProject.Services
         }
 
         public async Task InvokeAsync(HttpContext context, UserUtils _userUtils, 
-            ServiceDatabaseHandler serviceDatabaseHandler)
+            ServiceDatabaseHandler serviceDatabaseHandler, UserDatabaseHandler userDatabaseHandler)
         {
             string path = context.Request.Path.Value ?? "/";
             if (path.Equals('/'))
@@ -27,7 +27,8 @@ namespace ITStepFinalProject.Services
             }
 
             bool isAdminEndpoint = path.StartsWith(admin_endpoint_prefix);
-            UserModel? user = await _userUtils.GetUserModelFromAuth(context);
+            UserModel? user = await _userUtils.GetLoginUserFromCookie(context, userDatabaseHandler);
+
             if (user != null && non_login_endpoints.Contains(path))
             {
                 // user is logged in and tries to login in.

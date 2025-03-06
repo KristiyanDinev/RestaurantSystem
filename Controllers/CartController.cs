@@ -19,6 +19,12 @@ namespace ITStepFinalProject.Controllers
             {
                 try {
 
+                    if (!int.TryParse(context.Request.Cookies[controllerUtils.RestoratIdHeaderName], 
+                        out int restorantId))
+                    {
+                        return Results.Redirect("/dishes");
+                    }
+
                     UserModel? user = await userUtils.GetUserModelFromAuth(context);
                     if (user == null)
                     {
@@ -28,32 +34,30 @@ namespace ITStepFinalProject.Controllers
                     string FileData = await controllerUtils.GetHTMLFromWWWROOT("/cart");
 
                     List<int> dishesIds = controllerUtils.GetCartItems(context);
+
                     List<DishModel> dishes = new List<DishModel>();
                     if (dishesIds.Count > 0)
                     {
                         dishes = await db.GetDishesByIds(dishesIds.ToHashSet().ToList());
                     }
 
-                    List<DisplayDishModel> displayDishModels = new List<DisplayDishModel>();
+                    TimeTableJoinRestorantModel restorantAddress =
+                        await orderDB.GetRestorantAddressById(restorantId);
 
-                    foreach (DishModel dishModel in dishes)
+                    List<DishModel> temp = new List<DishModel>();
+                    foreach (int id in dishesIds)
                     {
-                        displayDishModels.Add(new DisplayDishModel(dishModel));
-                    }
-
-                    foreach (int dishId in dishesIds)
-                    {
-                        foreach (DisplayDishModel dishModel in displayDishModels)
+                        foreach (DishModel dish in dishes)
                         {
-                            if (dishModel.Id == dishId)
+                            if (dish.Id == id)
                             {
-                                dishModel.Amount += 1;
+                                temp.Add(dish);
+                                break;
                             }
                         }
                     }
 
-                    List<TimeTableJoinRestorantModel> timeTableWithRestorantAddresses = 
-                        await orderDB.GetRestorantsAddressesForUser(user);
+                    List<DisplayDishModel> displayDishModels = controllerUtils.ConvertToDisplayDish(temp);
 
                     FileData = webUtils.HandleCommonPlaceholders(FileData, 
                         controllerUtils.UserModelName, [user]);
@@ -62,9 +66,8 @@ namespace ITStepFinalProject.Controllers
                         controllerUtils.DishModelName, displayDishModels.Cast<object>()
                         .ToList());
 
-                    FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                        controllerUtils.RestorantModelName,
-                        timeTableWithRestorantAddresses.Cast<object>().ToList());
+                    FileData = webUtils.HandleCommonPlaceholders(FileData,
+                        controllerUtils.RestorantModelName, [restorantAddress]);
 
                     return Results.Content(FileData, "text/html");
 

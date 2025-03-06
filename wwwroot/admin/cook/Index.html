@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Cook Page</title>
+        <script src='../../Index.js'></script>
+    </head>
+
+    <body>
+
+        {{UserStaff}}
+
+        <h1>All Dishes to prepare per Order</h1>
+
+        <div>
+            {{CookDishes}}
+        </div>
+        
+
+        <link rel='stylesheet' type='text/css' media='screen' href='../../Index.css'>
+        <link rel='stylesheet' type='text/css' media='screen' href='../../single_dish/single_dish.css'>
+        <script src='../admin.js'></script>
+
+        <script>
+            if (dishIds.length > 0) {
+                startWebSocket()
+            }
+        </script>
+    </body>
+</html>

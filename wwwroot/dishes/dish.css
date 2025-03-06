@@ -130,3 +130,7 @@ body {
 .food {
     cursor: pointer;
 }
+
+.restorant {
+    align-items: center;
+}

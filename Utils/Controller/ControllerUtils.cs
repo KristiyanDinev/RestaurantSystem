@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Models.DatabaseModels;
+using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Utils;
 using ITStepFinalProject.Utils.Web;
 using System.Text;
@@ -13,6 +14,7 @@ namespace ITStepFinalProject.Utils.Controller {
         public readonly string RestorantModelName = "Restorant";
         public readonly string ReservationModelName = "Reservation";
         public readonly string CartHeaderName = "cart";
+        public readonly string RestoratIdHeaderName = "RestorantId";
         public readonly string PendingStatus = "pending";
         public readonly string DBStatus = "db";
 
@@ -126,6 +128,28 @@ namespace ITStepFinalProject.Utils.Controller {
             }
         }
 
+        public List<DisplayDishModel> ConvertToDisplayDish(List<DishModel> dishModels)
+        {
+            HashSet<DisplayDishModel> displayDishModels = new HashSet<DisplayDishModel>();
+
+            foreach (DishModel dishModel in dishModels)
+            {
+                foreach (DisplayDishModel displayDish in displayDishModels)
+                {
+                    if (displayDish.Id == dishModel.Id)
+                    {
+                        displayDish.Amount += 1;
+                    }
+                }
+
+                if (!displayDishModels.Any(a => a.Id == dishModel.Id))
+                {
+                    displayDishModels.Add(new DisplayDishModel(dishModel));
+                }
+            }
+
+            return displayDishModels.ToList();
+        }
 
         /*
          * public JsonElement GetModelFromSession(ISession session, string modelName)

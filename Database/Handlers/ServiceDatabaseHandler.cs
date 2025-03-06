@@ -8,25 +8,24 @@ namespace ITStepFinalProject.Database.Handlers
         private static readonly string table = "Services";
         private static readonly string tableRoles = "Roles";
 
-        public void AddRolesToServices(List<ServiceModel> serviceModels)
+        public async void AddRolesToServices(List<ServiceModel> serviceModels)
         {
-            DatabaseManager._ExecuteNonQuery(
+            await DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder()
-                .Insert(table, serviceModels.Cast<object>().ToList()).ToString()
-                , true);
+                .Insert(table, serviceModels.Cast<object>().ToList()).ToString());
         }
 
-        public void RemoveService(string service)
+        public async void RemoveService(string service)
         {
-            DatabaseManager._ExecuteNonQuery(
+            await DatabaseManager._ExecuteNonQuery(
                new SqlBuilder()
                .Delete(table)
                .ConditionKeyword("WHERE")
                .BuildCondition("Service", ValueHandler.Strings(service))
-               .ToString(), false);
+               .ToString());
         }
 
-        public void RemoveRolesFromService(List<ServiceModel> serviceModels)
+        public async void RemoveRolesFromService(List<ServiceModel> serviceModels)
         {
             List<string> Roles = new List<string>();
             List<string> Services = new List<string>();
@@ -36,16 +35,16 @@ namespace ITStepFinalProject.Database.Handlers
                 Services.Add(ValueHandler.Strings(serviceModel.Service));
             }
 
-            DatabaseManager._ExecuteNonQuery(
+            await DatabaseManager._ExecuteNonQuery(
                new SqlBuilder()
                .Delete(table)
                .ConditionKeyword("WHERE")
                .BuildCondition("Service", '(' + string.Join(", ", Services) + ')', "IN", "AND ")
                .BuildCondition("Role", '(' + string.Join(", ", Roles) + ')', "IN")
-               .ToString(), true);
+               .ToString());
         }
 
-        public void RemoveRolesFromUser(List<UserRoleModel> userRoleModels)
+        public async void RemoveRolesFromUser(List<UserRoleModel> userRoleModels)
         {
             List<int> Ids = new List<int>();
             List<string> Roles = new List<string>();
@@ -55,26 +54,26 @@ namespace ITStepFinalProject.Database.Handlers
                 Roles.Add(ValueHandler.Strings(userRoleModel.Role));
             }
 
-            DatabaseManager._ExecuteNonQuery(
+            await DatabaseManager._ExecuteNonQuery(
                new SqlBuilder()
                .Delete(tableRoles)
                .ConditionKeyword("WHERE")
                .BuildCondition("UserId", '('+string.Join(", ", Ids) + ')', "IN", "AND ")
                .BuildCondition("Role", '(' + string.Join(", ", Roles) + ')', "IN")
-               .ToString(), true);
+               .ToString());
         }
 
-        public void AddRolesToUser(List<UserRoleModel> userRoleModels)
+        public async void AddRolesToUser(List<UserRoleModel> userRoleModels)
         {
-            DatabaseManager._ExecuteNonQuery(
+            await DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder()
                 .Insert(tableRoles, userRoleModels.Cast<object>().ToList()).ToString()
-                , true);
+                );
         }
 
         public async Task<bool> DoesUserHaveRolesToAccessService(UserModel user, string service)
         {
-            List<object> res = await DatabaseManager._ExecuteQuery(
+            ResultSqlQuery res = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder()
                 .Select("*", table)
                 .Join(tableRoles, "INNER")
@@ -83,9 +82,9 @@ namespace ITStepFinalProject.Database.Handlers
                 .ConditionKeyword("WHERE")
                 .BuildCondition("UserId", user.Id, "=", "AND ")
                 .BuildCondition("Service", ValueHandler.Strings(service, true))
-                .ToString(), new JoinedServiceAndRoleModel(), true);
+                .ToString(), new JoinedServiceAndRoleModel());
 
-            return res.Count != 0;
+            return res.Models.Count != 0;
         }
     }
 }

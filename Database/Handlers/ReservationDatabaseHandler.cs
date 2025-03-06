@@ -13,7 +13,7 @@ namespace ITStepFinalProject.Database.Handlers
 
         public async Task<bool> CreateReservation(InsertReservationModel model, string currentStatus)
         {
-            List<object> restorant = await DatabaseManager._ExecuteQuery(new SqlBuilder()
+            ResultSqlQuery restorant = await DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", tableRestorant)
                 .ConditionKeyword("WHERE")
                 .BuildCondition("Id", model.RestorantId, "=", "AND")
@@ -34,41 +34,41 @@ namespace ITStepFinalProject.Database.Handlers
                 .BuildCondition("ReservationMinChildren", 0, ">=", "OR", "", ") ")
                 .BuildCondition("ReservationMinChildren", 0, "<", "", "", ") ")
                 .ToString(),
-                new RestorantModel(), true);
+                new RestorantModel());
             
-            if (restorant.Count == 0)
+            if (restorant.Models.Count == 0)
             {
                 return false;
             }
 
             model.CurrentStatus = currentStatus;
-            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [model]).ToString(), true);
+            await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+                .Insert(table, [model]).ToString());
             return true;
         }
 
         public async Task<List<DisplayReservationModel>> GetReservationsByUser(UserModel model)
         {
-            List<object> reservations = await DatabaseManager._ExecuteQuery(new SqlBuilder()
+            ResultSqlQuery reservations = await DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
                 .Join(tableRestorant, "INNER")
                 .ConditionKeyword("ON")
                 .BuildCondition(table+ ".RestorantId", '"'+tableRestorant+"\".\"Id\"")
                 .ConditionKeyword("WHERE")
                 .BuildCondition("ReservatorId", model.Id)
-                .ToString(), new DisplayReservationModel(), true);
+                .ToString(), new DisplayReservationModel());
 
-            return reservations.Cast<DisplayReservationModel>().ToList();
+            return reservations.Models.Cast<DisplayReservationModel>().ToList();
         }
 
-        public void DeleteReservation(int reservationId)
+        public async void DeleteReservation(int reservationId)
         {
-            DatabaseManager._ExecuteNonQuery(
+            await DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder()
                 .Delete(table)
                 .ConditionKeyword("WHERE")
                 .BuildCondition("Id", reservationId).ToString()
-                , true);
+                );
         }
 
         public async Task<List<TimeTableJoinRestorantModel>> GetRestorantsAddressesForReservation(UserModel user)
@@ -103,10 +103,10 @@ namespace ITStepFinalProject.Database.Handlers
                 sqlBuilder.BuildCondition("RestorantState", state, "=");
             }
 
-            List<object> objs = await DatabaseManager._ExecuteQuery(sqlBuilder
-                .ToString(), new TimeTableJoinRestorantModel(), true);
+            ResultSqlQuery objs = await DatabaseManager._ExecuteQuery(sqlBuilder
+                .ToString(), new TimeTableJoinRestorantModel());
 
-            return objs.Cast<TimeTableJoinRestorantModel>().ToList();
+            return objs.Models.Cast<TimeTableJoinRestorantModel>().ToList();
         }
     }
 }

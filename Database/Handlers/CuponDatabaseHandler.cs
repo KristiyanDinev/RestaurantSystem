@@ -8,21 +8,21 @@ namespace ITStepFinalProject.Database.Handlers
         private static readonly string table = "Cupons";
         public async void DeleteCupon(string cuponCode)
         {
-            DatabaseManager._ExecuteNonQuery(new SqlBuilder()
+            await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(table)
                 .ConditionKeyword("WHERE")
-                .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode)).ToString(), true);
+                .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode)).ToString());
         }
 
         public async Task<CuponModel?> GetCuponByCode(string cuponCode)
         {
-            List<object> objects = await DatabaseManager._ExecuteQuery(
+            ResultSqlQuery res = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder().Select("*", table)
                 .ConditionKeyword("WHERE")
                 .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode))
-                .ToString(), new CuponModel(), true);
+                .ToString(), new CuponModel());
 
-            return objects.Count == 0 ? null : (CuponModel)objects[0];
+            return res.Models.Count == 0 ? null : (CuponModel)res.Models[0];
         }
     }
 }

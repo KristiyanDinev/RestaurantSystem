@@ -58,8 +58,9 @@ The `User` is the model name.
 ```
 You open it with `{% if ... %}` and close it with `{% endif %}`. The `{% elseif ... %}` and `{% else %}` is optional
 
+- Added transactions to the database
 
 ### TODO
 - Staff page for seeing orders, reservations and updating / cancelling them.
 - Admin page for adding staff.
-- Frontend for reservations
+- Dish Controller needs some work. Handle dish avaliable in what restorants.
