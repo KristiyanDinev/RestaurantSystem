@@ -58,11 +58,11 @@ namespace ITStepFinalProject
 
             builder.Services.AddSingleton<WebUtils>(new WebUtils(
                 new Dictionary<string, List<string>>{
-                       {"User", ["{{UserBar}}", "{{Profile}}", "{{UserStaff}}"]},
+                       {"User", ["{{UserBar}}", "{{Profile}}"]},
                        {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}", 
                            "{{CookDishes}}", "{{MinimalDishOrder}}"]},
                        {"Order", ["{{OrderDisplay}}"]},
-                       {"Restorant", ["{{RestorantAddress}}"] },
+                       {"Restorant", ["{{RestorantAddress}}", "{{UserStaff}}"] },
                        {"Reservation", ["{{ReservationDisplay}}"] },
                 }));
 

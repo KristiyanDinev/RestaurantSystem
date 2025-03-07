@@ -46,13 +46,11 @@ namespace ITStepFinalProject.Controllers {
                                 .Cast<object>().ToList());
                         }
 
-                        if (orders.Count == 0)
-                        {
-                            FileData = webUtils.HandleCommonPlaceholders(FileData,
-                                controllerUtils.OrderModelName, []);
-                        }
+                        FileData = webUtils.HandleCommonPlaceholders(FileData,
+                               controllerUtils.OrderModelName, []);
+                        
 
-                            return Results.Content(FileData, "text/html");
+                        return Results.Content(FileData, "text/html");
 
                 } catch (Exception) {
                     return Results.BadRequest();

@@ -55,8 +55,8 @@ namespace ITStepFinalProject.Services
                 if (!await serviceDatabaseHandler.DoesUserHaveRolesToAccessService(user, path))
                 {
                     // user doesn't have the roles to do so.
-                    Console.WriteLine(user.Username +" was trying to reach to admin page. Service: "+
-                        path+" without the proper roles.");
+                    Console.WriteLine("\n"+user.Username +" was trying to reach to admin page. Service: "+
+                        path+" without the proper roles.\n");
                     context.Response.Redirect("/dishes");
                     return;
                 }

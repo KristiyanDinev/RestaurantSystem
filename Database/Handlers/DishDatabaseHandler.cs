@@ -10,7 +10,7 @@ namespace ITStepFinalProject.Database.Handlers
         {
             ResultSqlQuery objects = await DatabaseManager.
                 _ExecuteQuery(new SqlBuilder().Select("*", table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Type_Of_Dish", ValueHandler.Strings(type), "=", "AND ")
                 .BuildCondition("RestorantId", restorantId)
                 .ToString(), new DishModel());
@@ -22,7 +22,7 @@ namespace ITStepFinalProject.Database.Handlers
         {
             ResultSqlQuery dishes = 
                 await DatabaseManager._ExecuteQuery(new SqlBuilder().Select("*", table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Id", "("+string.Join(", ", IDs)+")", "IN")
                 .ToString(), new DishModel());
 

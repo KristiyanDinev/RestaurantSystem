@@ -17,7 +17,7 @@ namespace ITStepFinalProject.Database.Utils
         public override string ToString()
         {
             string v = sql.Append(';').ToString();
-            Console.WriteLine("SQL Builder: " + v);
+            Console.WriteLine("\nSQL Builder: " + v + "\n");
             return v;
         }
 
@@ -94,14 +94,27 @@ namespace ITStepFinalProject.Database.Utils
         }
 
 
-        /*
-         * <summery>
-         * Keyword can be: WHERE, SET, ON, HAVING
-         * </summery>
-         */
-        public SqlBuilder ConditionKeyword(string keyword)
+        public SqlBuilder Where()
         {
-            sql.Append(' ').Append(keyword).Append(' ');
+            sql.Append(" WHERE ");
+            return this;
+        }
+
+        public SqlBuilder Having()
+        {
+            sql.Append(" HAVING ");
+            return this;
+        }
+
+        public SqlBuilder On()
+        {
+            sql.Append(" ON ");
+            return this;
+        }
+
+        public SqlBuilder Set()
+        {
+            sql.Append(" SET ");
             return this;
         }
 

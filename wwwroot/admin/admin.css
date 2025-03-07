@@ -1,0 +1,17 @@
+body {
+    background-color: rgb(228, 228, 228);
+}
+
+.user {
+    background-color: rgb(177, 177, 177);
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+}
+
+.user p {
+    padding: 20px;
+    font-size: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    color: black;
+}

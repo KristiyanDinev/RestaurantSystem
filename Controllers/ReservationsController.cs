@@ -6,7 +6,6 @@ using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Controller;
 using ITStepFinalProject.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 
 namespace ITStepFinalProject.Controllers
 {
@@ -113,6 +112,7 @@ namespace ITStepFinalProject.Controllers
 
             app.MapPost("/reservations/delete", async (HttpContext context,
                 UserUtils userUtils, ReservationDatabaseHandler reservationsDB,
+                 WebSocketUtils webSocketUtils,
                 [FromForm] string reservationIdStr) =>
             {
                 try
@@ -129,6 +129,7 @@ namespace ITStepFinalProject.Controllers
                     }
 
                     reservationsDB.DeleteReservation(reservationId);
+                    webSocketUtils.RemoveModelIdFromReservationSubscribtion(reservationId);
 
                     return Results.Ok();
 

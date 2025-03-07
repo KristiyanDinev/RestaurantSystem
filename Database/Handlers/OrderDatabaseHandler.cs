@@ -29,7 +29,7 @@ namespace ITStepFinalProject.Database.Handlers
             {
                 ResultSqlQuery ordersIdQ = await DatabaseManager._ExecuteQuery(
                     new SqlBuilder().Select("\"Id\"", table)
-                    .ConditionKeyword("WHERE")
+                    .Where()
                     .BuildCondition("UserId", userId, "=", "AND")
                     .BuildCondition("CurrentStatus", "'"+utils.DBStatus+"'")
                     .ToString(), new OrderModel(), false, cmd.Connection);
@@ -63,13 +63,13 @@ namespace ITStepFinalProject.Database.Handlers
         {
             await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(tableOrderedDishes)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("OrderId", orderId)
                 .ToString());
 
             await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Id", orderId, "=", "AND ")
                 .BuildCondition("UserId", user.Id)
                 .ToString());
@@ -81,10 +81,10 @@ namespace ITStepFinalProject.Database.Handlers
                 new SqlBuilder()
                 .Update(table)
 
-                .ConditionKeyword("SET")
+                .Set()
                 .BuildCondition("CurrentStatus", "'"+newStatus+"'")
 
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Id", orderId)
                 .ToString()
                 );
@@ -95,10 +95,10 @@ namespace ITStepFinalProject.Database.Handlers
             ResultSqlQuery orderObj = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder().Select("*", table)
                 .Join(tableRestorant, "INNER")
-                .ConditionKeyword("ON")
+                .On()
                 .BuildCondition(tableRestorant+".Id", '"'+table + "\".\"RestorantId\"")
 
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("UserId", userId)
                 .ToString(), new DisplayOrderModel());
 
@@ -110,7 +110,7 @@ namespace ITStepFinalProject.Database.Handlers
 
             ResultSqlQuery results = await DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("\"CurrentStatus\"", table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Id", orderId)
                 .ToString(), new OrderModel());
 
@@ -123,10 +123,10 @@ namespace ITStepFinalProject.Database.Handlers
                 .Select("*", tableOrderedDishes)
                 .Join("Dishes", "INNER")
 
-                .ConditionKeyword("ON")
+                .On()
                 .BuildCondition(tableOrderedDishes + ".DishId", "\"Dishes\".\"Id\"")
 
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition(tableOrderedDishes + ".OrderId", orderId)
 
                 .ToString(), new DishModel());
@@ -143,10 +143,10 @@ namespace ITStepFinalProject.Database.Handlers
             SqlBuilder sqlBuilder = new SqlBuilder()
                 .Select("*", tableTimeTable)
                 .Join(tableRestorant, "INNER")
-                .ConditionKeyword("ON")
+                .On()
                 .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
 
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("DoDelivery", "'1'", "=", "AND")
                 .BuildCondition("UserCity", city, "=", "AND")
                 .BuildCondition("RestorantCity", city, "=", "AND")
@@ -178,10 +178,10 @@ namespace ITStepFinalProject.Database.Handlers
                 new SqlBuilder()
                 .Select("*", tableTimeTable)
                 .Join(tableRestorant, "INNER")
-                .ConditionKeyword("ON")
+                .On()
                 .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
 
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("RestorantId", id)
                 .ToString(), new TimeTableJoinRestorantModel());
 
@@ -195,15 +195,15 @@ namespace ITStepFinalProject.Database.Handlers
                 .Select("*", tableTimeTable)
 
                 .Join(tableRestorant, "INNER")
-                .ConditionKeyword("ON")
+                .On()
                 .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
 
                 .Join(tableDishes, "INNER")
-                .ConditionKeyword("ON")
+                .On()
                 .BuildCondition(tableDishes + ".RestorantId",   '"' +tableRestorant + "\".\"Id\"")
 
 
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition(tableDishes + ".Id", dishId, "=", "AND ")
                 .BuildCondition(tableDishes + ".IsAvailable", "'1'")
                 .ToString(), new TimeTableJoinRestorantModel());

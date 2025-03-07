@@ -15,7 +15,7 @@ namespace ITStepFinalProject.Database.Handlers
         {
             ResultSqlQuery restorant = await DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", tableRestorant)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Id", model.RestorantId, "=", "AND")
                 .BuildCondition("ReservationMaxAdults", model.Amount_Of_Adults, ">=", "AND", " ((")
                 .BuildCondition("ReservationMaxAdults", 0, ">=", "OR", "", ") ")
@@ -52,9 +52,9 @@ namespace ITStepFinalProject.Database.Handlers
             ResultSqlQuery reservations = await DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
                 .Join(tableRestorant, "INNER")
-                .ConditionKeyword("ON")
+                .On()
                 .BuildCondition(table+ ".RestorantId", '"'+tableRestorant+"\".\"Id\"")
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("ReservatorId", model.Id)
                 .ToString(), new DisplayReservationModel());
 
@@ -66,7 +66,7 @@ namespace ITStepFinalProject.Database.Handlers
             await DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder()
                 .Delete(table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Id", reservationId).ToString()
                 );
         }
@@ -79,10 +79,10 @@ namespace ITStepFinalProject.Database.Handlers
             SqlBuilder sqlBuilder = new SqlBuilder()
                 .Select("*", tableTimeTable)
                 .Join(tableRestorant, "INNER")
-                .ConditionKeyword("ON")
+                .On()
                 .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
 
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("ServeCustomersInPlace", "'1'", "=", "AND")
                 .BuildCondition("UserCity", city, "=", "AND")
                 .BuildCondition("RestorantCity", city, "=", "AND")

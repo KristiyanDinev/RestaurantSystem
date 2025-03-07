@@ -23,7 +23,7 @@ namespace ITStepFinalProject.Database.Handlers
             ResultSqlQuery user = await 
                 DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Id", id).ToString(), new UserModel());
 
             return (UserModel)user.Models[0];
@@ -41,7 +41,7 @@ namespace ITStepFinalProject.Database.Handlers
             ResultSqlQuery user = await DatabaseManager
                 ._ExecuteQuery(new SqlBuilder()
                 .Select("*", table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Email", ValueHandler.Strings(loginUser.Email), "=", "AND")
                 .BuildCondition("Password",
                "'"+ (hashPassword ? ValueHandler.HashString(loginUser.Password) :
@@ -61,8 +61,8 @@ namespace ITStepFinalProject.Database.Handlers
         {
             SqlBuilder sqlBuilder = new SqlBuilder()
                 .Update(table)
-                .ConditionKeyword("SET")
-                .BuildCondition("Password", ValueHandler.HashString(model.Password), ", ");
+                .Set()
+                .BuildCondition("Password", ValueHandler.HashString(model.Password), "=", ", ");
 
             List<string> names = ObjectUtils.Get_Model_Property_Names(model);
             for (int i = 0; i < names.Count; i++)
@@ -72,12 +72,11 @@ namespace ITStepFinalProject.Database.Handlers
                 {
                     continue;
                 }
-                sqlBuilder.BuildCondition(property, ValueHandler.GetModelPropertyValue(model, property),
+                sqlBuilder.BuildCondition(property, ValueHandler.GetModelPropertyValue(model, property), "=",
                     i == names.Count - 1 ? "" : ", ");
             }
 
-            sqlBuilder.ConditionKeyword("WHERE")
-                .BuildCondition("Id", model.Id);
+            sqlBuilder.Where().BuildCondition("Id", model.Id);
 
             await DatabaseManager._ExecuteNonQuery(sqlBuilder.ToString());
         }
@@ -86,7 +85,7 @@ namespace ITStepFinalProject.Database.Handlers
         {
             await DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder().Delete(table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("Id", userId)
                 .ToString());
         }

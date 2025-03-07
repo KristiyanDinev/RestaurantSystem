@@ -59,9 +59,20 @@ values
 
         insert into "Services" ("Role", "Service") values
             ('staff', ''),
+            ('owner', ''),
+            ('waitress', ''),
+            ('cook', ''),
+            ('delivery', ''),
+
             ('waitress', '/orders'),
+            ('owner', '/orders'),
+
             ('cook', '/dishes'),
+            ('owner', '/dishes'),
+
             ('delivery', '/delivery'),
+            ('owner', '/delivery'),
+
             ('owner', '/owner');
 
 

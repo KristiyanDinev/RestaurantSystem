@@ -10,7 +10,7 @@ namespace ITStepFinalProject.Database.Handlers
         {
             await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode)).ToString());
         }
 
@@ -18,7 +18,7 @@ namespace ITStepFinalProject.Database.Handlers
         {
             ResultSqlQuery res = await DatabaseManager._ExecuteQuery(
                 new SqlBuilder().Select("*", table)
-                .ConditionKeyword("WHERE")
+                .Where()
                 .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode))
                 .ToString(), new CuponModel());
 
