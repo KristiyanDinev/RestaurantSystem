@@ -1,6 +1,6 @@
 ﻿using ITStepFinalProject.Models;
+using ITStepFinalProject.Utils.Controller;
 using System.Net.WebSockets;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ITStepFinalProject.Controllers
 {
@@ -8,6 +8,7 @@ namespace ITStepFinalProject.Controllers
     {
         public static List<SubscribtionModel> orderSubscribtions = new List<SubscribtionModel>();
         public static List<SubscribtionModel> reservationSubscribtions = new List<SubscribtionModel>();
+        public static List<SubscribtionModel> cookSubscribtions = new List<SubscribtionModel>();
         public WebSocketController(WebApplication app)
         {
             app.MapGet("/ws/orders", async (HttpContext context) =>
@@ -16,6 +17,11 @@ namespace ITStepFinalProject.Controllers
             }).RequireRateLimiting("fixed");
 
             app.MapGet("/ws/reservations", async (HttpContext context) =>
+            {
+                await HandleWholeRequest(context);
+            }).RequireRateLimiting("fixed");
+
+            app.MapGet("/ws/cook", async (HttpContext context) =>
             {
                 await HandleWholeRequest(context);
             }).RequireRateLimiting("fixed");
@@ -38,8 +44,8 @@ namespace ITStepFinalProject.Controllers
             WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
             var socketFinishedTcs = new TaskCompletionSource<object>();
-
-            SubscribtionModel subscribtionModel = new SubscribtionModel(context.Request.Path.Value ?? "", 
+            string path = context.Request.Path.Value ?? "";
+            SubscribtionModel subscribtionModel = new SubscribtionModel(path, 
                 webSocket,
             socketFinishedTcs);
 
@@ -61,7 +67,6 @@ namespace ITStepFinalProject.Controllers
                 Console.WriteLine("\nWebSocket Message from Client: " + text);
 
                 string title = parts[0];
-                parts.RemoveAt(0);
 
                 switch (title)
                 {
@@ -71,11 +76,27 @@ namespace ITStepFinalProject.Controllers
                             subscribtionModel.HandleUpdateModelIds(parts);
                             break;
                         }
+                    case "cook_status":
+                        {
+                            WebSocketUtils.HandleCookStatus(parts);
+                            break;
+                        }
                 }
             });
 
-            orderSubscribtions.Add(subscribtionModel);
+            if (path.EndsWith("/cook"))
+            {
+                cookSubscribtions.Add(subscribtionModel);
 
+            } else if (path.EndsWith("/reservations"))
+            {
+                reservationSubscribtions.Add(subscribtionModel);
+
+            } else if (path.EndsWith("/orders"))
+            {
+                orderSubscribtions.Add(subscribtionModel);
+            }
+                
             await socketFinishedTcs.Task;
         }
     }

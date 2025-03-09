@@ -68,6 +68,11 @@ function startReservationWebSocket(onopen, onclose, onerror, onmessage) {
         onopen, onclose, onerror, onmessage)
 }
 
+function startCookWebSocket(onopen, onclose, onerror, onmessage) {
+    return UseWebSockets(getDataFromLocalStorage("WebSocketHost") + "/ws/cook", 
+        onopen, onclose, onerror, onmessage)
+}
+
 
 function goToProfile() {
     window.location.href = getDataFromLocalStorage("Host") + "/profile"

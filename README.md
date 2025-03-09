@@ -63,4 +63,5 @@ You open it with `{% if ... %}` and close it with `{% endif %}`. The `{% elseif 
 ### TODO
 - Staff page for seeing orders, reservations and updating / cancelling them.
 - Admin page for adding staff.
-- Dish Controller needs some work. Handle dish avaliable in what restorants.
+- update the database order's status.
+- the cook reloads the website and makes a new connection. Send him the current status of the dishes and orders if any.

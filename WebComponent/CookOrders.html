@@ -1,0 +1,22 @@
+<div class="order_view">
+
+        <p class="status" id="{{Order.Id}}status">CurrentStatus: {{Order.CurrentStatus}}</p>
+    
+        <div class="notes_view">
+            <p class="notes_title">Notes: </p>
+            <p class="notes">{{Order.Notes}}</p>
+        </div>
+
+        <p class="part" id="{{Order.Id}}orderedat"></p>
+
+        <p class="part">TotalPrice: {{Order.TotalPrice}}</p>
+
+        <script>
+            document.getElementById("{{Order.Id}}orderedat").innerHTML = "OrderedAt: " + new Date(Date.parse("{{Order.OrderedAt}}")).toLocaleString()
+            orderIds[Number('{{Order.Id}}')] = []
+        </script>
+
+        {{CookDishes}}
+</div>
+
+{{CookOrders}}

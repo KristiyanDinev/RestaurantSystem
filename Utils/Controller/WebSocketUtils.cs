@@ -34,15 +34,39 @@ namespace ITStepFinalProject.Utils.Controller
             RemoveModelIdFromSubscribtion(id, WebSocketController.reservationSubscribtions);
         }
 
-
-        public static void CloseAllOrderSubscribtion()
+        public static void CloseAllSubscribtions()
         {
             CloseAllSubscribtions(WebSocketController.orderSubscribtions);
+            CloseAllSubscribtions(WebSocketController.reservationSubscribtions);
+            CloseAllSubscribtions(WebSocketController.cookSubscribtions);
         }
 
-        public static void CloseAllReservationSubscribtion()
+        public async static void HandleCookStatus(List<string> parts)
         {
-            CloseAllSubscribtions(WebSocketController.reservationSubscribtions);
+            // 1  or  di s
+            if (parts.Count != 4 || !int.TryParse(parts[1], out int orderId) ||
+                                !int.TryParse(parts[2], out int dishId))
+            {
+                return;
+            }
+
+            // update the database order's status.
+
+            string message = "cook_status;" + orderId + ";" + dishId + ";" + parts[3];
+            foreach (SubscribtionModel subscribtion in WebSocketController.cookSubscribtions)
+            {
+                if (subscribtion.ModelIds.Contains(orderId))
+                {
+                    await subscribtion.SendTextToClient(message);
+                }
+            }
+            foreach (SubscribtionModel subscribtion in WebSocketController.orderSubscribtions)
+            {
+                if (subscribtion.ModelIds.Contains(orderId))
+                {
+                    await subscribtion.SendTextToClient(message);
+                }
+            }
         }
     }
 }

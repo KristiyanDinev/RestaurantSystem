@@ -4,7 +4,6 @@ using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
 using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Controller;
 using Npgsql;
-using System.Linq;
 
 namespace ITStepFinalProject.Database.Handlers
 {
@@ -209,6 +208,16 @@ namespace ITStepFinalProject.Database.Handlers
                 .ToString(), new TimeTableJoinRestorantModel());
 
             return objs.Models.Cast<TimeTableJoinRestorantModel>().ToList();
+        }
+
+        public async Task<List<OrderModel>> GetOrdersByRestorantId(int restorantId)
+        {
+            ResultSqlQuery sql = await DatabaseManager._ExecuteQuery(
+                new SqlBuilder().Select("*", table)
+                .Where()
+                .BuildCondition("RestorantId", restorantId).ToString(), new OrderModel());
+
+            return sql.Models.Cast<OrderModel>().ToList();
         }
     }
 }

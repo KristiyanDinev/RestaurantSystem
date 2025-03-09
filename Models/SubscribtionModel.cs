@@ -81,6 +81,7 @@ namespace ITStepFinalProject.Models
         {
             try
             {
+                values.RemoveAt(0);
                 List<int> Ids = new List<int>();
                 foreach (string IdStr in values)
                 {

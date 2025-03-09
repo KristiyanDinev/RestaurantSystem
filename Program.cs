@@ -59,9 +59,9 @@ namespace ITStepFinalProject
             builder.Services.AddSingleton<WebUtils>(new WebUtils(
                 new Dictionary<string, List<string>>{
                        {"User", ["{{UserBar}}", "{{Profile}}"]},
-                       {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}", 
-                           "{{CookDishes}}", "{{MinimalDishOrder}}"]},
-                       {"Order", ["{{OrderDisplay}}"]},
+                       {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}",
+                           "{{MinimalDishOrder}}", "{{CookDishes}}"]},
+                       {"Order", ["{{OrderDisplay}}", "{{CookOrders}}"]},
                        {"Restorant", ["{{RestorantAddress}}", "{{UserStaff}}"] },
                        {"Reservation", ["{{ReservationDisplay}}"] },
                 }));
@@ -134,8 +134,7 @@ namespace ITStepFinalProject
 
         public static void OnApplicationExit(object sender, EventArgs e)
         {
-            WebSocketUtils.CloseAllReservationSubscribtion();
-            WebSocketUtils.CloseAllOrderSubscribtion();
+            WebSocketUtils.CloseAllSubscribtions();
             Console.WriteLine("Closed websockets.");
         }
     }

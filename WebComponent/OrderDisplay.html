@@ -1,5 +1,5 @@
 ﻿<div class="order_view">
-    <p class="status">CurrentStatus: {{Order.CurrentStatus}}</p>
+    <p class="status" id="{{Order.Id}}status">CurrentStatus: {{Order.CurrentStatus}}</p>
 
     <div class="notes_view">
         <p class="notes_title">Notes: </p>
@@ -15,9 +15,12 @@
     <p class="part" id="{{Order.Id}}orderedat"></p>
 
     {% if "{{Order.CurrentStatus}}" != "pending" %}
-    <button class="cancel" style="opacity: 50%">Cancel</button>
+    <button class="cancel noselect" style="opacity: 50%">Cancel</button>
     {% else %}
-    <button class="cancel" style="opacity: 100%" onclick="cancelOrder('{{Order.Id}}')">Cancel</button>
+    <button class="cancel noselect" 
+    style="opacity: 100%" 
+    onclick="cancelOrder('{{Order.Id}}')"
+    id="{{Order.Id}}cancel">Cancel</button>
     {% endif %}
     <!-- MM/DD/YYYYTHH:mm:ssZ -->
     <script>

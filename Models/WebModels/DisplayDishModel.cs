@@ -13,6 +13,7 @@ namespace ITStepFinalProject.Models.WebModels
         public string Type_Of_Dish { get; set; }
         public bool IsAvailable { get; set; }
         public string AvrageTimeToCook { get; set; }
+        public int OrderId { get; set; }
         public int Amount { get; set; }
 
 
