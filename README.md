@@ -64,4 +64,3 @@ You open it with `{% if ... %}` and close it with `{% endif %}`. The `{% elseif 
 - Staff page for seeing orders, reservations and updating / cancelling them.
 - Admin page for adding staff.
 - update the database order's status.
-- the cook reloads the website and makes a new connection. Send him the current status of the dishes and orders if any.

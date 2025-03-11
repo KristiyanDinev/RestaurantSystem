@@ -1,4 +1,5 @@
 using ITStepFinalProject.Controllers;
+using ITStepFinalProject.Controllers.WebSocketHandlers;
 using ITStepFinalProject.Database;
 using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Services;
@@ -71,7 +72,7 @@ namespace ITStepFinalProject
             builder.Services.AddSingleton<UserUtils>(
                 new UserUtils(encryptionHandler, jwtHandler));
 
-            builder.Services.AddSingleton<WebSocketUtils>();
+            builder.Services.AddSingleton<WebSocketHandler>();
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
                     ?? "ugyw89ub9Y9H8OP9j1wsfwedS";
@@ -134,7 +135,7 @@ namespace ITStepFinalProject
 
         public static void OnApplicationExit(object sender, EventArgs e)
         {
-            WebSocketUtils.CloseAllSubscribtions();
+            WebSocketHandler.CloseAllSubscribtions();
             Console.WriteLine("Closed websockets.");
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels
+﻿namespace ITStepFinalProject.Models.Controller
 {
     public class UpdateUserModel
     {

@@ -15,6 +15,8 @@ namespace ITStepFinalProject.Models.WebModels
         public string AvrageTimeToCook { get; set; }
         public int OrderId { get; set; }
         public int Amount { get; set; }
+        public string? Notes { get; set; }
+        public string CurrentStatus { get; set; } = "pending";
 
 
         public DisplayDishModel(DishModel model) {

@@ -1,6 +1,5 @@
 ﻿using ITStepFinalProject.Database.Utils;
 using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
 using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Controller;
 using Npgsql;
@@ -15,19 +14,20 @@ namespace ITStepFinalProject.Database.Handlers
         private static readonly string tableTimeTable = "TimeTable";
         private static readonly string tableDishes = "Dishes";
 
-        public async void AddOrder(int userId, List<int> dishesId, InsertOrderModel order, 
+        public async Task AddOrder(int userId, List<int> dishesId, OrderModel order, 
             ControllerUtils utils)
         {
             order.CurrentStatus = utils.DBStatus;
 
             NpgsqlCommand cmd = await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [order]).ToString(), true) ?? throw new Exception();
-
+                .Insert(table, [order], ["Id", "OrderedAt"]).ToString(), true) 
+                ?? throw new Exception();
+            
             int? orderId = null;
             try
             {
                 ResultSqlQuery ordersIdQ = await DatabaseManager._ExecuteQuery(
-                    new SqlBuilder().Select("\"Id\"", table)
+                    new SqlBuilder().Select("Id", table)
                     .Where()
                     .BuildCondition("UserId", userId, "=", "AND")
                     .BuildCondition("CurrentStatus", "'"+utils.DBStatus+"'")
@@ -42,23 +42,24 @@ namespace ITStepFinalProject.Database.Handlers
                     orderedDishes.Add(new OrderedDishesModel((int)orderId, dishId));
                 }
 
-            
+                
                 await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                    .Insert("OrderedDishes", 
-                    orderedDishes.Cast<object>().ToList()).ToString(), false, cmd.Connection);
+                    .Insert(tableOrderedDishes, 
+                    orderedDishes.Cast<object>().ToList(), 
+                    ["CurrentStatus"]).ToString(), false, cmd.Connection);
 
-                cmd.Transaction.Commit();
+                cmd.Transaction?.Commit();
 
             } catch (Exception)
             {
-                cmd.Transaction.Rollback();
+                cmd.Transaction?.Rollback();
                 throw;
             }
 
             UpdateOrderCurrentStatusById((int)orderId, utils.PendingStatus);
         }
 
-        public async void DeleteOrder(int orderId, UserModel user)
+        public async Task DeleteOrder(int orderId, UserModel user)
         {
             await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
                 .Delete(tableOrderedDishes)
@@ -108,7 +109,7 @@ namespace ITStepFinalProject.Database.Handlers
         {
 
             ResultSqlQuery results = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("\"CurrentStatus\"", table)
+                .Select("CurrentStatus", table)
                 .Where()
                 .BuildCondition("Id", orderId)
                 .ToString(), new OrderModel());
@@ -119,11 +120,11 @@ namespace ITStepFinalProject.Database.Handlers
         public async Task<List<DishModel>> GetAllDishesFromOrder(int orderId)
         {
             ResultSqlQuery objs = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("*", tableOrderedDishes)
-                .Join("Dishes", "INNER")
+                .Select("*", tableDishes)
+                .Join(tableOrderedDishes, "INNER")
 
                 .On()
-                .BuildCondition(tableOrderedDishes + ".DishId", "\"Dishes\".\"Id\"")
+                .BuildCondition(tableOrderedDishes + ".DishId", '"' + tableDishes+"\".\"Id\"")
 
                 .Where()
                 .BuildCondition(tableOrderedDishes + ".OrderId", orderId)

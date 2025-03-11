@@ -1,5 +1,6 @@
 ﻿using ITStepFinalProject.Utils.Utils;
 using Microsoft.Extensions.Primitives;
+using System.Linq;
 using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
@@ -26,12 +27,33 @@ namespace ITStepFinalProject.Database.Utils
             return table.Length == 0 ? table : (_isPostgresql ? '"' + table.Replace(".", "\".\"") + '"' : table);
         }
 
-        private string _handlePropertyNames(List<string> properties)
+        private string _handlePropertyNames(List<string> properties, 
+            List<string> exceptionalProperties)
         {
             // ["Id", "Name", "Email"]
             // "Id", "Name", "Email"
-            return _isPostgresql ? '"'+string.Join("\", \"", properties)+'"' : 
-                string.Join(", ", properties);
+            List<string> listOfProperties = new List<string>();
+            if (_isPostgresql)
+            {
+                for (int i = 0; i < properties.Count; i++)
+                {
+                    string property = properties[i];
+                    if (!exceptionalProperties.Contains(property))
+                    {
+                        listOfProperties.Add("\"" + property + "\"");
+                    }
+                }
+            } else {
+                for (int i = 0; i < properties.Count; i++)
+                {
+                    string property = properties[i];
+                    if (!exceptionalProperties.Contains(property))
+                    {
+                        listOfProperties.Add(property);
+                    }
+                }
+            }
+            return string.Join(", ", listOfProperties);
         }
 
         /*
@@ -46,6 +68,35 @@ namespace ITStepFinalProject.Database.Utils
         */
         public SqlBuilder Select(string fields, string table)
         {
+            if (fields.Length == 0)
+            {
+                return this;
+            }
+            if (!fields.Equals("*"))
+            {
+                string[] parts = fields.Split(',');
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    string property = parts[i].Replace(" ", "");
+                    if (property.Length == 0)
+                    {
+                        continue;
+                    }
+                    if (_isPostgresql)
+                    {
+                        stringBuilder.Append('"')
+                            .Append(property)
+                            .Append('"');
+                    } else
+                    {
+                        stringBuilder.Append(property);
+                    }
+
+                    stringBuilder.Append(i == parts.Length - 1 ? "" : ", ");
+                }
+                fields = stringBuilder.ToString();
+            } 
             sql.Append("SELECT ").Append(fields).Append(" FROM ")
                 .Append(_handleTableNames(table)).Append(' ');
             return this;
@@ -57,16 +108,19 @@ namespace ITStepFinalProject.Database.Utils
             return this;
         }
 
-        public SqlBuilder Insert(string table, List<object> models)
+        public SqlBuilder Insert(string table, List<object> models, 
+            List<string>? exceptionalProperties = null)
         {
             if (models.Count == 0)
             {
                 return this;
             }
+            exceptionalProperties ??= new List<string>();
+
             sql.Append("INSERT INTO ").Append(_handleTableNames(table)).Append(" (");
 
             List<string> properties = ObjectUtils.Get_Model_Property_Names(models[0]);
-            sql.Append(_handlePropertyNames(properties))
+            sql.Append(_handlePropertyNames(properties, exceptionalProperties))
                 .Append(") VALUES ");
 
 
@@ -77,7 +131,10 @@ namespace ITStepFinalProject.Database.Utils
                 List<object> values = new List<object>();
                 foreach (string property in properties)
                 {
-                    values.Add(ValueHandler.GetModelPropertyValue(model, property));
+                    if (!exceptionalProperties.Contains(property))
+                    {
+                        values.Add(ValueHandler.GetModelPropertyValue(model, property));
+                    }
                 }
 
                 sql.Append(string.Join(", ", values))
@@ -125,6 +182,15 @@ namespace ITStepFinalProject.Database.Utils
                 .Append(condition).Append(' ').Append(value)
                 .Append(groupEnd).Append(endingCondtion);
             return this;
+        }
+
+        public SqlBuilder Set_Model(object model, List<string>? exceptionalProperties = null)
+        {
+            exceptionalProperties ??= new List<string>();
+            List<string> properties = ObjectUtils.Get_Model_Property_Names(model);
+            foreach (string property in properties) { 
+                
+            }
         }
 
         public SqlBuilder Limit(int limit, int? offset)

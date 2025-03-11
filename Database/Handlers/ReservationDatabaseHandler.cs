@@ -11,7 +11,7 @@ namespace ITStepFinalProject.Database.Handlers
         private static readonly string tableRestorant = "Restorant";
         private static readonly string tableTimeTable = "TimeTable";
 
-        public async Task<bool> CreateReservation(InsertReservationModel model, string currentStatus)
+        public async Task<bool> CreateReservation(ReservationModel model, string currentStatus)
         {
             ResultSqlQuery restorant = await DatabaseManager._ExecuteQuery(new SqlBuilder()
                 .Select("*", tableRestorant)
@@ -43,7 +43,8 @@ namespace ITStepFinalProject.Database.Handlers
 
             model.CurrentStatus = currentStatus;
             await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [model]).ToString());
+                .Insert(table, [model], 
+                ["Created_At", "Price_Per_Adult", "Price_Per_Children"]).ToString());
             return true;
         }
 

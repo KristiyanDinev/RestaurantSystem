@@ -11,6 +11,8 @@
         public bool IsAvailable { get; set; }
         public string AvrageTimeToCook { get; set; }
         public int RestorantId { get; set; }
+        public string CurrentStatus { get; set; } = "pending";
+        public string? Notes { get; set; }
 
 
         public DishModel()

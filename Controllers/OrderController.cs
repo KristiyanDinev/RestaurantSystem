@@ -1,4 +1,5 @@
-﻿using ITStepFinalProject.Database.Handlers;
+﻿using ITStepFinalProject.Controllers.WebSocketHandlers;
+using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
 using ITStepFinalProject.Models.WebModels;
@@ -106,13 +107,20 @@ namespace ITStepFinalProject.Controllers {
                             }
                         }
 
+                        /*
                         InsertOrderModel order = new InsertOrderModel();
                         order.RestorantId = restorantId;
                         order.UserId = user.Id;
                         order.TotalPrice = TotalPrice;
-                        order.Notes = notes;
+                        order.Notes = notes;*/
 
-                        orderDb.AddOrder(user.Id, dishesIds, order, controllerUtils);
+
+                        OrderModel order = new OrderModel();
+                        order.RestorantId = restorantId;
+                        order.UserId = user.Id;
+                        order.TotalPrice = TotalPrice;
+                        order.Notes = notes;
+                        await orderDb.AddOrder(user.Id, dishesIds, order, controllerUtils);
 
                         if (cupon != null) {
                             cuponDb.DeleteCupon(cupon.CuponCode);
@@ -133,7 +141,7 @@ namespace ITStepFinalProject.Controllers {
 
             // stop order
             app.MapPost("/order/stop", async (HttpContext context,
-                OrderDatabaseHandler db, WebSocketUtils webSocketUtils,
+                OrderDatabaseHandler db, WebSocketHandler webSocketHandler,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string orderIdStr) => {
 
@@ -160,7 +168,7 @@ namespace ITStepFinalProject.Controllers {
 
                         db.DeleteOrder(orderId, user);
 
-                        webSocketUtils.RemoveModelIdFromOrderSubscribtion(orderId);
+                        webSocketHandler.RemoveModelIdFromOrderSubscribtion(orderId);
 
                         return Results.Ok();
 

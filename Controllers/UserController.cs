@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ITStepFinalProject.Utils.Web;
 using ITStepFinalProject.Utils.Controller;
 using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
 using ITStepFinalProject.Models.Controller;
 
 namespace ITStepFinalProject.Controllers {
@@ -136,11 +135,10 @@ namespace ITStepFinalProject.Controllers {
                             registerUserModel.Image = await controllerUtils.UploadImage(image);
                         }
 
-                        db.RegisterUser(new InsertUserModel(registerUserModel));
-                        //db.RegisterUser(registerUserModel);
+                        UserModel userModel = new UserModel(registerUserModel);
+                        await db.RegisterUser(userModel);
 
-                        UserModel? user = await db.LoginUser(new UserModel(registerUserModel), 
-                            true);
+                        UserModel? user = await db.LoginUser(userModel, false);
                         if (user == null)
                         {
                             if (registerUserModel.Image != null && 
@@ -159,8 +157,9 @@ namespace ITStepFinalProject.Controllers {
 
                         return Results.Ok();
 
-                } catch (Exception) {
-                    return Results.BadRequest();
+                } catch (Exception e) {
+                        Console.WriteLine(e);
+                        return Results.BadRequest();
                 }
 
             }).RequireRateLimiting("fixed")
@@ -252,7 +251,7 @@ namespace ITStepFinalProject.Controllers {
                     // you can't change your password as of now.
                     user.Id = model.Id;
 
-                    db.UpdateUser(user);
+                    await db.UpdateUser(user);
 
                     string authString = userUtils.HandleAuth(user, "off");
 

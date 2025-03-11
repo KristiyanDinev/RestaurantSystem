@@ -29,11 +29,12 @@ namespace ITStepFinalProject.Database.Handlers
             return (UserModel)user.Models[0];
         }
 
-        public async void RegisterUser(InsertUserModel model)
+        public async Task<object?> RegisterUser(UserModel model)
         {
             model.Password = ValueHandler.HashString(model.Password);
             await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [model]).ToString());
+                    .Insert(table, [model], ["Id", "CreatedAt"]).ToString());
+            return null;
         }
 
         public async Task<UserModel?> LoginUser(UserModel loginUser, bool hashPassword)
@@ -55,20 +56,23 @@ namespace ITStepFinalProject.Database.Handlers
         /*
          * <summery>
          * `model` must have one or more properties/fields
+         * `model` must have a hashed password
          * </summery>
          */
-        public async void UpdateUser(UserModel model)
+        public async Task UpdateUser(UserModel model)
         {
+            //model.Password = ValueHandler.HashString(model.Password);
             SqlBuilder sqlBuilder = new SqlBuilder()
                 .Update(table)
-                .Set()
-                .BuildCondition("Password", ValueHandler.HashString(model.Password), "=", ", ");
+                .Set();
 
             List<string> names = ObjectUtils.Get_Model_Property_Names(model);
+            List<object> propertyValues = new List<object>();
             for (int i = 0; i < names.Count; i++)
             {
                 string property = names[i];
-                if (property.Equals("Password") || property.Equals("Id"))
+                if (property.Equals("Id") || property.Equals("CreatedAt") 
+                    || property.Equals("Password") || property.Equals("Email"))
                 {
                     continue;
                 }
@@ -81,7 +85,7 @@ namespace ITStepFinalProject.Database.Handlers
             await DatabaseManager._ExecuteNonQuery(sqlBuilder.ToString());
         }
 
-        public async void DeleteUser(int userId)
+        public async Task DeleteUser(int userId)
         {
             await DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder().Delete(table)

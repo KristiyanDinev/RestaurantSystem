@@ -1,4 +1,5 @@
-﻿using ITStepFinalProject.Database.Handlers;
+﻿using ITStepFinalProject.Controllers.WebSocketHandlers;
+using ITStepFinalProject.Database.Handlers;
 using ITStepFinalProject.Models.Controller;
 using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
@@ -90,8 +91,8 @@ namespace ITStepFinalProject.Controllers
                         return Results.Unauthorized();
                     }
 
-                    bool IsCreated = await reservationsDB.CreateReservation(new InsertReservationModel(registerReservationModel, 
-                        user.Id),
+                    bool IsCreated = await reservationsDB
+                        .CreateReservation(new ReservationModel(registerReservationModel, user.Id),
                         controllerUtils.PendingStatus);
 
                     if (!IsCreated)
@@ -112,7 +113,7 @@ namespace ITStepFinalProject.Controllers
 
             app.MapPost("/reservations/delete", async (HttpContext context,
                 UserUtils userUtils, ReservationDatabaseHandler reservationsDB,
-                 WebSocketUtils webSocketUtils,
+                 WebSocketHandler webSocketHandler,
                 [FromForm] string reservationIdStr) =>
             {
                 try
@@ -129,7 +130,7 @@ namespace ITStepFinalProject.Controllers
                     }
 
                     reservationsDB.DeleteReservation(reservationId);
-                    webSocketUtils.RemoveModelIdFromReservationSubscribtion(reservationId);
+                    webSocketHandler.RemoveModelIdFromReservationSubscribtion(reservationId);
 
                     return Results.Ok();
 

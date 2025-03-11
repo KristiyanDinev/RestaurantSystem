@@ -182,7 +182,9 @@ values
 
                 CREATE TABLE IF NOT EXISTS "OrderedDishes" (
                     "OrderId" INT REFERENCES "Orders"("Id") NOT NULL,
-                    "DishId" INT REFERENCES "Dishes"("Id") NOT NULL
+                    "DishId" INT REFERENCES "Dishes"("Id") NOT NULL,
+                    "Notes" VARCHAR(255) DEFAULT NULL,
+                    "CurrentStatus" VARCHAR(100) NOT NULL DEFAULT 'pending'
                 );
 
                 CREATE TABLE IF NOT EXISTS "Reservations" (
