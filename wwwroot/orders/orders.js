@@ -23,10 +23,16 @@ function onmessage(event) {
         //const dishId = Number(parts[2])
         const status = parts[3]
 
+        var cancel = document.getElementById(orderId+'cancel')
         if (status !== "pending") {
-            let cancel = document.getElementById(orderId+'cancel')
             cancel.onclick = () => {};
             cancel.style.opacity = '50%'
+
+        } else {
+            cancel.onclick = async () => {
+                await cancelOrder(orderId)
+            };
+            cancel.style.opacity = '100%'
         }
 
         document.getElementById(orderId+'status')

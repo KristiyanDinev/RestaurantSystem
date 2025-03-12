@@ -217,3 +217,9 @@ h1 {
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome, Edge, Opera and Firefox */
   }
+
+.row {
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}

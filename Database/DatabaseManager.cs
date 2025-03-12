@@ -1,4 +1,4 @@
-﻿using ITStepFinalProject.Models.DatabaseModels;
+﻿using ITStepFinalProject.Models;
 using ITStepFinalProject.Utils.Utils;
 using Npgsql;
 using Npgsql.Schema;

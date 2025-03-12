@@ -1,6 +1,6 @@
 ﻿using Npgsql;
 
-namespace ITStepFinalProject.Models.DatabaseModels
+namespace ITStepFinalProject.Models
 {
     public class ResultSqlQuery
     {

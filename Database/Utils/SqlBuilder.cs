@@ -1,6 +1,5 @@
 ﻿using ITStepFinalProject.Utils.Utils;
-using Microsoft.Extensions.Primitives;
-using System.Linq;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
@@ -184,13 +183,27 @@ namespace ITStepFinalProject.Database.Utils
             return this;
         }
 
-        public SqlBuilder Set_Model(object model, List<string>? exceptionalProperties = null)
+
+        public SqlBuilder CreateTable(string tableName, bool ifNotExists = true)
         {
-            exceptionalProperties ??= new List<string>();
-            List<string> properties = ObjectUtils.Get_Model_Property_Names(model);
-            foreach (string property in properties) { 
-                
-            }
+            sql.Append("CREATE TABLE ")
+                .Append(ifNotExists ? " IF NOT EXISTS " : "")
+                .Append(_handleTableNames(tableName)).Append(" ( ");
+            return this;
+        }
+
+        public SqlBuilder AddColumn(string columnName, string type, bool isNotNull = false, 
+            string foreignKey = "", string defaultValue = "", bool isEnd = false)
+        {
+            sql.Append(' ')
+                .Append(_handleTableNames(columnName))
+                .Append(' ')
+                .Append(type)
+                .Append(isNotNull ? " NOT NULL " : " ")
+                .Append(foreignKey)
+                .Append(defaultValue.Length == 0 ? "" : " DEFAULT "+defaultValue)
+                .Append(isEnd ? ' ' : ',');
+            return this;
         }
 
         public SqlBuilder Limit(int limit, int? offset)

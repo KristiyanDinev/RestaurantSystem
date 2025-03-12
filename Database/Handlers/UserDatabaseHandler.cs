@@ -1,6 +1,6 @@
 ﻿using ITStepFinalProject.Database.Utils;
+using ITStepFinalProject.Models;
 using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.DatabaseModels.ModifingDatabaseModels;
 using ITStepFinalProject.Utils.Utils;
 
 namespace ITStepFinalProject.Database.Handlers

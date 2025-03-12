@@ -2,7 +2,7 @@
 
     <p class="part">Amount: {{Dish.Amount}}</p>
 
-    <p class="part" id="{{Dish.OrderId}}.{{Dish.Id}}status">Dish Status: pending</p>
+    <p class="part" >Dish Status: {{Dish.CurrentStatus}}</p>
 
     <p class="name">{{Dish.Name}}</p>
 
@@ -16,9 +16,24 @@
 
     <p class="price">{{Dish.Price}} lv.</p>
 
+    {% if {{Dish.CurrentStatus}} == "pending" %}
     <button class="order noselect" 
-    onclick="startPreparing('{{Dish.OrderId}}', '{{Dish.Id}}')" 
-    id="{{Dish.OrderId}}.{{Dish.Id}}btn">Start preparing</button>
+        onclick="setStatus('{{Dish.OrderId}}', '{{Dish.Id}}', 'preparing')">Start preparing</button>
+        {% endif %}
+    {% if {{Dish.CurrentStatus}} == "preparing" %}
+    <div class="row noselect">
+        <button class="undo" 
+        onclick="setStatus('{{Dish.OrderId}}', '{{Dish.Id}}', 'pending')">UnDo</button>
+
+    <button class="order" 
+        onclick="setStatus('{{Dish.OrderId}}', '{{Dish.Id}}', 'ready')">Ready</button>
+    </div>
+    {% endif %}
+    {% if {{Dish.CurrentStatus}} == "ready" %}
+    <button class="undo noselect" 
+        onclick="setStatus('{{Dish.OrderId}}', '{{Dish.Id}}', 'preparing')">UnDo</button>
+
+    {% endif %}
 
     <script>
         orderIds[Number('{{Dish.OrderId}}')].push(Number('{{Dish.Id}}'))

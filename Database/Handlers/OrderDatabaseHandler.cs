@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Database.Utils;
+using ITStepFinalProject.Models;
 using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Controller;
@@ -56,7 +57,7 @@ namespace ITStepFinalProject.Database.Handlers
                 throw;
             }
 
-            UpdateOrderCurrentStatusById((int)orderId, utils.PendingStatus);
+            await UpdateOrderCurrentStatusById((int)orderId, utils.PendingStatus);
         }
 
         public async Task DeleteOrder(int orderId, UserModel user)
@@ -75,8 +76,9 @@ namespace ITStepFinalProject.Database.Handlers
                 .ToString());
         }
 
-        public async void UpdateOrderCurrentStatusById(int orderId, string newStatus)
+        public async Task UpdateOrderCurrentStatusById(int orderId, string newStatus)
         {
+
             await DatabaseManager._ExecuteNonQuery(
                 new SqlBuilder()
                 .Update(table)

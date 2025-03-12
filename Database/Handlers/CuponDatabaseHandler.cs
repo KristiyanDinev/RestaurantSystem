@@ -1,4 +1,5 @@
 ﻿using ITStepFinalProject.Database.Utils;
+using ITStepFinalProject.Models;
 using ITStepFinalProject.Models.DatabaseModels;
 
 namespace ITStepFinalProject.Database.Handlers

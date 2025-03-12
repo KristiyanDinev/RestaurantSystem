@@ -29,6 +29,7 @@ namespace ITStepFinalProject.Models.WebModels
             Type_Of_Dish = model.Type_Of_Dish;
             IsAvailable = model.IsAvailable;
             AvrageTimeToCook = model.AvrageTimeToCook;
+            CurrentStatus = model.CurrentStatus;
             Amount = 1;
         }
     }

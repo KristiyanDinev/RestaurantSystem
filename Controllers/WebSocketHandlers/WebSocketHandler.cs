@@ -44,9 +44,10 @@ namespace ITStepFinalProject.Controllers.WebSocketHandlers
             CloseAllSubscribtions(cookSubscribtions);
         }
 
-        public async static void HandleCookStatus(List<string> parts, 
-            OrderDatabaseHandler orderDatabaseHandler)
+        public async static void HandleCookStatus(List<string> parts,
+            OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler)
         {
+            // This is cook status. About cooking the food and not delivery or payment.
             // 1  or  di s
             if (parts.Count != 4 || !int.TryParse(parts[1], out int orderId) ||
                                 !int.TryParse(parts[2], out int dishId))
@@ -55,33 +56,46 @@ namespace ITStepFinalProject.Controllers.WebSocketHandlers
             }
 
             // update the database order's status.
+            string status = parts[3];
+            await dishDatabaseHandler.UpdateDishStatusById(dishId, status);
 
-            orderDatabaseHandler.UpdateOrderCurrentStatusById(orderId, parts[3]);
+            string? sameStatus = await dishDatabaseHandler.GetSameCurrentStatusForAllDishesByOrderId(orderId);
 
-            string message = "cook_status;" + orderId + ";" + dishId + ";" + parts[3];
-            foreach (SubscribtionModel subscribtion in cookSubscribtions)
+            if (sameStatus != null)
             {
-                if (subscribtion.ModelIds.Contains(orderId))
-                {
-                    await subscribtion.SendTextToClient(message);
-                }
+                await orderDatabaseHandler.UpdateOrderCurrentStatusById(orderId, sameStatus);
+
+            } else
+            {
+                await orderDatabaseHandler.UpdateOrderCurrentStatusById(orderId, "preparing");
             }
+
+            foreach (SubscribtionModel subscribtion in cookSubscribtions)
+                {
+                    if (subscribtion.ModelIds.Contains(orderId))
+                    {
+                        await subscribtion.SendTextToClient("reload");
+                    }
+                }
             foreach (SubscribtionModel subscribtion in orderSubscribtions)
             {
                 if (subscribtion.ModelIds.Contains(orderId))
                 {
-                    await subscribtion.SendTextToClient(message);
+                    await subscribtion
+                        .SendTextToClient(
+                        "cook_status;" + orderId + ";" + dishId + ";" + 
+                        (sameStatus != null ? sameStatus : "preparing"));
                 }
             }
         }
 
 
         public async Task HandleWholeRequest(HttpContext context,
-            OrderDatabaseHandler orderDatabaseHandler)
+            OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler)
         {
             if (context.WebSockets.IsWebSocketRequest)
             {
-                await HandleWebSocket(context, orderDatabaseHandler);
+                await HandleWebSocket(context, orderDatabaseHandler, dishDatabaseHandler);
             }
             else
             {
@@ -90,7 +104,7 @@ namespace ITStepFinalProject.Controllers.WebSocketHandlers
         }
 
         public async Task HandleWebSocket(HttpContext context,
-            OrderDatabaseHandler orderDatabaseHandler)
+            OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler)
         {
             WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
@@ -129,7 +143,7 @@ namespace ITStepFinalProject.Controllers.WebSocketHandlers
                         }
                     case "cook_status":
                         {
-                            HandleCookStatus(parts, orderDatabaseHandler);
+                            HandleCookStatus(parts, orderDatabaseHandler, dishDatabaseHandler);
                             break;
                         }
                 }
