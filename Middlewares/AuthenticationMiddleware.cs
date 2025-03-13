@@ -26,7 +26,7 @@ namespace ITStepFinalProject.Services
                 return;
             }
 
-            bool isAdminEndpoint = path.StartsWith(admin_endpoint_prefix);
+            bool isAdminEndpoint = ("/"+path.Split("/")[0]).Equals(admin_endpoint_prefix);
             UserModel? user = await _userUtils.GetLoginUserFromCookie(context, userDatabaseHandler);
 
             if (user != null && non_login_endpoints.Contains(path))
@@ -51,7 +51,9 @@ namespace ITStepFinalProject.Services
                 {
                     path = path.Split('?')[0];
                 }
-                path = path.Substring(admin_endpoint_prefix.Length);
+                List<string> splited = path.Split("/").ToList();
+                splited.RemoveAt(0);
+                path = "/" + string.Join("/", splited);
                 if (!await serviceDatabaseHandler.DoesUserHaveRolesToAccessService(user, path))
                 {
                     // user doesn't have the roles to do so.

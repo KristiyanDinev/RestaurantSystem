@@ -86,6 +86,9 @@ namespace ITStepFinalProject
                 })
             );
 
+
+            builder.Services.AddControllersWithViews();
+
             var app = builder.Build();
 
             //app.UseSession();
@@ -98,6 +101,7 @@ namespace ITStepFinalProject
 
             app.UseWebSockets(webSocketOptions);
             app.UseRateLimiter();
+            app.UseRouting();
             app.UseStaticFiles();
             app.UseAuthenticationMiddleware();
             

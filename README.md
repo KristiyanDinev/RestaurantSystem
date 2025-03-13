@@ -63,4 +63,3 @@ You open it with `{% if ... %}` and close it with `{% endif %}`. The `{% elseif 
 ### TODO
 - Staff page for seeing orders, reservations and updating / cancelling them.
 - Admin page for adding staff.
-- update the database order's status.

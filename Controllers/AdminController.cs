@@ -3,6 +3,8 @@ using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Controller;
 using ITStepFinalProject.Utils.Web;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ITStepFinalProject.Controllers
 {
@@ -13,7 +15,13 @@ namespace ITStepFinalProject.Controllers
 
             // Note: Here should be only endpoints that are for staff.
             // These endpoints are already Authorized by the Authentication middleware.
-            
+
+         /*
+            app.MapControllerRoute(
+                 name: "AdminTest",
+                 pattern: "/admin2/{controller=Admin2}/{action=Index}");*/
+
+
             app.MapGet("/admin", async (HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils, 
                 ServiceDatabaseHandler serviceDatabaseHandler) => {
@@ -124,6 +132,22 @@ namespace ITStepFinalProject.Controllers
                     return await controllerUtils.HandleDefaultPage_WithUserModel("/admin/owner",
                           context, userUtils, webUtils);
                 });
+        }
+    }
+
+    public class Admin2Controller : Controller
+    {
+        private UserUtils _userUtils;
+        public Admin2Controller(UserUtils userUtils)
+        {
+            _userUtils = userUtils;
+        }
+            
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            UserModel? user = await _userUtils.GetUserModelFromAuth(HttpContext);
+            return View(user);
         }
     }
 }

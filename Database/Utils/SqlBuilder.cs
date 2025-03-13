@@ -1,5 +1,4 @@
 ﻿using ITStepFinalProject.Utils.Utils;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using System.Text;
 
 namespace ITStepFinalProject.Database.Utils
@@ -65,7 +64,7 @@ namespace ITStepFinalProject.Database.Utils
          * If you have a list of fields then you can do `string.Join(", ", List)` to get the string.
          * </summery>
         */
-        public SqlBuilder Select(string fields, string table)
+        public SqlBuilder Select(string fields, string table, int? top = null)
         {
             if (fields.Length == 0)
             {
@@ -77,8 +76,10 @@ namespace ITStepFinalProject.Database.Utils
                 StringBuilder stringBuilder = new StringBuilder();
                 for (int i = 0; i < parts.Length; i++)
                 {
-                    string property = parts[i].Replace(" ", "");
-                    if (property.Length == 0)
+                    string property = parts[i];
+
+
+                    if (property.Trim().Length == 0)
                     {
                         continue;
                     }
@@ -96,7 +97,7 @@ namespace ITStepFinalProject.Database.Utils
                 }
                 fields = stringBuilder.ToString();
             } 
-            sql.Append("SELECT ").Append(fields).Append(" FROM ")
+            sql.Append(top != null ? "SELECT TOP "+top+' ' : "SELECT ").Append(fields).Append(" FROM ")
                 .Append(_handleTableNames(table)).Append(' ');
             return this;
         }
@@ -193,7 +194,7 @@ namespace ITStepFinalProject.Database.Utils
         }
 
         public SqlBuilder AddColumn(string columnName, string type, bool isNotNull = false, 
-            string foreignKey = "", string defaultValue = "", bool isEnd = false)
+            string foreignKey = "", string defaultValue = "", bool isLast = false)
         {
             sql.Append(' ')
                 .Append(_handleTableNames(columnName))
@@ -202,7 +203,7 @@ namespace ITStepFinalProject.Database.Utils
                 .Append(isNotNull ? " NOT NULL " : " ")
                 .Append(foreignKey)
                 .Append(defaultValue.Length == 0 ? "" : " DEFAULT "+defaultValue)
-                .Append(isEnd ? ' ' : ',');
+                .Append(isLast ? " )" : ',');
             return this;
         }
 

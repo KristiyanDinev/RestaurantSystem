@@ -24,7 +24,7 @@ function onmessage(event) {
         const status = parts[3]
 
         var cancel = document.getElementById(orderId+'cancel')
-        if (status !== "pending") {
+        if (status != "pending") {
             cancel.onclick = () => {};
             cancel.style.opacity = '50%'
 
