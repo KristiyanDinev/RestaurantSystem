@@ -3,8 +3,6 @@ using ITStepFinalProject.Models.DatabaseModels;
 using ITStepFinalProject.Models.WebModels;
 using ITStepFinalProject.Utils.Controller;
 using ITStepFinalProject.Utils.Web;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace ITStepFinalProject.Controllers
 {
@@ -135,6 +133,7 @@ namespace ITStepFinalProject.Controllers
         }
     }
 
+    /*
     public class Admin2Controller : Controller
     {
         private UserUtils _userUtils;
@@ -149,5 +148,5 @@ namespace ITStepFinalProject.Controllers
             UserModel? user = await _userUtils.GetUserModelFromAuth(HttpContext);
             return View(user);
         }
-    }
+    }*/
 }

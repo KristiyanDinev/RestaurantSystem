@@ -29,9 +29,6 @@ The `CurrectStatus` will be `stopped` if it got cancelled by the user only when 
 - If you want to disable reservations then set `ReservationMaxAdults` and `ReservationMaxChildren` to `0` and `ReservationMinAdults` and `ReservationMinChildren` to `-1`
  This can be done from the UI as planned or from the database.
 
-### Git access token
-- `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`
-
 ### Notes
 - In text files the property names of the Model will be replaced 
 Ex: `{{User.__Id}}` -> `1`: If there is no data or error the `{{property}}` 

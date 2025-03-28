@@ -30,7 +30,10 @@ namespace ITStepFinalProject
                 options.Cookie.IsEssential = true;
                 //options.IOTimeout = TimeSpan.FromSeconds(20);
                 options.Cookie.HttpOnly = true;
-            });*/
+            });
+
+            builder.Services.AddControllersWithViews()
+            */
 
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
@@ -86,12 +89,8 @@ namespace ITStepFinalProject
                 })
             );
 
-
-            builder.Services.AddControllersWithViews();
-
             var app = builder.Build();
 
-            //app.UseSession();
             var webSocketOptions = new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(2),
