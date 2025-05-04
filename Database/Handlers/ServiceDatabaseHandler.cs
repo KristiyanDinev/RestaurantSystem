@@ -1,114 +1,100 @@
-﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Models.DatabaseModels;
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Models.DatabaseModels;
 
-namespace ITStepFinalProject.Database.Handlers
+namespace RestaurantSystem.Database.Handlers
 {
     public class ServiceDatabaseHandler
     {
-        private static readonly string table = "Services";
-        private static readonly string tableRoles = "Roles";
-        private static readonly string tableRestorant = "Restorant";
 
-        public async void AddRolesToServices(List<ServiceModel> serviceModels)
+        public DatabaseManager _databaseManager;
+
+        public ServiceDatabaseHandler(DatabaseManager databaseManager)
         {
-            await DatabaseManager._ExecuteNonQuery(
-                new SqlBuilder()
-                .Insert(table, serviceModels.Cast<object>().ToList()).ToString());
+            _databaseManager = databaseManager;
         }
 
-        public async void RemoveService(string service)
+        // Throws an exception for errors.
+        public async Task AddRoleToUser(int userId, string role)
         {
-            await DatabaseManager._ExecuteNonQuery(
-               new SqlBuilder()
-               .Delete(table)
-               .Where()
-               .BuildCondition("Service", ValueHandler.Strings(service))
-               .ToString());
-        }
+            UserModel user = await _databaseManager.Users
+                .Include(user => user.Roles)
+                .FirstOrDefaultAsync(user => user.Id == userId) ?? 
+                throw new Exception("No such user");
 
-        public async void RemoveRolesFromService(List<ServiceModel> serviceModels)
-        {
-            List<string> Roles = new List<string>();
-            List<string> Services = new List<string>();
-            foreach (ServiceModel serviceModel in serviceModels)
+            user.Roles ??= new List<UserRoleModel>();
+
+            if (user.Roles.Any(ur => ur.Role.Equals(role)))
             {
-                Roles.Add(ValueHandler.Strings(serviceModel.Role));
-                Services.Add(ValueHandler.Strings(serviceModel.Service));
+                throw new Exception("No such role");
             }
 
-            await DatabaseManager._ExecuteNonQuery(
-               new SqlBuilder()
-               .Delete(table)
-               .Where()
-               .BuildCondition("Service", '(' + string.Join(", ", Services) + ')', "IN", "AND ")
-               .BuildCondition("Role", '(' + string.Join(", ", Roles) + ')', "IN")
-               .ToString());
+            UserRoleModel roleModel = new UserRoleModel();
+            roleModel.UserModelId = userId;
+            roleModel.Role = role;
+
+            user.Roles.Add(roleModel);
+
+            await _databaseManager.SaveChangesAsync();
         }
 
-        public async void RemoveRolesFromUser(List<UserRoleModel> userRoleModels)
+        // Throws an exception for errors.
+        public async Task RemoveRoleFromUser(int userId, string role)
         {
-            List<int> Ids = new List<int>();
-            List<string> Roles = new List<string>();
-            foreach (UserRoleModel userRoleModel in userRoleModels)
+            UserModel user = await _databaseManager.Users
+                .Include(user => user.Roles)
+                .FirstOrDefaultAsync(user => user.Id == userId) ??
+                throw new Exception("No such user");
+
+            user.Roles ??= new List<UserRoleModel>();
+
+            UserRoleModel userRole = user.Roles.FirstOrDefault(u => u.Role.Equals(role)) ??
+                throw new Exception("No such role");
+
+            user.Roles.Remove(userRole);
+
+            await _databaseManager.SaveChangesAsync();
+        }
+
+        public async Task GrantRoleAccessToService(string role, string new_service)
+        {
+            // user -> role -> service
+
+            ServiceModel serviceModel = await _databaseManager.Services
+                .Include(s => s.AllowedRoles)
+        .       FirstOrDefaultAsync(s => s.Service == servicePath);
+
+            if (service == null)
             {
-                Ids.Add(userRoleModel.UserId);
-                Roles.Add(ValueHandler.Strings(userRoleModel.Role));
+                service = new ServiceModel
+                {
+                    Service = servicePath,
+                    AllowedRoles = new List<UserRoleModel>()
+                };
+                _context.Set<ServiceModel>().Add(service);
             }
 
-            await DatabaseManager._ExecuteNonQuery(
-               new SqlBuilder()
-               .Delete(tableRoles)
-               .Where()
-               .BuildCondition("UserId", '('+string.Join(", ", Ids) + ')', "IN", "AND ")
-               .BuildCondition("Role", '(' + string.Join(", ", Roles) + ')', "IN")
-               .ToString());
+
+            UserRoleModel roleModel = await _databaseManager.UserRoles
+                .Include(role => role.Services)
+                .FirstOrDefaultAsync(s => s.Role.Equals(role)) ?? 
+                throw new Exception("No such role");
+
+            ServiceModel serviceModel = new ServiceModel();
+            serviceModel.Service = new_service;
+            serviceModel.AllowedRoles
+
+            roleModel.Services.Add();
         }
 
-        public async void AddRolesToUser(List<UserRoleModel> userRoleModels)
+        public async Task<UserRoleModel> CheckUserAccess(int userId, string service)
         {
-            await DatabaseManager._ExecuteNonQuery(
-                new SqlBuilder()
-                .Insert(tableRoles, userRoleModels.Cast<object>().ToList()).ToString()
-                );
-        }
+            UserModel user = await _databaseManager.Users
+                .Include(user => user.Roles)
+                .FirstOrDefaultAsync(user => user.Id == userId) ??
+                throw new Exception("No such user");
 
-        public async Task<bool> DoesUserHaveRolesToAccessService(UserModel user, string service)
-        {
-            ResultSqlQuery res = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder()
-                .Select("*", table)
-                .Join(tableRoles, "INNER")
-                .On()
-                .BuildCondition(tableRoles + ".Role", '"'+table+ "\".\"Role\"")
-                .Where()
-                .BuildCondition("UserId", user.Id, "=", "AND ")
-                .BuildCondition("Service", ValueHandler.Strings(service, true))
-                .ToString(), new JoinedServiceAndRoleModel());
-
-            return res.Models.Count != 0;
-        }
-
-        public async Task<RestorantModel> GetStaffRestorant(UserModel user) {
-            // The staff's address should match the restorant they are serving.
-            // I don't know if this should appy to delivery staff.
-
-
-            ResultSqlQuery res = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder()
-                .Select("*", tableRestorant)
-            .Where()
-                .BuildCondition("RestorantCity", ValueHandler.Strings(user.City), "=", "AND")
-                .BuildCondition("RestorantCountry", ValueHandler.Strings(user.Country), "=", "AND")
-
-
-                .BuildCondition("RestorantState", ValueHandler.Strings(user.State),
-                    string.IsNullOrWhiteSpace(user.State)? "is" : "=", "AND")
-
-                .BuildCondition("RestorantAddress", ValueHandler.Strings(user.Address)).ToString(),
-                new RestorantModel());
-
-            return (RestorantModel)res.Models[0];
+            return user.Roles.FirstOrDefault(r => r.Services.Equals(service)) ?? 
+                throw new Exception("Can't access the resource");
         }
     }
 }

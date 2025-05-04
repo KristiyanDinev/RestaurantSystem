@@ -1,8 +1,8 @@
-﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Utils.Controller;
+﻿using RestaurantSystem.Database.Handlers;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Utils.Controller;
 
-namespace ITStepFinalProject.Services
+namespace RestaurantSystem.Services
 {
     public class AuthenticationMiddleware
     {
@@ -18,7 +18,7 @@ namespace ITStepFinalProject.Services
         }
 
         public async Task InvokeAsync(HttpContext context, UserUtils _userUtils, 
-            ServiceDatabaseHandler serviceDatabaseHandler, UserDatabaseHandler userDatabaseHandler)
+            ServiceDatabaseHandler serviceDatabaseHandler)
         {
             string path = context.Request.Path.Value ?? "/";
             if (path.Equals('/'))
@@ -27,7 +27,7 @@ namespace ITStepFinalProject.Services
             }
 
             bool isAdminEndpoint = ("/"+path.Split("/")[0]).Equals(admin_endpoint_prefix);
-            UserModel? user = await _userUtils.GetLoginUserFromCookie(context, userDatabaseHandler);
+            UserModel? user = await _userUtils.GetUserByJWT(context);
 
             if (user != null && non_login_endpoints.Contains(path))
             {
@@ -57,7 +57,7 @@ namespace ITStepFinalProject.Services
                 if (!await serviceDatabaseHandler.DoesUserHaveRolesToAccessService(user, path))
                 {
                     // user doesn't have the roles to do so.
-                    Console.WriteLine("\n"+user.Username +" was trying to reach to admin page. Service: "+
+                    Console.WriteLine("\n"+user.Name +" was trying to reach to admin page. Service: "+
                         path+" without the proper roles.\n");
                     context.Response.Redirect("/dishes");
                     return;

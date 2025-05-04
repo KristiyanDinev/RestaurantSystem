@@ -1,6 +1,6 @@
-﻿using ITStepFinalProject.Utils.Controller;
+﻿using RestaurantSystem.Utils.Controller;
 
-namespace ITStepFinalProject.Controllers {
+namespace RestaurantSystem.Controllers {
     public class ErrorController {
 
 

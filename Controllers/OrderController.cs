@@ -1,12 +1,12 @@
-﻿using ITStepFinalProject.Controllers.WebSocketHandlers;
-using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.WebModels;
-using ITStepFinalProject.Utils.Controller;
-using ITStepFinalProject.Utils.Web;
+﻿using RestaurantSystem.Database.Handlers;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.WebModels;
+using RestaurantSystem.Utils.Controller;
+using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
+using RestaurantSystem.Controllers;
 
-namespace ITStepFinalProject.Controllers {
+namespace RestaurantSystem.Controllers {
     public class OrderController {
 
 
@@ -18,7 +18,7 @@ namespace ITStepFinalProject.Controllers {
                 UserUtils userUtils, WebUtils webUtils) => {
 
                 try {
-                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                        UserModel? user = await userUtils.GetUserByJWT(context);
                         if (user == null)
                         {
                             return Results.Redirect("/login");
@@ -81,7 +81,7 @@ namespace ITStepFinalProject.Controllers {
                             return Results.BadRequest();
                         }
 
-                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                        UserModel? user = await userUtils.GetUserByJWT(context);
                         if (user == null)
                         {
                             return Results.Redirect("/login");
@@ -151,7 +151,7 @@ namespace ITStepFinalProject.Controllers {
 
                     try {
 
-                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                        UserModel? user = await userUtils.GetUserByJWT(context);
                         if (user == null)
                         {
                             return Results.Redirect("/login");

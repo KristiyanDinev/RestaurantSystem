@@ -1,113 +1,63 @@
-﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.WebModels;
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Models.DatabaseModels;
 
-namespace ITStepFinalProject.Database.Handlers
+namespace RestaurantSystem.Database.Handlers
 {
     public class ReservationDatabaseHandler
     {
-        private static readonly string table = "Reservations";
-        private static readonly string tableRestorant = "Restorant";
-        private static readonly string tableTimeTable = "TimeTable";
 
-        public async Task<bool> CreateReservation(ReservationModel model, string currentStatus)
+        private DatabaseManager _databaseManager;
+
+        private RestaurantDatabaseHandler _restaurantDatabaseHandler;
+
+        public ReservationDatabaseHandler(DatabaseManager databaseManager,
+            RestaurantDatabaseHandler restaurantDatabaseHandler)
         {
-            ResultSqlQuery restorant = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("*", tableRestorant)
-                .Where()
-                .BuildCondition("Id", model.RestorantId, "=", "AND")
-                .BuildCondition("ReservationMaxAdults", model.Amount_Of_Adults, ">=", "AND", " ((")
-                .BuildCondition("ReservationMaxAdults", 0, ">=", "OR", "", ") ")
-                .BuildCondition("ReservationMaxAdults", 0, "<", "AND", "", ") ")
+            _databaseManager = databaseManager;
+            _restaurantDatabaseHandler = restaurantDatabaseHandler;
+        }
 
+        public async Task<bool> CreateReservation(int userId, int restaurantId, 
+            int amount_Of_Adults, int amount_Of_Children, DateTime dateTime, string? notes)
+        {
+            ReservationModel reservation = new ReservationModel();
+            reservation.UserModelId = userId;
+            reservation.RestaurantModelId = restaurantId;
+            reservation.Amount_Of_Adults = amount_Of_Adults;
+            reservation.Amount_Of_Children = amount_Of_Children;
+            reservation.At_Date = dateTime;
+            reservation.Notes = notes;
 
-                .BuildCondition("ReservationMaxChildren", model.Amount_Of_Children, ">=", "AND", " ((")
-                .BuildCondition("ReservationMaxChildren", 0, ">=", "OR", "", ") ")
-                .BuildCondition("ReservationMaxChildren", 0, "<", "AND", "", ") ")
-
-                .BuildCondition("ReservationMinAdults", model.Amount_Of_Adults, "<=", "AND", " ((")
-                .BuildCondition("ReservationMinAdults", 0, ">=", "OR", "", ")")
-                .BuildCondition("ReservationMinAdults", 0, "<", "AND", "", ")")
-
-                .BuildCondition("ReservationMinChildren", model.Amount_Of_Children, "<=", "AND", " ((")
-                .BuildCondition("ReservationMinChildren", 0, ">=", "OR", "", ") ")
-                .BuildCondition("ReservationMinChildren", 0, "<", "", "", ") ")
-                .ToString(),
-                new RestorantModel());
-            
-            if (restorant.Models.Count == 0)
-            {
+            if (!(await _restaurantDatabaseHandler.CheckForReservation(reservation))) {
                 return false;
             }
 
-            model.CurrentStatus = currentStatus;
-            await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [model], 
-                ["Created_At", "Price_Per_Adult", "Price_Per_Children"]).ToString());
-            return true;
+            await _databaseManager.Reservations.AddAsync(reservation);
+
+            int num = await _databaseManager.SaveChangesAsync();
+
+            return num >= 1;
         }
 
-        public async Task<List<DisplayReservationModel>> GetReservationsByUser(UserModel model)
+        public async Task<List<ReservationModel>> GetReservationsByUserId(int userId)
         {
-            ResultSqlQuery reservations = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("*", table)
-                .Join(tableRestorant, "INNER")
-                .On()
-                .BuildCondition(table+ ".RestorantId", '"'+tableRestorant+"\".\"Id\"")
-                .Where()
-                .BuildCondition("ReservatorId", model.Id)
-                .ToString(), new DisplayReservationModel());
-
-            return reservations.Models.Cast<DisplayReservationModel>().ToList();
+            return await _databaseManager.Reservations.Where(res => 
+                res.UserModelId == userId)
+                .ToListAsync();
         }
 
-        public async void DeleteReservation(int reservationId)
+        public async Task DeleteReservation(int reservationId)
         {
-            await DatabaseManager._ExecuteNonQuery(
-                new SqlBuilder()
-                .Delete(table)
-                .Where()
-                .BuildCondition("Id", reservationId).ToString()
-                );
-        }
+            ReservationModel? reservation = await _databaseManager
+                .Reservations.FirstOrDefaultAsync(res => res.Id == reservationId);
 
-        public async Task<List<TimeTableJoinRestorantModel>> GetRestorantsAddressesForReservation(UserModel user)
-        {
-            string city = ValueHandler.Strings(user.City);
-            string country = ValueHandler.Strings(user.Country);
-
-            SqlBuilder sqlBuilder = new SqlBuilder()
-                .Select("*", tableTimeTable)
-                .Join(tableRestorant, "INNER")
-                .On()
-                .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
-
-                .Where()
-                .BuildCondition("ServeCustomersInPlace", "'1'", "=", "AND")
-                .BuildCondition("UserCity", city, "=", "AND")
-                .BuildCondition("RestorantCity", city, "=", "AND")
-                .BuildCondition("UserCountry", country, "=", "AND")
-                .BuildCondition("RestorantCountry", country, "=", "AND")
-                .BuildCondition("UserAddress", ValueHandler.Strings('%' + user.Address + '%'), "LIKE", "AND");
-
-            string state = ValueHandler.Strings(user.State);
-            if (state.Equals("null"))
-            {
-                sqlBuilder.BuildCondition("UserState", "NULL", "IS", "AND");
-                sqlBuilder.BuildCondition("RestorantState", "NULL", "IS");
-
-            }
-            else
-            {
-                sqlBuilder.BuildCondition("UserState", state, "=", "AND");
-                sqlBuilder.BuildCondition("RestorantState", state, "=");
+            if (reservation == null) {
+                return;
             }
 
-            ResultSqlQuery objs = await DatabaseManager._ExecuteQuery(sqlBuilder
-                .ToString(), new TimeTableJoinRestorantModel());
+            _databaseManager.Remove(reservation);
 
-            return objs.Models.Cast<TimeTableJoinRestorantModel>().ToList();
+            await _databaseManager.SaveChangesAsync();
         }
     }
 }

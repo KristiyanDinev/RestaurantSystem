@@ -1,323 +1,363 @@
-﻿using ITStepFinalProject.Models;
-using ITStepFinalProject.Utils.Utils;
-using Npgsql;
-using Npgsql.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Models.DatabaseModels;
 
-namespace ITStepFinalProject.Database {
-    public class DatabaseManager {
-        // Username, password and email are required
-        // Username: 123
-        // email: 123@example.com
-        // password: 123
+namespace RestaurantSystem.Database {
+    public class DatabaseManager : DbContext {
 
-        /*
-         * 
-       
-        -- year-month-day MM/DD/YYYYTHH:mm:ssZ
-          insert into "Cupons" ("CuponCode", "DiscountPercent", "ExpirationDate", "Name") VALUES
-          ('Code', 5.99, '2022-01-01', 'Expired'),
-          ('Summer', 6.10, '2025-05-01', 'Summer Cupon'),
-          ('Winter', 12.99, '2025-12-01', 'Winter Cupon');
+        public DbSet<UserModel> Users { get; set; }
+        public DbSet<CuponModel> Cupons { get; set; }
+        public DbSet<DishModel> Dishies { get; set; }
+        public DbSet<OrderedDishesModel> OrderedDishes { get; set; }
+        public DbSet<OrderModel> Orders { get; set; }
+        public DbSet<ServiceModel> Services { get; set; }
+        public DbSet<UserRoleModel> UserRoles { get; set; }
+        public DbSet<ReservationModel> Reservations { get; set; }
+        public DbSet<RestaurantModel> Restaurants { get; set; }
+        public DbSet<TimeTableModel> TimeTables { get; set; }
 
+        public DatabaseManager(DbContextOptions<DatabaseManager> options) : base(options) {}
 
-        insert into "Restorant" ("RestorantAddress", "RestorantCity", "RestorantState", 
-            "RestorantCountry", "DoDelivery", "ServeCustomersInPlace") values 
-            ('ul. Restorant', 'Sofia', null, 'Bulgaria', true, false),
-            ('ul. Restorant2', 'Sofia', null, 'Bulgaria', true, false),
-            ('ul. Restorant2 alt', 'Sofia', null, 'Bulgaria', true, true),
-            ('ul. Restorant3 alt', 'Sofia', null, 'Bulgaria', true, true),
-            ('ul. Restorant3', 'Sofia', null, 'Bulgaria', false, true),
-            ('ul. Restorant4', 'Sofia', null, 'Bulgaria', false, true),
-            ('ul. Restorant5', 'Sofia', 'Some State', 'Bulgaria', false, true),
-            ('ul. Restorant7', 'Sofia', 'Some State', 'Bulgaria', true, false),
-            ('ul. Restorant6', 'Sofia', 'Some State', 'Bulgaria', true, false);
-
-        insert into "Dishes" ("Name", "Price", "Ingredients", "Grams", "Type_Of_Dish", 
-        "IsAvailable", "AvrageTimeToCook", "Image", "RestorantId")
-values
-('Salad 1', 10.99, 'some stuff in it and this and that', 440, 'salad', true, '3', '/images/salad/1.png', 4),
-('Salad 2', 12.99, 'some stuff in it and this and that', 500, 'salad', false, '2', null, 1),
-('Drink 1', 13.99, 'some stuff in it and this and that', 100, 'drink', true, '1', null, 2),
-('Drink 2', 10.00, 'some stuff in it and this and that', 100, 'drink', false, '1', null, 3),
-('Appetizer 1', 10.09, 'some stuff in it and this and that', 440, 'appetizers', true, '3', null, 4),
-('Appetizer 2', 20.19, 'some stuff in it and this and that', 140, 'appetizers', false, '4', null, 1),
-('Desserts 1', 23.19, 'some stuff in it and this and that', 140, 'desserts', true, '1', null, 2),
-('Desserts 2', 30.20, 'some stuff in it and this and that', 120, 'desserts', false, '4', null, 3),
-('Dishes 1', 21.19, 'some stuff in it and this and that', 142, 'dishes', true, '2', null, 5),
-('Dishes 2', 30.22, 'some stuff in it and this and that', 120, 'dishes', false, '3', null, 5);
-
-        insert into "TimeTable" ("RestorantId", "UserAddress", "UserCity", "UserState",
-            "UserCountry", "AvrageDeliverTime") values 
-            (1, 'ul. User', 'Sofia', null, 'Bulgaria', '5m - 10m'),
-            (2, 'ul. User', 'Sofia', null, 'Bulgaria', '7m - 8m'),
-            (2, 'ul. User2', 'Sofia', null, 'Bulgaria', '2m - 3m+'),
-            (3, 'ul. User', 'Sofia', null, 'Bulgaria', '2m - 3m'),
-            (4, 'ul. User', 'Sofia', null, 'Bulgaria', '1m - 2m'),
-            (4, 'ul. User3', 'Sofia', null, 'Bulgaria', '1m - 2m+'),
-            (5, 'ul. User', 'Sofia', 'Some State', 'Bulgaria', '3m - 5m'),
-            (6, 'ul. User', 'Sofia', 'Some State', 'Bulgaria', '2m - 4m');
-
-        insert into "Services" ("Role", "Service") values
-            ('staff', ''),
-            ('owner', ''),
-            ('waitress', ''),
-            ('cook', ''),
-            ('delivery', ''),
-
-            ('waitress', '/orders'),
-            ('owner', '/orders'),
-
-            ('cook', '/dishes'),
-            ('owner', '/dishes'),
-
-            ('delivery', '/delivery'),
-            ('owner', '/delivery'),
-
-            ('owner', '/owner');
-
-
-
-        insert into "Roles" ("UserId", "Role") values
-            (1, 'staff');
-         */
-
-        public static string _connectionString = "";
-
-
-
-        private static async Task<NpgsqlCommand> BuildCommand(string sql, 
-            NpgsqlConnection? connection = null, bool beginTransaction = false)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            if (connection == null)
-            {
-                connection = new NpgsqlConnection(_connectionString);
-                await connection.OpenAsync();
-            }
+            // UserModel
+            BuildUserModel(ref builder);
 
-            NpgsqlTransaction? transaction = null;
-            if (beginTransaction)
-            {
-                transaction = await connection.BeginTransactionAsync();
-            }
+            // ServiceModel
+            BuildServicesModel(ref builder);
 
-            var command = new NpgsqlCommand(sql, connection, transaction);
-            return command;
+            // UserRoleModel
+            BuildUserRoleModel(ref builder);
+
+            // RestaurantModel
+            BuildRestaurantModel(ref builder);
+
+            // TimeTableModel
+            BuildTimeTableModel(ref builder);
+
+            // DishModel
+            BuildDishModel(ref builder);
+
+            // OrderModel
+            BuildOrderModel(ref builder);
+
+            // OrderedDishes
+            BuildOrderedDishes(ref builder);
+
+            // ReservationModel
+            BuildReservationModel(ref builder);
+
+            // CuponModel
+            BuildCuponModel(ref builder);
         }
 
-
-
-        public static async void Setup() {
-            string sql = """
-                CREATE TABLE IF NOT EXISTS "Users" (
-                    "Id" SERIAL PRIMARY KEY,
-                    "Username" VARCHAR(100) NOT NULL,
-                    "Password" VARCHAR(64) NOT NULL,
-                    "Image" VARCHAR(255),
-                    "Address" TEXT NOT NULL,
-                    "City" VARCHAR(100) NOT NULL,
-                    "State" VARCHAR(100),
-                    "Country" VARCHAR(100) NOT NULL,
-                    "PhoneNumber" VARCHAR(15),
-                    "Email" VARCHAR(50) NOT NULL UNIQUE,
-                    "Notes" VARCHAR(255),
-                    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-                );
-
-                CREATE TABLE IF NOT EXISTS "Restorant" (
-                    "Id" SERIAL PRIMARY KEY,
-                    "RestorantAddress" TEXT NOT NULL,
-                    "RestorantCity" VARCHAR(100) NOT NULL,
-                    "RestorantState" VARCHAR(100),
-                    "RestorantCountry" VARCHAR(100) NOT NULL,
-                    "DoDelivery" BOOL NOT NULL,
-                    "ServeCustomersInPlace" BOOL NOT NULL,
-                    "ReservationMaxChildren" SMALLINT NOT NULL DEFAULT -1,
-                    "ReservationMinChildren" SMALLINT NOT NULL DEFAULT 0,
-                    "ReservationMaxAdults" SMALLINT NOT NULL DEFAULT -1,
-                    "ReservationMinAdults" SMALLINT NOT NULL DEFAULT 1
-                );
-
-                CREATE TABLE IF NOT EXISTS "Services" (
-                    "Role" VARCHAR(100) NOT NULL,
-                    "Service" VARCHAR(100) NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS "Roles" (
-                    "UserId" INT REFERENCES "Users"("Id") NOT NULL,
-                    "Role" VARCHAR(100) NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS "TimeTable" (
-                    "RestorantId" INT REFERENCES "Restorant"("Id") NOT NULL,
-                    "UserAddress" TEXT NOT NULL,
-                    "UserCity" VARCHAR(100) NOT NULL,
-                    "UserState" VARCHAR(100),
-                    "UserCountry" VARCHAR(100) NOT NULL,
-                    "AvrageDeliverTime" VARCHAR(50) NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS "Dishes" (
-                    "Id" SERIAL PRIMARY KEY,
-                    "Name" VARCHAR(100) NOT NULL,
-                    "Price" NUMERIC(10, 2) NOT NULL,
-                    "Ingredients" TEXT NOT NULL,
-                    "Grams" SMALLINT NOT NULL,
-                    "Type_Of_Dish" VARCHAR(50) NOT NULL,
-                    "IsAvailable" BOOLEAN NOT NULL DEFAULT TRUE,
-                    "RestorantId" INT REFERENCES "Restorant"("Id") NOT NULL,
-                    "AvrageTimeToCook" VARCHAR(20) NOT NULL,
-                    "Image" TEXT
-                );
-
-
-                CREATE TABLE IF NOT EXISTS "Orders" (
-                    "Id" SERIAL PRIMARY KEY,
-                    "CurrentStatus" VARCHAR(100) NOT NULL,
-                    "Notes" VARCHAR(255),
-                    "OrderedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-                    "UserId" INT REFERENCES "Users"("Id") NOT NULL,
-                    "RestorantId" INT REFERENCES "Restorant"("Id") NOT NULL,
-                    "TotalPrice" NUMERIC(10, 2) NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS "OrderedDishes" (
-                    "OrderId" INT REFERENCES "Orders"("Id") NOT NULL,
-                    "DishId" INT REFERENCES "Dishes"("Id") NOT NULL,
-                    "Notes" VARCHAR(255) DEFAULT NULL,
-                    "CurrentStatus" VARCHAR(100) NOT NULL DEFAULT 'pending'
-                );
-
-                CREATE TABLE IF NOT EXISTS "Reservations" (
-                    "Id" SERIAL PRIMARY KEY,
-                    "ReservatorId" INT REFERENCES "Users"("Id"),
-                    "Notes" VARCHAR(255),
-                    "CurrentStatus" VARCHAR(100) NOT NULL,
-                    "RestorantId" INT REFERENCES "Restorant"("Id") NOT NULL,
-                    "Amount_Of_Adults" SMALLINT NOT NULL DEFAULT 0,
-                    "Amount_Of_Children" SMALLINT NOT NULL DEFAULT 0,
-                    "At_Date" TIMESTAMP WITH TIME ZONE NOT NULL,
-                    "Created_At" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-                    "Price_Per_Adult" NUMERIC(10, 2) NOT NULL DEFAULT 0,
-                    "Price_Per_Children" NUMERIC(10, 2) NOT NULL DEFAULT 0
-                );
-
-                CREATE TABLE IF NOT EXISTS "Cupons" (
-                    "CuponCode" VARCHAR(25) NOT NULL UNIQUE,
-                    "DiscountPercent" NUMERIC(10, 2) NOT NULL,
-                    "ExpirationDate" DATE NOT NULL,
-                    "Name" VARCHAR(100) NOT NULL
-                );
-
-                """;
-
-
-            var cmd = await BuildCommand(sql);
-            await cmd.ExecuteNonQueryAsync();
-            cmd.Dispose();
-        }
-
-
-        // the model shall not be null
-        public static async Task<List<object>> ConvertToModels(NpgsqlDataReader reader, object model)
+        private void BuildUserModel(ref ModelBuilder builder)
         {
-            List<object> objects = new List<object>();
-            if (!reader.HasRows)
-            {
-                return objects;
-            }
+            builder.Entity<UserModel>()
+                .HasKey(user => user.Id);
 
-            //DataTable ? dataTable = reader.GetSchemaTable();
+            builder.Entity<UserModel>()
+                .Property(user => user.Name)
+                .IsRequired();
 
-            // create mapping for the columns
-            Dictionary<string, string> columnMapping = new Dictionary<string, string>();
-            foreach (NpgsqlDbColumn col in reader.GetColumnSchema())
-            {
-                string dataColumnName = col.ColumnName;
-                if (columnMapping.ContainsKey(dataColumnName))
-                {
-                    continue;
-                }
+            builder.Entity<UserModel>()
+                .Property(user => user.Email)
+                .IsRequired();
 
-                if (dataColumnName.Contains('.'))
-                {
-                    columnMapping.Add(dataColumnName, dataColumnName.Split('.')[1]);
+            builder.Entity<UserModel>()
+                .Property(user => user.Image)
+                .HasDefaultValue(null);
 
-                } else
-                {
-                    columnMapping.Add(dataColumnName, dataColumnName);
-                }
-            }
+            builder.Entity<UserModel>()
+                .Property(user => user.Address)
+                .IsRequired();
 
+            builder.Entity<UserModel>()
+                .Property(user => user.City)
+                .IsRequired();
 
-            // while (await reader.ReadAsync())
-            while (await reader.ReadAsync())
-            {
-                object obj = Activator.CreateInstance(model.GetType());
-                // every record
-                foreach (string key in columnMapping.Keys)
-                {
-                    try
-                    {
-                        ObjectUtils.Set_Property_Value(obj,
-                            columnMapping[key], reader[key]);
-                    } catch (Exception) { }
-                }
-                objects.Add(obj);
-            }
-            /*
-            foreach (string property in ObjectUtils.Get_Model_Property_Names(model))
-           {
-               try
-               {
-                  ObjectUtils.Set_Property_Value(obj, property, reader[property.ToLower()]);
-               }
-               catch (Exception)
-               { }
-           }*/
-            return objects;
+            builder.Entity<UserModel>()
+                .Property(user => user.State)
+                .HasDefaultValue(null);
+
+            builder.Entity<UserModel>()
+                .Property(user => user.Country)
+                .IsRequired();
+
+            builder.Entity<UserModel>()
+                .Property(user => user.PhoneNumber)
+                .HasDefaultValue(null);
+
+            builder.Entity<UserModel>()
+                .Property(user => user.Notes)
+                .HasDefaultValue(null);
+
+            builder.Entity<UserModel>()
+                .Property(user => user.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("NOW()");
+
+            builder.Entity<UserModel>()
+                .HasMany(user => user.Roles)
+                .WithOne(userRole => userRole.UserModel)
+                .HasForeignKey(userRole => userRole.UserModelId)
+                .IsRequired();
         }
 
-        public static async Task<NpgsqlCommand?> _ExecuteNonQuery(string sql,
-            bool beginTransaction = false, NpgsqlConnection? connection = null) {
-
-            var cmd = await BuildCommand(sql, connection, beginTransaction);
-            cmd.Prepare();
-
-            int num = await cmd.ExecuteNonQueryAsync();
-
-            if (connection != null || beginTransaction)
-            {
-                return cmd;
-            }
-
-            cmd.Connection?.Close();
-            cmd.Dispose();
-            return null;
+        private void BuildServicesModel(ref ModelBuilder builder) {
+            // URL path = Service
+            // UserRoleModel = User's role whether they can access it or not.
+            builder.Entity<ServiceModel>()
+                .HasKey(service => service.Service);
         }
 
-        public static async Task<ResultSqlQuery> _ExecuteQuery(string sql,
-            object model, bool beginTransaction = false, NpgsqlConnection? connection = null)
+        private void BuildUserRoleModel(ref ModelBuilder builder)
         {
+            // URL path = Service
+            // UserRoleModel = User's role whether they can access it or not.
+            builder.Entity<UserRoleModel>()
+                .HasKey(role => new { role.UserModelId, role.Role });
 
-            ResultSqlQuery res = new ResultSqlQuery();
+            builder.Entity<UserRoleModel>()
+                .Property(user => user.Role)
+                .IsRequired();
 
-            var cmd = await BuildCommand(sql, connection, beginTransaction);
-            cmd.Prepare();
+            builder.Entity<UserRoleModel>()
+                .Property(user => user.UserModelId)
+                .IsRequired();
 
-            using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+            builder.Entity<UserRoleModel>()
+                .HasMany(userRole => userRole.Services)
+                .WithMany(service => service.AllowedRoles)
+                .UsingEntity(j => j.ToTable("RoleServiceAccess"));
+        }
+        
+        private void BuildRestaurantModel(ref ModelBuilder builder)
+        {
+            builder.Entity<RestaurantModel>()
+                .HasKey(restaurant => restaurant.Id);
 
-            List<object> models = await ConvertToModels(reader, model);
-            reader.Close();
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.Address)
+                .IsRequired();
 
-            res.Models = models;
-            res.Cmd = cmd;
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.City)
+                .IsRequired();
 
-            if (connection == null)
-            {
-                cmd.Connection?.Close();
-                cmd.Dispose();
-            }
-            return res;
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.State)
+                .HasDefaultValue(null);
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.Country)
+                .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.DoDelivery)
+                .HasDefaultValue(true);
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.ServeCustomersInPlace)
+                .HasDefaultValue(true);
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.ReservationMaxAdults)
+                .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.ReservationMinAdults)
+                .HasDefaultValue(1);
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.ReservationMaxChildren)
+                .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.ReservationMinChildren)
+                .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.ReservationMinChildren)
+                .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.ReservationMinChildren)
+                .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.Price_Per_Children)
+                .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.Price_Per_Adult)
+                .IsRequired();
+        }
+
+        private void BuildTimeTableModel(ref ModelBuilder bulder)
+        {
+            bulder.Entity<TimeTableModel>()
+                .HasKey(time => time.RestuarantModelId);
+
+            bulder.Entity<TimeTableModel>()
+                .Property(time => time.UserAddress)
+                .IsRequired();
+
+            bulder.Entity<TimeTableModel>()
+                .Property(time => time.UserCity)
+                .IsRequired();
+
+            bulder.Entity<TimeTableModel>()
+                .Property(time => time.UserState)
+                .HasDefaultValue(null);
+
+            bulder.Entity<TimeTableModel>()
+                .Property(time => time.UserCountry)
+                .IsRequired();
+
+            bulder.Entity<TimeTableModel>()
+                .Property(time => time.AvrageDeliverTime)
+                .IsRequired();
+        }
+
+        private void BuildDishModel(ref ModelBuilder builder) {
+            builder.Entity<DishModel>()
+                .HasKey(dish => dish.Id);
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.Name)
+                .IsRequired();
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.Price)
+                .IsRequired();
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.Ingredients)
+                .IsRequired();
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.Grams)
+                .IsRequired();
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.Type_Of_Dish)
+                .IsRequired();
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.IsAvailable)
+                .HasDefaultValue(true);
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.RestaurantModelId)
+                .IsRequired();
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.AvrageTimeToCook)
+                .IsRequired();
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.Image)
+                .HasDefaultValue(null);
+        }
+
+        private void BuildOrderModel(ref ModelBuilder builder) {
+            builder.Entity<OrderModel>()
+                .HasKey(order => order.Id);
+
+            builder.Entity<OrderModel>()
+                .Property(order => order.CurrentStatus)
+                .HasDefaultValue("pending")
+                .IsRequired();
+
+            builder.Entity<OrderModel>()
+                .Property(order => order.Notes)
+                .HasDefaultValue(null);
+
+            builder.Entity<OrderModel>()
+                .Property(order => order.OrderedAt)
+                .IsRequired()
+                .HasDefaultValueSql("NOW()");
+
+            builder.Entity<OrderModel>()
+                .Property(order => order.TotalPrice)
+                .IsRequired();
+
+            builder.Entity<OrderModel>()
+                .Property(order => order.UserModelId)
+                .IsRequired();
+
+            builder.Entity<OrderModel>()
+                .Property(order => order.RestaurantModelId)
+                .IsRequired();
+        }
+
+        private void BuildOrderedDishes(ref ModelBuilder builder) {
+            builder.Entity<OrderedDishesModel>()
+                .Property(order => order.Notes)
+                .HasDefaultValue(null);
+
+            builder.Entity<OrderedDishesModel>()
+                .Property(order => order.CurrentStatus)
+                .HasDefaultValue("preparing")
+                .IsRequired();
+        }
+
+        private void BuildReservationModel(ref ModelBuilder builder)
+        {
+            builder.Entity<ReservationModel>()
+                .HasKey(res => res.Id);
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.Notes)
+                .HasDefaultValue(null);
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.CurrentStatus)
+                .HasDefaultValue("pending")
+                .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.UserModelId)
+                .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.RestaurantModelId)
+                .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.Amount_Of_Adults)
+                .HasDefaultValue(1)
+                .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.Amount_Of_Children)
+                .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.At_Date)
+                .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.Created_At)
+                .HasDefaultValueSql("NOW()")
+                .IsRequired();
+        }
+
+        private void BuildCuponModel(ref ModelBuilder builder) {
+            builder.Entity<CuponModel>()
+                .HasKey(cupon => cupon.CuponCode);
+
+            builder.Entity<CuponModel>()
+                .Property(cupon => cupon.Name)
+                .IsRequired();
+
+            builder.Entity<CuponModel>()
+                .Property(cupon => cupon.DiscountPercent)
+                .IsRequired();
+
+            builder.Entity<CuponModel>()
+                .Property(cupon => cupon.ExpirationDate)
+                .IsRequired();
         }
     }
 }

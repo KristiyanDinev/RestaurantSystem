@@ -1,4 +1,4 @@
-﻿namespace ITStepFinalProject.Models.DatabaseModels {
+﻿namespace RestaurantSystem.Models.DatabaseModels {
     public class DishModel {
 
         public int Id { get; set; }
@@ -10,17 +10,11 @@
         public string Type_Of_Dish { get; set; }
         public bool IsAvailable { get; set; }
         public string AvrageTimeToCook { get; set; }
-        public int RestorantId { get; set; }
-        public string CurrentStatus { get; set; } = "pending";
         public string? Notes { get; set; }
 
 
-        public DishModel()
-        {
-        }
-        public DishModel(int id)
-        {
-            Id = id;
-        }
+
+        public int RestaurantModelId { get; set; }
+        public RestaurantModel RestaurantModel { get; set; }
     }
 }

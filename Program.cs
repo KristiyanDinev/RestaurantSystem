@@ -1,15 +1,14 @@
-using ITStepFinalProject.Controllers;
-using ITStepFinalProject.Controllers.WebSocketHandlers;
-using ITStepFinalProject.Database;
-using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Services;
-using ITStepFinalProject.Utils.Controller;
-using ITStepFinalProject.Utils.Utils;
-using ITStepFinalProject.Utils.Web;
+using RestaurantSystem.Controllers;
+using RestaurantSystem.Database;
+using RestaurantSystem.Database.Handlers;
+using RestaurantSystem.Services;
+using RestaurantSystem.Utils.Controller;
+using RestaurantSystem.Utils.Utils;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 
-namespace ITStepFinalProject
+namespace RestaurantSystem
 {
     public class Program
     {
@@ -35,45 +34,37 @@ namespace ITStepFinalProject
             builder.Services.AddControllersWithViews()
             */
 
+            builder.Services.AddControllersWithViews();
+
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
 
             builder.WebHost.UseUrls([uri]);
 
             // postgresql 17 5432
-            // postgresql 16 5433
-            DatabaseManager._connectionString = 
-                builder.Configuration.GetValue<string>("ConnectionString") ?? "";
 
             string encryption_key = builder.Configuration.GetValue<string>("Encryption_Key") ?? "D471E0624EA5A7FFFABAA918E87";
             string jwt_key = builder.Configuration.GetValue<string>("JWT_Key") ?? "234w13543ewf53erdfa";
-
-            DatabaseManager.Setup();
-
+            
             EncryptionHandler encryptionHandler = new EncryptionHandler(encryption_key);
             JWTHandler jwtHandler = new JWTHandler(jwt_key);
 
+            builder.Services.AddDbContext<DatabaseManager>(options =>
+            {
+                options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString"));
+            });
             builder.Services.AddScoped<UserDatabaseHandler>();
             builder.Services.AddScoped<DishDatabaseHandler>();
+            builder.Services.AddScoped<OrderedDishesDatabaseHandler>();
+            builder.Services.AddScoped<RestaurantDatabaseHandler>();
             builder.Services.AddScoped<CuponDatabaseHandler>();
             builder.Services.AddScoped<OrderDatabaseHandler>();
             builder.Services.AddScoped<ServiceDatabaseHandler>();
             builder.Services.AddScoped<ReservationDatabaseHandler>();
 
-            builder.Services.AddSingleton<WebUtils>(new WebUtils(
-                new Dictionary<string, List<string>>{
-                       {"User", ["{{UserBar}}", "{{Profile}}"]},
-                       {"Dish", ["{{DishDisplay}}", "{{DishCart}}", "{{WholeDish}}",
-                           "{{MinimalDishOrder}}", "{{CookDishes}}"]},
-                       {"Order", ["{{OrderDisplay}}", "{{CookOrders}}"]},
-                       {"Restorant", ["{{RestorantAddress}}", "{{UserStaff}}"] },
-                       {"Reservation", ["{{ReservationDisplay}}"] },
-                }));
-
             builder.Services.AddSingleton<ControllerUtils>();
 
-            builder.Services.AddSingleton<UserUtils>(
-                new UserUtils(encryptionHandler, jwtHandler));
+            builder.Services.AddSingleton<UserUtils>();
 
             builder.Services.AddSingleton<WebSocketHandler>();
 
@@ -91,14 +82,13 @@ namespace ITStepFinalProject
 
             var app = builder.Build();
 
-            var webSocketOptions = new WebSocketOptions
+
+            app.UseWebSockets(new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(2),
-            };
+                AllowedOrigins = { uri }
+            });
 
-            webSocketOptions.AllowedOrigins.Add(uri);
-
-            app.UseWebSockets(webSocketOptions);
             app.UseRateLimiter();
             app.UseRouting();
             app.UseStaticFiles();
@@ -120,7 +110,7 @@ namespace ITStepFinalProject
                 await next(context);
             });
 
-
+            app.MapControllers();
 
             new WebSocketController(app);
             new ReservationsController(app);

@@ -1,11 +1,11 @@
-﻿using ITStepFinalProject.Database.Handlers;
+﻿using RestaurantSystem.Database.Handlers;
 using Microsoft.AspNetCore.Mvc;
-using ITStepFinalProject.Utils.Web;
-using ITStepFinalProject.Utils.Controller;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.Controller;
+using RestaurantSystem.Utils.Web;
+using RestaurantSystem.Utils.Controller;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.Controller;
 
-namespace ITStepFinalProject.Controllers {
+namespace RestaurantSystem.Controllers {
     public class UserController {
 
         // testing user:
@@ -36,7 +36,7 @@ namespace ITStepFinalProject.Controllers {
             app.MapGet("/login", async (HttpContext context, ControllerUtils controllerUtils, 
                 UserDatabaseHandler db, UserUtils userUtils) => {
                     try {
-                        UserModel? user = await userUtils.GetLoginUserFromCookie(context, db);
+                        UserModel? user = await userUtils.LoginByUsingCookie(context, db);
                         string data = await controllerUtils.GetHTMLFromWWWROOT("/login");
 
                         return user == null ? Results.Content(data, "text/html") :
@@ -61,7 +61,7 @@ namespace ITStepFinalProject.Controllers {
                     }
 
                     try {
-                        UserModel? _user = await userUtils.GetUserModelFromAuth(context);
+                        UserModel? _user = await userUtils.GetUserByJWT(context);
                         if (_user != null)
                         {
                             return Results.Redirect("/dishes");
@@ -72,7 +72,7 @@ namespace ITStepFinalProject.Controllers {
                             ?? throw new Exception("Didn't login");
 
                         // the user.Password is hashed
-                        string authString = userUtils.HandleAuth(user, rememberMe);
+                        string authString = userUtils.GenerateJWT(user, rememberMe);
 
                         context.Response.Cookies.Delete(userUtils.authHeader);
                         context.Response.Cookies.Append(userUtils.authHeader, authString);
@@ -91,7 +91,7 @@ namespace ITStepFinalProject.Controllers {
             app.MapGet("/register", async (HttpContext context, ControllerUtils controllerUtils, 
                 UserDatabaseHandler db, UserUtils userUtils) => {
                 try {
-                    UserModel? user = await userUtils.GetLoginUserFromCookie(context, db);
+                    UserModel? user = await userUtils.LoginByUsingCookie(context, db);
                     string data = await controllerUtils.GetHTMLFromWWWROOT("/register");
 
                     return user == null ? Results.Content(data, "text/html") :
@@ -121,7 +121,7 @@ namespace ITStepFinalProject.Controllers {
 
                     try {
 
-                        UserModel? _user = await userUtils.GetLoginUserFromCookie(context, db);
+                        UserModel? _user = await userUtils.LoginByUsingCookie(context, db);
                         if (_user != null)
                         {
                             return Results.Redirect("/dishes");
@@ -150,7 +150,7 @@ namespace ITStepFinalProject.Controllers {
                         }
 
                         // the user.Password is hashed
-                        string authString = userUtils.HandleAuth(user, registerUserModel.RememberMe);
+                        string authString = userUtils.GenerateJWT(user, registerUserModel.RememberMe);
 
                         context.Response.Cookies.Delete(userUtils.authHeader);
                         context.Response.Cookies.Append(userUtils.authHeader, authString);
@@ -200,13 +200,13 @@ namespace ITStepFinalProject.Controllers {
                         return Results.BadRequest();
                     }
 
-                    UserModel? model = await userUtils.GetUserModelFromAuth(context);
+                    UserModel? model = await userUtils.GetUserByJWT(context);
                     if (model == null)
                     {
                         return Results.Redirect("/login");
                     }
 
-                    string Username = !model.Username.Equals(updateUserModel.Username) ? updateUserModel.Username : model.Username;
+                    string Username = !model.Name.Equals(updateUserModel.Username) ? updateUserModel.Username : model.Name;
                     
                     string Address = !model.Address.Equals(updateUserModel.Address) ? updateUserModel.Address : model.Address;
                     string City = !model.City.Equals(updateUserModel.City) ? updateUserModel.City : model.City;
@@ -242,7 +242,7 @@ namespace ITStepFinalProject.Controllers {
                     user.Address = Address;
                     user.State = State;
                     user.City = City;
-                    user.Username = Username;
+                    user.Name = Username;
                     user.Country = Country;
                     user.Notes = Notes;
                     user.Image = Image;
@@ -253,7 +253,7 @@ namespace ITStepFinalProject.Controllers {
 
                     await db.UpdateUser(user);
 
-                    string authString = userUtils.HandleAuth(user, "off");
+                    string authString = userUtils.GenerateJWT(user, "off");
 
                     context.Response.Cookies.Delete(userUtils.authHeader);
                     context.Response.Cookies.Append(userUtils.authHeader, authString);

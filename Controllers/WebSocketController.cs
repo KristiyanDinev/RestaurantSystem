@@ -1,7 +1,7 @@
-﻿using ITStepFinalProject.Controllers.WebSocketHandlers;
-using ITStepFinalProject.Database.Handlers;
+﻿using RestaurantSystem.Database.Handlers;
+using RestaurantSystem.Controllers;
 
-namespace ITStepFinalProject.Controllers
+namespace RestaurantSystem.Controllers
 {
     public class WebSocketController
     {

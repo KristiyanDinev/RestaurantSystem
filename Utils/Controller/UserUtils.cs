@@ -1,82 +1,75 @@
-﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Utils.Utils;
+﻿using RestaurantSystem.Database.Handlers;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Utils.Utils;
 using System.Security.Claims;
 
-namespace ITStepFinalProject.Utils.Controller
+namespace RestaurantSystem.Utils.Controller
 {
     public class UserUtils
     {
-        private EncryptionHandler _encryptionHandler;
-        private JWTHandler _jwtHandler;
+        private EncryptionHandler _EncryptionHandler;
+        private JWTHandler _JWTHandler;
+        private UserDatabaseHandler _UserDatabaseHandler;
 
-        public readonly string authHeader = "Auth";
-        public UserUtils(EncryptionHandler encryptionHandler, JWTHandler jwtHandler)
+        public readonly string authHeader = "Authorization";
+
+        public UserUtils(EncryptionHandler encryptionHandler, JWTHandler jwtHandler,
+            UserDatabaseHandler UserDatabaseHandler)
         {
-            _encryptionHandler = encryptionHandler;
-            _jwtHandler = jwtHandler;
+            _EncryptionHandler = encryptionHandler;
+            _JWTHandler = jwtHandler;
+            _UserDatabaseHandler = UserDatabaseHandler;
         }
 
-        // <summary>The Password in the model can be hashed</summary>
-        public string HandleAuth(UserModel model, string remeberMe)
+        /*
+         * A clean and easy way to extract the JWT from the header.
+         */
+
+        private string? _ExtractJWTFromHeader(string? header)
+        {
+            return header != null && header.StartsWith("Bearer ") ? header.Substring(7) : null;
+        }
+
+        /*
+         * Generates a JWT:
+         * Claims: "Id": model.Id
+         * Based on the `remember me` option (if `remember me` is "off")
+         * it specifies an experation date of 1 day.
+         */
+        public string GenerateJWT(UserModel model, string remeberMe)
         {
             List<Claim> claims = new List<Claim>();
-            foreach (string property in ObjectUtils.Get_Model_Property_Names(model))
-            {
-                claims.Add(new Claim(property,
-                    Convert.ToString(ObjectUtils.Get_Property_Value(model, property) ?? "")));
-            }
+            claims.Add(new Claim("Id", model.Id.ToString()));
 
-            return _encryptionHandler.Encrypt(
-                _jwtHandler.GenerateJwtToken(claims,
+            return _EncryptionHandler.Encrypt(
+                _JWTHandler.GenerateJwtToken(claims,
 
                 remeberMe.Equals("off") ? DateTime.Now.AddDays(1.0) : null)
                 );
         }
 
-        public async Task<UserModel?> GetLoginUserFromCookie(HttpContext context,
-            UserDatabaseHandler userDB)
+        /*
+         * Extracts the JWT from the "Authorization" header.
+         * Decrypts the JWT.
+         * Verifies the JWT.
+         * Gets the JWT claims.
+         * 
+         * Checks if the claims are valid.
+         * Returns the users based on the provided JWT.
+         */
+        public async Task<UserModel?> GetUserByJWT(HttpContext context)
         {
-            try
-            {
-                UserModel? user = await GetUserModelFromAuth(context);
-                return user == null ? null : await userDB.LoginUser(user, false);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
+            Dictionary<string, object>? claims = await _JWTHandler.VerifyJWT(
+                   _EncryptionHandler.Decrypt(
+                       _ExtractJWTFromHeader(context.Request.Cookies[authHeader]
+                       )));
 
-        public async Task<UserModel?> GetUserModelFromAuth(HttpContext context)
-        {
-            Dictionary<string, object>? claims = await _jwtHandler.VerifyJWT(
-                   _encryptionHandler.Decrypt(context.Request.Cookies[authHeader]));
-
-            if (claims == null)
-            {
+            if (claims == null || !claims.ContainsKey("Id") ||
+                !int.TryParse(claims["Id"].ToString(), out int Id)) {
                 return null;
             }
 
-            UserModel userModel = new UserModel();
-            foreach (string property in ObjectUtils.Get_Model_Property_Names(userModel))
-            {
-                ObjectUtils.Set_Property_Value(userModel, property, claims[property]);
-            }
-            /*
-            userModel.Id = int.Parse(claims["Id"].ToString());
-            userModel.Notes = claims["Notes"].ToString();
-            userModel.Email = claims["Email"].ToString();
-            userModel.Username = claims["Username"].ToString();
-            userModel.Image = claims["Image"].ToString();
-            userModel.Address = claims["Address"].ToString();
-            userModel.City = claims["City"].ToString();
-            userModel.State = claims["State"].ToString();
-            userModel.Country = claims["Country"].ToString();
-            userModel.PhoneNumber = claims["PhoneNumber"].ToString();
-            userModel.Password = claims["Password"].ToString();*/
-            return userModel;
+            return await _UserDatabaseHandler.GetUser(Id);
         }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace ITStepFinalProject.Models.DatabaseModels {
+﻿namespace RestaurantSystem.Models.DatabaseModels {
+
     public class CuponModel {
 
         public string Name { get; set; }

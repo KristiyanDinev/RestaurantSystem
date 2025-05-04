@@ -1,10 +1,10 @@
-﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.WebModels;
-using ITStepFinalProject.Utils.Controller;
-using ITStepFinalProject.Utils.Web;
+﻿using RestaurantSystem.Database.Handlers;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.WebModels;
+using RestaurantSystem.Utils.Controller;
+using RestaurantSystem.Utils.Web;
 
-namespace ITStepFinalProject.Controllers
+namespace RestaurantSystem.Controllers
 {
     public class CartController
     {
@@ -25,7 +25,7 @@ namespace ITStepFinalProject.Controllers
                         return Results.Redirect("/dishes");
                     }
 
-                    UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                    UserModel? user = await userUtils.GetUserByJWT(context);
                     if (user == null)
                     {
                         return Results.Redirect("/login");

@@ -1,7 +1,7 @@
-﻿using ITStepFinalProject.Models.DatabaseModels;
+﻿using RestaurantSystem.Models.DatabaseModels;
 using System.Text;
 
-namespace ITStepFinalProject.Utils.Controller
+namespace RestaurantSystem.Utils.Controller
 {
     public class OrderUtils
     {

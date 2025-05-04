@@ -1,10 +1,10 @@
-﻿using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.WebModels;
-using ITStepFinalProject.Utils.Utils;
-using ITStepFinalProject.Utils.Web;
+﻿using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.WebModels;
+using RestaurantSystem.Utils.Utils;
+using RestaurantSystem.Utils.Web;
 using System.Text;
 
-namespace ITStepFinalProject.Utils.Controller {
+namespace RestaurantSystem.Utils.Controller {
     public class ControllerUtils
     {
 
@@ -110,7 +110,7 @@ namespace ITStepFinalProject.Utils.Controller {
         {
             try
             {
-                UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                UserModel? user = await userUtils.GetUserByJWT(context);
                 if (user == null)
                 {
                     return Results.Redirect("/login");

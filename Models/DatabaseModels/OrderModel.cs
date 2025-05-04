@@ -1,4 +1,4 @@
-﻿namespace ITStepFinalProject.Models.DatabaseModels {
+﻿namespace RestaurantSystem.Models.DatabaseModels {
     public class OrderModel {
 
         public int Id { get; set; }
@@ -7,10 +7,13 @@
         public DateTime OrderedAt { get; set; }
         public decimal TotalPrice { get; set; }
 
-        public int UserId { get; set; }
-        public int RestorantId { get; set; }
 
-        public OrderModel() { }
+        public int UserModelId { get; set; }
+        public UserModel UserModel { get; set; }
 
+
+
+        public int RestaurantModelId { get; set; }
+        public RestaurantModel RestaurantModel { get; set; }
     }
 }

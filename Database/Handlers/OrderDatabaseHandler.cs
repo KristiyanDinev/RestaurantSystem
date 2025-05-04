@@ -1,226 +1,83 @@
-﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Models.WebModels;
-using ITStepFinalProject.Utils.Controller;
-using Npgsql;
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Models.DatabaseModels;
 
-namespace ITStepFinalProject.Database.Handlers
+namespace RestaurantSystem.Database.Handlers
 {
     public class OrderDatabaseHandler
     {
-        private static readonly string table = "Orders";
-        private static readonly string tableRestorant = "Restorant";
-        private static readonly string tableOrderedDishes = "OrderedDishes";
-        private static readonly string tableTimeTable = "TimeTable";
-        private static readonly string tableDishes = "Dishes";
 
-        public async Task AddOrder(int userId, List<int> dishesId, OrderModel order, 
-            ControllerUtils utils)
+        private DatabaseManager _databaseManager;
+        private OrderedDishesDatabaseHandler _orderedDishesDatabaseHandler;
+
+        public OrderDatabaseHandler(DatabaseManager databaseManager, OrderedDishesDatabaseHandler orderedDishesDatabaseHandler)
         {
-            order.CurrentStatus = utils.DBStatus;
+            _databaseManager = databaseManager;
+            _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;
+        }
 
-            NpgsqlCommand cmd = await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Insert(table, [order], ["Id", "OrderedAt"]).ToString(), true) 
-                ?? throw new Exception();
-            
-            int? orderId = null;
-            try
+        public async Task AddOrder(int userId, int restaurantId,
+            List<int> dishesId, string? notes, decimal totalPrice)
+        {
+            OrderModel order = new OrderModel();
+            order.Notes = notes;
+            order.RestaurantModelId = restaurantId;
+            order.TotalPrice = totalPrice;
+            order.UserModelId = userId;
+
+            await _databaseManager.Orders.AddAsync(order);
+
+            await _databaseManager.SaveChangesAsync();
+
+            foreach (int id in dishesId)
             {
-                ResultSqlQuery ordersIdQ = await DatabaseManager._ExecuteQuery(
-                    new SqlBuilder().Select("Id", table)
-                    .Where()
-                    .BuildCondition("UserId", userId, "=", "AND")
-                    .BuildCondition("CurrentStatus", "'"+utils.DBStatus+"'")
-                    .ToString(), new OrderModel(), false, cmd.Connection);
-
-                orderId = ((OrderModel)ordersIdQ.Models[0]).Id;
-
-
-                List<OrderedDishesModel> orderedDishes = new List<OrderedDishesModel>();
-                foreach (int dishId in dishesId)
-                {
-                    orderedDishes.Add(new OrderedDishesModel((int)orderId, dishId));
-                }
-
-                
-                await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                    .Insert(tableOrderedDishes, 
-                    orderedDishes.Cast<object>().ToList(), 
-                    ["CurrentStatus"]).ToString(), false, cmd.Connection);
-
-                cmd.Transaction?.Commit();
-
-            } catch (Exception)
-            {
-                cmd.Transaction?.Rollback();
-                throw;
+                await _orderedDishesDatabaseHandler.CreateOrderedDish(id, order.Id, null, false);
             }
 
-            await UpdateOrderCurrentStatusById((int)orderId, utils.PendingStatus);
+            await _databaseManager.SaveChangesAsync();
         }
 
-        public async Task DeleteOrder(int orderId, UserModel user)
+        public async Task DeleteOrder(int orderId)
         {
-            await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Delete(tableOrderedDishes)
-                .Where()
-                .BuildCondition("OrderId", orderId)
-                .ToString());
+            OrderModel? order = await _databaseManager.Orders.FirstOrDefaultAsync(
+                o => o.Id == orderId);
 
-            await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Delete(table)
-                .Where()
-                .BuildCondition("Id", orderId, "=", "AND ")
-                .BuildCondition("UserId", user.Id)
-                .ToString());
-        }
-
-        public async Task UpdateOrderCurrentStatusById(int orderId, string newStatus)
-        {
-
-            await DatabaseManager._ExecuteNonQuery(
-                new SqlBuilder()
-                .Update(table)
-
-                .Set()
-                .BuildCondition("CurrentStatus", "'"+newStatus+"'")
-
-                .Where()
-                .BuildCondition("Id", orderId)
-                .ToString()
-                );
-        }
-
-        public async Task<List<DisplayOrderModel>> GetOrdersByUser(int userId)
-        {
-            ResultSqlQuery orderObj = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder().Select("*", table)
-                .Join(tableRestorant, "INNER")
-                .On()
-                .BuildCondition(tableRestorant+".Id", '"'+table + "\".\"RestorantId\"")
-
-                .Where()
-                .BuildCondition("UserId", userId)
-                .ToString(), new DisplayOrderModel());
-
-            return orderObj.Models.Cast<DisplayOrderModel>().ToList();
-        }
-
-        public async Task<string?> GetOrder_CurrentStatus_ById(int orderId)
-        {
-
-            ResultSqlQuery results = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("CurrentStatus", table)
-                .Where()
-                .BuildCondition("Id", orderId)
-                .ToString(), new OrderModel());
-
-            return results.Models.Count == 0 ? null : ((OrderModel)results.Models[0]).CurrentStatus;
-        }
-
-        public async Task<List<DishModel>> GetAllDishesFromOrder(int orderId)
-        {
-            ResultSqlQuery objs = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("*", tableDishes)
-                .Join(tableOrderedDishes, "INNER")
-
-                .On()
-                .BuildCondition(tableOrderedDishes + ".DishId", '"' + tableDishes+"\".\"Id\"")
-
-                .Where()
-                .BuildCondition(tableOrderedDishes + ".OrderId", orderId)
-
-                .ToString(), new DishModel());
-
-            return objs.Models.Cast<DishModel>().ToList();
-        }
-
-
-        public async Task<List<TimeTableJoinRestorantModel>> GetRestorantsAddressesForUser(UserModel user)
-        {
-            string city = ValueHandler.Strings(user.City);
-            string country = ValueHandler.Strings(user.Country);
-
-            SqlBuilder sqlBuilder = new SqlBuilder()
-                .Select("*", tableTimeTable)
-                .Join(tableRestorant, "INNER")
-                .On()
-                .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
-
-                .Where()
-                .BuildCondition("DoDelivery", "'1'", "=", "AND")
-                .BuildCondition("UserCity", city, "=", "AND")
-                .BuildCondition("RestorantCity", city, "=", "AND")
-                .BuildCondition("UserCountry", country, "=", "AND")
-                .BuildCondition("RestorantCountry", country, "=", "AND")
-                .BuildCondition("UserAddress", ValueHandler.Strings('%' + user.Address + '%'), "LIKE", "AND");
-
-            string state = ValueHandler.Strings(user.State);
-            if (state.Equals("null"))
+            if (order == null)
             {
-                sqlBuilder.BuildCondition("UserState", "NULL", "IS", "AND");
-                sqlBuilder.BuildCondition("RestorantState", "NULL", "IS");
-
-            } else
-            {
-                sqlBuilder.BuildCondition("UserState", state, "=", "AND");
-                sqlBuilder.BuildCondition("RestorantState", state, "=");
+                return;
             }
 
-            ResultSqlQuery objs = await DatabaseManager._ExecuteQuery(sqlBuilder
-                .ToString(), new TimeTableJoinRestorantModel());
+            await _orderedDishesDatabaseHandler.DeleteOrderedDishes(orderId);
 
-            return objs.Models.Cast<TimeTableJoinRestorantModel>().ToList();
+            _databaseManager.Orders.Remove(order);
+
+            await _databaseManager.SaveChangesAsync();
         }
 
-        public async Task<TimeTableJoinRestorantModel> GetRestorantAddressById(int id)
+        public async Task UpdateOrderCurrentStatusById(int orderId, string status)
         {
-            ResultSqlQuery objs = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder()
-                .Select("*", tableTimeTable)
-                .Join(tableRestorant, "INNER")
-                .On()
-                .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
+            OrderModel? order = await _databaseManager.Orders.FirstOrDefaultAsync(
+                o => o.Id == orderId);
 
-                .Where()
-                .BuildCondition("RestorantId", id)
-                .ToString(), new TimeTableJoinRestorantModel());
+            if (order == null)
+            {
+                return;
+            }
 
-            return (TimeTableJoinRestorantModel)objs.Models[0];
+            order.CurrentStatus = status;
+
+            await _databaseManager.SaveChangesAsync();
         }
 
-        public async Task<List<TimeTableJoinRestorantModel>> GetRestorantAddressesWhere_DishId_IsAvailable(int dishId)
+        public async Task<List<OrderModel>> GetOrdersByUser(int userId)
         {
-            ResultSqlQuery objs = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder()
-                .Select("*", tableTimeTable)
-
-                .Join(tableRestorant, "INNER")
-                .On()
-                .BuildCondition(tableRestorant + ".Id", '"' + tableTimeTable + "\".\"RestorantId\"")
-
-                .Join(tableDishes, "INNER")
-                .On()
-                .BuildCondition(tableDishes + ".RestorantId",   '"' +tableRestorant + "\".\"Id\"")
-
-
-                .Where()
-                .BuildCondition(tableDishes + ".Id", dishId, "=", "AND ")
-                .BuildCondition(tableDishes + ".IsAvailable", "'1'")
-                .ToString(), new TimeTableJoinRestorantModel());
-
-            return objs.Models.Cast<TimeTableJoinRestorantModel>().ToList();
+            return await _databaseManager.Orders.Where(
+                order => order.UserModelId == userId)
+                .ToListAsync();
         }
 
-        public async Task<List<OrderModel>> GetOrdersByRestorantId(int restorantId)
+        public async Task<OrderModel?> GetOrderById(int orderId)
         {
-            ResultSqlQuery sql = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder().Select("*", table)
-                .Where()
-                .BuildCondition("RestorantId", restorantId).ToString(), new OrderModel());
-
-            return sql.Models.Cast<OrderModel>().ToList();
+            return await _databaseManager.Orders.FirstOrDefaultAsync(order => order.Id == orderId);
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿namespace ITStepFinalProject.Models.DatabaseModels
+﻿namespace RestaurantSystem.Models.DatabaseModels
 {
     public class ServiceModel
     {
-        public string Role { get; set; }
+
         public string Service { get; set; }
+
+        public ICollection<UserRoleModel> AllowedRoles { get; set; }
     }
 }

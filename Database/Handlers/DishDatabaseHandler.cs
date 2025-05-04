@@ -1,68 +1,60 @@
-﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Models.DatabaseModels;
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Models.DatabaseModels;
 
-namespace ITStepFinalProject.Database.Handlers
+namespace RestaurantSystem.Database.Handlers
 {
     public class DishDatabaseHandler
     {
-        private static readonly string table = "Dishes";
-        private static readonly string tableOrderedDishes = "OrderedDishes";
-        public async Task<List<DishModel>> GetDishes(string type, int restorantId)
-        {
-            ResultSqlQuery objects = await DatabaseManager.
-                _ExecuteQuery(new SqlBuilder().Select("*", table)
-                .Where()
-                .BuildCondition("Type_Of_Dish", ValueHandler.Strings(type), "=", "AND ")
-                .BuildCondition("RestorantId", restorantId)
-                .ToString(), new DishModel());
+        private DatabaseManager _databaseManager;
+        public DishDatabaseHandler(DatabaseManager databaseManager) {
+            _databaseManager = databaseManager;
+        }
 
-            return objects.Models.Cast<DishModel>().ToList();
+        public async Task<List<DishModel>> GetDishes(string type, int restaurantId)
+        {
+            return await _databaseManager.Dishies.Where(
+                dish => dish.Type_Of_Dish.Equals(type) && dish.RestaurantModelId == restaurantId)
+                .ToListAsync();
         }
 
         public async Task<List<DishModel>> GetDishesByIds(List<int> IDs)
         {
-            ResultSqlQuery dishes =
-                await DatabaseManager._ExecuteQuery(new SqlBuilder().Select("*", table)
-                .Where()
-                .BuildCondition("Id", "(" + string.Join(", ", IDs) + ")", "IN")
-                .ToString(), new DishModel());
-
-            return dishes.Models.Cast<DishModel>().ToList();
+            return await _databaseManager.Dishies.Where(
+                dish => IDs.Contains(dish.Id))
+                .ToListAsync();
         }
 
-        public async Task UpdateDishStatusById(int id, string status)
+        public async Task<DishModel> CreateDish(string name, string type,
+            decimal price, int restaurantModelId, string ingredients, string avrageTimeToCook, 
+            int grams, string? notes, string? image, bool isAvailable)
         {
-            await DatabaseManager._ExecuteNonQuery(
-                new SqlBuilder()
-                .Update(tableOrderedDishes)
-                .Set()
-                .BuildCondition("CurrentStatus", ValueHandler.Strings(status))
-                .Where()
-                .BuildCondition("DishId", id).ToString());
+            DishModel dish = new DishModel();
+            dish.Name = name;
+            dish.Type_Of_Dish = type;
+            dish.Price = price;
+            dish.RestaurantModelId = restaurantModelId;
+            dish.Ingredients = ingredients;
+            dish.AvrageTimeToCook = avrageTimeToCook;
+            dish.Grams = grams;
+            dish.IsAvailable = isAvailable;
+            dish.Notes = notes;
+            dish.Image = image;
+
+            await _databaseManager.Dishies.AddAsync(dish);
+
+            await _databaseManager.SaveChangesAsync();
+
+            return dish;
         }
 
-        public async Task<string?> GetSameCurrentStatusForAllDishesByOrderId(int orderId)
+        public async Task DeleteDish(int id)
         {
-            ResultSqlQuery res = await DatabaseManager._ExecuteQuery(new SqlBuilder()
-                .Select("CurrentStatus", tableOrderedDishes)
-                .Where()
-                .BuildCondition("OrderId", orderId).ToString(), new OrderedDishesModel());
-            string? status = null;
-            foreach (OrderedDishesModel model in res.Models.Cast<OrderedDishesModel>())
-            {
-                if (status == null)
-                {
-                    status = model.CurrentStatus;
-                    continue;
-                }
-                if (!status.Equals(model.CurrentStatus))
-                {
-                    status = null;
-                    break;
-                }
-            }
-            return status;
+            DishModel? dish = await _databaseManager.Dishies.FirstOrDefaultAsync(
+                d => d.Id == id) ?? throw new Exception("Dish doesn't exist.");
+
+            _databaseManager.Dishies.Remove(dish);
+
+            await _databaseManager.SaveChangesAsync();
         }
     }
 }

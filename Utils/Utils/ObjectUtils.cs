@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace ITStepFinalProject.Utils.Utils
+namespace RestaurantSystem.Utils.Utils
 {
     public class ObjectUtils
     {

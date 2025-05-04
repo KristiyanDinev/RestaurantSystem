@@ -1,17 +1,14 @@
-﻿namespace ITStepFinalProject.Models.DatabaseModels
+﻿namespace RestaurantSystem.Models.DatabaseModels
 {
     public class OrderedDishesModel
     {
-        public int OrderId { get; set; }
-        public int DishId { get; set; }
+        public int OrderModelId { get; set; }
+        public OrderModel OrderModel { get; set; }
+
+        public int DishModelId { get; set; }
+        public DishModel DishModel { get; set; }
+
         public string? Notes { get; set; }
         public string CurrentStatus { get; set; }
-
-        public OrderedDishesModel() { }
-        public OrderedDishesModel(int orderId, int dishId)
-        {
-            OrderId = orderId;
-            DishId = dishId;
-        }
     }
 }

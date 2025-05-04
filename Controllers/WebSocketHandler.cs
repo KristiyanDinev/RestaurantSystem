@@ -1,8 +1,8 @@
-﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models;
+﻿using RestaurantSystem.Database.Handlers;
+using RestaurantSystem.Utils;
 using System.Net.WebSockets;
 
-namespace ITStepFinalProject.Controllers.WebSocketHandlers
+namespace RestaurantSystem.Controllers
 {
     public class WebSocketHandler
     {
@@ -116,7 +116,7 @@ namespace ITStepFinalProject.Controllers.WebSocketHandlers
 
             Console.WriteLine("\nNew WebSocket Connection.");
 
-            subscribtionModel.WhileOpen(async (WebSocket socket) =>
+            subscribtionModel.WhileOpen(async (socket) =>
             {
                 string text = await subscribtionModel.ReceiveTextFromClient() ?? "";
                 if (text.Length == 0)

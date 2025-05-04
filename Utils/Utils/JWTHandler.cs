@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ITStepFinalProject.Utils.Utils {
+namespace RestaurantSystem.Utils.Utils {
     public class JWTHandler {
         private JwtSecurityTokenHandler jwt;
         private SecurityKey key;

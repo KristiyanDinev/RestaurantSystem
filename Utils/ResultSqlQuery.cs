@@ -1,6 +1,6 @@
 ﻿using Npgsql;
 
-namespace ITStepFinalProject.Models
+namespace RestaurantSystem.Utils
 {
     public class ResultSqlQuery
     {

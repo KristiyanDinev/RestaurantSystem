@@ -29,34 +29,7 @@ The `CurrectStatus` will be `stopped` if it got cancelled by the user only when 
 - If you want to disable reservations then set `ReservationMaxAdults` and `ReservationMaxChildren` to `0` and `ReservationMinAdults` and `ReservationMinChildren` to `-1`
  This can be done from the UI as planned or from the database.
 
-### Notes
-- In text files the property names of the Model will be replaced 
-Ex: `{{User.__Id}}` -> `1`: If there is no data or error the `{{property}}` 
-will be removed as a string from the file. There is prefix of that property Like `{{User.property}}`.
-The `User` is the model name.
-
-- Global elements to replace in static files. User bar -> `{{UserBar}}`. 
- This can be replaced by a html component which the server generates.
-
-- See the `Orders`'s `CurrentStatus` in the DB notes.
-
-- `Auth` header will contain a encrypted JWT token representing the user's data.
-
-- If statement supported for comparing numbers and lenght of strings. Example:
-```
-{% if "{{User.Image}}".length > 0 %}
-    <img src="{{User.Image}}">
-
-{% elseif "{{User.Image}}".length == 0 %}
-   <img>
-{% else %}
-    <p>idk</p>
-{% endif %}
-```
-You open it with `{% if ... %}` and close it with `{% endif %}`. The `{% elseif ... %}` and `{% else %}` is optional
-
-- Added transactions to the database
 
 ### TODO
 - Staff page for seeing orders, reservations and updating / cancelling them.
-- Admin page for adding staff.
+- Admin page for adding staff. 

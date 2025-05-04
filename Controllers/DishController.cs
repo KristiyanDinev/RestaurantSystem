@@ -1,10 +1,10 @@
-﻿using ITStepFinalProject.Database.Handlers;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Utils.Controller;
-using ITStepFinalProject.Utils.Web;
+﻿using RestaurantSystem.Database.Handlers;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Utils.Controller;
+using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ITStepFinalProject.Controllers {
+namespace RestaurantSystem.Controllers {
     public class DishController {
 
         public DishController(WebApplication app) {
@@ -17,7 +17,7 @@ namespace ITStepFinalProject.Controllers {
 
                 try
                 {
-                    UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                    UserModel? user = await userUtils.GetUserByJWT(context);
                     if (user == null)
                     {
                         return Results.Redirect("/login");
@@ -59,7 +59,7 @@ namespace ITStepFinalProject.Controllers {
                             return Results.Redirect("/dishes");
                         }
 
-                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                        UserModel? user = await userUtils.GetUserByJWT(context);
                         if (user == null)
                         {
                             return Results.Redirect("/login");
@@ -99,7 +99,7 @@ namespace ITStepFinalProject.Controllers {
                             return Results.Redirect("/dishes");
                         }
 
-                        UserModel? user = await userUtils.GetUserModelFromAuth(context);
+                        UserModel? user = await userUtils.GetUserByJWT(context);
                         if (user == null)
                         {
                             return Results.Redirect("/login");

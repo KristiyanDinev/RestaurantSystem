@@ -1,29 +1,52 @@
-﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Models.DatabaseModels;
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Models.DatabaseModels;
 
-namespace ITStepFinalProject.Database.Handlers
+namespace RestaurantSystem.Database.Handlers
 {
     public class CuponDatabaseHandler
     {
-        private static readonly string table = "Cupons";
+        private DatabaseManager _databaseManager;
+
+        public CuponDatabaseHandler(DatabaseManager databaseManager)
+        {
+            _databaseManager = databaseManager;
+        }
+
+
         public async void DeleteCupon(string cuponCode)
         {
-            await DatabaseManager._ExecuteNonQuery(new SqlBuilder()
-                .Delete(table)
-                .Where()
-                .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode)).ToString());
+            CuponModel? cupon = await GetCuponByCode(cuponCode);
+
+            if (cupon == null)
+            {
+                return;
+            }
+
+            _databaseManager.Cupons.Remove(cupon);
+
+            await _databaseManager.SaveChangesAsync();
         }
 
         public async Task<CuponModel?> GetCuponByCode(string cuponCode)
         {
-            ResultSqlQuery res = await DatabaseManager._ExecuteQuery(
-                new SqlBuilder().Select("*", table)
-                .Where()
-                .BuildCondition("CuponCode", ValueHandler.Strings(cuponCode))
-                .ToString(), new CuponModel());
+            return await _databaseManager.Cupons.FirstOrDefaultAsync<CuponModel>(
+                c => c.CuponCode == cuponCode);
+        }
 
-            return res.Models.Count == 0 ? null : (CuponModel)res.Models[0];
+        public async Task<CuponModel> CreateCupon(string cuponCode, string name,
+            DateTime expirationDate, decimal discountPercent)
+        {
+            CuponModel cupon = new CuponModel();
+            cupon.ExpirationDate = expirationDate;
+            cupon.DiscountPercent = discountPercent;
+            cupon.CuponCode = cuponCode;
+            cupon.Name = name;
+
+            await _databaseManager.Cupons.AddAsync(cupon);
+
+            await _databaseManager.SaveChangesAsync();
+
+            return cupon;
         }
     }
 }

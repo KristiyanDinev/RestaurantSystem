@@ -1,9 +1,9 @@
-﻿using ITStepFinalProject.Database.Utils;
-using ITStepFinalProject.Models;
-using ITStepFinalProject.Models.DatabaseModels;
-using ITStepFinalProject.Utils.Utils;
+﻿using RestaurantSystem.Database.Utils;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Utils;
+using RestaurantSystem.Utils.Utils;
 
-namespace ITStepFinalProject.Database.Handlers
+namespace RestaurantSystem.Database.Handlers
 {
     public class UserDatabaseHandler
     {
