@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 
-namespace RestaurantSystem.Database.Handlers
+namespace RestaurantSystem.Services
 {
-    public class CuponDatabaseHandler
+    public class CuponService
     {
-        private DatabaseManager _databaseManager;
+        private DatabaseContext _databaseManager;
 
-        public CuponDatabaseHandler(DatabaseManager databaseManager)
+        public CuponService(DatabaseContext databaseManager)
         {
             _databaseManager = databaseManager;
         }
@@ -29,7 +30,7 @@ namespace RestaurantSystem.Database.Handlers
 
         public async Task<CuponModel?> GetCuponByCode(string cuponCode)
         {
-            return await _databaseManager.Cupons.FirstOrDefaultAsync<CuponModel>(
+            return await _databaseManager.Cupons.FirstOrDefaultAsync(
                 c => c.CuponCode == cuponCode);
         }
 

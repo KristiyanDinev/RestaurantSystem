@@ -2,7 +2,7 @@
 using RestaurantSystem.Models.DatabaseModels;
 
 namespace RestaurantSystem.Database {
-    public class DatabaseManager : DbContext {
+    public class DatabaseContext : DbContext {
 
         public DbSet<UserModel> Users { get; set; }
         public DbSet<CuponModel> Cupons { get; set; }
@@ -11,11 +11,13 @@ namespace RestaurantSystem.Database {
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<ServiceModel> Services { get; set; }
         public DbSet<UserRoleModel> UserRoles { get; set; }
+        public DbSet<RolePermissionModel> RolePermissions { get; set; }
+        public DbSet<RoleModel> Roles { get; set; }
         public DbSet<ReservationModel> Reservations { get; set; }
         public DbSet<RestaurantModel> Restaurants { get; set; }
         public DbSet<TimeTableModel> TimeTables { get; set; }
 
-        public DatabaseManager(DbContextOptions<DatabaseManager> options) : base(options) {}
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) {}
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -48,6 +50,12 @@ namespace RestaurantSystem.Database {
 
             // CuponModel
             BuildCuponModel(ref builder);
+
+            // RoleModel
+            BuildRoleModel(ref builder);
+
+            // RolePermissionModel
+            BuildRolePermissionModel(ref builder);
         }
 
         private void BuildUserModel(ref ModelBuilder builder)
@@ -57,11 +65,16 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<UserModel>()
                 .Property(user => user.Name)
+                .IsUnicode()
                 .IsRequired();
 
             builder.Entity<UserModel>()
                 .Property(user => user.Email)
                 .IsRequired();
+
+            builder.Entity<UserModel>()
+                .HasIndex(user => user.Email)
+                .IsUnique();
 
             builder.Entity<UserModel>()
                 .Property(user => user.Image)
@@ -95,40 +108,74 @@ namespace RestaurantSystem.Database {
                 .Property(user => user.CreatedAt)
                 .IsRequired()
                 .HasDefaultValueSql("NOW()");
-
-            builder.Entity<UserModel>()
-                .HasMany(user => user.Roles)
-                .WithOne(userRole => userRole.UserModel)
-                .HasForeignKey(userRole => userRole.UserModelId)
-                .IsRequired();
         }
 
         private void BuildServicesModel(ref ModelBuilder builder) {
-            // URL path = Service
-            // UserRoleModel = User's role whether they can access it or not.
             builder.Entity<ServiceModel>()
-                .HasKey(service => service.Service);
+                .HasKey(service => service.Path);
+
+            builder.Entity<ServiceModel>()
+                .Property(service => service.Path)
+                .IsRequired();
+
+            builder.Entity<ServiceModel>()
+                .Property(service => service.Description)
+                .HasDefaultValue(null);
+        }
+
+        private void BuildRolePermissionModel(ref ModelBuilder builder)
+        {
+            builder.Entity<RolePermissionModel>()
+                .HasKey(rp => new { rp.RoleName, rp.ServicePath });
+
+            builder.Entity<RolePermissionModel>()
+                .HasOne(role => role.Role)
+                .WithMany(role => role.RolePermissions)
+                .HasForeignKey(role => role.RoleName);
+
+            builder.Entity<RolePermissionModel>()
+                .HasOne(role => role.Service)
+                .WithMany(role => role.RolePermissions)
+                .HasForeignKey(role => role.ServicePath);
         }
 
         private void BuildUserRoleModel(ref ModelBuilder builder)
         {
-            // URL path = Service
-            // UserRoleModel = User's role whether they can access it or not.
             builder.Entity<UserRoleModel>()
-                .HasKey(role => new { role.UserModelId, role.Role });
+                .HasKey(role => new { role.UserId, role.RoleName });
 
             builder.Entity<UserRoleModel>()
-                .Property(user => user.Role)
+                .Property(user => user.UserId)
                 .IsRequired();
 
             builder.Entity<UserRoleModel>()
-                .Property(user => user.UserModelId)
+                .Property(user => user.RoleName)
                 .IsRequired();
 
             builder.Entity<UserRoleModel>()
-                .HasMany(userRole => userRole.Services)
-                .WithMany(service => service.AllowedRoles)
-                .UsingEntity(j => j.ToTable("RoleServiceAccess"));
+                .HasOne(user => user.User)
+                .WithMany(user => user.Roles)
+                .HasForeignKey(user => user.UserId);
+
+            builder.Entity<UserRoleModel>()
+                .HasOne(user => user.User)
+                .WithMany(user => user.Roles)
+                .HasForeignKey(user => user.UserId);
+
+            builder.Entity<UserRoleModel>()
+                .HasOne(role => role.Role)
+                .WithMany(role => role.UserRoles)
+                .HasForeignKey(role => role.RoleName);
+        }
+
+        private void BuildRoleModel(ref ModelBuilder builder)
+        {
+            builder.Entity<RoleModel>()
+                .HasKey(role => role.Name);
+
+            builder.Entity<RoleModel>()
+                .Property(role => role.Description)
+                .HasDefaultValue(null);
         }
         
         private void BuildRestaurantModel(ref ModelBuilder builder)

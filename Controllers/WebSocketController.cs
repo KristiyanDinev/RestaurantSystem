@@ -1,5 +1,5 @@
-﻿using RestaurantSystem.Database.Handlers;
-using RestaurantSystem.Controllers;
+﻿using RestaurantSystem.Controllers;
+using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Controllers
 {
@@ -9,19 +9,19 @@ namespace RestaurantSystem.Controllers
         public WebSocketController(WebApplication app)
         {
             app.MapGet("/ws/orders", async (HttpContext context, WebSocketHandler webSocketHandler,
-                OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler) =>
+                OrderService orderDatabaseHandler, DishService dishDatabaseHandler) =>
             {
                 await webSocketHandler.HandleWholeRequest(context, orderDatabaseHandler, dishDatabaseHandler);
             }).RequireRateLimiting("fixed");
 
             app.MapGet("/ws/reservations", async (HttpContext context, WebSocketHandler webSocketHandler, 
-                OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler) =>
+                OrderService orderDatabaseHandler, DishService dishDatabaseHandler) =>
             {
                 await webSocketHandler.HandleWholeRequest(context, orderDatabaseHandler, dishDatabaseHandler);
             }).RequireRateLimiting("fixed");
 
             app.MapGet("/ws/cook", async (HttpContext context, WebSocketHandler webSocketHandler,
-                OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler) =>
+                OrderService orderDatabaseHandler, DishService dishDatabaseHandler) =>
             {
                 await webSocketHandler.HandleWholeRequest(context, orderDatabaseHandler, dishDatabaseHandler);
             }).RequireRateLimiting("fixed");

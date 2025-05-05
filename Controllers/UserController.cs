@@ -1,9 +1,9 @@
-﻿using RestaurantSystem.Database.Handlers;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RestaurantSystem.Utils.Web;
 using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Controller;
+using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Controllers {
     public class UserController {
@@ -22,7 +22,7 @@ namespace RestaurantSystem.Controllers {
 
             // get front-end logged in user profile (full page)
             app.MapGet("/profile",
-                async (HttpContext context, UserDatabaseHandler db,
+                async (HttpContext context, UserService db,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils) => {
 
                     return await controllerUtils.HandleDefaultPage_WithUserModel("/profile",
@@ -34,7 +34,7 @@ namespace RestaurantSystem.Controllers {
 
             // get front-end login page
             app.MapGet("/login", async (HttpContext context, ControllerUtils controllerUtils, 
-                UserDatabaseHandler db, UserUtils userUtils) => {
+                UserService db, UserUtils userUtils) => {
                     try {
                         UserModel? user = await userUtils.LoginByUsingCookie(context, db);
                         string data = await controllerUtils.GetHTMLFromWWWROOT("/login");
@@ -50,7 +50,7 @@ namespace RestaurantSystem.Controllers {
 
 
             // try loging in
-            app.MapPost("/login", async (UserDatabaseHandler db, HttpContext context,
+            app.MapPost("/login", async (UserService db, HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string email, [FromForm] string password,
                 [FromForm] string rememberMe) => {
@@ -89,7 +89,7 @@ namespace RestaurantSystem.Controllers {
 
             // get front-end register page
             app.MapGet("/register", async (HttpContext context, ControllerUtils controllerUtils, 
-                UserDatabaseHandler db, UserUtils userUtils) => {
+                UserService db, UserUtils userUtils) => {
                 try {
                     UserModel? user = await userUtils.LoginByUsingCookie(context, db);
                     string data = await controllerUtils.GetHTMLFromWWWROOT("/register");
@@ -106,7 +106,7 @@ namespace RestaurantSystem.Controllers {
 
 
             // try registering
-            app.MapPost("/register", async (UserDatabaseHandler db, HttpContext context,
+            app.MapPost("/register", async (UserService db, HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] RegisterUserModel registerUserModel) => {
 
@@ -186,7 +186,7 @@ namespace RestaurantSystem.Controllers {
 
 
             //edit user profile
-            app.MapPost("/profile/edit", async (UserDatabaseHandler db, HttpContext context,
+            app.MapPost("/profile/edit", async (UserService db, HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] UpdateUserModel updateUserModel) =>
             {

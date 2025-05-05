@@ -1,15 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 
-namespace RestaurantSystem.Database.Handlers
+namespace RestaurantSystem.Services
 {
-    public class OrderDatabaseHandler
+    public class OrderService
     {
 
-        private DatabaseManager _databaseManager;
-        private OrderedDishesDatabaseHandler _orderedDishesDatabaseHandler;
+        private DatabaseContext _databaseManager;
+        private OrderedDishesService _orderedDishesDatabaseHandler;
 
-        public OrderDatabaseHandler(DatabaseManager databaseManager, OrderedDishesDatabaseHandler orderedDishesDatabaseHandler)
+        public OrderService(DatabaseContext databaseManager, OrderedDishesService orderedDishesDatabaseHandler)
         {
             _databaseManager = databaseManager;
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;

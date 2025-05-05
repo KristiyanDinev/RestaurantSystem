@@ -1,17 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 
-namespace RestaurantSystem.Database.Handlers
+namespace RestaurantSystem.Services
 {
-    public class ReservationDatabaseHandler
+    public class ReservationService
     {
 
-        private DatabaseManager _databaseManager;
+        private DatabaseContext _databaseManager;
 
-        private RestaurantDatabaseHandler _restaurantDatabaseHandler;
+        private RestaurantService _restaurantDatabaseHandler;
 
-        public ReservationDatabaseHandler(DatabaseManager databaseManager,
-            RestaurantDatabaseHandler restaurantDatabaseHandler)
+        public ReservationService(DatabaseContext databaseManager,
+            RestaurantService restaurantDatabaseHandler)
         {
             _databaseManager = databaseManager;
             _restaurantDatabaseHandler = restaurantDatabaseHandler;
@@ -28,7 +29,7 @@ namespace RestaurantSystem.Database.Handlers
             reservation.At_Date = dateTime;
             reservation.Notes = notes;
 
-            if (!(await _restaurantDatabaseHandler.CheckForReservation(reservation))) {
+            if (!await _restaurantDatabaseHandler.CheckForReservation(reservation)) {
                 return false;
             }
 

@@ -1,14 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 
-namespace RestaurantSystem.Database.Handlers
+namespace RestaurantSystem.Services
 {
-    public class RestaurantDatabaseHandler
+    public class RestaurantService
     {
 
-        private DatabaseManager _databaseManager;
+        private DatabaseContext _databaseManager;
 
-        public RestaurantDatabaseHandler(DatabaseManager databaseManager)
+        public RestaurantService(DatabaseContext databaseManager)
         {
             _databaseManager = databaseManager;
         }
@@ -42,11 +43,11 @@ namespace RestaurantSystem.Database.Handlers
             return await _databaseManager.Restaurants.FirstOrDefaultAsync(
                 restaurant => restaurant.ServeCustomersInPlace &&
 
-                (restaurant.ReservationMinAdults <= reservation.Amount_Of_Adults &&
-                restaurant.ReservationMaxAdults >= reservation.Amount_Of_Adults)
+                restaurant.ReservationMinAdults <= reservation.Amount_Of_Adults &&
+                restaurant.ReservationMaxAdults >= reservation.Amount_Of_Adults
                 &&
-                (restaurant.ReservationMinChildren <= reservation.Amount_Of_Children &&
-                restaurant.ReservationMaxChildren >= reservation.Amount_Of_Children)
+                restaurant.ReservationMinChildren <= reservation.Amount_Of_Children &&
+                restaurant.ReservationMaxChildren >= reservation.Amount_Of_Children
                 ) != null;
         }
     }

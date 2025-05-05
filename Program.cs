@@ -1,23 +1,20 @@
 using RestaurantSystem.Controllers;
 using RestaurantSystem.Database;
-using RestaurantSystem.Database.Handlers;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Utils.Utils;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Middlewares;
 
 namespace RestaurantSystem
 {
     public class Program
     {
-        public static string currentDir;
         public static void Main(string[] args)
         {
-            currentDir = Directory.GetCurrentDirectory();
-
-            Console.WriteLine("Current Working Directory: "+ currentDir);
+            Console.WriteLine("Current Working Directory: "+ Directory.GetCurrentDirectory());
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -49,23 +46,22 @@ namespace RestaurantSystem
             EncryptionHandler encryptionHandler = new EncryptionHandler(encryption_key);
             JWTHandler jwtHandler = new JWTHandler(jwt_key);
 
-            builder.Services.AddDbContext<DatabaseManager>(options =>
+            builder.Services.AddDbContext<DatabaseContext>(options =>
             {
                 options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString"));
             });
-            builder.Services.AddScoped<UserDatabaseHandler>();
-            builder.Services.AddScoped<DishDatabaseHandler>();
-            builder.Services.AddScoped<OrderedDishesDatabaseHandler>();
-            builder.Services.AddScoped<RestaurantDatabaseHandler>();
-            builder.Services.AddScoped<CuponDatabaseHandler>();
-            builder.Services.AddScoped<OrderDatabaseHandler>();
-            builder.Services.AddScoped<ServiceDatabaseHandler>();
-            builder.Services.AddScoped<ReservationDatabaseHandler>();
+
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<DishService>();
+            builder.Services.AddScoped<OrderedDishesService>();
+            builder.Services.AddScoped<RestaurantService>();
+            builder.Services.AddScoped<CuponService>();
+            builder.Services.AddScoped<OrderService>();
+            builder.Services.AddScoped<RoleService>();
+            builder.Services.AddScoped<ReservationService>();
 
             builder.Services.AddSingleton<ControllerUtils>();
-
             builder.Services.AddSingleton<UserUtils>();
-
             builder.Services.AddSingleton<WebSocketHandler>();
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
@@ -82,7 +78,6 @@ namespace RestaurantSystem
 
             var app = builder.Build();
 
-
             app.UseWebSockets(new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(2),
@@ -92,23 +87,10 @@ namespace RestaurantSystem
             app.UseRateLimiter();
             app.UseRouting();
             app.UseStaticFiles();
+
             app.UseAuthenticationMiddleware();
-            
-
-            app.Use(async (HttpContext context, RequestDelegate next) =>
-            {
-                Console.WriteLine("\n"+context.Request.Method + ": " + context.Request.Path.Value);
-                Console.WriteLine("\n----\nCookies:");
-                foreach (var cookie in context.Request.Cookies)
-                {
-                    Console.WriteLine(cookie);
-                }
-                Console.WriteLine("----\n");
-
-
-
-                await next(context);
-            });
+            app.UseHttpLogging();
+            app.UseLoggingMiddleware();
 
             app.MapControllers();
 

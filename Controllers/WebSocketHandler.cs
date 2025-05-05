@@ -1,4 +1,4 @@
-﻿using RestaurantSystem.Database.Handlers;
+﻿using RestaurantSystem.Services;
 using RestaurantSystem.Utils;
 using System.Net.WebSockets;
 
@@ -45,7 +45,7 @@ namespace RestaurantSystem.Controllers
         }
 
         public async static void HandleCookStatus(List<string> parts,
-            OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler)
+            OrderService orderDatabaseHandler, DishService dishDatabaseHandler)
         {
             // This is cook status. About cooking the food and not delivery or payment.
             // 1  or  di s
@@ -91,7 +91,7 @@ namespace RestaurantSystem.Controllers
 
 
         public async Task HandleWholeRequest(HttpContext context,
-            OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler)
+            OrderService orderDatabaseHandler, DishService dishDatabaseHandler)
         {
             if (context.WebSockets.IsWebSocketRequest)
             {
@@ -104,7 +104,7 @@ namespace RestaurantSystem.Controllers
         }
 
         public async Task HandleWebSocket(HttpContext context,
-            OrderDatabaseHandler orderDatabaseHandler, DishDatabaseHandler dishDatabaseHandler)
+            OrderService orderDatabaseHandler, DishService dishDatabaseHandler)
         {
             WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
 

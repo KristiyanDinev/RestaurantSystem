@@ -1,11 +1,11 @@
-﻿using RestaurantSystem.Database.Handlers;
-using RestaurantSystem.Models.Controller;
+﻿using RestaurantSystem.Models.Controller;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.WebModels;
 using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantSystem.Controllers;
+using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Controllers
 {
@@ -15,7 +15,7 @@ namespace RestaurantSystem.Controllers
         {
             app.MapGet("/reservations", async (HttpContext context, 
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils,
-                ReservationDatabaseHandler reservationsDB) =>
+                ReservationService reservationsDB) =>
             {
                 try
                 {
@@ -43,7 +43,7 @@ namespace RestaurantSystem.Controllers
 
             app.MapGet("/reservations/create", async (HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils, 
-                ReservationDatabaseHandler reservationDB) =>
+                ReservationService reservationDB) =>
             {
                 try
                 {
@@ -71,7 +71,7 @@ namespace RestaurantSystem.Controllers
 
 
             app.MapPost("/reservations/create", async (HttpContext context,
-                UserUtils userUtils, ReservationDatabaseHandler reservationsDB,
+                UserUtils userUtils, ReservationService reservationsDB,
                 ControllerUtils controllerUtils,
                 [FromForm] RegisterReservationModel registerReservationModel) =>
             {
@@ -111,7 +111,7 @@ namespace RestaurantSystem.Controllers
             .RequireRateLimiting("fixed");
 
             app.MapPost("/reservations/delete", async (HttpContext context,
-                UserUtils userUtils, ReservationDatabaseHandler reservationsDB,
+                UserUtils userUtils, ReservationService reservationsDB,
                  WebSocketHandler webSocketHandler,
                 [FromForm] string reservationIdStr) =>
             {

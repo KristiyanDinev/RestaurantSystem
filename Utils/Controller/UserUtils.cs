@@ -1,5 +1,5 @@
-﻿using RestaurantSystem.Database.Handlers;
-using RestaurantSystem.Models.DatabaseModels;
+﻿using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Services;
 using RestaurantSystem.Utils.Utils;
 using System.Security.Claims;
 
@@ -9,12 +9,12 @@ namespace RestaurantSystem.Utils.Controller
     {
         private EncryptionHandler _EncryptionHandler;
         private JWTHandler _JWTHandler;
-        private UserDatabaseHandler _UserDatabaseHandler;
+        private UserService _UserDatabaseHandler;
 
         public readonly string authHeader = "Authorization";
 
         public UserUtils(EncryptionHandler encryptionHandler, JWTHandler jwtHandler,
-            UserDatabaseHandler UserDatabaseHandler)
+            UserService UserDatabaseHandler)
         {
             _EncryptionHandler = encryptionHandler;
             _JWTHandler = jwtHandler;

@@ -1,14 +1,13 @@
 ﻿namespace RestaurantSystem.Models.DatabaseModels
 {
-    public class ServiceModel
+    public class RoleModel
     {
-
-        public string Path { get; set; }  // PK
+        public string Name { get; set; }  // PK
         public string? Description { get; set; }
 
 
-        // Navigation property
+        // Navigation properties
+        public ICollection<UserRoleModel> UserRoles { get; set; }
         public ICollection<RolePermissionModel> RolePermissions { get; set; }
-
     }
 }

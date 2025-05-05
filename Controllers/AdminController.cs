@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RestaurantSystem.Database.Handlers;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Services;
 using RestaurantSystem.Utils.Controller;
 
 namespace RestaurantSystem.Controllers
@@ -108,11 +108,11 @@ namespace RestaurantSystem.Controllers
         {
             private UserUtils _UserUtils;
             private ControllerUtils _ControllerUtils;
-            private ServiceDatabaseHandler _ServiceDatabaseHandler;
-            private OrderDatabaseHandler _OrderDatabaseHandler;
+            private RoleService _ServiceDatabaseHandler;
+            private OrderService _OrderDatabaseHandler;
             public Admin2Controller(UserUtils userUtils,
-                ControllerUtils controllerUtils, ServiceDatabaseHandler serviceDatabaseHandler,
-                OrderDatabaseHandler orderDatabaseHandler)
+                ControllerUtils controllerUtils, RoleService serviceDatabaseHandler,
+                OrderService orderDatabaseHandler)
             {
                 _UserUtils = userUtils;
                 _ControllerUtils = controllerUtils;

@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RestaurantSystem.Database.Handlers;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Controllers {
     public class CuponController : Controller{
 
-        private CuponDatabaseHandler _CuponDatabaseHandler;
+        private CuponService _CuponDatabaseHandler;
 
-        public CuponController(CuponDatabaseHandler cuponDatabaseHandler) {
+        public CuponController(CuponService cuponDatabaseHandler) {
             _CuponDatabaseHandler = cuponDatabaseHandler;
         }
 

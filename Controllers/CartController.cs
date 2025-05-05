@@ -1,6 +1,6 @@
-﻿using RestaurantSystem.Database.Handlers;
-using RestaurantSystem.Models.DatabaseModels;
+﻿using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.WebModels;
+using RestaurantSystem.Services;
 using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Utils.Web;
 
@@ -13,8 +13,8 @@ namespace RestaurantSystem.Controllers
         {
             
             // get current dishes about to order
-            app.MapGet("/cart", async (HttpContext context, DishDatabaseHandler db,
-                OrderDatabaseHandler orderDB,
+            app.MapGet("/cart", async (HttpContext context, DishService db,
+                OrderService orderDB,
                 ControllerUtils controllerUtils, WebUtils webUtils, UserUtils userUtils) =>
             {
                 try {

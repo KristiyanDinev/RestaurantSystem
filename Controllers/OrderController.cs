@@ -1,10 +1,10 @@
-﻿using RestaurantSystem.Database.Handlers;
-using RestaurantSystem.Models.DatabaseModels;
+﻿using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.WebModels;
 using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantSystem.Controllers;
+using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Controllers {
     public class OrderController {
@@ -14,7 +14,7 @@ namespace RestaurantSystem.Controllers {
 
             // get front-end display of your orders
             app.MapGet("/orders", async (HttpContext context, 
-                OrderDatabaseHandler db, ControllerUtils controllerUtils, 
+                OrderService db, ControllerUtils controllerUtils, 
                 UserUtils userUtils, WebUtils webUtils) => {
 
                 try {
@@ -61,8 +61,8 @@ namespace RestaurantSystem.Controllers {
             
             // start order
             app.MapPost("/order", async (HttpContext context,
-                CuponDatabaseHandler cuponDb, OrderDatabaseHandler orderDb,
-                DishDatabaseHandler dishDb,
+                CuponService cuponDb, OrderService orderDb,
+                DishService dishDb,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string notes,
                 [FromForm] string cuponCode) => {
@@ -140,7 +140,7 @@ namespace RestaurantSystem.Controllers {
 
             // stop order
             app.MapPost("/order/stop", async (HttpContext context,
-                OrderDatabaseHandler db, WebSocketHandler webSocketHandler,
+                OrderService db, WebSocketHandler webSocketHandler,
                 ControllerUtils controllerUtils, UserUtils userUtils,
                 [FromForm] string orderIdStr) => {
 

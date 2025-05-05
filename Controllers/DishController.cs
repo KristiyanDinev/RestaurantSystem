@@ -1,8 +1,8 @@
-﻿using RestaurantSystem.Database.Handlers;
-using RestaurantSystem.Models.DatabaseModels;
+﻿using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
+using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Controllers {
     public class DishController {
@@ -12,7 +12,7 @@ namespace RestaurantSystem.Controllers {
            
             app.MapGet("/dishes", async (HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils, 
-                OrderDatabaseHandler orderDB) =>
+                OrderService orderDB) =>
             {
 
                 try
@@ -47,7 +47,7 @@ namespace RestaurantSystem.Controllers {
 
             
             app.MapGet("/dish", async (HttpContext context,
-                DishDatabaseHandler db, ControllerUtils controllerUtils, 
+                DishService db, ControllerUtils controllerUtils, 
                 UserUtils userUtils, WebUtils webUtils,
                 [FromQuery(Name = "type")] string type) => {
 
@@ -87,8 +87,8 @@ namespace RestaurantSystem.Controllers {
 //  TODO
 
             app.MapGet("/single_dish", async (HttpContext context,
-                DishDatabaseHandler dishDb, ControllerUtils controllerUtils, 
-                OrderDatabaseHandler orderDatabaseHandler,
+                DishService dishDb, ControllerUtils controllerUtils, 
+                OrderService orderDatabaseHandler,
                 UserUtils userUtils, WebUtils webUtils,
                 [FromQuery(Name = "dishId")] string dishId) => {
                     

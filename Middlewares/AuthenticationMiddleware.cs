@@ -1,5 +1,4 @@
-﻿using RestaurantSystem.Database.Handlers;
-using RestaurantSystem.Models.DatabaseModels;
+﻿using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Utils.Controller;
 
 namespace RestaurantSystem.Services
@@ -17,8 +16,8 @@ namespace RestaurantSystem.Services
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, UserUtils _userUtils, 
-            ServiceDatabaseHandler serviceDatabaseHandler)
+        public async Task InvokeAsync(HttpContext context, UserUtils userUtils, 
+            RoleService roleService)
         {
             string path = context.Request.Path.Value ?? "/";
             if (path.Equals('/'))
@@ -27,7 +26,7 @@ namespace RestaurantSystem.Services
             }
 
             bool isAdminEndpoint = ("/"+path.Split("/")[0]).Equals(admin_endpoint_prefix);
-            UserModel? user = await _userUtils.GetUserByJWT(context);
+            UserModel? user = await userUtils.GetUserByJWT(context);
 
             if (user != null && non_login_endpoints.Contains(path))
             {
@@ -44,7 +43,7 @@ namespace RestaurantSystem.Services
 
             }
 
-            if (isAdminEndpoint)
+            if (isAdminEndpoint && user != null)
             {
                 // the user is logged in
                 if (path.Contains('?'))
@@ -54,7 +53,7 @@ namespace RestaurantSystem.Services
                 List<string> splited = path.Split("/").ToList();
                 splited.RemoveAt(0);
                 path = "/" + string.Join("/", splited);
-                if (!await serviceDatabaseHandler.DoesUserHaveRolesToAccessService(user, path))
+                if (!await roleService.CanUserAccessService(user.Id, path))
                 {
                     // user doesn't have the roles to do so.
                     Console.WriteLine("\n"+user.Name +" was trying to reach to admin page. Service: "+
