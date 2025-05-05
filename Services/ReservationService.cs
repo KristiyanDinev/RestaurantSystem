@@ -22,8 +22,8 @@ namespace RestaurantSystem.Services
             int amount_Of_Adults, int amount_Of_Children, DateTime dateTime, string? notes)
         {
             ReservationModel reservation = new ReservationModel();
-            reservation.UserModelId = userId;
-            reservation.RestaurantModelId = restaurantId;
+            reservation.UserId = userId;
+            reservation.RestaurantId = restaurantId;
             reservation.Amount_Of_Adults = amount_Of_Adults;
             reservation.Amount_Of_Children = amount_Of_Children;
             reservation.At_Date = dateTime;
@@ -43,7 +43,7 @@ namespace RestaurantSystem.Services
         public async Task<List<ReservationModel>> GetReservationsByUserId(int userId)
         {
             return await _databaseManager.Reservations.Where(res => 
-                res.UserModelId == userId)
+                res.UserId == userId)
                 .ToListAsync();
         }
 

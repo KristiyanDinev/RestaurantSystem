@@ -1,1 +1,13 @@
 ﻿@model RestaurantSystem.Models.View.AdminDishesModel
+
+
+@{
+    if (Model.Error != null)
+    {
+        <h1>Error</h1>
+        <h2>Model.Error</h2>
+    }
+}
+
+
+

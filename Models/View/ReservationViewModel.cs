@@ -2,13 +2,12 @@
 
 namespace RestaurantSystem.Models.View
 {
-    public class AdminDishesModel
+    public class ReservationViewModel
     {
         public string? Error;
 
-        public RestaurantModel? restaurantModel;
         public UserModel? userModel;
 
-        public Dictionary<OrderModel, List<DishModel>>? dishes;
+        public List<ReservationModel>? reservations;
     }
 }

@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.View;
 using RestaurantSystem.Services;
-using RestaurantSystem.Utils.Controller;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Controllers
 {
@@ -19,65 +20,6 @@ namespace RestaurantSystem.Controllers
                     pattern: "/admin2/{controller=Admin2}/{action=Index}");*/
 
             /*
-
-            app.MapGet("/admin/dishes", async (HttpContext context,
-                ControllerUtils controllerUtils, UserUtils userUtils,
-                ServiceDatabaseHandler serviceDatabaseHandler, 
-                OrderDatabaseHandler orderDatabaseHandler) => {
-
-                    try
-                    {
-                        UserModel? user = await userUtils.GetUserByJWT(context);
-                        if (user == null)
-                        {
-                            return Results.Redirect("/login");
-                        }
-
-                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/admin/cook");
-                        RestorantModel restorantModel = await serviceDatabaseHandler.GetStaffRestorant(user);
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData, controllerUtils.UserModelName, [user]);
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData,
-                            controllerUtils.RestorantModelName, [restorantModel]);
-
-                        List<OrderModel> orderModels = await orderDatabaseHandler.GetOrdersByRestorantId(restorantModel.Id);
-                        foreach (OrderModel orderModel in orderModels)
-                        {
-
-                            List<DishModel> dishes = await orderDatabaseHandler.GetAllDishesFromOrder(orderModel.Id);
-
-                            List<DisplayDishModel> displayDishModels = controllerUtils.ConvertToDisplayDish(dishes);
-
-                            foreach (DisplayDishModel dish in displayDishModels)
-                            {
-                                dish.OrderId = orderModel.Id;
-                            }
-
-                            FileData = webUtils.HandleCommonPlaceholders(FileData,
-                                controllerUtils.OrderModelName, [orderModel]);
-
-                            controllerUtils.ConvertToDisplayDish(dishes);
-
-                            FileData = webUtils.HandleCommonPlaceholders(FileData,
-                                controllerUtils.DishModelName,
-                                displayDishModels
-                                .Cast<object>().ToList());
-                        }
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData,
-                               controllerUtils.OrderModelName, []);
-                        
-
-
-                        return Results.Content(FileData, "text/html");
-
-                    }
-                    catch (Exception)
-                    {
-                        return Results.Redirect("/error");
-                    }
-                });
 
             app.MapGet("/admin/orders", async (HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils) => {
@@ -104,40 +46,104 @@ namespace RestaurantSystem.Controllers
     }
 
 
-        public class Admin2Controller : Controller
+    public class Admin2Controller : Controller
+    {
+        private readonly string error = "Please update your profile or tell the Manager to update your profile address, city, state and country to align with the address of the restaurant you work in.";
+
+        private RoleService _roleService;
+        private OrderService _orderService;
+        private UserUtility _userUtils;
+        private RestaurantService _restaurantService;
+        private OrderedDishesService _orderedDishesService;
+        private ReservationService _reservationService;
+
+        public Admin2Controller(UserUtility userUtils,
+            Utility _utils, RoleService roleService,
+            OrderService orderService, RestaurantService restaurantService,
+            OrderedDishesService orderedDishesService, ReservationService reservationService)
         {
-            private UserUtils _UserUtils;
-            private ControllerUtils _ControllerUtils;
-            private RoleService _ServiceDatabaseHandler;
-            private OrderService _OrderDatabaseHandler;
-            public Admin2Controller(UserUtils userUtils,
-                ControllerUtils controllerUtils, RoleService serviceDatabaseHandler,
-                OrderService orderDatabaseHandler)
-            {
-                _UserUtils = userUtils;
-                _ControllerUtils = controllerUtils;
-                _ServiceDatabaseHandler = serviceDatabaseHandler;
-                _ServiceDatabaseHandler = serviceDatabaseHandler;
-                _OrderDatabaseHandler = orderDatabaseHandler;
-            }
-
-            [HttpGet]
-            [Route("Admin")]
-            [Route("Admin/Index")]
-            public async Task<IActionResult> Index()
-            {
-                UserModel? user = await _UserUtils.GetUserByJWT(HttpContext);
-                return View(user);
-            }
-
-
-            [HttpGet]
-            [Route("Admin/Dishes")]
-            public async Task<IActionResult> Dishes()
-            {
-                UserModel? user = await _UserUtils.GetUserByJWT(HttpContext);
-                return View(user);
-            }
+            _userUtils = userUtils;
+            _roleService = roleService;
+            _orderService = orderService;
+            _restaurantService = restaurantService;
+            _orderedDishesService = orderedDishesService;
+            _reservationService = reservationService;
         }
-   
+
+        [HttpGet]
+        [Route("Admin")]
+        [Route("Admin/Index")]
+        public async Task<IActionResult> Index()
+        {
+            UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
+            if (user == null ||
+                !(await _roleService.CanUserAccessService(user.Id, "/admin")))
+            {
+                return Redirect("/login");
+            }
+
+            return View(user);
+        }
+
+
+        [HttpGet]
+        [Route("Admin/Dishes")]
+        public async Task<IActionResult> Dishes()
+        {
+            // Chief in the kitchen
+
+            UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
+            if (user == null ||
+                !(await _roleService.CanUserAccessService(user.Id, "/admin/dishes")))
+            {
+                return Redirect("/login");
+            }
+
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantForStaff(user);
+
+            AdminDishesModel adminDishesModel = new AdminDishesModel();
+            if (restaurant == null)
+            {
+                adminDishesModel.Error = error;
+                return View(adminDishesModel);
+            }
+
+            Dictionary<OrderModel, List<DishModel>> dishes = new Dictionary<OrderModel, List<DishModel>>();
+            foreach (OrderModel order in await _orderService.GetOrdersByRestaurantId(restaurant.Id))
+            {
+                dishes.Add(order, await _orderedDishesService.GetDishesFromOrder(order.Id));
+            }
+
+            adminDishesModel.restaurantModel = restaurant;
+            adminDishesModel.userModel = user;
+            adminDishesModel.dishes = dishes;
+
+            return View(adminDishesModel);
+        }
+
+
+        [HttpGet]
+        [Route("Admin/Reservations")]
+        public async Task<IActionResult> Reservations()
+        {
+            // TODO Finish
+            UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
+            if (user == null ||
+                !(await _roleService.CanUserAccessService(user.Id, "/admin/dishes")))
+            {
+                return Redirect("/login");
+            }
+
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantForStaff(user);
+
+            ReservationViewModel reservationViewModel = new ReservationViewModel();
+            if (restaurant == null)
+            {
+                reservationViewModel.Error = error;
+                return View(reservationViewModel);
+            }
+
+            _reservationService.
+        }
+    }
 }

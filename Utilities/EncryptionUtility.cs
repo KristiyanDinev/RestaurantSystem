@@ -1,14 +1,14 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace RestaurantSystem.Utils.Utils
+namespace RestaurantSystem.Utilities
 {
-    public class EncryptionHandler
+    public class EncryptionUtility
     {
 
         private readonly byte[] _key;
 
-        public EncryptionHandler(string key)
+        public EncryptionUtility(string key)
         {
             // key = 256 bit.
             _key = HashIt(key);

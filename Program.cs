@@ -1,12 +1,11 @@
 using RestaurantSystem.Controllers;
 using RestaurantSystem.Database;
 using RestaurantSystem.Services;
-using RestaurantSystem.Utils.Controller;
-using RestaurantSystem.Utils.Utils;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Middlewares;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem
 {
@@ -39,13 +38,6 @@ namespace RestaurantSystem
             builder.WebHost.UseUrls([uri]);
 
             // postgresql 17 5432
-
-            string encryption_key = builder.Configuration.GetValue<string>("Encryption_Key") ?? "D471E0624EA5A7FFFABAA918E87";
-            string jwt_key = builder.Configuration.GetValue<string>("JWT_Key") ?? "234w13543ewf53erdfa";
-            
-            EncryptionHandler encryptionHandler = new EncryptionHandler(encryption_key);
-            JWTHandler jwtHandler = new JWTHandler(jwt_key);
-
             builder.Services.AddDbContext<DatabaseContext>(options =>
             {
                 options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString"));
@@ -60,8 +52,16 @@ namespace RestaurantSystem
             builder.Services.AddScoped<RoleService>();
             builder.Services.AddScoped<ReservationService>();
 
-            builder.Services.AddSingleton<ControllerUtils>();
-            builder.Services.AddSingleton<UserUtils>();
+            builder.Services.AddSingleton<EncryptionUtility>(
+                new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??
+                "D471E0624EA5A7FFFABAA918E87"));
+
+            builder.Services.AddSingleton<JWTUtility>(
+                new JWTUtility(builder.Configuration.GetValue<string>("JWT_Key") ?? 
+                "234w13543ewf53erdfa"));
+
+            builder.Services.AddSingleton<Utility>();
+            builder.Services.AddSingleton<UserUtility>();
             builder.Services.AddSingleton<WebSocketHandler>();
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
@@ -89,6 +89,7 @@ namespace RestaurantSystem
             app.UseStaticFiles();
 
             app.UseAuthenticationMiddleware();
+
             app.UseHttpLogging();
             app.UseLoggingMiddleware();
 

@@ -1,11 +1,11 @@
 ﻿using RestaurantSystem.Models.Controller;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.WebModels;
-using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantSystem.Controllers;
 using RestaurantSystem.Services;
+using RestaurantSystem.Utils;
 
 namespace RestaurantSystem.Controllers
 {

@@ -17,6 +17,11 @@
         public string Country { get; set; }
         public DateTime CreatedAt { get; set; }
 
+
+        // navigation
         public ICollection<UserRoleModel> Roles { get; set; }
+        public ICollection<OrderModel> Orders { get; set; }
+        public ICollection<ReservationModel> Reservations { get; set; }
+
     }
 }

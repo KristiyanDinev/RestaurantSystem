@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RestaurantSystem.Utils.Web;
-using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Controller;
 using RestaurantSystem.Services;
+using RestaurantSystem.Utils;
 
 namespace RestaurantSystem.Controllers {
     public class UserController {

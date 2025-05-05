@@ -17,9 +17,8 @@ namespace RestaurantSystem.Services
         public async Task<List<TimeTableModel>> GetRestaurantsForDelivery_ForUser(UserModel user)
         {
             return await _databaseManager.TimeTables.Where(
-                times => times.RestuarantModel.DoDelivery &&
+                times => times.Restuarant.DoDelivery &&
                 times.UserCity.Equals(user.City) &&
-                times.UserAddress.Equals(user.Address) &&
                 times.UserCountry.Equals(user.Country) &&
                 times.UserState == user.State
                 )
@@ -29,9 +28,8 @@ namespace RestaurantSystem.Services
         public async Task<List<TimeTableModel>> GetRestaurantsForServingPeople_ForUser(UserModel user)
         {
             return await _databaseManager.TimeTables.Where(
-                times => times.RestuarantModel.ServeCustomersInPlace &&
+                times => times.Restuarant.ServeCustomersInPlace &&
                 times.UserCity.Equals(user.City) &&
-                times.UserAddress.Equals(user.Address) &&
                 times.UserCountry.Equals(user.Country) &&
                 times.UserState == user.State
                 )
@@ -49,6 +47,20 @@ namespace RestaurantSystem.Services
                 restaurant.ReservationMinChildren <= reservation.Amount_Of_Children &&
                 restaurant.ReservationMaxChildren >= reservation.Amount_Of_Children
                 ) != null;
+        }
+
+        // The user's address is the address of the restaurant, they work in.
+        // This only applies to people, who take care of reservations and cooks,
+        // because they need to be present in the restaurant.
+        public async Task<RestaurantModel?> GetRestaurantForStaff(UserModel user)
+        {
+            return await _databaseManager.Restaurants.FirstOrDefaultAsync(
+                restaurant => restaurant.ServeCustomersInPlace &&
+                restaurant.Address.Equals(user.Address) &&
+                restaurant.City.Equals(user.City) &&
+                restaurant.Country.Equals(user.Country) &&
+                restaurant.State == user.State
+                );
         }
     }
 }

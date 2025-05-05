@@ -1,19 +1,16 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using System.Collections;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
-namespace RestaurantSystem.Utils.Utils {
-    public class JWTHandler {
+namespace RestaurantSystem.Utilities {
+    public class JWTUtility {
         private JwtSecurityTokenHandler jwt;
         private SecurityKey key;
         private TokenValidationParameters tokenValidationParameters;
         private SigningCredentials signingCredentials;
 
-        public JWTHandler(string _secret_key) {
-            key = new SymmetricSecurityKey(EncryptionHandler.HashIt(_secret_key)); // - `JWT_SecurityKey` has to be 44 characters in base64 string
+        public JWTUtility(string _secret_key) {
+            key = new SymmetricSecurityKey(EncryptionUtility.HashIt(_secret_key)); // - `JWT_SecurityKey` has to be 44 characters in base64 string
             jwt = new JwtSecurityTokenHandler();
             signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             tokenValidationParameters = new TokenValidationParameters() {
@@ -24,8 +21,8 @@ namespace RestaurantSystem.Utils.Utils {
             };
         }
 
-        // <summary>Handles the `exp` - expiration date on the token. It will be empty if none.</summary>
-        public string GenerateJwtToken(List<Claim> claims, DateTime? expires) {
+        // Handles the `_exp` - expiration date on the token. It will be empty if none.
+        public string GenerateJWT(List<Claim> claims, DateTime? expires) {
             //Claim claim = new Claim("a", "a");
             claims.Add(new Claim("_exp", expires?.ToString() ?? ""));
             return jwt.WriteToken(new JwtSecurityToken(

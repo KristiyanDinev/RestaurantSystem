@@ -21,9 +21,9 @@ namespace RestaurantSystem.Services
         {
             OrderModel order = new OrderModel();
             order.Notes = notes;
-            order.RestaurantModelId = restaurantId;
+            order.RestaurantId = restaurantId;
             order.TotalPrice = totalPrice;
-            order.UserModelId = userId;
+            order.UserId = userId;
 
             await _databaseManager.Orders.AddAsync(order);
 
@@ -72,7 +72,14 @@ namespace RestaurantSystem.Services
         public async Task<List<OrderModel>> GetOrdersByUser(int userId)
         {
             return await _databaseManager.Orders.Where(
-                order => order.UserModelId == userId)
+                order => order.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<List<OrderModel>> GetOrdersByRestaurantId(int restaurantId)
+        {
+            return await _databaseManager.Orders.Where(
+                order => order.RestaurantId == restaurantId)
                 .ToListAsync();
         }
 

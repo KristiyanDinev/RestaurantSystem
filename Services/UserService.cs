@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Utils.Utils;
+using RestaurantSystem.Utils;
 
 namespace RestaurantSystem.Services
 {

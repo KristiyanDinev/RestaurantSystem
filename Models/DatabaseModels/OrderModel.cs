@@ -8,12 +8,16 @@
         public decimal TotalPrice { get; set; }
 
 
-        public int UserModelId { get; set; }
-        public UserModel UserModel { get; set; }
+        public int UserId { get; set; }
+        public UserModel User { get; set; }
 
 
 
-        public int RestaurantModelId { get; set; }
-        public RestaurantModel RestaurantModel { get; set; }
+        public int RestaurantId { get; set; }
+        public RestaurantModel Restaurant { get; set; }
+
+
+        // navigation
+        public ICollection<OrderedDishesModel> OrderedDishes { get; set; }
     }
 }

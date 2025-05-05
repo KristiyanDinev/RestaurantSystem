@@ -14,7 +14,11 @@
 
 
 
-        public int RestaurantModelId { get; set; }
-        public RestaurantModel RestaurantModel { get; set; }
+        public int RestaurantId { get; set; }
+        public RestaurantModel Restaurant { get; set; }
+
+
+        // navigation
+        public ICollection<OrderedDishesModel> OrderedDishes { get; set; }
     }
 }

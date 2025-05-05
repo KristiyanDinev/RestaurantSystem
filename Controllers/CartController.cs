@@ -1,7 +1,7 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.WebModels;
 using RestaurantSystem.Services;
-using RestaurantSystem.Utils.Controller;
+using RestaurantSystem.Utils;
 using RestaurantSystem.Utils.Web;
 
 namespace RestaurantSystem.Controllers

@@ -1,4 +1,4 @@
-﻿using RestaurantSystem.Utils.Controller;
+﻿using RestaurantSystem.Utils;
 
 namespace RestaurantSystem.Controllers {
     public class ErrorController {

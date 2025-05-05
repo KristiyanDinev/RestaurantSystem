@@ -11,10 +11,10 @@ namespace RestaurantSystem.Services
             _databaseManager = databaseManager;
         }
 
-        public async Task<List<DishModel>> GetDishes(string type, int restaurantId)
+        public async Task<List<DishModel>> GetDishesByTypeAndRestaurantId(string type, int restaurantId)
         {
             return await _databaseManager.Dishies.Where(
-                dish => dish.Type_Of_Dish.Equals(type) && dish.RestaurantModelId == restaurantId)
+                dish => dish.Type_Of_Dish.Equals(type) && dish.RestaurantId == restaurantId)
                 .ToListAsync();
         }
 
@@ -33,7 +33,7 @@ namespace RestaurantSystem.Services
             dish.Name = name;
             dish.Type_Of_Dish = type;
             dish.Price = price;
-            dish.RestaurantModelId = restaurantModelId;
+            dish.RestaurantId = restaurantModelId;
             dish.Ingredients = ingredients;
             dish.AvrageTimeToCook = avrageTimeToCook;
             dish.Grams = grams;
@@ -56,6 +56,27 @@ namespace RestaurantSystem.Services
             _databaseManager.Dishies.Remove(dish);
 
             await _databaseManager.SaveChangesAsync();
+        }
+
+        public List<int> GetDishIDsFromCart(HttpContext context)
+        {
+            context.Request.Cookies.TryGetValue("cart", out string? cart);
+            if (cart == null || cart.Length == 0)
+            {
+                return new List<int>();
+            }
+
+            List<int> dishesIds = new List<int>();
+
+            foreach (string dishIdStr in cart.Split('-').ToList())
+            {
+                if (int.TryParse(dishIdStr, out int dishId))
+                {
+                    dishesIds.Add(dishId);
+                }
+            }
+            return dishesIds;
+
         }
     }
 }

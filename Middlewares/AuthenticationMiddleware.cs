@@ -1,5 +1,5 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Utils.Controller;
+using RestaurantSystem.Utils;
 
 namespace RestaurantSystem.Services
 {

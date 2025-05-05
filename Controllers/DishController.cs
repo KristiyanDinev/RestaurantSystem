@@ -1,8 +1,8 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Utils.Controller;
 using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantSystem.Services;
+using RestaurantSystem.Utils;
 
 namespace RestaurantSystem.Controllers {
     public class DishController {
@@ -65,7 +65,7 @@ namespace RestaurantSystem.Controllers {
                             return Results.Redirect("/login");
                         }
 
-                        List<DishModel> dishes = await db.GetDishes(type, restorant_id_num);
+                        List<DishModel> dishes = await db.GetDishesByTypeAndRestaurantId(type, restorant_id_num);
                         string FileData = await controllerUtils.GetHTMLFromWWWROOT("/dishes/" + type);
 
                         FileData = webUtils.HandleCommonPlaceholders(FileData, 

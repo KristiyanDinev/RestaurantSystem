@@ -1,7 +1,7 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
 
-namespace RestaurantSystem.Utils
+namespace RestaurantSystem.Utilities
 {
     public class SubscribtionModel
     {

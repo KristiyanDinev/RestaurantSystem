@@ -243,7 +243,7 @@ namespace RestaurantSystem.Database {
         private void BuildTimeTableModel(ref ModelBuilder bulder)
         {
             bulder.Entity<TimeTableModel>()
-                .HasKey(time => time.RestuarantModelId);
+                .HasKey(time => time.RestuarantId);
 
             bulder.Entity<TimeTableModel>()
                 .Property(time => time.UserAddress)
@@ -264,6 +264,11 @@ namespace RestaurantSystem.Database {
             bulder.Entity<TimeTableModel>()
                 .Property(time => time.AvrageDeliverTime)
                 .IsRequired();
+
+            bulder.Entity<TimeTableModel>()
+                .HasOne(time => time.Restuarant)
+                .WithMany(restaurant => restaurant.TimeTables)
+                .HasForeignKey(time => time.RestuarantId);
         }
 
         private void BuildDishModel(ref ModelBuilder builder) {
@@ -295,7 +300,7 @@ namespace RestaurantSystem.Database {
                 .HasDefaultValue(true);
 
             builder.Entity<DishModel>()
-                .Property(dish => dish.RestaurantModelId)
+                .Property(dish => dish.RestaurantId)
                 .IsRequired();
 
             builder.Entity<DishModel>()
@@ -330,12 +335,22 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<OrderModel>()
-                .Property(order => order.UserModelId)
+                .Property(order => order.UserId)
                 .IsRequired();
 
             builder.Entity<OrderModel>()
-                .Property(order => order.RestaurantModelId)
+                .Property(order => order.RestaurantId)
                 .IsRequired();
+
+            builder.Entity<OrderModel>()
+                .HasOne(order => order.User)
+                .WithMany(user => user.Orders)
+                .HasForeignKey(order => order.UserId);
+
+            builder.Entity<OrderModel>()
+                .HasOne(order => order.Restaurant)
+                .WithMany(restauratn => restauratn.Orders)
+                .HasForeignKey(order => order.RestaurantId);
         }
 
         private void BuildOrderedDishes(ref ModelBuilder builder) {
@@ -347,6 +362,24 @@ namespace RestaurantSystem.Database {
                 .Property(order => order.CurrentStatus)
                 .HasDefaultValue("preparing")
                 .IsRequired();
+
+            builder.Entity<OrderedDishesModel>()
+                .Property(order => order.OrderId)
+                .IsRequired();
+
+            builder.Entity<OrderedDishesModel>()
+                .Property(order => order.DishId)
+                .IsRequired();
+
+            builder.Entity<OrderedDishesModel>()
+                .HasOne(order => order.Order)
+                .WithMany(order => order.OrderedDishes)
+                .HasForeignKey(order => order.OrderId);
+
+            builder.Entity<OrderedDishesModel>()
+                .HasOne(order => order.Dish)
+                .WithMany(dish => dish.OrderedDishes)
+                .HasForeignKey(order => order.DishId);
         }
 
         private void BuildReservationModel(ref ModelBuilder builder)
@@ -364,11 +397,11 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<ReservationModel>()
-                .Property(order => order.UserModelId)
+                .Property(order => order.UserId)
                 .IsRequired();
 
             builder.Entity<ReservationModel>()
-                .Property(order => order.RestaurantModelId)
+                .Property(order => order.RestaurantId)
                 .IsRequired();
 
             builder.Entity<ReservationModel>()
@@ -388,6 +421,16 @@ namespace RestaurantSystem.Database {
                 .Property(order => order.Created_At)
                 .HasDefaultValueSql("NOW()")
                 .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .HasOne(reservation => reservation.User)
+                .WithMany(user => user.Reservations)
+                .HasForeignKey(reservation => reservation.UserId);
+
+            builder.Entity<ReservationModel>()
+                .HasOne(reservation => reservation.Restaurant)
+                .WithMany(restaurant => restaurant.Reservations)
+                .HasForeignKey(reservation => reservation.RestaurantId);
         }
 
         private void BuildCuponModel(ref ModelBuilder builder) {

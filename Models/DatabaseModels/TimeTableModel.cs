@@ -2,8 +2,8 @@
 {
     public class TimeTableModel
     {
-        public int RestuarantModelId;
-        public RestaurantModel RestuarantModel;
+        public int RestuarantId;
+        public RestaurantModel Restuarant;
 
         public string UserAddress;
         public string UserCity;

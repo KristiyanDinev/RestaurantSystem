@@ -18,5 +18,11 @@
         public decimal Price_Per_Adult { get; set; }
 
         public decimal Price_Per_Children { get; set; }
+
+
+        // navigation
+        public ICollection<OrderModel> Orders { get; set; }
+        public ICollection<ReservationModel> Reservations { get; set; }
+        public ICollection<TimeTableModel> TimeTables { get; set; }
     }
 }

@@ -1,24 +1,23 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Services;
-using RestaurantSystem.Utils.Utils;
 using System.Security.Claims;
 
-namespace RestaurantSystem.Utils.Controller
+namespace RestaurantSystem.Utilities
 {
-    public class UserUtils
+    public class UserUtility
     {
-        private EncryptionHandler _EncryptionHandler;
-        private JWTHandler _JWTHandler;
-        private UserService _UserDatabaseHandler;
+        private EncryptionUtility _encryptionUtility;
+        private JWTUtility _jwtUtility;
+        private UserService _userService;
 
-        public readonly string authHeader = "Authorization";
+        private readonly string authHeader = "Authorization";
 
-        public UserUtils(EncryptionHandler encryptionHandler, JWTHandler jwtHandler,
-            UserService UserDatabaseHandler)
+        public UserUtility(EncryptionUtility encryptionUtility, JWTUtility jwtUtility,
+            UserService userService)
         {
-            _EncryptionHandler = encryptionHandler;
-            _JWTHandler = jwtHandler;
-            _UserDatabaseHandler = UserDatabaseHandler;
+            _encryptionUtility = encryptionUtility;
+            _jwtUtility = jwtUtility;
+            _userService = userService;
         }
 
         /*
@@ -36,13 +35,13 @@ namespace RestaurantSystem.Utils.Controller
          * Based on the `remember me` option (if `remember me` is "off")
          * it specifies an experation date of 1 day.
          */
-        public string GenerateJWT(UserModel model, string remeberMe)
+        public string GenerateAuthBearerHeader_JWT(UserModel model, string remeberMe)
         {
             List<Claim> claims = new List<Claim>();
             claims.Add(new Claim("Id", model.Id.ToString()));
 
-            return _EncryptionHandler.Encrypt(
-                _JWTHandler.GenerateJwtToken(claims,
+            return _encryptionUtility.Encrypt(
+                _jwtUtility.GenerateJWT(claims,
 
                 remeberMe.Equals("off") ? DateTime.Now.AddDays(1.0) : null)
                 );
@@ -59,17 +58,25 @@ namespace RestaurantSystem.Utils.Controller
          */
         public async Task<UserModel?> GetUserByJWT(HttpContext context)
         {
-            Dictionary<string, object>? claims = await _JWTHandler.VerifyJWT(
-                   _EncryptionHandler.Decrypt(
+            try
+            {
+                Dictionary<string, object>? claims = await _jwtUtility.VerifyJWT(
+                   _encryptionUtility.Decrypt(
                        _ExtractJWTFromHeader(context.Request.Cookies[authHeader]
                        )));
 
-            if (claims == null || !claims.ContainsKey("Id") ||
-                !int.TryParse(claims["Id"].ToString(), out int Id)) {
+                if (claims == null || !claims.ContainsKey("Id") ||
+                    !int.TryParse(claims["Id"].ToString(), out int Id))
+                {
+                    return null;
+                }
+
+                return await _userService.GetUser(Id);
+
+            } catch (Exception e)
+            {
                 return null;
             }
-
-            return await _UserDatabaseHandler.GetUser(Id);
         }
     }
 }
