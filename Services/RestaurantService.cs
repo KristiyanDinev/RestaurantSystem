@@ -27,6 +27,7 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
+
         public async Task<List<TimeTableModel>> GetRestaurantsForServingPeople_ForUser(UserModel user)
         {
             return await _databaseContext.TimeTables
@@ -39,6 +40,7 @@ namespace RestaurantSystem.Services
                 )
                 .ToListAsync();
         }
+
 
         public async Task<bool> CheckForReservation(ReservationModel reservation)
         {
@@ -53,6 +55,7 @@ namespace RestaurantSystem.Services
                 ) != null;
         }
 
+
         // The user's address is the address of the restaurant, they work in.
         // This only applies to people, who take care of reservations and cooks,
         // because they need to be present in the restaurant.
@@ -63,12 +66,25 @@ namespace RestaurantSystem.Services
                 );
         }
 
+
         public bool CheckUserWorkingInThatRestaurat(UserModel user, RestaurantModel restaurant) {
             return restaurant.ServeCustomersInPlace &&
                 restaurant.Address.Equals(user.Address) &&
                 restaurant.City.Equals(user.City) &&
                 restaurant.Country.Equals(user.Country) &&
                 restaurant.State == user.State;
+        }
+
+
+        public int? GetRestaurantIdFromCookieHeader(HttpContext context)
+        {
+            context.Request.Cookies.TryGetValue("restaurant_id", out string? restaurant_id_str);
+            if (!int.TryParse(restaurant_id_str, out int restaurant_id))
+            {
+                return null;
+            }
+
+            return restaurant_id;
         }
     }
 }

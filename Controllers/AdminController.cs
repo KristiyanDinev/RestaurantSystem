@@ -8,7 +8,6 @@ using RestaurantSystem.Utilities;
 namespace RestaurantSystem.Controllers
 {
 
-    [Route("/Admin")]
     public class AdminController : Controller
     {
         private readonly string _restaurant_error = "Please update your profile or tell the Manager to update your profile address, city, state and country to align with the address of the Restaurant you work in.";

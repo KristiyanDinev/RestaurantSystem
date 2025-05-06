@@ -20,7 +20,7 @@ namespace RestaurantSystem.Services
 
         public async Task<List<DishModel>> GetDishesByIds(List<int> IDs)
         {
-            return await _databaseContext.Dishies.Where(
+            return IDs.Count == 0 ? new List<DishModel>() : await _databaseContext.Dishies.Where(
                 dish => IDs.Contains(dish.Id))
                 .ToListAsync();
         }
@@ -76,7 +76,6 @@ namespace RestaurantSystem.Services
                 }
             }
             return dishesIds;
-
         }
     }
 }

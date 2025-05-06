@@ -1,23 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Controllers {
     public class CuponController : Controller{
 
-        private CuponService _CuponDatabaseHandler;
+        private CuponService _cuponDatabaseHandler;
 
         public CuponController(CuponService cuponDatabaseHandler) {
-            _CuponDatabaseHandler = cuponDatabaseHandler;
+            _cuponDatabaseHandler = cuponDatabaseHandler;
         }
 
-        [HttpGet]
-        [Route("Cupon")]
-        [Route("Cupon/Index")]
-        public async Task<IActionResult> Index(string code, string name)
+        [HttpPost]
+        [Route("/Cupon")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IResult> Cupon(string code)
         {
-            CuponModel cupon = await _CuponDatabaseHandler.CreateCupon(code, name, DateTime.Now, 1);
-            return View(cupon);
+            return Results.Json<CuponModel?>(await _cuponDatabaseHandler.GetCuponByCode(code));
         }
     }
 }

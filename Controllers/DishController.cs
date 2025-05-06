@@ -1,15 +1,19 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using RestaurantSystem.Utilities;
 using RestaurantSystem.Services;
-using RestaurantSystem.Utils;
 
 namespace RestaurantSystem.Controllers {
-    public class DishController {
+    public class DishController : Controller {
 
-        public DishController(WebApplication app) {
+        private UserUtility _userUtility;
+        private RestaurantService _restaurantService;
 
-           
+        public DishController(UserUtility userUtility, RestaurantService restaurantService) {
+            _userUtility = userUtility;
+            _restaurantService = restaurantService;
+            /*
             app.MapGet("/Dishes", async (HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils, 
                 OrderService orderDB) =>
@@ -134,6 +138,29 @@ namespace RestaurantSystem.Controllers {
                     }
 
             }).RequireRateLimiting("fixed");
+           */
+        }
+
+
+        [HttpGet]
+        [Route("/Dishes")]
+        [Route("/Dishes/Index")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> Index()
+        {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return Redirect("/login");
+            }
+
+            int? restaurantId = _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext);
+            if (restaurantId == null)
+            {
+                return Redirect("/restaurants");
+            }
+
+            return View(user);
         }
     }
 }

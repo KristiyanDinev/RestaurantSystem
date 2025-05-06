@@ -1,83 +1,42 @@
-﻿using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Models.WebModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.View;
 using RestaurantSystem.Services;
-using RestaurantSystem.Utils;
-using RestaurantSystem.Utils.Web;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Controllers
 {
-    public class CartController
+    public class CartController : Controller
     {
+        private UserUtility _userUtility;
+        private DishService _dishService;
 
-        public CartController(WebApplication app)
+        public CartController(DishService dishService, UserUtility userUtility)
         {
-            
-            // get current dishes about to order
-            app.MapGet("/cart", async (HttpContext context, DishService db,
-                OrderService orderDB,
-                ControllerUtils controllerUtils, WebUtils webUtils, UserUtils userUtils) =>
+            _dishService = dishService;
+            _userUtility = userUtility;
+        }
+
+
+        [HttpGet]
+        [Route("/Cart")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> Cart()
+        {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
             {
-                try {
+                return Redirect("/login");
+            }
 
-                    if (!int.TryParse(context.Request.Cookies[controllerUtils.RestoratIdHeaderName], 
-                        out int restorantId))
-                    {
-                        return Results.Redirect("/Dishes");
-                    }
+            CartViewModel cartViewModel = new CartViewModel();
 
-                    UserModel? user = await userUtils.GetUserByJWT(context);
-                    if (user == null)
-                    {
-                        return Results.Redirect("/login");
-                    }
+            cartViewModel.User = user;
+            cartViewModel.Dishes = await _dishService.GetDishesByIds(
+                _dishService.GetDishIDsFromCart(HttpContext));
 
-                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/cart");
-
-                    List<int> dishesIds = controllerUtils.GetCartItems(context);
-
-                    List<DishModel> dishes = new List<DishModel>();
-                    if (dishesIds.Count > 0)
-                    {
-                        dishes = await db.GetDishesByIds(dishesIds.ToHashSet().ToList());
-                    }
-
-                    TimeTableJoinRestorantModel restorantAddress =
-                        await orderDB.GetRestorantAddressById(restorantId);
-
-                    List<DishModel> temp = new List<DishModel>();
-                    foreach (int id in dishesIds)
-                    {
-                        foreach (DishModel dish in dishes)
-                        {
-                            if (dish.Id == id)
-                            {
-                                temp.Add(dish);
-                                break;
-                            }
-                        }
-                    }
-
-                    List<DisplayDishModel> displayDishModels = controllerUtils.ConvertToDisplayDish(temp);
-
-                    FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                        controllerUtils.UserModelName, [user]);
-
-                    FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                        controllerUtils.DishModelName, displayDishModels.Cast<object>()
-                        .ToList());
-
-                    FileData = webUtils.HandleCommonPlaceholders(FileData,
-                        controllerUtils.RestorantModelName, [restorantAddress]);
-
-                    return Results.Content(FileData, "text/html");
-
-                }
-                catch (Exception)
-                {
-                    return Results.Redirect("/Dishes");
-                }
-            }).RequireRateLimiting("fixed")
-            .DisableAntiforgery();
+            return View(cartViewModel);
         }
     }
 }
