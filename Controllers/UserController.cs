@@ -40,10 +40,10 @@ namespace RestaurantSystem.Controllers {
                         string data = await controllerUtils.GetHTMLFromWWWROOT("/login");
 
                         return user == null ? Results.Content(data, "text/html") :
-                            Results.Redirect("/dishes");
+                            Results.Redirect("/Dishes");
 
                     } catch (Exception) {
-                        return Results.Redirect("/error");
+                        return Results.Redirect("/_restaurant_error");
                     }
 
             }).RequireRateLimiting("fixed");
@@ -64,7 +64,7 @@ namespace RestaurantSystem.Controllers {
                         UserModel? _user = await userUtils.GetUserByJWT(context);
                         if (_user != null)
                         {
-                            return Results.Redirect("/dishes");
+                            return Results.Redirect("/Dishes");
                         }
 
                         UserModel user = new UserModel(email, password);
@@ -95,10 +95,10 @@ namespace RestaurantSystem.Controllers {
                     string data = await controllerUtils.GetHTMLFromWWWROOT("/register");
 
                     return user == null ? Results.Content(data, "text/html") :
-                        Results.Redirect("/dishes");
+                        Results.Redirect("/Dishes");
 
                 } catch (Exception) {
-                    return Results.Redirect("/error");
+                    return Results.Redirect("/_restaurant_error");
                 }
 
             }).RequireRateLimiting("fixed");
@@ -124,7 +124,7 @@ namespace RestaurantSystem.Controllers {
                         UserModel? _user = await userUtils.LoginByUsingCookie(context, db);
                         if (_user != null)
                         {
-                            return Results.Redirect("/dishes");
+                            return Results.Redirect("/Dishes");
                         }
 
 

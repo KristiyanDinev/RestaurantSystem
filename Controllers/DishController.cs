@@ -10,7 +10,7 @@ namespace RestaurantSystem.Controllers {
         public DishController(WebApplication app) {
 
            
-            app.MapGet("/dishes", async (HttpContext context,
+            app.MapGet("/Dishes", async (HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils, 
                 OrderService orderDB) =>
             {
@@ -26,7 +26,7 @@ namespace RestaurantSystem.Controllers {
                     List<TimeTableJoinRestorantModel> timeTableWithRestorantAddresses =
                         await orderDB.GetRestorantsAddressesForUser(user);
 
-                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/dishes");
+                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/Dishes");
 
                     FileData = webUtils.HandleCommonPlaceholders(FileData, 
                         controllerUtils.UserModelName, [user]);
@@ -40,7 +40,7 @@ namespace RestaurantSystem.Controllers {
                 }
                 catch (Exception)
                 {
-                    return Results.Redirect("/error");
+                    return Results.Redirect("/_restaurant_error");
                 }
             });
 
@@ -56,7 +56,7 @@ namespace RestaurantSystem.Controllers {
                         if (!int.TryParse(context.Request.Cookies[controllerUtils.RestoratIdHeaderName],
                             out int restorant_id_num))
                         {
-                            return Results.Redirect("/dishes");
+                            return Results.Redirect("/Dishes");
                         }
 
                         UserModel? user = await userUtils.GetUserByJWT(context);
@@ -66,7 +66,7 @@ namespace RestaurantSystem.Controllers {
                         }
 
                         List<DishModel> dishes = await db.GetDishesByTypeAndRestaurantId(type, restorant_id_num);
-                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/dishes/" + type);
+                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/Dishes/" + type);
 
                         FileData = webUtils.HandleCommonPlaceholders(FileData, 
                             controllerUtils.UserModelName, [user]);
@@ -79,7 +79,7 @@ namespace RestaurantSystem.Controllers {
 
                     } catch (Exception)
                     {
-                        return Results.Redirect("/error");
+                        return Results.Redirect("/_restaurant_error");
                     }
 
             }).RequireRateLimiting("fixed");
@@ -96,7 +96,7 @@ namespace RestaurantSystem.Controllers {
 
                         if (!int.TryParse(dishId, out int Id))
                         {
-                            return Results.Redirect("/dishes");
+                            return Results.Redirect("/Dishes");
                         }
 
                         UserModel? user = await userUtils.GetUserByJWT(context);
@@ -130,7 +130,7 @@ namespace RestaurantSystem.Controllers {
                         return Results.Content(FileData, "text/html");
 
                     } catch (Exception) {
-                        return Results.Redirect("/error");
+                        return Results.Redirect("/_restaurant_error");
                     }
 
             }).RequireRateLimiting("fixed");

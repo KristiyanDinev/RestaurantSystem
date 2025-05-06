@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Utils;
-
+using RestaurantSystem.Utilities;
 namespace RestaurantSystem.Services
 {
     public class UserService
@@ -34,7 +33,7 @@ namespace RestaurantSystem.Services
                 Email = email,
                 Image = image,
                 Name = name,
-                Password = Convert.ToBase64String(EncryptionHandler.HashIt(no_hash_password)),
+                Password = Convert.ToBase64String(EncryptionUtility.HashIt(no_hash_password)),
                 Notes = notes
             };
 
@@ -86,5 +85,6 @@ namespace RestaurantSystem.Services
 
             await _databaseContext.SaveChangesAsync();
         }
+
     }
 }

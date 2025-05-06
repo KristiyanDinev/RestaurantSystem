@@ -7,16 +7,18 @@ namespace RestaurantSystem.Services
     public class RestaurantService
     {
 
-        private DatabaseContext _databaseManager;
+        private DatabaseContext _databaseContext;
 
-        public RestaurantService(DatabaseContext databaseManager)
+        public RestaurantService(DatabaseContext databaseContext)
         {
-            _databaseManager = databaseManager;
+            _databaseContext = databaseContext;
         }
 
         public async Task<List<TimeTableModel>> GetRestaurantsForDelivery_ForUser(UserModel user)
         {
-            return await _databaseManager.TimeTables.Where(
+            return await _databaseContext.TimeTables
+                .Include(times => times.Restuarant)
+                .Where(
                 times => times.Restuarant.DoDelivery &&
                 times.UserCity.Equals(user.City) &&
                 times.UserCountry.Equals(user.Country) &&
@@ -27,7 +29,9 @@ namespace RestaurantSystem.Services
 
         public async Task<List<TimeTableModel>> GetRestaurantsForServingPeople_ForUser(UserModel user)
         {
-            return await _databaseManager.TimeTables.Where(
+            return await _databaseContext.TimeTables
+                .Include(times => times.Restuarant)
+                .Where(
                 times => times.Restuarant.ServeCustomersInPlace &&
                 times.UserCity.Equals(user.City) &&
                 times.UserCountry.Equals(user.Country) &&
@@ -38,7 +42,7 @@ namespace RestaurantSystem.Services
 
         public async Task<bool> CheckForReservation(ReservationModel reservation)
         {
-            return await _databaseManager.Restaurants.FirstOrDefaultAsync(
+            return await _databaseContext.Restaurants.FirstOrDefaultAsync(
                 restaurant => restaurant.ServeCustomersInPlace &&
 
                 restaurant.ReservationMinAdults <= reservation.Amount_Of_Adults &&
@@ -54,13 +58,17 @@ namespace RestaurantSystem.Services
         // because they need to be present in the restaurant.
         public async Task<RestaurantModel?> GetRestaurantForStaff(UserModel user)
         {
-            return await _databaseManager.Restaurants.FirstOrDefaultAsync(
-                restaurant => restaurant.ServeCustomersInPlace &&
+            return await _databaseContext.Restaurants.FirstOrDefaultAsync(
+                restaurant => CheckUserWorkingInThatRestaurat(user, restaurant)
+                );
+        }
+
+        public bool CheckUserWorkingInThatRestaurat(UserModel user, RestaurantModel restaurant) {
+            return restaurant.ServeCustomersInPlace &&
                 restaurant.Address.Equals(user.Address) &&
                 restaurant.City.Equals(user.City) &&
                 restaurant.Country.Equals(user.Country) &&
-                restaurant.State == user.State
-                );
+                restaurant.State == user.State;
         }
     }
 }

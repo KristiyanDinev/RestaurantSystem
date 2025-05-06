@@ -22,7 +22,7 @@ namespace RestaurantSystem.Controllers
                     if (!int.TryParse(context.Request.Cookies[controllerUtils.RestoratIdHeaderName], 
                         out int restorantId))
                     {
-                        return Results.Redirect("/dishes");
+                        return Results.Redirect("/Dishes");
                     }
 
                     UserModel? user = await userUtils.GetUserByJWT(context);
@@ -74,7 +74,7 @@ namespace RestaurantSystem.Controllers
                 }
                 catch (Exception)
                 {
-                    return Results.Redirect("/dishes");
+                    return Results.Redirect("/Dishes");
                 }
             }).RequireRateLimiting("fixed")
             .DisableAntiforgery();

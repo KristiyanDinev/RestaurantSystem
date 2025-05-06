@@ -13,7 +13,7 @@ namespace RestaurantSystem.Controllers
     {
         public ReservationsController(WebApplication app)
         {
-            app.MapGet("/reservations", async (HttpContext context, 
+            app.MapGet("/Reservations", async (HttpContext context, 
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils,
                 ReservationService reservationsDB) =>
             {
@@ -27,7 +27,7 @@ namespace RestaurantSystem.Controllers
 
                     List<DisplayReservationModel> reservations = await reservationsDB.GetReservationsByUser(user);
 
-                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/reservations");
+                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/Reservations");
                     FileData = webUtils.HandleCommonPlaceholders(FileData, controllerUtils.UserModelName, [user]);
                     FileData = webUtils.HandleCommonPlaceholders(FileData, controllerUtils.ReservationModelName, 
                         reservations.Cast<object>().ToList());
@@ -37,11 +37,11 @@ namespace RestaurantSystem.Controllers
                 }
                 catch (Exception)
                 {
-                    return Results.Redirect("/error");
+                    return Results.Redirect("/_restaurant_error");
                 }
             }).RequireRateLimiting("fixed");
 
-            app.MapGet("/reservations/create", async (HttpContext context,
+            app.MapGet("/Reservations/create", async (HttpContext context,
                 ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils, 
                 ReservationService reservationDB) =>
             {
@@ -55,7 +55,7 @@ namespace RestaurantSystem.Controllers
 
                     List<TimeTableJoinRestorantModel> timeTableJoinRestorantModels = await reservationDB.GetRestorantsAddressesForReservation(user);
 
-                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/reservations/create");
+                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/Reservations/create");
                     FileData = webUtils.HandleCommonPlaceholders(FileData, controllerUtils.UserModelName, [user]);
                     FileData = webUtils.HandleCommonPlaceholders(FileData, controllerUtils.RestorantModelName,
                         timeTableJoinRestorantModels.Cast<object>().ToList());
@@ -65,12 +65,12 @@ namespace RestaurantSystem.Controllers
                 }
                 catch (Exception)
                 {
-                    return Results.Redirect("/error");
+                    return Results.Redirect("/_restaurant_error");
                 }
             }).RequireRateLimiting("fixed");
 
 
-            app.MapPost("/reservations/create", async (HttpContext context,
+            app.MapPost("/Reservations/create", async (HttpContext context,
                 UserUtils userUtils, ReservationService reservationsDB,
                 ControllerUtils controllerUtils,
                 [FromForm] RegisterReservationModel registerReservationModel) =>
@@ -110,7 +110,7 @@ namespace RestaurantSystem.Controllers
             }).DisableAntiforgery()
             .RequireRateLimiting("fixed");
 
-            app.MapPost("/reservations/delete", async (HttpContext context,
+            app.MapPost("/Reservations/delete", async (HttpContext context,
                 UserUtils userUtils, ReservationService reservationsDB,
                  WebSocketHandler webSocketHandler,
                 [FromForm] string reservationIdStr) =>

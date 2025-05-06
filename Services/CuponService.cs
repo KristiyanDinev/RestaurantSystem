@@ -6,11 +6,11 @@ namespace RestaurantSystem.Services
 {
     public class CuponService
     {
-        private DatabaseContext _databaseManager;
+        private DatabaseContext _databaseContext;
 
-        public CuponService(DatabaseContext databaseManager)
+        public CuponService(DatabaseContext databaseContext)
         {
-            _databaseManager = databaseManager;
+            _databaseContext = databaseContext;
         }
 
 
@@ -23,14 +23,14 @@ namespace RestaurantSystem.Services
                 return;
             }
 
-            _databaseManager.Cupons.Remove(cupon);
+            _databaseContext.Cupons.Remove(cupon);
 
-            await _databaseManager.SaveChangesAsync();
+            await _databaseContext.SaveChangesAsync();
         }
 
         public async Task<CuponModel?> GetCuponByCode(string cuponCode)
         {
-            return await _databaseManager.Cupons.FirstOrDefaultAsync(
+            return await _databaseContext.Cupons.FirstOrDefaultAsync(
                 c => c.CuponCode == cuponCode);
         }
 
@@ -43,9 +43,9 @@ namespace RestaurantSystem.Services
             cupon.CuponCode = cuponCode;
             cupon.Name = name;
 
-            await _databaseManager.Cupons.AddAsync(cupon);
+            await _databaseContext.Cupons.AddAsync(cupon);
 
-            await _databaseManager.SaveChangesAsync();
+            await _databaseContext.SaveChangesAsync();
 
             return cupon;
         }

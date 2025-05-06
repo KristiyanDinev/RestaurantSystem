@@ -7,14 +7,14 @@ namespace RestaurantSystem.Services
     public class ReservationService
     {
 
-        private DatabaseContext _databaseManager;
+        private DatabaseContext _databaseContext;
 
         private RestaurantService _restaurantDatabaseHandler;
 
-        public ReservationService(DatabaseContext databaseManager,
+        public ReservationService(DatabaseContext databaseContext,
             RestaurantService restaurantDatabaseHandler)
         {
-            _databaseManager = databaseManager;
+            _databaseContext = databaseContext;
             _restaurantDatabaseHandler = restaurantDatabaseHandler;
         }
 
@@ -33,32 +33,37 @@ namespace RestaurantSystem.Services
                 return false;
             }
 
-            await _databaseManager.Reservations.AddAsync(reservation);
+            await _databaseContext.Reservations.AddAsync(reservation);
 
-            int num = await _databaseManager.SaveChangesAsync();
+            int num = await _databaseContext.SaveChangesAsync();
 
             return num >= 1;
         }
 
         public async Task<List<ReservationModel>> GetReservationsByUserId(int userId)
         {
-            return await _databaseManager.Reservations.Where(res => 
-                res.UserId == userId)
-                .ToListAsync();
+            return await _databaseContext.Reservations.Where(res => 
+                res.UserId == userId).ToListAsync();
         }
 
         public async Task DeleteReservation(int reservationId)
         {
-            ReservationModel? reservation = await _databaseManager
+            ReservationModel? reservation = await _databaseContext
                 .Reservations.FirstOrDefaultAsync(res => res.Id == reservationId);
 
             if (reservation == null) {
                 return;
             }
 
-            _databaseManager.Remove(reservation);
+            _databaseContext.Remove(reservation);
 
-            await _databaseManager.SaveChangesAsync();
+            await _databaseContext.SaveChangesAsync();
+        }
+
+        public async Task<List<ReservationModel>> GetReservationsByRestaurantId(int restaurantId)
+        {
+            return await _databaseContext.Reservations.Where(res =>
+                res.RestaurantId == restaurantId).ToListAsync();
         }
     }
 }

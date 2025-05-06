@@ -14,7 +14,7 @@ namespace RestaurantSystem.Controllers
                 await webSocketHandler.HandleWholeRequest(context, orderDatabaseHandler, dishDatabaseHandler);
             }).RequireRateLimiting("fixed");
 
-            app.MapGet("/ws/reservations", async (HttpContext context, WebSocketHandler webSocketHandler, 
+            app.MapGet("/ws/Reservations", async (HttpContext context, WebSocketHandler webSocketHandler, 
                 OrderService orderDatabaseHandler, DishService dishDatabaseHandler) =>
             {
                 await webSocketHandler.HandleWholeRequest(context, orderDatabaseHandler, dishDatabaseHandler);

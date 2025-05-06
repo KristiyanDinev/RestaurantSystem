@@ -154,7 +154,7 @@ namespace RestaurantSystem.Controllers
                 cookSubscribtions.Add(subscribtionModel);
 
             }
-            else if (path.EndsWith("/reservations"))
+            else if (path.EndsWith("/Reservations"))
             {
                 reservationSubscribtions.Add(subscribtionModel);
 

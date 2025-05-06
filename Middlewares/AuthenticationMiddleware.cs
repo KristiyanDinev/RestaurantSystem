@@ -31,7 +31,7 @@ namespace RestaurantSystem.Services
             if (user != null && non_login_endpoints.Contains(path))
             {
                 // user is logged in and tries to login in.
-                context.Response.Redirect("/dishes");
+                context.Response.Redirect("/Dishes");
                 return;
 
             }
@@ -58,7 +58,7 @@ namespace RestaurantSystem.Services
                     // user doesn't have the roles to do so.
                     Console.WriteLine("\n"+user.Name +" was trying to reach to admin page. Service: "+
                         path+" without the proper roles.\n");
-                    context.Response.Redirect("/dishes");
+                    context.Response.Redirect("/Dishes");
                     return;
                 }
             }

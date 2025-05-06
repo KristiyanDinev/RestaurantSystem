@@ -6,10 +6,10 @@ namespace RestaurantSystem.Services
 {
     public class OrderedDishesService
     {
-        private DatabaseContext _databaseManager;
-        public OrderedDishesService(DatabaseContext databaseManager)
+        private DatabaseContext _databaseContext;
+        public OrderedDishesService(DatabaseContext databaseContext)
         {
-            _databaseManager = databaseManager;
+            _databaseContext = databaseContext;
         }
 
         public async Task<OrderedDishesModel> CreateOrderedDish(int dishModelId, 
@@ -20,10 +20,10 @@ namespace RestaurantSystem.Services
             orderedDishes.DishId = dishModelId;
             orderedDishes.Notes = notes;
 
-            await _databaseManager.OrderedDishes.AddAsync(orderedDishes);
+            await _databaseContext.OrderedDishes.AddAsync(orderedDishes);
 
             if (saveChanges) { 
-                await _databaseManager.SaveChangesAsync();
+                await _databaseContext.SaveChangesAsync();
             }
             
             return orderedDishes;
@@ -32,7 +32,7 @@ namespace RestaurantSystem.Services
 
         public async Task UpdateOrderedDishStatusById(int dishId, int orderId, string status)
         {
-            OrderedDishesModel? orderedDishes = await _databaseManager.OrderedDishes
+            OrderedDishesModel? orderedDishes = await _databaseContext.OrderedDishes
                 .FirstOrDefaultAsync(
                 order => order.DishId == dishId && order.OrderId == orderId);
 
@@ -43,25 +43,25 @@ namespace RestaurantSystem.Services
 
             orderedDishes.CurrentStatus = status;
 
-            await _databaseManager.SaveChangesAsync();
+            await _databaseContext.SaveChangesAsync();
         }
 
         public async Task DeleteOrderedDishes(int orderId)
         {
-            List<OrderedDishesModel> dishes = await _databaseManager.OrderedDishes
+            List<OrderedDishesModel> dishes = await _databaseContext.OrderedDishes
                 .Where(order => order.OrderId == orderId)
                 .ToListAsync();
 
             foreach (OrderedDishesModel orderedDishes in dishes) {
-                _databaseManager.OrderedDishes.Remove(orderedDishes);
+                _databaseContext.OrderedDishes.Remove(orderedDishes);
             }
 
-            await _databaseManager.SaveChangesAsync();
+            await _databaseContext.SaveChangesAsync();
         }
 
         public async Task<List<DishModel>> GetDishesFromOrder(int orderId)
         {
-            List<OrderedDishesModel> orderedDishes = await _databaseManager.OrderedDishes.Where(
+            List<OrderedDishesModel> orderedDishes = await _databaseContext.OrderedDishes.Where(
                 order => order.OrderId == orderId)
                 .ToListAsync();
 
@@ -70,7 +70,7 @@ namespace RestaurantSystem.Services
                 IDs.Add(orderedDish.DishId);
             }
 
-            return await _databaseManager.Dishies.Where(
+            return await _databaseContext.Dishies.Where(
                 dish => IDs.Contains(dish.Id))
                 .ToListAsync();
         }

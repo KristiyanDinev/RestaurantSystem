@@ -6,10 +6,10 @@ namespace RestaurantSystem.Controllers {
 
         public ErrorController(WebApplication app) {
 
-            app.MapGet("/error", async (ControllerUtils controllerUtils) => {
+            app.MapGet("/_restaurant_error", async (ControllerUtils controllerUtils) => {
                 try {
 
-                    string data = await controllerUtils.GetHTMLFromWWWROOT("/error");
+                    string data = await controllerUtils.GetHTMLFromWWWROOT("/_restaurant_error");
                     return Results.Content(data, "text/html");
 
                 } catch (Exception) {

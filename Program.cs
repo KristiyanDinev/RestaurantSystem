@@ -69,10 +69,10 @@ namespace RestaurantSystem
 
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options => {
-                    options.PermitLimit = 2;
-                    options.Window = TimeSpan.FromSeconds(1);
+                    options.PermitLimit = 10;
+                    options.Window = TimeSpan.FromMinutes(1);
                     options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                    options.QueueLimit = 1;
+                    options.QueueLimit = 0;
                 })
             );
 
@@ -97,7 +97,6 @@ namespace RestaurantSystem
 
             new WebSocketController(app);
             new ReservationsController(app);
-            new AdminController(app);
             new UserController(app);
             new DishController(app);
             new ErrorController(app);

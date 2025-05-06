@@ -6,21 +6,21 @@ namespace RestaurantSystem.Services
 {
     public class DishService
     {
-        private DatabaseContext _databaseManager;
-        public DishService(DatabaseContext databaseManager) {
-            _databaseManager = databaseManager;
+        private DatabaseContext _databaseContext;
+        public DishService(DatabaseContext databaseContext) {
+            _databaseContext = databaseContext;
         }
 
         public async Task<List<DishModel>> GetDishesByTypeAndRestaurantId(string type, int restaurantId)
         {
-            return await _databaseManager.Dishies.Where(
+            return await _databaseContext.Dishies.Where(
                 dish => dish.Type_Of_Dish.Equals(type) && dish.RestaurantId == restaurantId)
                 .ToListAsync();
         }
 
         public async Task<List<DishModel>> GetDishesByIds(List<int> IDs)
         {
-            return await _databaseManager.Dishies.Where(
+            return await _databaseContext.Dishies.Where(
                 dish => IDs.Contains(dish.Id))
                 .ToListAsync();
         }
@@ -41,21 +41,21 @@ namespace RestaurantSystem.Services
             dish.Notes = notes;
             dish.Image = image;
 
-            await _databaseManager.Dishies.AddAsync(dish);
+            await _databaseContext.Dishies.AddAsync(dish);
 
-            await _databaseManager.SaveChangesAsync();
+            await _databaseContext.SaveChangesAsync();
 
             return dish;
         }
 
         public async Task DeleteDish(int id)
         {
-            DishModel? dish = await _databaseManager.Dishies.FirstOrDefaultAsync(
+            DishModel? dish = await _databaseContext.Dishies.FirstOrDefaultAsync(
                 d => d.Id == id) ?? throw new Exception("Dish doesn't exist.");
 
-            _databaseManager.Dishies.Remove(dish);
+            _databaseContext.Dishies.Remove(dish);
 
-            await _databaseManager.SaveChangesAsync();
+            await _databaseContext.SaveChangesAsync();
         }
 
         public List<int> GetDishIDsFromCart(HttpContext context)

@@ -7,11 +7,13 @@ namespace RestaurantSystem.Services
     public class RoleService
     {
 
-        public DatabaseContext _databaseContext;
+        private DatabaseContext _databaseContext;
+        private RestaurantService _restaurantService; 
 
-        public RoleService(DatabaseContext databaseContext)
+        public RoleService(DatabaseContext databaseContext, RestaurantService restaurantService)
         {
             _databaseContext = databaseContext;
+            _restaurantService = restaurantService;
         }
 
         public async Task<bool> CreateRole(string roleName, string? description = null)
@@ -179,6 +181,32 @@ namespace RestaurantSystem.Services
                 .Select(rp => rp.ServicePath)
                 .Distinct()
                 .ToListAsync();
+        }
+
+
+        public async Task<List<UserModel>> GetUsersWithAccessToServices(List<string> services)
+        {
+            return await _databaseContext.Users
+                .Include(user => user.Roles)
+                .Where(user => user.Roles.Any(userRole =>
+            userRole.Role.RolePermissions.Any(rolePermission =>
+                services.Contains(rolePermission.ServicePath)))
+                )
+            .ToListAsync();
+        }
+
+        public async Task<List<UserModel>> GetUsersWithAccessToServicesInTheRestaurant(List<string> services, 
+            RestaurantModel restaurant)
+        {
+            return await _databaseContext.Users
+                .Include(user => user.Roles)
+                .Where(user => user.Roles.Any(userRole =>
+            userRole.Role.RolePermissions.Any(rolePermission =>
+                services.Contains(rolePermission.ServicePath))) &&
+
+                _restaurantService.CheckUserWorkingInThatRestaurat(user, restaurant)
+                )
+            .ToListAsync();
         }
     }
 }
