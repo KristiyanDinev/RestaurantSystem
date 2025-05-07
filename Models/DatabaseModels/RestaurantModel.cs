@@ -24,5 +24,6 @@
         public ICollection<OrderModel> Orders { get; set; }
         public ICollection<ReservationModel> Reservations { get; set; }
         public ICollection<TimeTableModel> TimeTables { get; set; }
+        public ICollection<UserModel> Employees { get; set; }
     }
 }

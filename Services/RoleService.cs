@@ -195,18 +195,5 @@ namespace RestaurantSystem.Services
             .ToListAsync();
         }
 
-        public async Task<List<UserModel>> GetUsersWithAccessToServicesInTheRestaurant(List<string> services, 
-            RestaurantModel restaurant)
-        {
-            return await _databaseContext.Users
-                .Include(user => user.Roles)
-                .Where(user => user.Roles.Any(userRole =>
-            userRole.Role.RolePermissions.Any(rolePermission =>
-                services.Contains(rolePermission.ServicePath))) &&
-
-                _restaurantService.CheckUserWorkingInThatRestaurat(user, restaurant)
-                )
-            .ToListAsync();
-        }
     }
 }

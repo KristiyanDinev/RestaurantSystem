@@ -17,13 +17,15 @@ namespace RestaurantSystem.Services
         }
 
         public async Task AddOrder(int userId, int restaurantId,
-            List<int> dishesId, string? notes, decimal totalPrice)
+            List<int> dishesId, string? notes, decimal totalPrice, bool isHomeDelivery)
         {
-            OrderModel order = new OrderModel();
-            order.Notes = notes;
-            order.RestaurantId = restaurantId;
-            order.TotalPrice = totalPrice;
-            order.UserId = userId;
+            OrderModel order = new OrderModel {
+                Notes = notes,
+                RestaurantId = restaurantId,
+                TotalPrice = totalPrice,
+                UserId = userId,
+                IsHomeDelivery = isHomeDelivery
+            };
 
             await _databaseContext.Orders.AddAsync(order);
 
@@ -80,6 +82,14 @@ namespace RestaurantSystem.Services
         {
             return await _databaseContext.Orders.Where(
                 order => order.RestaurantId == restaurantId)
+                .ToListAsync();
+        }
+
+        public async Task<List<OrderModel>> GetOrdersByRestaurantId_WithHomeDeliveryOption(int restaurantId, bool isHomeDelivery)
+        {
+            return await _databaseContext.Orders.Where(
+                order => order.RestaurantId == restaurantId && 
+                order.IsHomeDelivery.Equals(isHomeDelivery))
                 .ToListAsync();
         }
 

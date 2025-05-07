@@ -56,26 +56,6 @@ namespace RestaurantSystem.Services
         }
 
 
-        // The user's address is the address of the restaurant, they work in.
-        // This only applies to people, who take care of reservations and cooks,
-        // because they need to be present in the restaurant.
-        public async Task<RestaurantModel?> GetRestaurantForStaff(UserModel user)
-        {
-            return await _databaseContext.Restaurants.FirstOrDefaultAsync(
-                restaurant => CheckUserWorkingInThatRestaurat(user, restaurant)
-                );
-        }
-
-
-        public bool CheckUserWorkingInThatRestaurat(UserModel user, RestaurantModel restaurant) {
-            return restaurant.ServeCustomersInPlace &&
-                restaurant.Address.Equals(user.Address) &&
-                restaurant.City.Equals(user.City) &&
-                restaurant.Country.Equals(user.Country) &&
-                restaurant.State == user.State;
-        }
-
-
         public int? GetRestaurantIdFromCookieHeader(HttpContext context)
         {
             context.Request.Cookies.TryGetValue("restaurant_id", out string? restaurant_id_str);
@@ -85,6 +65,18 @@ namespace RestaurantSystem.Services
             }
 
             return restaurant_id;
+        }
+
+
+        public async Task<List<UserModel>> GetRestaurantEmployeesByRestaurantId(int restaurantId)
+        {
+            ICollection<UserModel>? employees = await _databaseContext.Restaurants
+                .Include(restaurant => restaurant.Employees)
+                .Where(restaurant => restaurant.Id == restaurantId)
+                .Select(restaurant => restaurant.Employees)
+                .FirstOrDefaultAsync();
+
+            return employees == null ? new List<UserModel>() : employees.ToList();
         }
     }
 }

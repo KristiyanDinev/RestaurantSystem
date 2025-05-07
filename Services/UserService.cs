@@ -85,5 +85,15 @@ namespace RestaurantSystem.Services
 
             await _databaseContext.SaveChangesAsync();
         }
+
+
+        public async Task<RestaurantModel?> GetRestaurantWhereUserWorksIn(UserModel user)
+        {
+            return await _databaseContext.Restaurants
+                .Include(restaurant => restaurant.Employees)
+                .Where(restaurant => restaurant.Id == restaurantId)
+                .Select(restaurant => restaurant.Employees)
+                .FirstOrDefaultAsync();
+        }
     }
 }

@@ -18,6 +18,11 @@
         public DateTime CreatedAt { get; set; }
 
 
+        public int? RestaurantId { get; set; }
+        public RestaurantModel? Restaurant { get; set; }
+
+
+
         // navigation
         public ICollection<UserRoleModel> Roles { get; set; }
         public ICollection<OrderModel> Orders { get; set; }

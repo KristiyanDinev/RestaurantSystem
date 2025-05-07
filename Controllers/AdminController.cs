@@ -64,7 +64,7 @@ namespace RestaurantSystem.Controllers
                 return Redirect("/login");
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantForStaff(user);
+            RestaurantModel? restaurant = await _userSerive.(user);
 
             DishesViewModel adminDishesModel = new DishesViewModel();
             if (restaurant == null)
@@ -161,11 +161,11 @@ namespace RestaurantSystem.Controllers
 
             DeliveryViewModel deliveryViewModel = new DeliveryViewModel();
 
-            Dictionary<RestaurantModel, List<OrderModel>> orders = new Dictionary<RestaurantModel, List<OrderModel>>();
+            Dictionary<TimeTableModel, List<OrderModel>> orders = new Dictionary<TimeTableModel, List<OrderModel>>();
 
             foreach (TimeTableModel timeTable in await _restaurantService.GetRestaurantsForDelivery_ForUser(user)) {
 
-                orders.Add(timeTable.Restuarant, await _orderService.GetOrdersByRestaurantId(timeTable.Restuarant.Id));
+                orders.Add(timeTable, await _orderService.GetOrdersByRestaurantId_WithHomeDeliveryOption(timeTable.Restuarant.Id, true));
             }
 
             deliveryViewModel.Staff = user;

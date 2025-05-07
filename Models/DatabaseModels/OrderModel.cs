@@ -7,6 +7,8 @@
         public DateTime OrderedAt { get; set; }
         public decimal TotalPrice { get; set; }
 
+        public bool IsHomeDelivery { get; set; }
+
 
         public int UserId { get; set; }
         public UserModel User { get; set; }

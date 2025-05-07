@@ -108,6 +108,15 @@ namespace RestaurantSystem.Database {
                 .Property(user => user.CreatedAt)
                 .IsRequired()
                 .HasDefaultValueSql("NOW()");
+
+            builder.Entity<UserModel>()
+                .Property(user => user.RestaurantId)
+                .HasDefaultValue(null);
+
+            builder.Entity<UserModel>()
+                .HasOne(user => user.Restaurant)
+                .WithMany(restaurat => restaurat.Employees)
+                .HasForeignKey(user => user.RestaurantId);
         }
 
         private void BuildServicesModel(ref ModelBuilder builder) {
@@ -351,6 +360,10 @@ namespace RestaurantSystem.Database {
                 .HasOne(order => order.Restaurant)
                 .WithMany(restauratn => restauratn.Orders)
                 .HasForeignKey(order => order.RestaurantId);
+
+            builder.Entity<OrderModel>()
+                .Property(order => order.IsHomeDelivery)
+                .IsRequired();
         }
 
         private void BuildOrderedDishes(ref ModelBuilder builder) {
