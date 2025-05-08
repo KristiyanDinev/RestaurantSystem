@@ -7,6 +7,10 @@ using RestaurantSystem.Models.View.Order;
 using RestaurantSystem.Models.Form;
 
 namespace RestaurantSystem.Controllers {
+
+
+    [ApiController]
+    [EnableRateLimiting("fixed")]
     public class OrderController : Controller {
 
         private OrderService _orderService;
@@ -26,13 +30,12 @@ namespace RestaurantSystem.Controllers {
         [HttpGet]
         [Route("Orders")]
         [Route("Orders/Index")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Orders()
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             OrdersViewModel ordersViewModel = new OrdersViewModel()
@@ -47,13 +50,12 @@ namespace RestaurantSystem.Controllers {
 
         [HttpGet]
         [Route("Order/{orderId}")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Order(int orderId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             OrderViewModel orderViewModel = new OrderViewModel()
@@ -68,7 +70,7 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("Order/Start")]
-        [EnableRateLimiting("fixed")]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OrderStart([FromBody] OrderFormModel order)
         {
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
@@ -82,39 +84,27 @@ namespace RestaurantSystem.Controllers {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             OrderStartViewModel orderStartViewModel = new OrderStartViewModel()
             {
                 User = user,
-                Restaurant = restaurant
-            };
-
-            try
-            {
-                OrderModel orderModel = await _orderService.AddOrder(user.Id, restaurant.Id, order.Dishes, order.Notes,
+                Restaurant = restaurant,
+                Order = await _orderService.AddOrder(user.Id, restaurant.Id, order.Dishes, order.Notes,
 
                 (await _dishService.GetDishesByIds(order.Dishes)).Sum(dish => dish.Price)
 
-                , true);
+                , true)
+            };
 
-                orderStartViewModel.Success = true;
-                orderStartViewModel.Order = orderModel;
-
-                return View(orderStartViewModel);
-
-            } catch (Exception e)
-            {
-                orderStartViewModel.Success = false;
-                return View(orderStartViewModel);
-            }
+            return View(orderStartViewModel);
         }
 
 
         [HttpPost]
         [Route("Order/Stop/{orderId}")]
-        [EnableRateLimiting("fixed")]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OrderStop(int orderId)
         {
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
@@ -122,34 +112,22 @@ namespace RestaurantSystem.Controllers {
 
             if (restaurant == null)
             {
-                return Redirect("/restaurants");
+                return RedirectToAction("Index", "Restaurant");
             }
 
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             OrderStopView orderStopView = new OrderStopView()
             {
-                User = user
+                User = user,
+                Success = await _orderService.DeleteOrder(orderId)
             };
 
-            try
-            {
-                await _orderService.DeleteOrder(orderId);
-
-                orderStopView.Success = true;
-
-                return View(orderStopView);
-
-            }
-            catch (Exception e)
-            {
-                orderStopView.Success = false;
-                return View(orderStopView);
-            }
+            return View(orderStopView);
         }
     }
 }

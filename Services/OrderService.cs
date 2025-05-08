@@ -17,7 +17,7 @@ namespace RestaurantSystem.Services
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;
         }
 
-        public async Task<OrderModel> AddOrder(int userId, int restaurantId,
+        public async Task<OrderModel?> AddOrder(int userId, int restaurantId,
             List<int> dishesId, string? notes, decimal totalPrice, bool isHomeDelivery)
         {
             OrderModel order = new OrderModel {
@@ -31,43 +31,48 @@ namespace RestaurantSystem.Services
 
             await _databaseContext.Orders.AddAsync(order);
 
-            await _databaseContext.SaveChangesAsync();
+            if (await _databaseContext.SaveChangesAsync() <= 0) {
+                return null;
+            }
 
             foreach (int id in dishesId)
             {
-                await _orderedDishesDatabaseHandler.CreateOrderedDish(id, order.Id, null, false);
+                await _orderedDishesDatabaseHandler.CreateOrderedDish(id, order.Id, null);
             }
 
-            await _databaseContext.SaveChangesAsync();
+            if (await _databaseContext.SaveChangesAsync() <= 0)
+            {
+                return null;
+            }
 
             return order;
         }
 
-        public async Task DeleteOrder(int orderId)
+        public async Task<bool> DeleteOrder(int orderId)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
-                o => o.Id == orderId) ?? throw new Exception();
+                o => o.Id == orderId);
 
-            if (!order.CurrentStatus.Equals(pendingStatus))
+            if (order == null || !order.CurrentStatus.Equals(pendingStatus))
             {
-                throw new Exception();
+                return false;
             }
 
             await _orderedDishesDatabaseHandler.DeleteOrderedDishes(orderId);
 
             _databaseContext.Orders.Remove(order);
 
-            await _databaseContext.SaveChangesAsync();
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task UpdateOrderCurrentStatusById(int orderId, string status)
+        public async Task<bool> UpdateOrderCurrentStatusById(int orderId, string status)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId) ?? throw new Exception();
 
             order.CurrentStatus = status;
 
-            await _databaseContext.SaveChangesAsync();
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
         public async Task<List<OrderModel>> GetOrdersByUser(int userId)

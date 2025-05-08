@@ -8,12 +8,10 @@ namespace RestaurantSystem.Services
     {
 
         private DatabaseContext _databaseContext;
-        private RestaurantService _restaurantService; 
 
-        public RoleService(DatabaseContext databaseContext, RestaurantService restaurantService)
+        public RoleService(DatabaseContext databaseContext)
         {
             _databaseContext = databaseContext;
-            _restaurantService = restaurantService;
         }
 
         public async Task<bool> CreateRole(string roleName, string? description = null)

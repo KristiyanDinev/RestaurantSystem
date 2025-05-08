@@ -5,13 +5,17 @@ using RestaurantSystem.Services;
 using RestaurantSystem.Models.View.Dish;
 
 namespace RestaurantSystem.Controllers {
+
+
+
+    [ApiController]
+    [EnableRateLimiting("fixed")]
     public class DishController : Controller {
 
-        private RestaurantService _restaurantService;
         private DishService _dishService;
+        private RestaurantService _restaurantService;
 
-        public DishController(RestaurantService restaurantService, 
-            DishService dishService) {
+        public DishController(RestaurantService restaurantService, DishService dishService) {
             _restaurantService = restaurantService;
             _dishService = dishService;
         }
@@ -20,14 +24,13 @@ namespace RestaurantSystem.Controllers {
         [HttpGet]
         [Route("/Dishes")]
         [Route("/Dishes/Index")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Dishes()
         {
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
                 _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
 
             if (restaurant == null) {
-                return Redirect("/restaurants");
+                return RedirectToAction("Index", "Restaurant");
             }
 
             return View(restaurant);
@@ -36,7 +39,6 @@ namespace RestaurantSystem.Controllers {
 
         [HttpGet]
         [Route("/Dishes/{dishType}")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> DishesByType(string dishType)
         {
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
@@ -44,7 +46,7 @@ namespace RestaurantSystem.Controllers {
 
             if (restaurant == null)
             {
-                return Redirect("/restaurants");
+                return RedirectToAction("Index", "Restaurant");
             }
 
             DishesTypeViewModel dishesTypeViewModel = new DishesTypeViewModel()
@@ -60,7 +62,6 @@ namespace RestaurantSystem.Controllers {
 
         [HttpGet]
         [Route("/Dish/{dishId}")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> DishesByType(int dishId)
         {
             Console.WriteLine("Dish Id: " + dishId);
@@ -69,7 +70,7 @@ namespace RestaurantSystem.Controllers {
 
             if (restaurant == null)
             {
-                return Redirect("/restaurants");
+                return RedirectToAction("Index", "Restaurant");
             }
 
             DishViewModel dishViewModel = new DishViewModel()

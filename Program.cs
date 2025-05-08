@@ -1,4 +1,3 @@
-using RestaurantSystem.Controllers;
 using RestaurantSystem.Database;
 using RestaurantSystem.Services;
 using Microsoft.AspNetCore.RateLimiting;
@@ -16,19 +15,6 @@ namespace RestaurantSystem
             Console.WriteLine("Current Working Directory: "+ Directory.GetCurrentDirectory());
 
             var builder = WebApplication.CreateBuilder(args);
-
-            /*
-            builder.Services.AddDistributedMemoryCache();
-            builder.Services.AddSession(options =>
-            {
-                options.Cookie.Name = ".Resturant.Session";
-                options.Cookie.IsEssential = true;
-                //options.IOTimeout = TimeSpan.FromSeconds(20);
-                options.Cookie.HttpOnly = true;
-            });
-
-            builder.Services.AddControllersWithViews()
-            */
 
             builder.Services.AddControllersWithViews();
 
@@ -62,7 +48,6 @@ namespace RestaurantSystem
 
             builder.Services.AddSingleton<Utility>();
             builder.Services.AddSingleton<UserUtility>();
-            builder.Services.AddSingleton<WebSocketHandler>();
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
                     ?? "ugyw89ub9Y9H8OP9j1wsfwedS";
@@ -89,16 +74,13 @@ namespace RestaurantSystem
             app.UseStaticFiles();
 
             app.UseAuthenticationMiddleware();
+            app.UseMiddleware<WebSocketMiddleware>();
 
             app.UseHttpLogging();
             app.UseLoggingMiddleware();
 
             app.MapControllers();
-
-            new WebSocketController(app);
-            new ReservationsController(app);
-            new UserController(app);
-
+            
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
 
             app.Run();
@@ -106,8 +88,6 @@ namespace RestaurantSystem
 
         public static void OnApplicationExit(object sender, EventArgs e)
         {
-            WebSocketHandler.CloseAllSubscribtions();
-            Console.WriteLine("Closed websockets.");
         }
     }
 }

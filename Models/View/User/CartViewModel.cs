@@ -1,6 +1,6 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
 
-namespace RestaurantSystem.Models.View
+namespace RestaurantSystem.Models.View.User
 {
     public class CartViewModel
     {

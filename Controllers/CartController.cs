@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Models.View;
+using RestaurantSystem.Models.View.User;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Controllers
 {
+
+    [ApiController]
+    [EnableRateLimiting("fixed")]
     public class CartController : Controller
     {
         private UserUtility _userUtility;
@@ -21,13 +24,12 @@ namespace RestaurantSystem.Controllers
 
         [HttpGet]
         [Route("/Cart")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Cart()
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             CartViewModel cartViewModel = new CartViewModel();

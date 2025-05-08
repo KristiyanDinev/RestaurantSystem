@@ -4,7 +4,12 @@ using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Controllers {
-    public class CuponController : Controller{
+
+
+
+    [ApiController]
+    [EnableRateLimiting("fixed")]
+    public class CuponController : Controller {
 
         private CuponService _cuponDatabaseHandler;
 
@@ -14,7 +19,7 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("/Cupon")]
-        [EnableRateLimiting("fixed")]
+        [IgnoreAntiforgeryToken]
         public async Task<IResult> Cupon(string code)
         {
             return Results.Json<CuponModel?>(await _cuponDatabaseHandler.GetCuponByCode(code));

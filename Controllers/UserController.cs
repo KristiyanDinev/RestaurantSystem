@@ -1,272 +1,192 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using RestaurantSystem.Utils.Web;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Models.Controller;
+using RestaurantSystem.Models.Form;
+using RestaurantSystem.Models.View.User;
 using RestaurantSystem.Services;
-using RestaurantSystem.Utils;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Controllers {
-    public class UserController {
-
-        // testing user:
-        // email: some@email.com
-        // pass: 123
-
-        public UserController(WebApplication app) {
-
-            app.MapGet("/", (HttpContext context) => {
-                return Results.Redirect("/login");
-            });
 
 
 
-            // get front-end logged in user profile (full page)
-            app.MapGet("/profile",
-                async (HttpContext context, UserService db,
-                ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils) => {
-
-                    return await controllerUtils.HandleDefaultPage_WithUserModel("/profile",
-                        context, userUtils, webUtils);
-
-            }).RequireRateLimiting("fixed");
+    [ApiController]
+    [EnableRateLimiting("fixed")]
+    public class UserController : Controller {
 
 
+        private UserService _userService;
+        private UserUtility _userUtility;
+        private RoleService _roleService;
+        private readonly string deliveryRoleName = "delivery";
 
-            // get front-end login page
-            app.MapGet("/login", async (HttpContext context, ControllerUtils controllerUtils, 
-                UserService db, UserUtils userUtils) => {
-                    try {
-                        UserModel? user = await userUtils.LoginByUsingCookie(context, db);
-                        string data = await controllerUtils.GetHTMLFromWWWROOT("/login");
+        public UserController(UserService userService, UserUtility userUtility,
+            RoleService roleService)
+        {
+            _userService = userService;
+            _userUtility = userUtility;
+            _roleService = roleService;
+        }
 
-                        return user == null ? Results.Content(data, "text/html") :
-                            Results.Redirect("/Dishes");
+        [HttpGet]
+        [Route("/")]
+        [Route("/login")]
+        public async Task<IActionResult> Login()
+        {
+            return await _userUtility.GetUserByJWT(HttpContext) != null ?
+                RedirectToAction("Index", "Restaurant") : View();
+        }
 
-                    } catch (Exception) {
-                        return Results.Redirect("/_restaurant_error");
-                    }
+        [HttpGet]
+        [Route("/register")]
+        public async Task<IActionResult> Register()
+        {
+            return await _userUtility.GetUserByJWT(HttpContext) != null ?
+                RedirectToAction("Index", "Restaurant") : View();
+        }
 
-            }).RequireRateLimiting("fixed");
-
-
-            // try loging in
-            app.MapPost("/login", async (UserService db, HttpContext context,
-                ControllerUtils controllerUtils, UserUtils userUtils,
-                [FromForm] string email, [FromForm] string password,
-                [FromForm] string rememberMe) => {
-
-                    if (string.IsNullOrWhiteSpace(email) ||
-                        string.IsNullOrWhiteSpace(password)) {
-                        return Results.BadRequest();
-                    }
-
-                    try {
-                        UserModel? _user = await userUtils.GetUserByJWT(context);
-                        if (_user != null)
-                        {
-                            return Results.Redirect("/Dishes");
-                        }
-
-                        UserModel user = new UserModel(email, password);
-                        user = await db.LoginUser(user, true) 
-                            ?? throw new Exception("Didn't login");
-
-                        // the user.Password is hashed
-                        string authString = userUtils.GenerateJWT(user, rememberMe);
-
-                        context.Response.Cookies.Delete(userUtils.authHeader);
-                        context.Response.Cookies.Append(userUtils.authHeader, authString);
-
-                        return Results.Ok();
-
-                    } catch (Exception) {
-                        return Results.Unauthorized();
-                    }
-
-            }).RequireRateLimiting("fixed")
-            .DisableAntiforgery();
-
-
-            // get front-end register page
-            app.MapGet("/register", async (HttpContext context, ControllerUtils controllerUtils, 
-                UserService db, UserUtils userUtils) => {
-                try {
-                    UserModel? user = await userUtils.LoginByUsingCookie(context, db);
-                    string data = await controllerUtils.GetHTMLFromWWWROOT("/register");
-
-                    return user == null ? Results.Content(data, "text/html") :
-                        Results.Redirect("/Dishes");
-
-                } catch (Exception) {
-                    return Results.Redirect("/_restaurant_error");
-                }
-
-            }).RequireRateLimiting("fixed");
-
-
-
-            // try registering
-            app.MapPost("/register", async (UserService db, HttpContext context,
-                ControllerUtils controllerUtils, UserUtils userUtils,
-                [FromForm] RegisterUserModel registerUserModel) => {
-
-                    if (string.IsNullOrWhiteSpace(registerUserModel.Address) ||
-                        string.IsNullOrWhiteSpace(registerUserModel.City) ||
-                        string.IsNullOrWhiteSpace(registerUserModel.Country) ||
-                        string.IsNullOrWhiteSpace(registerUserModel.Username) ||
-                        string.IsNullOrWhiteSpace(registerUserModel.Password) ||
-                        string.IsNullOrWhiteSpace(registerUserModel.Email)) {
-                        return Results.BadRequest();
-                    }
-
-                    try {
-
-                        UserModel? _user = await userUtils.LoginByUsingCookie(context, db);
-                        if (_user != null)
-                        {
-                            return Results.Redirect("/Dishes");
-                        }
-
-
-
-                        // image => "someimage.png;BASE64=="
-                        string? image = registerUserModel.Image;
-                        if (image != null && image.Length > 0) {
-                            registerUserModel.Image = await controllerUtils.UploadImage(image);
-                        }
-
-                        UserModel userModel = new UserModel(registerUserModel);
-                        await db.RegisterUser(userModel);
-
-                        UserModel? user = await db.LoginUser(userModel, false);
-                        if (user == null)
-                        {
-                            if (registerUserModel.Image != null && 
-                                registerUserModel.Image.Length > 0)
-                            {
-                                controllerUtils.RemoveImage("wwwroot"+ registerUserModel.Image);
-                            }
-                            return Results.BadRequest();
-                        }
-
-                        // the user.Password is hashed
-                        string authString = userUtils.GenerateJWT(user, registerUserModel.RememberMe);
-
-                        context.Response.Cookies.Delete(userUtils.authHeader);
-                        context.Response.Cookies.Append(userUtils.authHeader, authString);
-
-                        return Results.Ok();
-
-                } catch (Exception e) {
-                        Console.WriteLine(e);
-                        return Results.BadRequest();
-                }
-
-            }).RequireRateLimiting("fixed")
-            .DisableAntiforgery();
-
-
-            // loggout from profile (by clearing session)
-            app.MapPost("/logout", async (HttpContext context) => {
-                try {
-
-                    List<string> keys = new List<string>(context.Request.Cookies.Keys);
-                    foreach (string key in keys)
-                    {
-                        context.Response.Cookies.Delete(key);
-                    }
-                    return Results.Redirect("/login");
-
-                } catch (Exception) {
-                    return Results.Unauthorized();
-                }
-
-            }).RequireRateLimiting("fixed")
-            .DisableAntiforgery();
-
-
-            //edit user profile
-            app.MapPost("/profile/edit", async (UserService db, HttpContext context,
-                ControllerUtils controllerUtils, UserUtils userUtils,
-                [FromForm] UpdateUserModel updateUserModel) =>
+        [HttpPost]
+        [Route("/")]
+        [Route("/login")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> LoginUser(
+            [FromForm] LoginFormModel loginFormModel)
+        {
+            if (!ModelState.IsValid)
             {
-                try
+                return View("Login", loginFormModel);
+            }
+
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user != null) {
+                return RedirectToAction("Index", "Restaurant");
+            }
+
+            UserModel? loggedIn = await _userService.LoginUser(
+                loginFormModel.Email, loginFormModel.Password);
+
+            if (loggedIn == null)
+            {
+                loginFormModel.Error = "Invalid login attempt.";
+                return View("Login", loginFormModel);
+            }
+
+            _userUtility.SetUserAuthBearerHeader(
+                HttpContext,
+                _userUtility.GenerateAuthBearerHeader_JWT(
+                    loggedIn, loginFormModel.RememberMe));
+
+            return RedirectToAction("Index", "Restaurant");
+        }
+
+
+        [HttpPost]
+        [Route("/register")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> RegisterUser(
+            [FromForm] RegisterFormModel registerFormModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Register", registerFormModel);
+            }
+
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user != null)
+            {
+                return RedirectToAction("Index", "Restaurant");
+            }
+
+            UserModel? registered = await _userService.RegisterUser(registerFormModel);
+            if (registered == null)
+            {
+                registerFormModel.Error = "Registration failed. Please try again.";
+                return View("Register", registerFormModel);
+            }
+
+            _userUtility.SetUserAuthBearerHeader(
+                HttpContext,
+                _userUtility.GenerateAuthBearerHeader_JWT(
+                    registered, registerFormModel.RememberMe));
+
+            return RedirectToAction("Index", "Restaurant");
+        }
+
+
+
+        [HttpGet]
+        [Route("/profile")]
+        public async Task<IActionResult> Profile()
+        {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            return user == null ? RedirectToAction("Login") :
+                View(new ProfileViewModel { User = user });
+        }
+
+
+        [HttpPost]
+        [Route("/profile/update")]
+        public async Task<IActionResult> ProfileUpdate(
+            [FromForm] ProfileUpdateFormModel profileUpdateFormModel)
+        {
+            // Client wants to update their own profile. Allow all changes.
+
+            // Check if that client is a delivery guy and if it is,
+            // then do not update the city, country and state
+            // Update these values only by an admin
+
+            // profileUpdateFormModel contains the new/updated information.
+            // It also may contain some old information.
+
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Profile", new ProfileViewModel
                 {
-                    if (string.IsNullOrWhiteSpace(updateUserModel.Address) ||
-                        string.IsNullOrWhiteSpace(updateUserModel.City) ||
-                        string.IsNullOrWhiteSpace(updateUserModel.Country) ||
-                        string.IsNullOrWhiteSpace(updateUserModel.Username))
-                    {
-                        return Results.BadRequest();
-                    }
+                    User = user
+                });
+            }
 
-                    UserModel? model = await userUtils.GetUserByJWT(context);
-                    if (model == null)
-                    {
-                        return Results.Redirect("/login");
-                    }
-
-                    string Username = !model.Name.Equals(updateUserModel.Username) ? updateUserModel.Username : model.Name;
-                    
-                    string Address = !model.Address.Equals(updateUserModel.Address) ? updateUserModel.Address : model.Address;
-                    string City = !model.City.Equals(updateUserModel.City) ? updateUserModel.City : model.City;
-                    string? State = model.State != null && !model.State.Equals(updateUserModel.State) ? updateUserModel.State : model.State;
-                    string Country = !model.Country.Equals(updateUserModel.Country) ? updateUserModel.Country : model.Country;
-                    string Email = !model.Email.Equals(updateUserModel.Email) ? updateUserModel.Email : model.Email;
-
-                    string? _notes = updateUserModel.Notes?.Replace(" ","").Length == 0 ? null : updateUserModel.Notes;
-
-                    string? Notes = model.Notes != _notes ? _notes : model.Notes;
-
-                    string? Image = null;
-                    if (updateUserModel.DeleteImage.Equals("yes") && 
-                        model.Image != null && model.Image.Contains('.'))
-                    {
-                        controllerUtils.RemoveImage("wwwroot"+model.Image);
-                        Image = null;
-
-                    } else
-                    {
-                        updateUserModel.Image = updateUserModel.Image?.Replace(" ", "").Length == 0 ? null : updateUserModel.Image;
-                        Image = model.Image;
-                        if (updateUserModel.Image != null)
-                        {
-                            Image = await controllerUtils.UploadImage(updateUserModel.Image);
-                        } 
-                    }
-
-                    string? _phone = updateUserModel.PhoneNumber?.Replace(" ", "").Length == 0 ? null : updateUserModel.PhoneNumber;
-                    string? PhoneNumber = model.PhoneNumber != _phone ? _phone : model.PhoneNumber;
-
-                    UserModel user = new UserModel();
-                    user.Address = Address;
-                    user.State = State;
-                    user.City = City;
-                    user.Name = Username;
-                    user.Country = Country;
-                    user.Notes = Notes;
-                    user.Image = Image;
-                    user.PhoneNumber = PhoneNumber;
-                    user.Email = Email;
-                    // you can't change your password as of now.
-                    user.Id = model.Id;
-
-                    await db.UpdateUser(user);
-
-                    string authString = userUtils.GenerateJWT(user, "off");
-
-                    context.Response.Cookies.Delete(userUtils.authHeader);
-                    context.Response.Cookies.Append(userUtils.authHeader, authString);
-
-                    return Results.Ok();
-
-                } catch (Exception)
-                {
-                    return Results.BadRequest();
+            if (!user.City.Equals(profileUpdateFormModel.City) ||
+               !user.Country.Equals(profileUpdateFormModel.Country) ||
+                user.State != profileUpdateFormModel.State)
+            {
+                // user changed city, country and state
+                List<string> roles = await _roleService.GetUserRoles(user.Id);
+                if (roles.Contains(deliveryRoleName)) {
+                    // that user is a delivery guy
+                    profileUpdateFormModel.City = user.City;
+                    profileUpdateFormModel.Country = user.Country;
+                    profileUpdateFormModel.State = user.State;
                 }
+            }
 
-            }).RequireRateLimiting("fixed")
-            .DisableAntiforgery();
+            bool updateSuccessful = await _userService.UpdateUser(user, profileUpdateFormModel);
+            user = await _userService.GetUser(user.Id);
+
+            ProfileViewModel profileViewModel = new ProfileViewModel()
+            {
+                UpdatedSuccessfully = updateSuccessful ? "Profile updated successfully!" : null,
+                User = user
+            };
+
+            return View("Profile", profileViewModel);
+        }
+
+
+        [HttpPost]
+        [Route("/logout")]
+        public async Task<IActionResult> Logout()
+        {
+            _userUtility.RemoveAuthBearerHeader(HttpContext);
+
+            return RedirectToAction("Login");
         }
     }
 }

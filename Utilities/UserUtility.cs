@@ -35,7 +35,7 @@ namespace RestaurantSystem.Utilities
          * Based on the `remember me` option (if `remember me` is "off")
          * it specifies an experation date of 1 day.
          */
-        public string GenerateAuthBearerHeader_JWT(UserModel model, string remeberMe)
+        public string GenerateAuthBearerHeader_JWT(UserModel model, bool remeberMe)
         {
             List<Claim> claims = new List<Claim>();
             claims.Add(new Claim("Id", model.Id.ToString()));
@@ -43,8 +43,19 @@ namespace RestaurantSystem.Utilities
             return _encryptionUtility.Encrypt(
                 _jwtUtility.GenerateJWT(claims,
 
-                remeberMe.Equals("off") ? DateTime.Now.AddDays(1.0) : null)
+                remeberMe ? DateTime.Now.AddDays(1.0) : null)
                 );
+        }
+
+        public void RemoveAuthBearerHeader(HttpContext context)
+        {
+            context.Response.Cookies.Delete(authHeader);
+        }
+
+        public void SetUserAuthBearerHeader(HttpContext context, string jwt)
+        {
+            RemoveAuthBearerHeader(context);
+            context.Response.Cookies.Append(authHeader, "Bearer " + jwt);
         }
 
         /*

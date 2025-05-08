@@ -30,7 +30,7 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<DishModel> CreateDish(string name, string type,
+        public async Task<DishModel?> CreateDish(string name, string type,
             decimal price, int restaurantModelId, string ingredients, string avrageTimeToCook, 
             int grams, string? notes, string? image, bool isAvailable)
         {
@@ -48,19 +48,17 @@ namespace RestaurantSystem.Services
 
             await _databaseContext.Dishies.AddAsync(dish);
 
-            await _databaseContext.SaveChangesAsync();
-
-            return dish;
+            return await _databaseContext.SaveChangesAsync() >= 1 ? dish : null;
         }
 
-        public async Task DeleteDish(int id)
+        public async Task<bool> DeleteDish(int id)
         {
             DishModel? dish = await _databaseContext.Dishies.FirstOrDefaultAsync(
                 d => d.Id == id) ?? throw new Exception("Dish doesn't exist.");
 
             _databaseContext.Dishies.Remove(dish);
 
-            await _databaseContext.SaveChangesAsync();
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
         public List<int> GetDishIDsFromCart(HttpContext context)

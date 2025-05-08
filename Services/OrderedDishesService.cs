@@ -13,24 +13,22 @@ namespace RestaurantSystem.Services
         }
 
         public async Task<OrderedDishesModel> CreateOrderedDish(int dishModelId, 
-            int orderModelId, string? notes, bool saveChanges)
+            int orderModelId, string? notes)
         {
-            OrderedDishesModel orderedDishes = new OrderedDishesModel();
-            orderedDishes.OrderId = orderModelId;
-            orderedDishes.DishId = dishModelId;
-            orderedDishes.Notes = notes;
+            OrderedDishesModel orderedDishes = new OrderedDishesModel()
+            {
+                OrderId = orderModelId,
+                DishId = dishModelId,
+                Notes = notes
+            };
 
             await _databaseContext.OrderedDishes.AddAsync(orderedDishes);
-
-            if (saveChanges) { 
-                await _databaseContext.SaveChangesAsync();
-            }
             
             return orderedDishes;
         }
 
 
-        public async Task UpdateOrderedDishStatusById(int dishId, int orderId, string status)
+        public async Task<bool> UpdateOrderedDishStatusById(int dishId, int orderId, string status)
         {
             OrderedDishesModel? orderedDishes = await _databaseContext.OrderedDishes
                 .FirstOrDefaultAsync(
@@ -38,15 +36,15 @@ namespace RestaurantSystem.Services
 
             if (orderedDishes == null)
             {
-                return;
+                return false;
             }
 
             orderedDishes.CurrentStatus = status;
 
-            await _databaseContext.SaveChangesAsync();
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task DeleteOrderedDishes(int orderId)
+        public async Task<bool> DeleteOrderedDishes(int orderId)
         {
             List<OrderedDishesModel> dishes = await _databaseContext.OrderedDishes
                 .Where(order => order.OrderId == orderId)
@@ -56,7 +54,7 @@ namespace RestaurantSystem.Services
                 _databaseContext.OrderedDishes.Remove(orderedDishes);
             }
 
-            await _databaseContext.SaveChangesAsync();
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
         public async Task<List<DishModel>> GetDishesFromOrder(int orderId)

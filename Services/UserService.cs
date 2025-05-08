@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.Form;
 using RestaurantSystem.Utilities;
 namespace RestaurantSystem.Services
 {
@@ -19,73 +20,70 @@ namespace RestaurantSystem.Services
             return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         }
 
-        public async Task<UserModel> RegisterUser(string name, string email, string no_hash_password, 
-            string address, string city, string? state, string country, 
-            string? notes, string? phoneNumber, string? image)
+        public async Task<UserModel?> RegisterUser(RegisterFormModel registerFormModel)
         {
             UserModel user = new UserModel
             {
-                PhoneNumber = phoneNumber,
-                Address = address,
-                City = city,
-                State = state,
-                Country = country,
-                Email = email,
-                Image = image,
-                Name = name,
-                Password = Convert.ToBase64String(EncryptionUtility.HashIt(no_hash_password)),
-                Notes = notes
+                PhoneNumber = registerFormModel.PhoneNumber,
+                Address = registerFormModel.Address,
+                City = registerFormModel.City,
+                State = registerFormModel.State,
+                Country = registerFormModel.Country,
+                Email = registerFormModel.Email,
+                Image = registerFormModel.Image,
+                Name = registerFormModel.Name,
+                Password = Convert.ToBase64String(EncryptionUtility.HashIt(registerFormModel.Password)),
+                Notes = registerFormModel.Notes
             };
 
             await _databaseContext.Users.AddAsync(user);
 
-            await _databaseContext.SaveChangesAsync();
+            if (await _databaseContext.SaveChangesAsync() <= 0)
+            {
+                return null;
+            }
 
             return user;
         }
 
-        public async Task<UserModel?> LoginUser(string email, string hash_password)
+        public async Task<UserModel?> LoginUser(string email, string no_hash_password)
         {
+            string hash_password = Convert.ToBase64String(EncryptionUtility.HashIt(no_hash_password));
             return await _databaseContext.Users.FirstOrDefaultAsync(
-                user => user.Email.Equals(email) && user.Password.Equals(hash_password));
+                user => user.Email.Equals(email) && 
+                user.Password.Equals(hash_password));
         }
 
 
-        public async Task UpdateUser(UserModel new_user)
+        public async Task<bool> UpdateUser(UserModel user, 
+            ProfileUpdateFormModel profileUpdateFormModel)
         {
-            UserModel? user = await GetUser(new_user.Id);
-            if (user == null) {
-                return;
-            }
+            user.State = profileUpdateFormModel.State;
+            user.Address = profileUpdateFormModel.Address;
+            user.City = profileUpdateFormModel.City;
+            user.Country = profileUpdateFormModel.Country;
+            user.PhoneNumber = profileUpdateFormModel.PhoneNumber;
+            user.Image = profileUpdateFormModel.Image;
+            user.Name = profileUpdateFormModel.Name;
+            user.Notes = profileUpdateFormModel.Notes;
 
-            user.State = new_user.State;
-            user.Address = new_user.Address;
-            user.City = new_user.City;
-            user.Country = new_user.Country;
-            user.Password = new_user.Password;
-            user.Roles = new_user.Roles;
-            user.PhoneNumber = new_user.PhoneNumber;
-            user.Image = new_user.Image;
-            user.Name = new_user.Name;
-            user.Notes = new_user.Notes;
-
-            await _databaseContext.SaveChangesAsync();
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
 
-        public async Task DeleteUser(int userId)
+        public async Task<bool> DeleteUser(int userId)
         {
             UserModel? user = await _databaseContext.Users.FirstOrDefaultAsync(
                 user => user.Id == userId);
 
             if (user == null)
             {
-                return;
+                return false;
             }
 
             _databaseContext.Users.Remove(user);
 
-            await _databaseContext.SaveChangesAsync();
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
 

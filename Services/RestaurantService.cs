@@ -8,6 +8,7 @@ namespace RestaurantSystem.Services
     {
 
         private DatabaseContext _databaseContext;
+        private readonly string restaurantId = "restaurant_id";
 
         public RestaurantService(DatabaseContext databaseContext)
         {
@@ -58,7 +59,7 @@ namespace RestaurantSystem.Services
 
         public int? GetRestaurantIdFromCookieHeader(HttpContext context)
         {
-            context.Request.Cookies.TryGetValue("restaurant_id", out string? restaurant_id_str);
+            context.Request.Cookies.TryGetValue(restaurantId, out string? restaurant_id_str);
             if (!int.TryParse(restaurant_id_str, out int restaurant_id))
             {
                 return null;

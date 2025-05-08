@@ -8,6 +8,8 @@ using RestaurantSystem.Utilities;
 namespace RestaurantSystem.Controllers
 {
 
+    [ApiController]
+    [EnableRateLimiting("fixed")]
     public class AdminController : Controller
     {
         private readonly string _restaurant_error = "Please update your profile or tell the Manager to update your profile address, city, state and country to align with the address of the Restaurant you work in.";
@@ -39,14 +41,13 @@ namespace RestaurantSystem.Controllers
         [HttpGet]
         [Route("Admin")]
         [Route("Admin/Index")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Index()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
                 !(await _roleService.CanUserAccessService(user.Id, "/admin")))
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             return View(user);
@@ -55,16 +56,15 @@ namespace RestaurantSystem.Controllers
 
         [HttpGet]
         [Route("Admin/Dishes")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Dishes()
         {
             // Chief in the kitchen
 
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/admin/Dishes")))
+                !(await _roleService.CanUserAccessService(user.Id, "/admin/dishes")))
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
@@ -92,18 +92,17 @@ namespace RestaurantSystem.Controllers
 
         [HttpGet]
         [Route("Admin/Reservations")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Reservations()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/admin/Dishes")))
+                !(await _roleService.CanUserAccessService(user.Id, "/admin/reservations")))
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
-            ReservationViewModel reservationViewModel = new ReservationViewModel();
+            AdminReservationViewModel reservationViewModel = new AdminReservationViewModel();
 
             if (restaurant == null)
             {
@@ -119,7 +118,6 @@ namespace RestaurantSystem.Controllers
 
         [HttpGet]
         [Route("Admin/Manager")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Manager()
         {
             // One Manager per restaurant
@@ -127,7 +125,7 @@ namespace RestaurantSystem.Controllers
             if (user == null ||
                 !(await _roleService.CanUserAccessService(user.Id, "/admin/manager")))
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
@@ -149,7 +147,6 @@ namespace RestaurantSystem.Controllers
 
         [HttpGet]
         [Route("Admin/Delivery")]
-        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Delivery()
         {
             // Delivery people can take orders from different restaurants in their own city.
@@ -159,7 +156,7 @@ namespace RestaurantSystem.Controllers
             if (user == null ||
                 !(await _roleService.CanUserAccessService(user.Id, "/admin/delivery")))
             {
-                return Redirect("/login");
+                return RedirectToAction("Login", "User");
             }
 
             Dictionary<TimeTableModel, List<OrderModel>> orders = new Dictionary<TimeTableModel, List<OrderModel>>();

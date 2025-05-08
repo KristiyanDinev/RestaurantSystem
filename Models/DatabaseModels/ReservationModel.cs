@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public string? Notes { get; set; }
-        public string CurrentStatus { get; set; }
+        public required string CurrentStatus { get; set; }
 
 
         public int UserId { get; set; }

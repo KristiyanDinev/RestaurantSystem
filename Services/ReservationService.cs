@@ -8,8 +8,8 @@ namespace RestaurantSystem.Services
     {
 
         private DatabaseContext _databaseContext;
-
         private RestaurantService _restaurantDatabaseHandler;
+        private readonly string pendingStatus = "pending";
 
         public ReservationService(DatabaseContext databaseContext,
             RestaurantService restaurantDatabaseHandler)
@@ -18,26 +18,26 @@ namespace RestaurantSystem.Services
             _restaurantDatabaseHandler = restaurantDatabaseHandler;
         }
 
-        public async Task<bool> CreateReservation(int userId, int restaurantId, 
+        public async Task<ReservationModel?> CreateReservation(int userId, int restaurantId, 
             int amount_Of_Adults, int amount_Of_Children, DateTime dateTime, string? notes)
         {
-            ReservationModel reservation = new ReservationModel();
-            reservation.UserId = userId;
-            reservation.RestaurantId = restaurantId;
-            reservation.Amount_Of_Adults = amount_Of_Adults;
-            reservation.Amount_Of_Children = amount_Of_Children;
-            reservation.At_Date = dateTime;
-            reservation.Notes = notes;
+            ReservationModel reservation = new ReservationModel() { 
+                UserId = userId,
+                RestaurantId = restaurantId,
+                Amount_Of_Adults = amount_Of_Adults,
+                Amount_Of_Children = amount_Of_Children,
+                At_Date = dateTime,
+                Notes = notes,
+                CurrentStatus = pendingStatus
+            };
 
             if (!await _restaurantDatabaseHandler.CheckForReservation(reservation)) {
-                return false;
+                return null;
             }
 
             await _databaseContext.Reservations.AddAsync(reservation);
 
-            int num = await _databaseContext.SaveChangesAsync();
-
-            return num >= 1;
+            return await _databaseContext.SaveChangesAsync() > 0 ? reservation : null;
         }
 
         public async Task<List<ReservationModel>> GetReservationsByUserId(int userId)
@@ -46,24 +46,33 @@ namespace RestaurantSystem.Services
                 res.UserId == userId).ToListAsync();
         }
 
-        public async Task DeleteReservation(int reservationId)
+        public async Task<bool> DeleteReservation(int reservationId)
         {
             ReservationModel? reservation = await _databaseContext
                 .Reservations.FirstOrDefaultAsync(res => res.Id == reservationId);
 
             if (reservation == null) {
-                return;
+                return false;
             }
 
             _databaseContext.Remove(reservation);
 
-            await _databaseContext.SaveChangesAsync();
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
         public async Task<List<ReservationModel>> GetReservationsByRestaurantId(int restaurantId)
         {
             return await _databaseContext.Reservations.Where(res =>
                 res.RestaurantId == restaurantId).ToListAsync();
+        }
+
+
+        public async Task<ReservationModel?> GetReservationById(int reservationId)
+        {
+            return await _databaseContext.Reservations
+                .Include(reservation => reservation.Restaurant)
+                .FirstOrDefaultAsync(
+                reservation => reservation.Id == reservationId);
         }
     }
 }
