@@ -1,144 +1,19 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using RestaurantSystem.Utilities;
 using RestaurantSystem.Services;
+using RestaurantSystem.Models.View.Dish;
 
 namespace RestaurantSystem.Controllers {
     public class DishController : Controller {
 
-        private UserUtility _userUtility;
         private RestaurantService _restaurantService;
+        private DishService _dishService;
 
-        public DishController(UserUtility userUtility, RestaurantService restaurantService) {
-            _userUtility = userUtility;
+        public DishController(RestaurantService restaurantService, 
+            DishService dishService) {
             _restaurantService = restaurantService;
-            /*
-            app.MapGet("/Dishes", async (HttpContext context,
-                ControllerUtils controllerUtils, UserUtils userUtils, WebUtils webUtils, 
-                OrderService orderDB) =>
-            {
-
-                try
-                {
-                    UserModel? user = await userUtils.GetUserByJWT(context);
-                    if (user == null)
-                    {
-                        return Results.Redirect("/login");
-                    }
-
-                    List<TimeTableJoinRestorantModel> timeTableWithRestorantAddresses =
-                        await orderDB.GetRestorantsAddressesForUser(user);
-
-                    string FileData = await controllerUtils.GetHTMLFromWWWROOT("/Dishes");
-
-                    FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                        controllerUtils.UserModelName, [user]);
-
-                    FileData = webUtils.HandleCommonPlaceholders(FileData,
-                        controllerUtils.RestorantModelName, timeTableWithRestorantAddresses
-                        .Cast<object>().ToList());
-
-                    return Results.Content(FileData, "text/html");
-
-                }
-                catch (Exception)
-                {
-                    return Results.Redirect("/_restaurant_error");
-                }
-            });
-
-
-            
-            app.MapGet("/dish", async (HttpContext context,
-                DishService db, ControllerUtils controllerUtils, 
-                UserUtils userUtils, WebUtils webUtils,
-                [FromQuery(Name = "type")] string type) => {
-
-                    try
-                    {
-                        if (!int.TryParse(context.Request.Cookies[controllerUtils.RestoratIdHeaderName],
-                            out int restorant_id_num))
-                        {
-                            return Results.Redirect("/Dishes");
-                        }
-
-                        UserModel? user = await userUtils.GetUserByJWT(context);
-                        if (user == null)
-                        {
-                            return Results.Redirect("/login");
-                        }
-
-                        List<DishModel> dishes = await db.GetDishesByTypeAndRestaurantId(type, restorant_id_num);
-                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/Dishes/" + type);
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                            controllerUtils.UserModelName, [user]);
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                            controllerUtils.DishModelName, dishes.Cast<object>()
-                            .ToList());
-
-                        return Results.Content(FileData, "text/html");
-
-                    } catch (Exception)
-                    {
-                        return Results.Redirect("/_restaurant_error");
-                    }
-
-            }).RequireRateLimiting("fixed");
-
-//  TODO
-
-            app.MapGet("/single_dish", async (HttpContext context,
-                DishService dishDb, ControllerUtils controllerUtils, 
-                OrderService orderDatabaseHandler,
-                UserUtils userUtils, WebUtils webUtils,
-                [FromQuery(Name = "dishId")] string dishId) => {
-                    
-                    try {
-
-                        if (!int.TryParse(dishId, out int Id))
-                        {
-                            return Results.Redirect("/Dishes");
-                        }
-
-                        UserModel? user = await userUtils.GetUserByJWT(context);
-                        if (user == null)
-                        {
-                            return Results.Redirect("/login");
-                        }
-
-                        List<DishModel> dishes = await dishDb.GetDishesByIds([Id]);
-                        if (dishes.Count == 0)
-                        {
-                            throw new Exception();
-                        }
-
-                        DishModel dish = dishes[0];
-                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/single_dish");
-
-                        List<TimeTableJoinRestorantModel> dishAvailableInRestorants =
-                                await orderDatabaseHandler.GetRestorantAddressesWhere_DishId_IsAvailable(Id);
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                            controllerUtils.UserModelName, [user]);
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                            controllerUtils.DishModelName, [dish]);
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData,
-                            controllerUtils.RestorantModelName, dishAvailableInRestorants
-                            .Cast<object>().ToList());
-
-                        return Results.Content(FileData, "text/html");
-
-                    } catch (Exception) {
-                        return Results.Redirect("/_restaurant_error");
-                    }
-
-            }).RequireRateLimiting("fixed");
-           */
+            _dishService = dishService;
         }
 
 
@@ -146,21 +21,65 @@ namespace RestaurantSystem.Controllers {
         [Route("/Dishes")]
         [Route("/Dishes/Index")]
         [EnableRateLimiting("fixed")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Dishes()
         {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
-            if (user == null)
-            {
-                return Redirect("/login");
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
+                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+
+            if (restaurant == null) {
+                return Redirect("/restaurants");
             }
 
-            int? restaurantId = _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext);
-            if (restaurantId == null)
+            return View(restaurant);
+        }
+
+
+        [HttpGet]
+        [Route("/Dishes/{dishType}")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> DishesByType(string dishType)
+        {
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
+                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+
+            if (restaurant == null)
             {
                 return Redirect("/restaurants");
             }
 
-            return View(user);
+            DishesTypeViewModel dishesTypeViewModel = new DishesTypeViewModel()
+            {
+                Dishes = await _dishService.GetDishesByTypeAndRestaurantId(
+                    dishType, restaurant.Id),
+                Restaurant = restaurant
+            };
+
+            return View(dishesTypeViewModel);
         }
+
+
+        [HttpGet]
+        [Route("/Dish/{dishId}")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> DishesByType(int dishId)
+        {
+            Console.WriteLine("Dish Id: " + dishId);
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
+                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+
+            if (restaurant == null)
+            {
+                return Redirect("/restaurants");
+            }
+
+            DishViewModel dishViewModel = new DishViewModel()
+            {
+                Dish = await _dishService.GetDishById(dishId),
+                Restaurant = restaurant
+            };
+
+            return View(dishViewModel);
+        }
+
     }
 }

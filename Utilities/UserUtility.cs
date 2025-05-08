@@ -10,7 +10,7 @@ namespace RestaurantSystem.Utilities
         private JWTUtility _jwtUtility;
         private UserService _userService;
 
-        private readonly string authHeader = "Authorization";
+        private readonly string authHeader = "Authentication";
 
         public UserUtility(EncryptionUtility encryptionUtility, JWTUtility jwtUtility,
             UserService userService)

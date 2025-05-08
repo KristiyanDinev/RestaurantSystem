@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Models.View;
+using RestaurantSystem.Models.View.Admin;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
@@ -19,11 +19,13 @@ namespace RestaurantSystem.Controllers
         private RestaurantService _restaurantService;
         private OrderedDishesService _orderedDishesService;
         private ReservationService _reservationService;
+        private UserService _userService;
 
         public AdminController(UserUtility userUtils,
             Utility _utils, RoleService roleService,
             OrderService orderService, RestaurantService restaurantService,
-            OrderedDishesService orderedDishesService, ReservationService reservationService)
+            OrderedDishesService orderedDishesService, ReservationService reservationService,
+            UserService userService)
         {
             _userUtils = userUtils;
             _roleService = roleService;
@@ -31,6 +33,7 @@ namespace RestaurantSystem.Controllers
             _restaurantService = restaurantService;
             _orderedDishesService = orderedDishesService;
             _reservationService = reservationService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -64,7 +67,7 @@ namespace RestaurantSystem.Controllers
                 return Redirect("/login");
             }
 
-            RestaurantModel? restaurant = await _userSerive.(user);
+            RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
 
             DishesViewModel adminDishesModel = new DishesViewModel();
             if (restaurant == null)
@@ -99,7 +102,7 @@ namespace RestaurantSystem.Controllers
                 return Redirect("/login");
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantForStaff(user);
+            RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
             ReservationViewModel reservationViewModel = new ReservationViewModel();
 
             if (restaurant == null)
@@ -127,7 +130,7 @@ namespace RestaurantSystem.Controllers
                 return Redirect("/login");
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantForStaff(user);
+            RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
             ManagerViewModel managerViewModel = new ManagerViewModel();
 
             if (restaurant == null)
@@ -138,9 +141,7 @@ namespace RestaurantSystem.Controllers
 
             managerViewModel.Staff = user;
             managerViewModel.Restaurant = restaurant;
-            managerViewModel.Employees = await _roleService.GetUsersWithAccessToServicesInTheRestaurant(
-                new List<string> { "/admin/Dishes", "/admin/Reservations" },
-                restaurant);
+            managerViewModel.Employees = await _restaurantService.GetRestaurantEmployeesByRestaurantId(restaurant.Id);
 
             return View(managerViewModel);
         }
@@ -151,15 +152,15 @@ namespace RestaurantSystem.Controllers
         [EnableRateLimiting("fixed")]
         public async Task<IActionResult> Delivery()
         {
-            // Delivery people can take orders from different restaurants
+            // Delivery people can take orders from different restaurants in their own city.
+            // They just have to update their profile in order to change which restaurants they can take 
+            // orders and deliver them
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
                 !(await _roleService.CanUserAccessService(user.Id, "/admin/delivery")))
             {
                 return Redirect("/login");
             }
-
-            DeliveryViewModel deliveryViewModel = new DeliveryViewModel();
 
             Dictionary<TimeTableModel, List<OrderModel>> orders = new Dictionary<TimeTableModel, List<OrderModel>>();
 
@@ -168,8 +169,11 @@ namespace RestaurantSystem.Controllers
                 orders.Add(timeTable, await _orderService.GetOrdersByRestaurantId_WithHomeDeliveryOption(timeTable.Restuarant.Id, true));
             }
 
-            deliveryViewModel.Staff = user;
-            deliveryViewModel.Orders = orders;
+            DeliveryViewModel deliveryViewModel = new DeliveryViewModel()
+            {
+                Staff = user,
+                Orders = orders
+            };
 
             return View(deliveryViewModel);
         }

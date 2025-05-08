@@ -98,8 +98,6 @@ namespace RestaurantSystem
             new WebSocketController(app);
             new ReservationsController(app);
             new UserController(app);
-            new ErrorController(app);
-            new OrderController(app);
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
 

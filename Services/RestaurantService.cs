@@ -78,5 +78,11 @@ namespace RestaurantSystem.Services
 
             return employees == null ? new List<UserModel>() : employees.ToList();
         }
+
+        public async Task<RestaurantModel?> GetRestaurantById(int? restaurantId)
+        {
+            return restaurantId == null ? null : await _databaseContext.Restaurants
+                .FirstOrDefaultAsync(restaurant => restaurant.Id == restaurantId);
+        }
     }
 }

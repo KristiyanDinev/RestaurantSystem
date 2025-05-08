@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 
@@ -18,6 +19,10 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
+
+        public async Task<DishModel?> GetDishById(int id) {
+            return await _databaseContext.Dishies.FirstOrDefaultAsync(dish => dish.Id == id);
+        }
         public async Task<List<DishModel>> GetDishesByIds(List<int> IDs)
         {
             return IDs.Count == 0 ? new List<DishModel>() : await _databaseContext.Dishies.Where(

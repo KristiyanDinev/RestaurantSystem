@@ -1,182 +1,155 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Models.WebModels;
-using RestaurantSystem.Utils.Web;
 using Microsoft.AspNetCore.Mvc;
-using RestaurantSystem.Controllers;
 using RestaurantSystem.Services;
-using RestaurantSystem.Utils;
+using Microsoft.AspNetCore.RateLimiting;
+using RestaurantSystem.Utilities;
+using RestaurantSystem.Models.View.Order;
+using RestaurantSystem.Models.Form;
 
 namespace RestaurantSystem.Controllers {
-    public class OrderController {
+    public class OrderController : Controller {
+
+        private OrderService _orderService;
+        private DishService _dishService;
+        private UserUtility _userUtility;
+        private RestaurantService _restaurantService;
+
+        public OrderController(OrderService orderService, 
+            DishService dishService, UserUtility userUtility,
+            RestaurantService restaurantService) {
+            _orderService = orderService;
+            _dishService = dishService;
+            _userUtility = userUtility;
+            _restaurantService = restaurantService;
+        }
+
+        [HttpGet]
+        [Route("Orders")]
+        [Route("Orders/Index")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> Orders()
+        {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return Redirect("/login");
+            }
+
+            OrdersViewModel ordersViewModel = new OrdersViewModel()
+            {
+                User = user,
+                Orders = await _orderService.GetOrdersByUser(user.Id)
+            };
+
+            return View(ordersViewModel);
+        }
 
 
-        public OrderController(WebApplication app) {
+        [HttpGet]
+        [Route("Order/{orderId}")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> Order(int orderId)
+        {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return Redirect("/login");
+            }
 
-            // get front-end display of your orders
-            app.MapGet("/orders", async (HttpContext context, 
-                OrderService db, ControllerUtils controllerUtils, 
-                UserUtils userUtils, WebUtils webUtils) => {
+            OrderViewModel orderViewModel = new OrderViewModel()
+            {
+                User = user,
+                Order = await _orderService.GetOrderById(orderId)
+            };
 
-                try {
-                        UserModel? user = await userUtils.GetUserByJWT(context);
-                        if (user == null)
-                        {
-                            return Results.Redirect("/login");
-                        }
-
-                        List<DisplayOrderModel> orders = await db.GetOrdersByUser(user.Id);
-
-                        string FileData = await controllerUtils.GetHTMLFromWWWROOT("/orders");
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData, 
-                            controllerUtils.UserModelName, [user]);
-
-
-                        foreach (DisplayOrderModel order in orders)
-                        {
-                            List<DishModel> dishes = await db.GetAllDishesFromOrder(order.Id);
-
-                            FileData = webUtils.HandleCommonPlaceholders(FileData,
-                                controllerUtils.OrderModelName, [order]);
-
-                            FileData = webUtils.HandleCommonPlaceholders(FileData,
-                                controllerUtils.DishModelName,
-
-                                controllerUtils.ConvertToDisplayDish(dishes)
-                                .Cast<object>().ToList());
-                        }
-
-                        FileData = webUtils.HandleCommonPlaceholders(FileData,
-                               controllerUtils.OrderModelName, []);
-                        
-
-                        return Results.Content(FileData, "text/html");
-
-                } catch (Exception) {
-                    return Results.BadRequest();
-                }
-            }).RequireRateLimiting("fixed");
-           
-
-            
-            // start order
-            app.MapPost("/order", async (HttpContext context,
-                CuponService cuponDb, OrderService orderDb,
-                DishService dishDb,
-                ControllerUtils controllerUtils, UserUtils userUtils,
-                [FromForm] string notes,
-                [FromForm] string cuponCode) => {
-
-                    try {
-
-                        string? value = context.Request.Cookies[controllerUtils.RestoratIdHeaderName];
-                        if (!int.TryParse(value, out int restorantId))
-                        {
-                            return Results.BadRequest();
-                        }
-
-                        List<int>? dishesIds = controllerUtils.GetCartItems(context);
-                        if (dishesIds == null && dishesIds.Count == 0)
-                        {
-                            return Results.BadRequest();
-                        }
-
-                        UserModel? user = await userUtils.GetUserByJWT(context);
-                        if (user == null)
-                        {
-                            return Results.Redirect("/login");
-                        }
-
-                        List<DishModel> dishes = await dishDb.GetDishesByIds(dishesIds.ToHashSet().ToList());
-
-                        decimal TotalPrice = OrderUtils.CalculateTotalPrice(dishes, 0);
-
-                        CuponModel? cupon = null;
-                        if (cuponCode.Length > 0) {
-                            cupon = await cuponDb.GetCuponByCode(cuponCode);
-
-                            if (cupon != null)
-                            {
-                                if (cupon.ExpirationDate.ToLocalTime() <= DateTime.Now) {
-                                    return Results.BadRequest();
-                                }
-
-                                TotalPrice = OrderUtils.CalculateTotalPrice(dishes,
-                                    cupon.DiscountPercent);
-                            }
-                        }
-
-                        /*
-                        InsertOrderModel order = new InsertOrderModel();
-                        order.RestorantId = restorantId;
-                        order.UserId = user.Id;
-                        order.TotalPrice = TotalPrice;
-                        order.Notes = notes;*/
+            return View(orderViewModel);
+        }
 
 
-                        OrderModel order = new OrderModel();
-                        order.RestorantId = restorantId;
-                        order.UserId = user.Id;
-                        order.TotalPrice = TotalPrice;
-                        order.Notes = notes;
-                        await orderDb.AddOrder(user.Id, dishesIds, order, controllerUtils);
+        [HttpPost]
+        [Route("Order/Start")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> OrderStart([FromBody] OrderFormModel order)
+        {
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
+                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
 
-                        if (cupon != null) {
-                            cuponDb.DeleteCupon(cupon.CuponCode);
-                        }
+            if (restaurant == null)
+            {
+                return Redirect("/restaurants");
+            }
 
-                        context.Response.Cookies.Delete(controllerUtils.CartHeaderName);
-                        context.Response.Cookies.Delete(controllerUtils.RestoratIdHeaderName);
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return Redirect("/login");
+            }
 
-                        return Results.Ok();
+            OrderStartViewModel orderStartViewModel = new OrderStartViewModel()
+            {
+                User = user,
+                Restaurant = restaurant
+            };
 
-                    } catch (Exception) {
-                        return Results.BadRequest();
-                    }
+            try
+            {
+                OrderModel orderModel = await _orderService.AddOrder(user.Id, restaurant.Id, order.Dishes, order.Notes,
 
-                }).RequireRateLimiting("fixed")
-              .DisableAntiforgery();
-            
+                (await _dishService.GetDishesByIds(order.Dishes)).Sum(dish => dish.Price)
 
-            // stop order
-            app.MapPost("/order/stop", async (HttpContext context,
-                OrderService db, WebSocketHandler webSocketHandler,
-                ControllerUtils controllerUtils, UserUtils userUtils,
-                [FromForm] string orderIdStr) => {
+                , true);
 
-                    if (!int.TryParse(orderIdStr, out int orderId))
-                    {
-                        return Results.BadRequest();
-                    }
+                orderStartViewModel.Success = true;
+                orderStartViewModel.Order = orderModel;
 
-                    try {
+                return View(orderStartViewModel);
 
-                        UserModel? user = await userUtils.GetUserByJWT(context);
-                        if (user == null)
-                        {
-                            return Results.Redirect("/login");
-                        }
+            } catch (Exception e)
+            {
+                orderStartViewModel.Success = false;
+                return View(orderStartViewModel);
+            }
+        }
 
-                        string? status = 
-                            await db.GetOrder_CurrentStatus_ById(orderId);
 
-                        if (status == null || !(status.Equals(controllerUtils.PendingStatus) || 
-                            status.Equals(controllerUtils.DBStatus))) {
-                            return Results.BadRequest();
-                        }
+        [HttpPost]
+        [Route("Order/Stop/{orderId}")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> OrderStop(int orderId)
+        {
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
+                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
 
-                        db.DeleteOrder(orderId, user);
+            if (restaurant == null)
+            {
+                return Redirect("/restaurants");
+            }
 
-                        webSocketHandler.RemoveModelIdFromOrderSubscribtion(orderId);
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return Redirect("/login");
+            }
 
-                        return Results.Ok();
+            OrderStopView orderStopView = new OrderStopView()
+            {
+                User = user
+            };
 
-                    } catch (Exception) {
-                        return Results.BadRequest();
-                    }
+            try
+            {
+                await _orderService.DeleteOrder(orderId);
 
-                }).RequireRateLimiting("fixed")
-              .DisableAntiforgery();
+                orderStopView.Success = true;
+
+                return View(orderStopView);
+
+            }
+            catch (Exception e)
+            {
+                orderStopView.Success = false;
+                return View(orderStopView);
+            }
         }
     }
 }

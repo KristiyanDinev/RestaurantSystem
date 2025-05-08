@@ -9,6 +9,7 @@ namespace RestaurantSystem.Services
 
         private DatabaseContext _databaseContext;
         private OrderedDishesService _orderedDishesDatabaseHandler;
+        private readonly string pendingStatus = "pending";
 
         public OrderService(DatabaseContext databaseContext, OrderedDishesService orderedDishesDatabaseHandler)
         {
@@ -16,12 +17,13 @@ namespace RestaurantSystem.Services
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;
         }
 
-        public async Task AddOrder(int userId, int restaurantId,
+        public async Task<OrderModel> AddOrder(int userId, int restaurantId,
             List<int> dishesId, string? notes, decimal totalPrice, bool isHomeDelivery)
         {
             OrderModel order = new OrderModel {
                 Notes = notes,
                 RestaurantId = restaurantId,
+                CurrentStatus = pendingStatus,
                 TotalPrice = totalPrice,
                 UserId = userId,
                 IsHomeDelivery = isHomeDelivery
@@ -37,16 +39,18 @@ namespace RestaurantSystem.Services
             }
 
             await _databaseContext.SaveChangesAsync();
+
+            return order;
         }
 
         public async Task DeleteOrder(int orderId)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
-                o => o.Id == orderId);
+                o => o.Id == orderId) ?? throw new Exception();
 
-            if (order == null)
+            if (!order.CurrentStatus.Equals(pendingStatus))
             {
-                return;
+                throw new Exception();
             }
 
             await _orderedDishesDatabaseHandler.DeleteOrderedDishes(orderId);
@@ -59,12 +63,7 @@ namespace RestaurantSystem.Services
         public async Task UpdateOrderCurrentStatusById(int orderId, string status)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
-                o => o.Id == orderId);
-
-            if (order == null)
-            {
-                return;
-            }
+                o => o.Id == orderId) ?? throw new Exception();
 
             order.CurrentStatus = status;
 
@@ -95,7 +94,10 @@ namespace RestaurantSystem.Services
 
         public async Task<OrderModel?> GetOrderById(int orderId)
         {
-            return await _databaseContext.Orders.FirstOrDefaultAsync(order => order.Id == orderId);
+            return await _databaseContext.Orders
+                .Include(order => order.OrderedDishes)
+                .Include(order => order.Restaurant)
+                .FirstOrDefaultAsync(order => order.Id == orderId);
         }
     }
 }

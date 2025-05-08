@@ -50,6 +50,7 @@ namespace RestaurantSystem.Services
                 user => user.Email.Equals(email) && user.Password.Equals(hash_password));
         }
 
+
         public async Task UpdateUser(UserModel new_user)
         {
             UserModel? user = await GetUser(new_user.Id);
@@ -71,6 +72,7 @@ namespace RestaurantSystem.Services
             await _databaseContext.SaveChangesAsync();
         }
 
+
         public async Task DeleteUser(int userId)
         {
             UserModel? user = await _databaseContext.Users.FirstOrDefaultAsync(
@@ -90,9 +92,7 @@ namespace RestaurantSystem.Services
         public async Task<RestaurantModel?> GetRestaurantWhereUserWorksIn(UserModel user)
         {
             return await _databaseContext.Restaurants
-                .Include(restaurant => restaurant.Employees)
-                .Where(restaurant => restaurant.Id == restaurantId)
-                .Select(restaurant => restaurant.Employees)
+                .Where(restaurant => restaurant.Id == user.RestaurantId)
                 .FirstOrDefaultAsync();
         }
     }
