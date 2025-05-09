@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.Form;
 using RestaurantSystem.Models.View.Admin;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
@@ -22,12 +23,13 @@ namespace RestaurantSystem.Controllers
         private OrderedDishesService _orderedDishesService;
         private ReservationService _reservationService;
         private UserService _userService;
+        private WebSocketService _webSocketService;
 
         public AdminController(UserUtility userUtils,
             Utility _utils, RoleService roleService,
             OrderService orderService, RestaurantService restaurantService,
             OrderedDishesService orderedDishesService, ReservationService reservationService,
-            UserService userService)
+            UserService userService, WebSocketService webSocketService)
         {
             _userUtils = userUtils;
             _roleService = roleService;
@@ -36,6 +38,7 @@ namespace RestaurantSystem.Controllers
             _orderedDishesService = orderedDishesService;
             _reservationService = reservationService;
             _userService = userService;
+            _webSocketService = webSocketService;
         }
 
         [HttpGet]
@@ -76,7 +79,7 @@ namespace RestaurantSystem.Controllers
                 return View(adminDishesModel);
             }
 
-            Dictionary<OrderModel, List<DishModel>> dishes = new Dictionary<OrderModel, List<DishModel>>();
+            Dictionary<OrderModel, List<DishModel>> dishes = new ();
             foreach (OrderModel order in await _orderService.GetOrdersByRestaurantId(restaurant.Id))
             {
                 dishes.Add(order, await _orderedDishesService.GetDishesFromOrder(order.Id));
@@ -87,6 +90,47 @@ namespace RestaurantSystem.Controllers
             adminDishesModel.Dishes = dishes;
 
             return View(adminDishesModel);
+        }
+
+        [HttpPost]
+        [Route("Admin/Dishes")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> DishesUpdate([FromForm] OrderUpdateFormModel orderUpdateFormModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Dishes");
+            }
+
+            UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
+            if (user == null ||
+                !(await _roleService.CanUserAccessService(user.Id, "/admin/dishes")))
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            DishesViewModel adminDishesModel = new DishesViewModel();
+            if (!await _orderService.UpdateOrderCurrentStatusById(orderUpdateFormModel.OrderId, 
+                orderUpdateFormModel.OrderCurrentStatus))
+            {
+                adminDishesModel.Error = "Can't update order's current status.";
+                return View("Dishes", adminDishesModel);
+            }
+
+            adminDishesModel.Staff = user;
+            // TODO Add the rest of the model and return it.
+
+            if (orderUpdateFormModel.DishCurrentStatus == null ||
+                orderUpdateFormModel.DishId == null)
+            {
+                await _webSocketService.SendJsonToClient("/ws/orders", ..., 
+                     _orderService.CheckIfOrderIsBeingTracked(user.Id, orderUpdateFormModel.OrderId));
+                
+                return View("Dishes");
+            }
+
+            
+            return RedirectToAction("Dishes", adminDishesModel);
         }
 
 
@@ -111,7 +155,9 @@ namespace RestaurantSystem.Controllers
             }
 
             reservationViewModel.Staff = user;
-            reservationViewModel.Reservations = await _reservationService.GetReservationsByRestaurantId(restaurant.Id);
+            reservationViewModel.Reservations = await _reservationService
+                .GetReservationsByRestaurantId(restaurant.Id);
+
             return View(reservationViewModel);
         }
 
@@ -139,7 +185,8 @@ namespace RestaurantSystem.Controllers
 
             managerViewModel.Staff = user;
             managerViewModel.Restaurant = restaurant;
-            managerViewModel.Employees = await _restaurantService.GetRestaurantEmployeesByRestaurantId(restaurant.Id);
+            managerViewModel.Employees = await _restaurantService
+                .GetRestaurantEmployeesByRestaurantId(restaurant.Id);
 
             return View(managerViewModel);
         }
@@ -163,7 +210,8 @@ namespace RestaurantSystem.Controllers
 
             foreach (TimeTableModel timeTable in await _restaurantService.GetRestaurantsForDelivery_ForUser(user)) {
 
-                orders.Add(timeTable, await _orderService.GetOrdersByRestaurantId_WithHomeDeliveryOption(timeTable.Restuarant.Id, true));
+                orders.Add(timeTable, await _orderService
+                    .GetOrdersByRestaurantId_WithHomeDeliveryOption(timeTable.Restuarant.Id, true));
             }
 
             DeliveryViewModel deliveryViewModel = new DeliveryViewModel()

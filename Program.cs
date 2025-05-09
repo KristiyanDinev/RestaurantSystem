@@ -17,6 +17,7 @@ namespace RestaurantSystem
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllersWithViews();
+            builder.Services.AddHttpLogging(o => { });
 
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
@@ -48,6 +49,7 @@ namespace RestaurantSystem
 
             builder.Services.AddSingleton<Utility>();
             builder.Services.AddSingleton<UserUtility>();
+            builder.Services.AddSingleton<WebSocketService>();
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
                     ?? "ugyw89ub9Y9H8OP9j1wsfwedS";
@@ -74,7 +76,7 @@ namespace RestaurantSystem
             app.UseStaticFiles();
 
             app.UseAuthenticationMiddleware();
-            app.UseMiddleware<WebSocketMiddleware>();
+            app.UseWebSocketMiddleware();
 
             app.UseHttpLogging();
             app.UseLoggingMiddleware();

@@ -91,7 +91,8 @@ namespace RestaurantSystem.Controllers {
             {
                 User = user,
                 Restaurant = restaurant,
-                Order = await _orderService.AddOrder(user.Id, restaurant.Id, order.Dishes, order.Notes,
+                Order = await _orderService.AddOrder(user.Id, restaurant.Id, 
+                order.Dishes, order.Notes,
 
                 (await _dishService.GetDishesByIds(order.Dishes)).Sum(dish => dish.Price)
 

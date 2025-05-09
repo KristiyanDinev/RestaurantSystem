@@ -56,6 +56,8 @@ namespace RestaurantSystem.Database {
 
             // RolePermissionModel
             BuildRolePermissionModel(ref builder);
+
+            base.OnModelCreating(builder);
         }
 
         private void BuildUserModel(ref ModelBuilder builder)

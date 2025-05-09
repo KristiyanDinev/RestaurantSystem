@@ -167,7 +167,8 @@ namespace RestaurantSystem.Controllers {
                 }
             }
 
-            bool updateSuccessful = await _userService.UpdateUser(user, profileUpdateFormModel);
+            bool updateSuccessful = await _userService.UpdateUser(user, 
+                profileUpdateFormModel);
             user = await _userService.GetUser(user.Id);
 
             ProfileViewModel profileViewModel = new ProfileViewModel()

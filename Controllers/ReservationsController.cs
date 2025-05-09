@@ -46,7 +46,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            ReservationFormViewModel reservationViewModel = new ReservationFormViewModel()
+            ReservationFormViewModel reservationViewModel = new ()
             {
                 User = user,
                 Restaurant = restaurant
@@ -66,7 +66,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            ReservationsViewModel reservationsViewModel = new ReservationsViewModel()
+            ReservationsViewModel reservationsViewModel = new ()
             {
                 User = user,
                 Reservations = await _reservationService.GetReservationsByUserId(user.Id)
@@ -85,7 +85,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            ReservationViewModel reservationViewModel = new ReservationViewModel()
+            ReservationViewModel reservationViewModel = new ()
             {
                 User = user,
                 Reservation = await _reservationService.GetReservationById(reservationId)
@@ -115,7 +115,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
             
-            ReservationCreateViewModel reservationCreateViewModel = new ReservationCreateViewModel()
+            ReservationCreateViewModel reservationCreateViewModel = new ()
             {
                 User = user,
                 Restaurant = restaurant,
@@ -139,7 +139,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            ReservationDeleteViewModel reservationDeleteViewModel = new ReservationDeleteViewModel()
+            ReservationDeleteViewModel reservationDeleteViewModel = new ()
             {
                 User = user,
                 Success = await _reservationService.DeleteReservation(reservationId)

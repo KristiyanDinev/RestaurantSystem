@@ -20,6 +20,15 @@ Users can order home delivery from `POST /Order/Start` endpoint.
 
 Waitress staff can place orders in the restaurant they work in from `... work in progress..` endpoint.
 
+When client starts a websocket and starts to track his own orders.
+He sends a JSON like: `{"user_id": 123, "orders": [1, 2, 3]}`
+- Here the **user_id** is the Id of the user whos orders we need to track, 
+ then we receive a collecion of orders ids, which we track down.
+
+- Keep in mind that there are orders which are tracked by the cooks in the kitchen and orders, 
+ which are seen by the client. So these orders can simply both. 
+ They can be orders for the kitchen or for the user (for now).
+
 ## Reservations
 
 You are required to log in, so you can the reservations feature.
@@ -85,3 +94,6 @@ Staff endpoints:
 - user: ResturantUser
 - password: password123
 
+### TODO
+- Finish `AdminController.cs` to support Order status updates, so it can notify the subscribers (websocket clients).
+- Finish `OrderService.cs`

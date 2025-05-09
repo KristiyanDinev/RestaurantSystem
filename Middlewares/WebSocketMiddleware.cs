@@ -17,13 +17,17 @@ namespace RestaurantSystem.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Path.StartsWithSegments("/ws"))
+            PathString path = context.Request.Path;
+            if (path.StartsWithSegments("/ws/"))
             {
                 if (context.WebSockets.IsWebSocketRequest)
                 {
-                    string endpoint = context.Request.Path.ToString().ToLower();
+                    string endpoint = path.ToString().ToLower();
                     using WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                    await _webSocketManager.HandleWebSocketAsync(endpoint, webSocket);
+
+                    TaskCompletionSource<object> socketFinishedTcs = new TaskCompletionSource<object>();
+                    await _webSocketManager.HandleWebSocketAsync(endpoint, webSocket, socketFinishedTcs);
+                    await socketFinishedTcs.Task;
                 }
                 else
                 {
@@ -34,6 +38,15 @@ namespace RestaurantSystem.Middlewares
             {
                 await _next(context);
             }
+        }
+    }
+
+    public static class WebSocketMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseWebSocketMiddleware(
+            this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<WebSocketMiddleware>();
         }
     }
 }

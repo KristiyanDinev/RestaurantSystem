@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -9,27 +9,68 @@ namespace RestaurantSystem.Services
     public class WebSocketService
     {
         // Dictionary of endpoint -> set of sockets
-        private readonly ConcurrentDictionary<string, ConcurrentBag<WebSocket>> _endpointSockets = new();
+        private ConcurrentDictionary<string, ConcurrentBag<WebSocket>> _endpointSockets = new();
 
-        public async Task HandleWebSocketAsync(string endpoint, WebSocket socket)
+        // multiple sockets may have in some situations multiple Ids:
+        // The same user has openned multiple tabs for tracking.
+        private ConcurrentDictionary<WebSocket, int> _UserIdWithWebSocket = new();
+        private OrderService _orderService;
+
+        public WebSocketService(OrderService orderService)
         {
-            var sockets = _endpointSockets.GetOrAdd(endpoint, _ => new ConcurrentBag<WebSocket>());
+            _orderService = orderService;
+        }
+
+        private void HandleJsonMessages(Dictionary<string, object> data, WebSocket socket)
+        {
+            int? user_id = null;
+            if (data.TryGetValue("user_id", out object? user_id_obj)) {
+                user_id = int.Parse(""+ user_id_obj);
+            }
+
+            if (user_id == null || !_UserIdWithWebSocket.TryAdd(socket, (int)user_id))
+            {
+                throw new Exception();
+            }
+
+            // The user sets Orders to listen to
+            if (data.TryGetValue("orders", out object? orders_obj))
+            {
+
+                // list of order Ids
+                _orderService.AddOrdersToListenTo((int)user_id, (List<int>)orders_obj, socket);
+            }
+        }
+
+
+        public async Task HandleWebSocketAsync(string endpoint, WebSocket socket,
+            TaskCompletionSource<object> taskCompletionSource)
+        {
+            ConcurrentBag<WebSocket> sockets = _endpointSockets.GetOrAdd(endpoint, _ => new ConcurrentBag<WebSocket>());
             sockets.Add(socket);
 
-            var buffer = new byte[1024 * 4];
+            byte[] buffer = new byte[1024 * 4];
             try
             {
-                while (socket.State == WebSocketState.Open)
+                while (socket.State.Equals(WebSocketState.Open))
                 {
-                    var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    WebSocketReceiveResult result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
-                    if (result.MessageType == WebSocketMessageType.Close)
-                        break;
-
-                    if (result.MessageType == WebSocketMessageType.Text)
+                    if (result.MessageType.Equals(WebSocketMessageType.Close))
                     {
-                        var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                        Console.WriteLine($"Received on {endpoint}: {message}");
+                        break;
+                    }
+
+                    if (result.MessageType.Equals(WebSocketMessageType.Text))
+                    {
+                        // expect a JSON text
+                        Dictionary<string, object>? message = JsonSerializer.Deserialize
+                            <Dictionary<string, object>>(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                        if (message == null) {
+                            break;
+                        }
+
+                        HandleJsonMessages(message, socket);
                     }
                 }
             }
@@ -37,28 +78,30 @@ namespace RestaurantSystem.Services
             {
                 await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed", CancellationToken.None);
                 RemoveSocket(endpoint, socket);
+                taskCompletionSource.TrySetResult(endpoint);
             }
         }
 
         private void RemoveSocket(string endpoint, WebSocket socket)
         {
-            if (_endpointSockets.TryGetValue(endpoint, out var sockets))
+            if (_endpointSockets.TryGetValue(endpoint, out ConcurrentBag<WebSocket>? sockets) &&
+                _UserIdWithWebSocket.TryGetValue(socket, out int userId))
             {
-                var newSockets = new ConcurrentBag<WebSocket>(sockets.Where(s => s != socket));
-                _endpointSockets[endpoint] = newSockets;
+                _endpointSockets[endpoint] = new ConcurrentBag<WebSocket>(sockets.Where(s => !s.Equals(socket)));
+                _orderService.RemoveOrderFromTracking(userId);
             }
         }
 
-        public async Task SendJsonAsync<T>(string endpoint, T data)
+
+        public async Task SendJsonToAll<T>(string endpoint, T data)
         {
-            if (_endpointSockets.TryGetValue(endpoint, 
+            if (_endpointSockets.TryGetValue(endpoint,
                 out ConcurrentBag<WebSocket>? sockets))
             {
-                string json = JsonSerializer.Serialize(data);
-                byte[] buffer = Encoding.UTF8.GetBytes(json);
-                ArraySegment<byte> segment = new ArraySegment<byte>(buffer);
+                ArraySegment<byte> segment = new ArraySegment<byte>(
+                    Encoding.UTF8.GetBytes(JsonSerializer.Serialize(data)));
 
-                foreach (var socket in sockets.Where(s => s.State == WebSocketState.Open))
+                foreach (WebSocket socket in sockets.Where(s => s.State.Equals(WebSocketState.Open)))
                 {
                     try
                     {
@@ -66,9 +109,36 @@ namespace RestaurantSystem.Services
                     }
                     catch
                     {
-                        // Optionally log and remove disconnected sockets
+                        RemoveSocket(endpoint, socket);
                     }
                 }
             }
         }
+
+
+        public async Task SendJsonToClient<T>(string endpoint, T data, List<WebSocket> sockets)
+        {
+            foreach (WebSocket socket in sockets)
+            {
+                if (!socket.State.Equals(WebSocketState.Open))
+                {
+                    return;
+                }
+
+                string json = JsonSerializer.Serialize(data);
+                ArraySegment<byte> segment = new ArraySegment<byte>(
+                        Encoding.UTF8.GetBytes(json));
+
+                try
+                {
+                    Console.WriteLine($"WebSocket: Sending to {endpoint}: {json}");
+                    await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+                catch
+                {
+                    RemoveSocket(endpoint, socket);
+                }
+            }
+        }
     }
+}

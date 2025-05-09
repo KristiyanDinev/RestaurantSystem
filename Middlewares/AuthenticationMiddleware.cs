@@ -1,5 +1,5 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Utils;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Services
 {
@@ -16,7 +16,7 @@ namespace RestaurantSystem.Services
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, UserUtils userUtils, 
+        public async Task InvokeAsync(HttpContext context, UserUtility userUtility, 
             RoleService roleService)
         {
             string path = context.Request.Path.Value ?? "/";
@@ -26,7 +26,7 @@ namespace RestaurantSystem.Services
             }
 
             bool isAdminEndpoint = ("/"+path.Split("/")[0]).Equals(admin_endpoint_prefix);
-            UserModel? user = await userUtils.GetUserByJWT(context);
+            UserModel? user = await userUtility.GetUserByJWT(context);
 
             if (user != null && non_login_endpoints.Contains(path))
             {

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.WebSockets;
+using System.Net.WebSockets;
 
 namespace RestaurantSystem.Services
 {
@@ -9,12 +11,15 @@ namespace RestaurantSystem.Services
 
         private DatabaseContext _databaseContext;
         private OrderedDishesService _orderedDishesDatabaseHandler;
-        private readonly string pendingStatus = "pending";
+        private readonly string PendingStatus = "pending";
+
+        private List<OrderWebSocketModel> OrderWebSockets;
 
         public OrderService(DatabaseContext databaseContext, OrderedDishesService orderedDishesDatabaseHandler)
         {
             _databaseContext = databaseContext;
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;
+            OrderWebSockets = new List<OrderWebSocketModel>();
         }
 
         public async Task<OrderModel?> AddOrder(int userId, int restaurantId,
@@ -23,7 +28,7 @@ namespace RestaurantSystem.Services
             OrderModel order = new OrderModel {
                 Notes = notes,
                 RestaurantId = restaurantId,
-                CurrentStatus = pendingStatus,
+                CurrentStatus = PendingStatus,
                 TotalPrice = totalPrice,
                 UserId = userId,
                 IsHomeDelivery = isHomeDelivery
@@ -53,7 +58,7 @@ namespace RestaurantSystem.Services
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
 
-            if (order == null || !order.CurrentStatus.Equals(pendingStatus))
+            if (order == null || !order.CurrentStatus.Equals(PendingStatus))
             {
                 return false;
             }
@@ -104,5 +109,39 @@ namespace RestaurantSystem.Services
                 .Include(order => order.Restaurant)
                 .FirstOrDefaultAsync(order => order.Id == orderId);
         }
+
+        public void AddOrdersToListenTo(int user_id, List<int> orderIds, WebSocket socket)
+        {
+            if (OrderWebSockets.Any(order => order.UserId == user_id))
+            {
+                return;
+            }
+
+            OrderWebSockets.Add(new OrderWebSocketModel()
+            {
+                UserId = user_id,
+                Socket = socket,
+                OrderIds = orderIds
+            });
+        }
+
+        public void RemoveOrderFromTracking(int user_id)
+        {
+            OrderWebSockets.RemoveAll(order => order.UserId == user_id);
+        }
+
+        public List<WebSocket> CheckIfOrderIsBeingTracked(int user_id, int order_id)
+        {
+            OrderWebSocketModel? orderWebSocketModel = OrderWebSockets
+                .FirstOrDefault(order => order.UserId == user_id);
+
+            if (orderWebSocketModel == null || orderWebSocketModel.OrderIds == null)
+            {
+                return false;
+            }
+
+            return orderWebSocketModel.OrderIds.Any(orderId => orderId == order_id);
+        }
+
     }
 }
