@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.Form;
 using RestaurantSystem.Models.WebSockets;
 using System.Net.WebSockets;
 
@@ -15,7 +16,8 @@ namespace RestaurantSystem.Services
 
         private List<OrderWebSocketModel> OrderWebSockets;
 
-        public OrderService(DatabaseContext databaseContext, OrderedDishesService orderedDishesDatabaseHandler)
+        public OrderService(DatabaseContext databaseContext, 
+            OrderedDishesService orderedDishesDatabaseHandler)
         {
             _databaseContext = databaseContext;
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;
@@ -97,7 +99,7 @@ namespace RestaurantSystem.Services
         public async Task<List<OrderModel>> GetOrdersByRestaurantId_WithHomeDeliveryOption(int restaurantId, bool isHomeDelivery)
         {
             return await _databaseContext.Orders.Where(
-                order => order.RestaurantId == restaurantId && 
+                order => order.RestaurantId == restaurantId &&
                 order.IsHomeDelivery.Equals(isHomeDelivery))
                 .ToListAsync();
         }
@@ -110,16 +112,15 @@ namespace RestaurantSystem.Services
                 .FirstOrDefaultAsync(order => order.Id == orderId);
         }
 
-        public void AddOrdersToListenTo(int user_id, List<int> orderIds, WebSocket socket)
+        public void AddOrdersToListenTo(List<int> orderIds, WebSocket socket)
         {
-            if (OrderWebSockets.Any(order => order.UserId == user_id))
+            if (OrderWebSockets.Any(order => order.Socket.Equals(socket)))
             {
                 return;
             }
 
             OrderWebSockets.Add(new OrderWebSocketModel()
             {
-                UserId = user_id,
                 Socket = socket,
                 OrderIds = orderIds
             });
@@ -130,18 +131,11 @@ namespace RestaurantSystem.Services
             OrderWebSockets.RemoveAll(order => order.UserId == user_id);
         }
 
-        public List<WebSocket> CheckIfOrderIsBeingTracked(int user_id, int order_id)
+        public List<WebSocket> GetListenersForOrderId(int order_id)
         {
-            OrderWebSocketModel? orderWebSocketModel = OrderWebSockets
-                .FirstOrDefault(order => order.UserId == user_id);
-
-            if (orderWebSocketModel == null || orderWebSocketModel.OrderIds == null)
-            {
-                return false;
-            }
-
-            return orderWebSocketModel.OrderIds.Any(orderId => orderId == order_id);
+            return OrderWebSockets
+                .Where(order => order.OrderIds.Contains(order_id))
+                .Select(order => order.Socket).ToList();
         }
-
     }
 }

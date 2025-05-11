@@ -62,6 +62,8 @@ namespace RestaurantSystem.Database {
 
         private void BuildUserModel(ref ModelBuilder builder)
         {
+            builder.Entity<UserModel>().ToTable("Users");
+
             builder.Entity<UserModel>()
                 .HasKey(user => user.Id);
 
@@ -122,6 +124,8 @@ namespace RestaurantSystem.Database {
         }
 
         private void BuildServicesModel(ref ModelBuilder builder) {
+            builder.Entity<ServiceModel>().ToTable("Services");
+
             builder.Entity<ServiceModel>()
                 .HasKey(service => service.Path);
 
@@ -136,6 +140,8 @@ namespace RestaurantSystem.Database {
 
         private void BuildRolePermissionModel(ref ModelBuilder builder)
         {
+            builder.Entity<RolePermissionModel>().ToTable("Role_Permissions");
+
             builder.Entity<RolePermissionModel>()
                 .HasKey(rp => new { rp.RoleName, rp.ServicePath });
 
@@ -152,6 +158,8 @@ namespace RestaurantSystem.Database {
 
         private void BuildUserRoleModel(ref ModelBuilder builder)
         {
+            builder.Entity<UserRoleModel>().ToTable("User_Roles");
+
             builder.Entity<UserRoleModel>()
                 .HasKey(role => new { role.UserId, role.RoleName });
 
@@ -181,6 +189,8 @@ namespace RestaurantSystem.Database {
 
         private void BuildRoleModel(ref ModelBuilder builder)
         {
+            builder.Entity<RoleModel>().ToTable("Roles");
+
             builder.Entity<RoleModel>()
                 .HasKey(role => role.Name);
 
@@ -191,6 +201,8 @@ namespace RestaurantSystem.Database {
         
         private void BuildRestaurantModel(ref ModelBuilder builder)
         {
+            builder.Entity<RestaurantModel>().ToTable("Restaurants");
+
             builder.Entity<RestaurantModel>()
                 .HasKey(restaurant => restaurant.Id);
 
@@ -251,38 +263,42 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
         }
 
-        private void BuildTimeTableModel(ref ModelBuilder bulder)
+        private void BuildTimeTableModel(ref ModelBuilder builder)
         {
-            bulder.Entity<TimeTableModel>()
+            builder.Entity<RestaurantModel>().ToTable("Restaurants");
+
+            builder.Entity<TimeTableModel>()
                 .HasKey(time => time.RestuarantId);
 
-            bulder.Entity<TimeTableModel>()
+            builder.Entity<TimeTableModel>()
                 .Property(time => time.UserAddress)
                 .IsRequired();
 
-            bulder.Entity<TimeTableModel>()
+            builder.Entity<TimeTableModel>()
                 .Property(time => time.UserCity)
                 .IsRequired();
 
-            bulder.Entity<TimeTableModel>()
+            builder.Entity<TimeTableModel>()
                 .Property(time => time.UserState)
                 .HasDefaultValue(null);
 
-            bulder.Entity<TimeTableModel>()
+            builder.Entity<TimeTableModel>()
                 .Property(time => time.UserCountry)
                 .IsRequired();
 
-            bulder.Entity<TimeTableModel>()
+            builder.Entity<TimeTableModel>()
                 .Property(time => time.AvrageDeliverTime)
                 .IsRequired();
 
-            bulder.Entity<TimeTableModel>()
+            builder.Entity<TimeTableModel>()
                 .HasOne(time => time.Restuarant)
                 .WithMany(restaurant => restaurant.TimeTables)
                 .HasForeignKey(time => time.RestuarantId);
         }
 
         private void BuildDishModel(ref ModelBuilder builder) {
+            builder.Entity<DishModel>().ToTable("Dishes");
+
             builder.Entity<DishModel>()
                 .HasKey(dish => dish.Id);
 
@@ -324,6 +340,8 @@ namespace RestaurantSystem.Database {
         }
 
         private void BuildOrderModel(ref ModelBuilder builder) {
+            builder.Entity<OrderModel>().ToTable("Orders");
+
             builder.Entity<OrderModel>()
                 .HasKey(order => order.Id);
 
@@ -369,6 +387,8 @@ namespace RestaurantSystem.Database {
         }
 
         private void BuildOrderedDishes(ref ModelBuilder builder) {
+            builder.Entity<OrderedDishesModel>().ToTable("Ordered_Dishes");
+
             builder.Entity<OrderedDishesModel>()
                 .Property(order => order.Notes)
                 .HasDefaultValue(null);
@@ -399,6 +419,8 @@ namespace RestaurantSystem.Database {
 
         private void BuildReservationModel(ref ModelBuilder builder)
         {
+            builder.Entity<ReservationModel>().ToTable("Reservations");
+
             builder.Entity<ReservationModel>()
                 .HasKey(res => res.Id);
 
@@ -449,6 +471,8 @@ namespace RestaurantSystem.Database {
         }
 
         private void BuildCuponModel(ref ModelBuilder builder) {
+            builder.Entity<CuponModel>().ToTable("Cupons");
+
             builder.Entity<CuponModel>()
                 .HasKey(cupon => cupon.CuponCode);
 

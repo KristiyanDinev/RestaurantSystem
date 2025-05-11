@@ -56,10 +56,10 @@ namespace RestaurantSystem
 
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options => {
-                    options.PermitLimit = 10;
-                    options.Window = TimeSpan.FromMinutes(1);
+                    options.PermitLimit = 1;
+                    options.Window = TimeSpan.FromSeconds(1);
                     options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                    options.QueueLimit = 0;
+                    options.QueueLimit = 2;
                 })
             );
 

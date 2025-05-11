@@ -99,6 +99,7 @@ namespace RestaurantSystem.Controllers
         {
             if (!ModelState.IsValid)
             {
+                TempData["ErrorMessage"] = "Invalid form submission";
                 return RedirectToAction("Dishes");
             }
 
@@ -109,28 +110,41 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            DishesViewModel adminDishesModel = new DishesViewModel();
-            if (!await _orderService.UpdateOrderCurrentStatusById(orderUpdateFormModel.OrderId, 
-                orderUpdateFormModel.OrderCurrentStatus))
+            string updateMessage = "Updated ";
+
+            if (orderUpdateFormModel.OrderCurrentStatus != null)
             {
-                adminDishesModel.Error = "Can't update order's current status.";
-                return View("Dishes", adminDishesModel);
+                if (!(await _orderService.UpdateOrderCurrentStatusById((int)orderUpdateFormModel.OrderId,
+                orderUpdateFormModel.OrderCurrentStatus)))
+                {
+                    TempData["ErrorMessage"] = "Can't update order's current status.";
+                    return View("Dishes");
+                }
+
+                updateMessage += "order's current status: " + orderUpdateFormModel.DishCurrentStatus+". ";
             }
 
-            adminDishesModel.Staff = user;
-            // TODO Add the rest of the model and return it.
-
-            if (orderUpdateFormModel.DishCurrentStatus == null ||
-                orderUpdateFormModel.DishId == null)
+            if (orderUpdateFormModel.DishCurrentStatus != null &&
+                orderUpdateFormModel.DishId != null)
             {
-                await _webSocketService.SendJsonToClient("/ws/orders", ..., 
-                     _orderService.CheckIfOrderIsBeingTracked(user.Id, orderUpdateFormModel.OrderId));
-                
-                return View("Dishes");
+
+                if(!(await _orderedDishesService.UpdateOrderedDishStatusById((int)orderUpdateFormModel.DishId,
+                    orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus)))
+                {
+                    TempData["ErrorMessage"] = "Can't update dish's current status.";
+                    return View("Dishes");
+                }
+
+                updateMessage += "dish current status: " + orderUpdateFormModel.DishCurrentStatus+". ";
             }
 
-            
-            return RedirectToAction("Dishes", adminDishesModel);
+            if (updateMessage.Length > 8)
+            {
+                TempData["SuccessMessage"] = updateMessage;
+                await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
+                     _orderService.GetListenersForOrderId(orderUpdateFormModel.OrderId));
+            }
+            return RedirectToAction("Dishes");
         }
 
 

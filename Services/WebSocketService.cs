@@ -10,10 +10,6 @@ namespace RestaurantSystem.Services
     {
         // Dictionary of endpoint -> set of sockets
         private ConcurrentDictionary<string, ConcurrentBag<WebSocket>> _endpointSockets = new();
-
-        // multiple sockets may have in some situations multiple Ids:
-        // The same user has openned multiple tabs for tracking.
-        private ConcurrentDictionary<WebSocket, int> _UserIdWithWebSocket = new();
         private OrderService _orderService;
 
         public WebSocketService(OrderService orderService)
@@ -23,15 +19,11 @@ namespace RestaurantSystem.Services
 
         private void HandleJsonMessages(Dictionary<string, object> data, WebSocket socket)
         {
-            int? user_id = null;
-            if (data.TryGetValue("user_id", out object? user_id_obj)) {
-                user_id = int.Parse(""+ user_id_obj);
-            }
-
-            if (user_id == null || !_UserIdWithWebSocket.TryAdd(socket, (int)user_id))
-            {
+            if (!data.TryGetValue("user_id", out object? user_id_obj)) {
                 throw new Exception();
             }
+
+            int user_id = int.Parse("" + user_id_obj);
 
             // The user sets Orders to listen to
             if (data.TryGetValue("orders", out object? orders_obj))
@@ -101,22 +93,13 @@ namespace RestaurantSystem.Services
                 ArraySegment<byte> segment = new ArraySegment<byte>(
                     Encoding.UTF8.GetBytes(JsonSerializer.Serialize(data)));
 
-                foreach (WebSocket socket in sockets.Where(s => s.State.Equals(WebSocketState.Open)))
-                {
-                    try
-                    {
-                        await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
-                    }
-                    catch
-                    {
-                        RemoveSocket(endpoint, socket);
-                    }
-                }
+                await SendJsonToClients<T>(endpoint, data,
+                    sockets.Where(s => s.State.Equals(WebSocketState.Open)).ToList());
             }
         }
 
 
-        public async Task SendJsonToClient<T>(string endpoint, T data, List<WebSocket> sockets)
+        public async Task SendJsonToClients<T>(string endpoint, T data, List<WebSocket> sockets)
         {
             foreach (WebSocket socket in sockets)
             {
