@@ -1,0 +1,24 @@
+﻿@model RestaurantSystem.Models.View.User.ProfileViewModel;
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "_NavBar";
+}
+
+
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href='profile/profile.css'>
+</head>
+
+
+@RenderBody()
+
+<h1>Profile</h1>
+
+{{Profile}}
+
+<p id="Stats"></p>
+<br>
+
+<button id="edit" onclick="updateUser()">Edit</button>
+
+<script src='profile/profile.js'></script>

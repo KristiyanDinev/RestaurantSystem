@@ -7,6 +7,6 @@ namespace RestaurantSystem.Models.View.User
         // if it is not null, then it did update successfully
         public string? UpdatedSuccessfully { get; set; }
 
-        public UserModel? User { get; set; }
+        public required UserModel User { get; set; }
     }
 }

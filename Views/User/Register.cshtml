@@ -1,0 +1,66 @@
+﻿@{
+    ViewData["Title"] = "Register";
+    Layout = "_Layout";
+}
+
+
+
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href='register/register.css'>
+    
+    @RenderBody()
+</head>
+
+<body>
+
+    <h1>Register</h1>
+
+    <div class="register">
+
+        <label>Username</label>
+        <input type="text" id="Username" maxlength="100" placeholder="Username" required>
+
+        <br>
+        <label>Email</label>
+        <input type="email" id="Email" maxlength="50" placeholder="Email" required>
+        <br>
+        <label>Password</label>
+        <input type="password" id="Password" placeholder="Password" required>
+        <br>
+        <label>Image</label>
+        <input type="file" accept="image/*" id="Image">
+        <br>
+        <img id="review" src="#" alt="your image" />
+        <br>
+        <label>Notes</label>
+        <textarea id="Notes" cols="50" rows="10" maxlength="255" placeholder="Notes"></textarea>
+        <br>
+        <label>Address</label>
+        <input type="text" id="Address" maxlength="255" placeholder="Address" required>
+        <br>
+        <label>City</label>
+        <input type="text" id="City" maxlength="50" placeholder="City" required>
+        <br>
+        <br>
+        <label>State</label>
+        <input type="text" id="State" maxlength="50" placeholder="State (if you have no state then you can leave it empty)">
+        <br>
+        <label>Country</label>
+        <input type="text" id="Country" maxlength="50" placeholder="Country" required>
+        <br>
+        <label>Phone</label>
+        <input type="phone" id="Phone" maxlength="15" placeholder="Phone Number">
+        <br>
+        <label>Remember Me?</label>
+        <input type="checkbox" id="RememberMe">
+        <br>
+        <p id="Stats"></p>
+        <br>
+
+        <button onclick="submit()">Register</button>
+    </div>
+
+    <button onclick="goToLogin()">Go to Login</button>
+
+    <script src='register/register.js'></script>
+</body>

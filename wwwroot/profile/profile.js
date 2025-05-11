@@ -10,22 +10,10 @@ function readURL(input) {
     }
 }
 
-$("#_image").change(function () {
-    readURL(this);
-});
+document.getElementById("_image").onchange = (e) => {
+    readURL(e.target);
+};
 
-
-function readURL(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-            document.getElementById('review').src = e.target.result
-        }
-
-        reader.readAsDataURL(input.files[0]);
-    }
-}
 
 var ImageFile = ""
 let fileSelection = document.getElementById("_image")

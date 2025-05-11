@@ -14,6 +14,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Shared\_Layout.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Views\Shared\_Layout.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.9.0" />
@@ -22,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Cupon\" />
     <Folder Include="wwwroot\dishes\drinks\" />
     <Folder Include="wwwroot\dishes\appetizers\" />
     <Folder Include="wwwroot\dishes\dishes\" />

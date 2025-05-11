@@ -183,7 +183,7 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("/logout")]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
             _userUtility.RemoveAuthBearerHeader(HttpContext);
 
