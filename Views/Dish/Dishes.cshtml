@@ -1,0 +1,30 @@
+﻿@model RestaurantSystem.Models.View.Dish.DishesViewModel;
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Dishes";
+}
+
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/dishes/dish.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/index.css'>
+    @RenderBody()
+</head>
+
+
+<body>
+
+    <partial name="NavBar" model="Model.User" />
+    <partial name="RestaurantBar" model="Model.Restaurant" />
+
+        <button onclick="goToSalads()" id="dish">Salads</button>
+        <button onclick="goToAppetizers()" id="dish">Appetizers</button>
+        <button onclick="goToDishesFood()" id="dish">Dishes</button>
+        <button onclick="goToDrinks()" id="dish">Drinks</button>
+        <button onclick="goToDesserts()" id="dish">Desserts</button>
+
+
+    <script src='~/index.js'></script>
+    <script src='~/dishes/dish.js'></script>
+
+</body>

@@ -4,8 +4,9 @@ namespace RestaurantSystem.Models.View.Dish
 {
     public class DishesTypeViewModel
     {
-
-        public RestaurantModel? Restaurant { get; set; }
-        public List<DishModel>? Dishes { get; set; }
+        public required RestaurantModel Restaurant { get; set; }
+        public required UserModel User { get; set; }
+        public required List<DishModel> Dishes { get; set; }
+        public required string DishType { get; set; }
     }
 }

@@ -1,1 +1,68 @@
-﻿
+﻿@using RestaurantSystem.Models.DatabaseModels;
+@model List<RestaurantSystem.Models.DatabaseModels.TimeTableModel>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Restaurants";
+}
+
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href="~/restaurant/restaurant.css">
+
+</head>
+
+<div>
+
+    @{
+        foreach (TimeTableModel timeTable in Model)
+        {
+            RestaurantModel restaurant = timeTable.Restuarant;
+
+            string delivery = restaurant.DoDelivery ? "Yes" : "No";
+            string serve = restaurant.ServeCustomersInPlace ? "Yes" : "No";
+
+            <div class="restaurant" onclick="choose('@restaurant.Id')">
+                <p>@string.Join(", ", restaurant.Address,
+                         restaurant.City, restaurant.State, restaurant.Country)</p>
+
+                <br />
+
+                <p>Avrage Delivery Time: @timeTable.AvrageDeliverTime</p>
+
+                <br />
+
+                <p>Does Delivery: @delivery</p>
+                <br />
+
+                <p>Serves People at Place: @serve</p>
+                <br />
+
+                <p>Postal Code: @restaurant.PostalCode</p>
+                <br />
+
+                <p>Reservations:</p>
+                <br />
+
+                <p>Price per Adult: @restaurant.Price_Per_Adult</p>
+                <br />
+
+                <p>Price per Child: @restaurant.Price_Per_Children</p>
+                <br />
+
+                <p>Max Adults: @restaurant.ReservationMaxAdults</p>
+                <br />
+
+                <p>Min Adults: @restaurant.ReservationMinAdults</p>
+                <br />
+
+                <p>Max Children: @restaurant.ReservationMaxChildren</p>
+                <br />
+
+                <p>Min Children: @restaurant.ReservationMinChildren</p>
+                <br />
+
+            </div>
+        }
+    }
+
+</div>

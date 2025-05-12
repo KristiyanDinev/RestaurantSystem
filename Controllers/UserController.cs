@@ -38,6 +38,7 @@ namespace RestaurantSystem.Controllers {
                 RedirectToAction("Index", "Restaurant") : View();
         }
 
+
         [HttpGet]
         [Route("/register")]
         public async Task<IActionResult> Register()
@@ -45,6 +46,7 @@ namespace RestaurantSystem.Controllers {
             return await _userUtility.GetUserByJWT(HttpContext) != null ?
                 RedirectToAction("Index", "Restaurant") : View();
         }
+
 
         [HttpPost]
         [Route("/")]
@@ -139,18 +141,15 @@ namespace RestaurantSystem.Controllers {
             // profileUpdateFormModel contains the new/updated information.
             // It also may contain some old information.
 
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Profile");
+            }
+
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View("Profile", new ProfileViewModel
-                {
-                    User = user
-                });
             }
 
             if (!user.City.Equals(profileUpdateFormModel.City) ||
@@ -170,6 +169,10 @@ namespace RestaurantSystem.Controllers {
             bool updateSuccessful = await _userService.UpdateUser(user, 
                 profileUpdateFormModel);
             user = await _userService.GetUser(user.Id);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
 
             ProfileViewModel profileViewModel = new ProfileViewModel()
             {

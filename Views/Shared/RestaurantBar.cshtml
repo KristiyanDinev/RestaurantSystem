@@ -1,0 +1,20 @@
+﻿@model RestaurantSystem.Models.DatabaseModels.RestaurantModel;
+@{
+    Layout = "_Layout";
+}
+
+
+<head>
+    @RenderBody();
+</head>
+
+
+<body>
+    <div>
+           <p>@string.Join(", ", Model.Address,
+                     Model.City, Model.State, Model.Country)</p>
+        
+    </div>
+
+</body>
+

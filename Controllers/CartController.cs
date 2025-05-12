@@ -14,29 +14,44 @@ namespace RestaurantSystem.Controllers
     {
         private UserUtility _userUtility;
         private DishService _dishService;
+        private RestaurantService _restaurantService;
 
-        public CartController(DishService dishService, UserUtility userUtility)
+        public CartController(DishService dishService, UserUtility userUtility, 
+            RestaurantService restaurantService)
         {
             _dishService = dishService;
             _userUtility = userUtility;
+            _restaurantService = restaurantService;
         }
 
 
         [HttpGet]
         [Route("/Cart")]
-        public async Task<IActionResult> Cart()
+        [Route("/Cart/Index")]
+        public async Task<IActionResult> Index()
         {
+
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
             }
 
-            CartViewModel cartViewModel = new CartViewModel();
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
+                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
 
-            cartViewModel.User = user;
-            cartViewModel.Dishes = await _dishService.GetDishesByIds(
-                _dishService.GetDishIDsFromCart(HttpContext));
+            if (restaurant == null)
+            {
+                return RedirectToAction("Index", "Restaurant");
+            }
+
+            CartViewModel cartViewModel = new CartViewModel()
+            {
+                User = user,
+                Restaurant = restaurant,
+                Dishes = await _dishService.GetDishesByIds(
+                _dishService.GetDishIDsFromCart(HttpContext))
+            };
 
             return View(cartViewModel);
         }

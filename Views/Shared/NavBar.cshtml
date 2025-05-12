@@ -1,0 +1,45 @@
+﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+@{
+    Layout = "_Layout";
+}
+
+
+<head>
+    @RenderBody();
+</head>
+
+
+<body>
+    <div class="user noselect">
+
+        <button class="navigation_button" onclick="goToCart()">🛒</button>
+
+        <button class="navigation_button" onclick="goToOrders()">Orders</button>
+
+        <button class="navigation_button" onclick="goToDishes()">Dishes</button>
+
+        <button class="navigation_button" onclick="goToReservations()">Reservations</button>
+
+        <button class="navigation_button_column" onclick="goToProfile()">
+            @{
+                if (Model.Image != null && Model.Image.Length > 0)
+                {
+                    <img src="http://127.0.0.1:7278{{User.Image}}">
+
+                } else
+                {
+                    <img>
+                }
+            }=
+            <p>@Model.Name</p>
+        </button>
+
+
+        <div class="logout">
+            <button onclick="Logout()" id="logout">Log Out <img src="https://cdn-icons-png.flaticon.com/512/1286/1286853.png"></button>
+        </div>
+    </div>
+
+</body>
+
+                 

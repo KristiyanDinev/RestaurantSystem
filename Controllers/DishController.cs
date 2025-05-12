@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Services;
 using RestaurantSystem.Models.View.Dish;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Controllers {
 
@@ -14,10 +15,14 @@ namespace RestaurantSystem.Controllers {
 
         private DishService _dishService;
         private RestaurantService _restaurantService;
+        private UserUtility _userUtility;
 
-        public DishController(RestaurantService restaurantService, DishService dishService) {
+        public DishController(RestaurantService restaurantService, DishService dishService, 
+            UserUtility userUtility)
+        {
             _restaurantService = restaurantService;
             _dishService = dishService;
+            _userUtility = userUtility;
         }
 
 
@@ -26,6 +31,12 @@ namespace RestaurantSystem.Controllers {
         [Route("/Dishes/Index")]
         public async Task<IActionResult> Dishes()
         {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
                 _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
 
@@ -33,7 +44,10 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Index", "Restaurant");
             }
 
-            return View(restaurant);
+            return View("Dishes", new DishesViewModel() { 
+                Restaurant = restaurant,
+                User = user
+            });
         }
 
 
@@ -41,6 +55,12 @@ namespace RestaurantSystem.Controllers {
         [Route("/Dishes/{dishType}")]
         public async Task<IActionResult> DishesByType(string dishType)
         {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
                 _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
 
@@ -49,22 +69,29 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Index", "Restaurant");
             }
 
-            DishesTypeViewModel dishesTypeViewModel = new DishesTypeViewModel()
+            return View(new DishesTypeViewModel()
             {
                 Dishes = await _dishService.GetDishesByTypeAndRestaurantId(
                     dishType, restaurant.Id),
-                Restaurant = restaurant
-            };
-
-            return View(dishesTypeViewModel);
+                Restaurant = restaurant,
+                User = user,
+                DishType = dishType
+            });
         }
 
 
         [HttpGet]
         [Route("/Dish/{dishId}")]
-        public async Task<IActionResult> DishesByType(int dishId)
+        public async Task<IActionResult> DishById(int dishId)
         {
             Console.WriteLine("Dish Id: " + dishId);
+
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
                 _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
 
@@ -73,13 +100,18 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Index", "Restaurant");
             }
 
-            DishViewModel dishViewModel = new DishViewModel()
+            DishModel? dish = await _dishService.GetDishById(dishId);
+            if (dish == null)
             {
-                Dish = await _dishService.GetDishById(dishId),
-                Restaurant = restaurant
-            };
+                return RedirectToAction("Dishes");
+            }
 
-            return View(dishViewModel);
+            return View(new DishViewModel()
+            {
+                Dish = dish,
+                Restaurant = restaurant,
+                User = user
+            });
         }
 
     }

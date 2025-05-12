@@ -6,7 +6,7 @@
 
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='register/register.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/register/register.css'>
     
     @RenderBody()
 </head>
@@ -22,7 +22,7 @@
 
         <br>
         <label>Email</label>
-        <input type="email" id="Email" maxlength="50" placeholder="Email" required>
+        <input type="email" id="Email" maxlength="100" placeholder="Email" required>
         <br>
         <label>Password</label>
         <input type="password" id="Password" placeholder="Password" required>
@@ -36,20 +36,23 @@
         <textarea id="Notes" cols="50" rows="10" maxlength="255" placeholder="Notes"></textarea>
         <br>
         <label>Address</label>
-        <input type="text" id="Address" maxlength="255" placeholder="Address" required>
+        <input type="text" id="Address" placeholder="Address" required>
         <br>
         <label>City</label>
-        <input type="text" id="City" maxlength="50" placeholder="City" required>
+        <input type="text" id="City" placeholder="City" required>
         <br>
         <br>
         <label>State</label>
-        <input type="text" id="State" maxlength="50" placeholder="State (if you have no state then you can leave it empty)">
+        <input type="text" id="State" placeholder="State (if you have no state then you can leave it empty)">
         <br>
         <label>Country</label>
-        <input type="text" id="Country" maxlength="50" placeholder="Country" required>
+        <input type="text" id="Country" placeholder="Country" required>
+        <br>
+        <label>Postal Code</label>
+        <input type="text" id="PostalCode" placeholder="PostalCode: 1234" required>
         <br>
         <label>Phone</label>
-        <input type="phone" id="Phone" maxlength="15" placeholder="Phone Number">
+        <input type="text" id="Phone" maxlength="15" placeholder="Phone Number">
         <br>
         <label>Remember Me?</label>
         <input type="checkbox" id="RememberMe">
@@ -62,5 +65,5 @@
 
     <button onclick="goToLogin()">Go to Login</button>
 
-    <script src='register/register.js'></script>
+    <script src='~/register/register.js'></script>
 </body>

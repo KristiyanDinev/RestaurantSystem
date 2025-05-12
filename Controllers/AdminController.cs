@@ -99,7 +99,7 @@ namespace RestaurantSystem.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Invalid form submission";
+                ViewData["ErrorMessage"] = "Invalid form submission";
                 return RedirectToAction("Dishes");
             }
 
@@ -117,7 +117,7 @@ namespace RestaurantSystem.Controllers
                 if (!(await _orderService.UpdateOrderCurrentStatusById((int)orderUpdateFormModel.OrderId,
                 orderUpdateFormModel.OrderCurrentStatus)))
                 {
-                    TempData["ErrorMessage"] = "Can't update order's current status.";
+                    ViewData["ErrorMessage"] = "Can't update order's current status.";
                     return View("Dishes");
                 }
 
@@ -131,7 +131,7 @@ namespace RestaurantSystem.Controllers
                 if(!(await _orderedDishesService.UpdateOrderedDishStatusById((int)orderUpdateFormModel.DishId,
                     orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus)))
                 {
-                    TempData["ErrorMessage"] = "Can't update dish's current status.";
+                    ViewData["ErrorMessage"] = "Can't update dish's current status.";
                     return View("Dishes");
                 }
 
@@ -140,7 +140,7 @@ namespace RestaurantSystem.Controllers
 
             if (updateMessage.Length > 8)
             {
-                TempData["SuccessMessage"] = updateMessage;
+                ViewData["SuccessMessage"] = updateMessage;
                 await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
                      _orderService.GetListenersForOrderId(orderUpdateFormModel.OrderId));
             }
@@ -220,12 +220,13 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            Dictionary<TimeTableModel, List<OrderModel>> orders = new Dictionary<TimeTableModel, List<OrderModel>>();
+            Dictionary<TimeTableModel, List<OrderModel>> orders = new ();
 
-            foreach (TimeTableModel timeTable in await _restaurantService.GetRestaurantsForDelivery_ForUser(user)) {
+            foreach (TimeTableModel timeTable in await _restaurantService
+                .GetRestaurantsForDelivery_ForUser(user)) {
 
                 orders.Add(timeTable, await _orderService
-                    .GetOrdersByRestaurantId_WithHomeDeliveryOption(timeTable.Restuarant.Id, true));
+                    .Get_HomeDelivery_OrdersBy_RestaurantId(timeTable.Restuarant.Id));
             }
 
             DeliveryViewModel deliveryViewModel = new DeliveryViewModel()

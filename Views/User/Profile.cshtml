@@ -1,24 +1,94 @@
 ﻿@model RestaurantSystem.Models.View.User.ProfileViewModel;
 @{
     ViewData["Title"] = "Profile";
-    Layout = "_NavBar";
+    Layout = "_Layout";
+    Model.User.Image ??= "";
+    Model.User.State ??= "";
 }
 
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='profile/profile.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/profile/profile.css'>
 </head>
 
+<body>
+    <partial name="NavBar" model="Model.User" />
 
-@RenderBody()
+    <h1>Profile</h1>
 
-<h1>Profile</h1>
+    <div>
+        <label id="profile_value">Image</label>
+        <br>
+        <image id="image" src="@Model.User.Image" alt="user image">
+            <br>
 
-{{Profile}}
+            <input type="file" accept="image/*" id="_image">
+            <br>
+            <label id="profile_value">Preview</label>
+            <br>
+            <img id="review" alt="your image" />
+            <br>
+            <label id="delete_image_status"></label>
+            <br>
+            <button onclick="toggleDeleteImage()">Toggle Delete Image</button>
+            <br>
+            <div class="input_center">
+                <p>Username: @Model.User.Name</p>
+                <br>
+                <input type="text" id="username"
+                       maxlength="255" value="@Model.User.Name" placeholder="Username" required>
+            </div>
+            <br>
 
-<p id="Stats"></p>
-<br>
+            <div class="input_center">
+                <p>Email: @Model.User.Email</p>
+                <br>
+                <input type="email" id="email" maxlength="50" value="@Model.User.Email" placeholder="Email" required>
+            </div>
 
-<button id="edit" onclick="updateUser()">Edit</button>
+            <div class="input_center">
+                <p>Address</p>
+                <br>
+                <input type="text" id="address" placeholder="Address" value="@Model.User.Address" required>
+            </div>
 
-<script src='profile/profile.js'></script>
+            <div class="input_center">
+                <p>City</p>
+                <br>
+                <input type="text" id="city" placeholder="City" value="@Model.User.City" required>
+            </div>
+
+            <div class="input_center">
+                <p>State @Model.User.State</p>
+                <br>
+                <input type="text" id="state" value="@Model.User.State" placeholder="State (leave it empty if you don't live in a State')" required>
+            </div>
+
+            <div class="input_center">
+                <p>Country</p>
+                <br>
+                <input type="text" id="country" placeholder="Country" value="@Model.User.Country" required>
+            </div>
+
+            <div class="input_center">
+                <p>Notes: <p>@Model.User.State</p>
+                <br>
+                <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">@Model.User.Notes</textarea>
+            </div>
+
+            <div class="input_center">
+                <p>Phone Number: @Model.User.PhoneNumber</p>
+                <br>
+                <input type="text" id="phone" value="@Model.User.PhoneNumber" maxlength="15" placeholder="Phone Number">
+            </div>
+    </div>
+
+
+    <p id="Stats"></p>
+    <br>
+
+    <button id="edit" onclick="updateUser()">Edit</button>
+
+    <script src='~/profile/profile.js'></script>
+</body>
+

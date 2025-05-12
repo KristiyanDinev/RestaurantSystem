@@ -56,6 +56,7 @@ function submit() {
     formData.append("Country", country.value)
     formData.append("PhoneNumber", document.getElementById("Phone").value)
     formData.append("Image", ImageFile)
+    formData.append("PostalCode", document.getElementById("PostalCode").value)
     formData.append("RememberMe", document.querySelector('#RememberMe:checked') === null ?
                                  "off" : "on")
 

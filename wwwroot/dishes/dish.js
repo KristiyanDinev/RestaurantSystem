@@ -1,9 +1,9 @@
 
 
 function addDishToCart(id, name) {
-    let restorantId = getCookie("RestorantId")
-    if (restorantId === '') {
-        alert("You can't add dishes to your cart except you first select a restorant in /dishes.")
+    let restorantId = getCookie("restaurant_id")
+    if (restorantId.length == 0) {
+        alert("Select a restaurant first.")
         return
     }
 

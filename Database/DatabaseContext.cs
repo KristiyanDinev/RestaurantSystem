@@ -73,6 +73,11 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<UserModel>()
+                .Property(user => user.PostalCode)
+                .IsUnicode()
+                .IsRequired();
+
+            builder.Entity<UserModel>()
                 .Property(user => user.Email)
                 .IsRequired();
 
@@ -102,7 +107,7 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<UserModel>()
                 .Property(user => user.PhoneNumber)
-                .HasDefaultValue(null);
+                .IsRequired();
 
             builder.Entity<UserModel>()
                 .Property(user => user.Notes)
@@ -212,6 +217,10 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.City)
+                .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.PostalCode)
                 .IsRequired();
 
             builder.Entity<RestaurantModel>()
@@ -382,8 +391,8 @@ namespace RestaurantSystem.Database {
                 .HasForeignKey(order => order.RestaurantId);
 
             builder.Entity<OrderModel>()
-                .Property(order => order.IsHomeDelivery)
-                .IsRequired();
+                .Property(order => order.TableNumber)
+                .HasDefaultValue(null);
         }
 
         private void BuildOrderedDishes(ref ModelBuilder builder) {

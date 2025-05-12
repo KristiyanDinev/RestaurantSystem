@@ -3,13 +3,15 @@
 
 ## Dishes and Restaurant
 
+First of all that user must be logged in to see the restaurants.
+So the system can actually pick the restaurants in his city.
+
 When a user visits the website, he needs to select a restaurant (`/restaurants`), then that 
 restaurat is saved in the cookie by `restaurant_id` key (it is an **int**).
 That string `restaurant_id` is located in `Controllers/RestaurantController.cs` 
 and `Services/RestaurantService.cs`.
 
 You need to select a restaurant, before you got to see the dishes.
-You don't need a login or registression to see the retaurants or dishes.
 
 ## Orders
 
@@ -23,6 +25,11 @@ Waitress staff can place orders in the restaurant they work in from `... work in
 When client starts a websocket and starts to track his own orders.
 He sends a JSON like: `{"orders": [1, 2, 3]}`
 - The orders, which will be tracked by the websocket. No matter what kind of order it is. Still, it will be tracked.
+
+Orders have a `TableNumber`, which is a string and it can be null if it is a online order.
+## Cart
+
+You need an account and selected restaurant, so you can ses your cart.
 
 ## Reservations
 

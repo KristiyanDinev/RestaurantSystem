@@ -28,6 +28,19 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
+        public async Task<List<TimeTableModel>> GetAllRestaurantsForUser(UserModel user)
+        {
+            return await _databaseContext.TimeTables
+                .Include(times => times.Restuarant)
+                .Where(
+                times =>
+                times.UserCity.Equals(user.City) &&
+                times.UserCountry.Equals(user.Country) &&
+                times.UserState == user.State
+                )
+                .ToListAsync();
+        }
+
 
         public async Task<List<TimeTableModel>> GetRestaurantsForServingPeople_ForUser(UserModel user)
         {

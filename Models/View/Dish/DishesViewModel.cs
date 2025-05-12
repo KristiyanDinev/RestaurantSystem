@@ -2,10 +2,9 @@
 
 namespace RestaurantSystem.Models.View.Dish
 {
-    public class DishViewModel
+    public class DishesViewModel
     {
         public required UserModel User { get; set; }
         public required RestaurantModel Restaurant { get; set; }
-        public required DishModel Dish { get; set; }
     }
 }

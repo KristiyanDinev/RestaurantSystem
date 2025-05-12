@@ -3,6 +3,7 @@
     public class OrderFormModel
     {
         public string? Notes { get; set; }
+        public string? TableNumber { get; set; }
 
         public List<int> Dishes { get; set; } = new List<int>();
     }

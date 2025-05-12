@@ -1,0 +1,77 @@
+﻿@using RestaurantSystem.Models.DatabaseModels;
+@model RestaurantSystem.Models.View.User.CartViewModel;
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Cart";
+}
+
+
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/index.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/dishes/dish.css'>
+    @RenderBody()
+</head>
+
+
+<body>
+    <partial name="NavBar" model="Model.User" />
+
+    <h1>Your Cart</h1>
+
+    <div id="dishes">
+        @{
+            foreach (DishModel dish in Model.Dishes)
+            {
+                dish.Image ??= "";
+
+                <div id="whole_food">
+                    <div class="food" onclick="goToDish('@dish.Id')">
+                        <p class="food_name">@dish.Name</p>
+                        <p class="food_grams">grams: /@dish.Grams/</p>
+                        <img class="food_image" src="@dish.Image">
+                        <p class="food_price">@dish.Price lv.</p>
+                    </div>
+
+                    <div class="quantity">
+                        <label id="q_@dish.Id"></label>
+
+                        <button class="remove_dish" onclick="removeDishFromCart('@dish.Id', '@dish.Name')">Remove Dish</button>
+                        <button class="add_dish" onclick="addDishToCart('@dish.Id', '@dish.Name')">+</button>
+                    </div>
+                </div>
+
+                <script>
+                    calculateQuantity('@dish.Id');
+                </script>
+            }
+        }
+    </div>
+
+    <p id="dish_stats"></p>
+
+    <div class="input_center">
+        <p>Notes for the order</p>
+        <textarea id="notes" cols="40" rows="6" maxlength="255" placeholder="Notes"></textarea>
+    </div>
+
+    <div class="input_center">
+        <p>Cupon Code</p>
+        <input id="cupon_input" maxlength="25" placeholder="Cupon Code">
+    </div>
+
+    <div class="input_center">
+        <p>Restorant Address: @string.Join(", ", Model.Restaurant.Address,
+                Model.Restaurant.City, Model.Restaurant.State, Model.Restaurant.Country)
+        </p>
+    </div>
+
+    <div class="start_order noselect">
+        <button onclick="startOrder()">Order</button>
+    </div>
+
+    <link rel='stylesheet' type='text/css' media='screen' href='~/index.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/dishes/dish.css'>
+    <script src='~/dishes/dish.js'></script>
+    <script src='~/cart/cart.js'></script>
+</body>

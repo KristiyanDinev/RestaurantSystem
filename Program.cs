@@ -79,7 +79,7 @@ namespace RestaurantSystem
             app.UseWebSocketMiddleware();
 
             app.UseHttpLogging();
-            app.UseLoggingMiddleware();
+            //app.UseLoggingMiddleware();
 
             app.MapControllers();
             

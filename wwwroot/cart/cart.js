@@ -1,4 +1,13 @@
-
+function calculateQuantity(dishId) {
+    let cart = getCookie("cart");
+    let count = 0;
+    for (let i in cart.split("-")) {
+        if (Number(i) == Number(dishId)) {
+            count++;
+        }
+    }
+    document.getElementById('q_' + dishId).innerHTML = "Quantity: " + count;
+}
 
     
 async function startOrder() {

@@ -33,17 +33,13 @@ namespace RestaurantSystem.Services
                 Image = registerFormModel.Image,
                 Name = registerFormModel.Name,
                 Password = Convert.ToBase64String(EncryptionUtility.HashIt(registerFormModel.Password)),
-                Notes = registerFormModel.Notes
+                Notes = registerFormModel.Notes,
+                PostalCode = registerFormModel.PostalCode
             };
 
             await _databaseContext.Users.AddAsync(user);
 
-            if (await _databaseContext.SaveChangesAsync() <= 0)
-            {
-                return null;
-            }
-
-            return user;
+            return await _databaseContext.SaveChangesAsync() > 0 ? user : null;
         }
 
         public async Task<UserModel?> LoginUser(string email, string no_hash_password)

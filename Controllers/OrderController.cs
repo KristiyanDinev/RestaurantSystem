@@ -96,7 +96,7 @@ namespace RestaurantSystem.Controllers {
 
                 (await _dishService.GetDishesByIds(order.Dishes)).Sum(dish => dish.Price)
 
-                , true)
+                , order.TableNumber)
             };
 
             return View(orderStartViewModel);

@@ -19,18 +19,12 @@ namespace RestaurantSystem.Services
 
         private void HandleJsonMessages(Dictionary<string, object> data, WebSocket socket)
         {
-            if (!data.TryGetValue("user_id", out object? user_id_obj)) {
-                throw new Exception();
-            }
-
-            int user_id = int.Parse("" + user_id_obj);
-
             // The user sets Orders to listen to
             if (data.TryGetValue("orders", out object? orders_obj))
             {
 
                 // list of order Ids
-                _orderService.AddOrdersToListenTo((int)user_id, (List<int>)orders_obj, socket);
+                _orderService.AddOrdersToListenTo((List<int>)orders_obj, socket);
             }
         }
 

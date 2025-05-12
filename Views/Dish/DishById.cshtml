@@ -1,0 +1,43 @@
+﻿@model RestaurantSystem.Models.View.Dish.DishViewModel;
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Dish";
+    Model.Dish.Image ??= "";
+}
+
+
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/index.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/single_dish/single_dish.css'>
+
+    @RenderBody()
+</head>
+
+
+<body>
+
+    <partial name="NavBar" model="Model.User" />
+    <partial name="RestaurantBar" model="Model.Restaurant" />
+
+    <div class="menu">
+        <p class="name">@Model.Dish.Name</p>
+
+        <p class="grams">grams /@Model.Dish.Grams/</p>
+
+        <p class="ingr">Ingredients: @Model.Dish.Ingredients</p>
+
+        <image src="@Model.Dish.Image" class="image" alt="No image for now"></image>
+
+        <p class="avg_time_to_took">Avrage time to cook: @Model.Dish.AvrageTimeToCook minute/s</p>
+
+        <p class="price">@Model.Dish.Price lv.</p>
+
+        <div id="orderbttn">
+            <button class="order" onclick="addDishToCart('@Model.Dish.Id', '@Model.Dish.Name')">Add to order</button>
+        </div>
+    </div>
+
+    <script src='~/dishes/dish.js'></script>
+
+</body>

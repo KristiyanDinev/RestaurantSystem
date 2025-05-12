@@ -6,8 +6,7 @@
         public string? Notes { get; set; }
         public DateTime OrderedAt { get; set; }
         public decimal TotalPrice { get; set; }
-
-        public bool IsHomeDelivery { get; set; }
+        public string? TableNumber { get; set; }
 
 
         public int UserId { get; set; }
