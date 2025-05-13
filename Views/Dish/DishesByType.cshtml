@@ -2,70 +2,66 @@
 @model RestaurantSystem.Models.View.Dish.DishesTypeViewModel;
 
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = Model.DishType;
+    ViewData["Title"] = Model.DishType.Substring(0, 1).ToUpper() + Model.DishType.Substring(1);
 }
 
 <head>
     <link rel='stylesheet' type='text/css' media='screen' href='~/dishes/dish.css'>
     <link rel='stylesheet' type='text/css' media='screen' href='~/index.css'>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
 
-
-    @RenderBody()
+    <script src="~/index.js"></script>
+    <script src='~/dishes/dish.js'></script>
 </head>
 
 <body>
-
-
     <partial name="NavBar" model="Model.User" />
     <partial name="RestaurantBar" model="Model.Restaurant" />
 
     <p id="dish_stats"></p>
 
-
     <div id="dishes">
-        <!--{{DishDisplay}}  -->
         @foreach (DishModel dishModel in Model.Dishes)
         {
             dishModel.Image ??= "";
 
             <div id="whole_food">
+                @{
+                    string foodClass = dishModel.IsAvailable ? "food" : "food-opacity";
+                    string clickAction = dishModel.IsAvailable ? "goToDish('" + dishModel.Id + "')" : "";
+                    // food = style="opacity: 100%;" | food-opacity = style="opacity: 50%;"
+                }
 
-                        @if (dishModel.IsAvailable)
-                        {
-                            <div class="food" style="opacity: 100%;" onclick="goToDish('@dishModel.Id')">
-
-                        } else {
-                                 <div class="food" style="opacity: 50%;">
-                        }
+                <div class="@foodClass" onclick="@clickAction">
 
 
-                            <p class="food_name">@dishModel.Name</p>
-                            <p class="food_grams">grams: /@dishModel.Grams/</p>
+                    <p class="food_name">@dishModel.Name</p>
+                    <p class="food_grams">grams: /@dishModel.Grams/</p>
 
-                            <img class="food_image" src="@dishModel.Image">
+                    <img class="food_image" src="@dishModel.Image">
 
-                            <p class="food_price">@dishModel.Price lv.</p>
-                        </div>
+                    <p class="food_price">@dishModel.Price lv.</p>
+                </div>
 
-                        <div>
-                            @if (dishModel.IsAvailable)
-                            {
-                                <button id="order" style="opacity: 100%;"
-                                        onclick="addDishToCart('@dishModel.Id', '@dishModel.Name')">
-                                    Add to order
-                                </button>
-                            }
-                            else
-                            {
-                                <button id="order" style="opacity: 50%;">Not available</button>
-                            }
-                        </div>
+                <div>
+                    @if (dishModel.IsAvailable)
+                    {
+                        <button id="order" style="opacity: 100%;"
+                                onclick="addDishToCart('@dishModel.Id', '@dishModel.Name')">
+                            Add to order
+                        </button>
+                    }
+                    else
+                    {
+                        <button id="order" style="opacity: 50%;">Not available</button>
+                    }
+                </div>
             </div>
         }
 
     </div>
-
-   <script src='~/dishes/dish.js'></script>
 
 </body>

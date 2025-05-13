@@ -1,14 +1,19 @@
 ﻿@model RestaurantSystem.Models.View.Dish.DishesViewModel;
 
 @{
-    Layout = "_Layout";
     ViewData["Title"] = "Dishes";
 }
 
 <head>
     <link rel='stylesheet' type='text/css' media='screen' href='~/dishes/dish.css'>
     <link rel='stylesheet' type='text/css' media='screen' href='~/index.css'>
-    @RenderBody()
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+
+    <script src="~/index.js"></script>
+    <script src='~/dishes/dish.js'></script>
 </head>
 
 
@@ -23,8 +28,5 @@
         <button onclick="goToDrinks()" id="dish">Drinks</button>
         <button onclick="goToDesserts()" id="dish">Desserts</button>
 
-
-    <script src='~/index.js'></script>
-    <script src='~/dishes/dish.js'></script>
 
 </body>

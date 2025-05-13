@@ -7,7 +7,7 @@ namespace RestaurantSystem.Utilities
     {
         public string subscribedTo { get; set; }
         public WebSocket webSocket { get; set; }
-        public List<int> ModelIds { get; set; }
+        public List<int> ModelIds { get; set; } = new List<int>();
         public bool IsRunning { get; set; }
         public TaskCompletionSource<object> taskCompletionSource { get; set; }
 

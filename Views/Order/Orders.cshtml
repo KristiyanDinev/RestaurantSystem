@@ -1,0 +1,76 @@
+﻿@using RestaurantSystem.Models.DatabaseModels;
+@model RestaurantSystem.Models.View.Order.OrdersViewModel;
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/index.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/dishes/dish.css'>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+
+    <script src="~/index.js"></script>
+    <script src='~/orders/orders.js'></script>
+    <script src='~/dishes/dish.js'></script>
+</head>
+
+<body>
+
+
+    <partial name="NavBar" model="Model.User" />
+
+    <h1>Orders</h1>
+
+    <div id="orders">
+        @foreach (OrderModel orderModel in Model.Orders.Keys)
+        {
+            <div class="order_view">
+                <p class="status" id="status_@orderModel.Id">CurrentStatus: @orderModel.CurrentStatus</p>
+
+                <div class="notes_view">
+                    <p class="notes_title">Notes: </p>
+                    <p class="notes">@orderModel.Notes</p>
+                </div>
+
+                <div class="dish_list">
+                    @foreach (DishModel dish in Model.Orders[orderModel])
+                    {
+
+                        <p class="list_dish"> x {{Dish.Amount}}  {{Dish.Name}} - {{Dish.AvrageTimeToCook}} minute/s</p>
+                    }
+                </div>
+
+                <p class="part">TotalPrice: @orderModel.TotalPrice lv.</p>
+                <p class="part">Restorant Address: @string.Join(", ", 
+                orderModel.Restaurant.Address, orderModel.Restaurant.City, 
+                orderModel.Restaurant.State, orderModel.Restaurant.Country)</p>
+                <p class="part">Ordered At: @orderModel.OrderedAt.ToString()</p>
+
+                @if (!orderModel.CurrentStatus.Equals("pending"))
+                {
+                    <button class="cancel noselect" style="opacity: 50%">Can't Cancel</button>
+
+                } else
+                {
+                    <button class="cancel noselect"
+                    style="opacity: 100%"
+                    onclick="cancelOrder('@orderModel.Id')">Cancel</button>
+                }
+
+            </div>
+        }
+    </div>
+
+    @if (Model.Orders.Count > 0)
+    {
+        <script>
+            startWebSocket()
+        </script>
+    }
+</body>
+

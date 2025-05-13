@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Utilities;
 using RestaurantSystem.Models.View.Order;
 using RestaurantSystem.Models.Form;
+using System.Collections.Generic;
 
 namespace RestaurantSystem.Controllers {
 
@@ -38,13 +39,19 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            OrdersViewModel ordersViewModel = new OrdersViewModel()
+            Dictionary<OrderModel, List<DishModel>> orders = new Dictionary<OrderModel, List<DishModel>>();
+
+            foreach (OrderModel order in await _orderService.GetOrdersByUser(user.Id))
+            {
+                orders.Add(order, await _dishService.GetDishesByIds(
+                    order.OrderedDishes.Select(dish => dish.DishId).ToList()));
+            }
+
+            return View("Orders", new OrdersViewModel()
             {
                 User = user,
-                Orders = await _orderService.GetOrdersByUser(user.Id)
-            };
-
-            return View(ordersViewModel);
+                Orders = orders
+            });
         }
 
 
@@ -87,19 +94,17 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            OrderStartViewModel orderStartViewModel = new OrderStartViewModel()
+            return View(new OrderStartViewModel()
             {
                 User = user,
                 Restaurant = restaurant,
-                Order = await _orderService.AddOrder(user.Id, restaurant.Id, 
+                Order = await _orderService.AddOrder(user.Id, restaurant.Id,
                 order.Dishes, order.Notes,
 
                 (await _dishService.GetDishesByIds(order.Dishes)).Sum(dish => dish.Price)
 
                 , order.TableNumber)
-            };
-
-            return View(orderStartViewModel);
+            });
         }
 
 

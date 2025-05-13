@@ -34,17 +34,19 @@ namespace RestaurantSystem.Services
             decimal price, int restaurantModelId, string ingredients, string avrageTimeToCook, 
             int grams, string? notes, string? image, bool isAvailable)
         {
-            DishModel dish = new DishModel();
-            dish.Name = name;
-            dish.Type_Of_Dish = type;
-            dish.Price = price;
-            dish.RestaurantId = restaurantModelId;
-            dish.Ingredients = ingredients;
-            dish.AvrageTimeToCook = avrageTimeToCook;
-            dish.Grams = grams;
-            dish.IsAvailable = isAvailable;
-            dish.Notes = notes;
-            dish.Image = image;
+            DishModel dish = new DishModel()
+            {
+                Name = name,
+                Type_Of_Dish = type,
+                Price = price,
+                RestaurantId = restaurantModelId,
+                Ingredients = ingredients,
+                AvrageTimeToCook = avrageTimeToCook,
+                Grams = grams,
+                IsAvailable = isAvailable,
+                Notes = notes,
+                Image = image
+            };
 
             await _databaseContext.Dishies.AddAsync(dish);
 

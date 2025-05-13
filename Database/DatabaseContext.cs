@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Database {
     public class DatabaseContext : DbContext {
@@ -57,7 +58,91 @@ namespace RestaurantSystem.Database {
             // RolePermissionModel
             BuildRolePermissionModel(ref builder);
 
+            // Setup Default Data
+            AddDefaultData(ref builder);
+
             base.OnModelCreating(builder);
+        }
+
+        private void AddDefaultData(ref ModelBuilder builder)
+        {
+            builder.Entity<UserModel>()
+                .HasData(new UserModel()
+                {
+                    Name = "John",
+                    Email = "john@example.com",
+                    Address = "ul. Home1",
+                    City = "Sofia",
+                    Country = "Bulgaria",
+                    Password = Convert.ToBase64String(
+                        EncryptionUtility.HashIt("123")),
+                    PhoneNumber = "+359878661224",
+                    PostalCode = "1212"
+                });
+
+            builder.Entity<RestaurantModel>()
+                .HasData(new RestaurantModel()
+                {
+                    Address = "ul. Test",
+                    City = "Sofia",
+                    Country = "Bulgaria",
+                    PostalCode = "1313"
+                },
+                new RestaurantModel()
+                {
+                    Address = "ul. Test2",
+                    City = "Sofia",
+                    Country = "Bulgaria",
+                    PostalCode = "1314"
+                });
+
+            builder.Entity<DishModel>()
+                .HasData(new DishModel()
+                {
+                    Name = "Some salad",
+                    Price = (decimal)10.50,
+                    Grams = 200,
+                    Ingredients = "salad stuff..., tomatos, etc.",
+                    IsAvailable = true,
+                    Type_Of_Dish = "salad",
+                    AvrageTimeToCook = "2-3 minutes",
+                    RestaurantId = 1
+                },
+                new DishModel()
+                {
+                    Name = "Some salad 2",
+                    Price = (decimal)12,
+                    Grams = 220,
+                    Ingredients = "salad stuff..., tomatos, etc.",
+                    IsAvailable = false,
+                    Type_Of_Dish = "salad",
+                    AvrageTimeToCook = "2-3 minutes",
+                    RestaurantId = 1
+                },
+
+
+                new DishModel()
+                {
+                    Name = "Some salad 3",
+                    Price = (decimal)11.50,
+                    Grams = 200,
+                    Ingredients = "salad stuff..., tomatos, etc.",
+                    IsAvailable = true,
+                    Type_Of_Dish = "salad",
+                    AvrageTimeToCook = "2-3 minutes",
+                    RestaurantId = 2
+                },
+                new DishModel()
+                {
+                    Name = "Some salad 4",
+                    Price = (decimal)13,
+                    Grams = 220,
+                    Ingredients = "salad stuff..., tomatos, etc.",
+                    IsAvailable = false,
+                    Type_Of_Dish = "salad",
+                    AvrageTimeToCook = "2-3 minutes",
+                    RestaurantId = 2
+                });
         }
 
         private void BuildUserModel(ref ModelBuilder builder)
@@ -274,7 +359,7 @@ namespace RestaurantSystem.Database {
 
         private void BuildTimeTableModel(ref ModelBuilder builder)
         {
-            builder.Entity<RestaurantModel>().ToTable("Restaurants");
+            builder.Entity<TimeTableModel>().ToTable("TimeTable");
 
             builder.Entity<TimeTableModel>()
                 .HasKey(time => time.RestuarantId);

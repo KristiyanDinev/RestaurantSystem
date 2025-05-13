@@ -2,12 +2,12 @@ var socket = null
 var regiseredOrders = [];
 
 function onopen() {
-    console.log('Connected')
-    socket.send("subscribtion_ids;"+regiseredOrders.join(';'))
+    // convert this to a json: {"orders": [1, 2, 3]}
+    regiseredOrders
+    socket.send()
 }
 
 function onclose() {
-    console.log('Closed')
 }
 
 function onmessage(event) {
@@ -15,35 +15,33 @@ function onmessage(event) {
     if (data.length == 0) {
         return;
     }
-    console.log('message: '+data)
 
-    const parts = data.split(';')
-    if (parts[0] === "cook_status") {
-        const orderId = Number(parts[1])
-        //const dishId = Number(parts[2])
-        const status = parts[3]
-
-        var cancel = document.getElementById(orderId+'cancel')
-        if (status != "pending") {
-            cancel.onclick = () => {};
-            cancel.style.opacity = '50%'
-
-        } else {
-            cancel.onclick = async () => {
-                await cancelOrder(orderId)
-            };
-            cancel.style.opacity = '100%'
-        }
-
-        document.getElementById(orderId+'status')
-        .innerHTML = 'CurrentStatus: '+status
-    }
+    // convert this to a json.
 }
 
 function onerror(event) {
-    console.log('error: '+event.data)
 }
 
 function startWebSocket() {
     socket = startOrderWebSocket(onopen, onclose, onerror, onmessage)
+}
+
+
+async function cancelOrder(id) {
+    if (!confirm("Do you really want to cancel the order?")) {
+        return;
+    }
+
+    const res = await fetch(getDataFromLocalStorage("Host") + '/order/stop/'+id, {
+        method: 'POST',
+        redirect: 'follow'
+    })
+
+    if (res.status !== 200) {
+        alert("Can't cancel the order")
+        return;
+    }
+
+    alert("Cancelled the order")
+    window.location.reload()
 }

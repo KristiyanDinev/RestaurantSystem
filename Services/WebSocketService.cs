@@ -70,11 +70,9 @@ namespace RestaurantSystem.Services
 
         private void RemoveSocket(string endpoint, WebSocket socket)
         {
-            if (_endpointSockets.TryGetValue(endpoint, out ConcurrentBag<WebSocket>? sockets) &&
-                _UserIdWithWebSocket.TryGetValue(socket, out int userId))
+            if (_endpointSockets.TryGetValue(endpoint, out ConcurrentBag<WebSocket>? sockets))
             {
                 _endpointSockets[endpoint] = new ConcurrentBag<WebSocket>(sockets.Where(s => !s.Equals(socket)));
-                _orderService.RemoveOrderFromTracking(userId);
             }
         }
 

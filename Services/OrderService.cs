@@ -85,7 +85,10 @@ namespace RestaurantSystem.Services
 
         public async Task<List<OrderModel>> GetOrdersByUser(int userId)
         {
-            return await _databaseContext.Orders.Where(
+            return await _databaseContext.Orders
+                .Include(order => order.Restaurant)
+                .Include(order => order.OrderedDishes)
+                .Where(
                 order => order.UserId == userId)
                 .ToListAsync();
         }
@@ -125,11 +128,6 @@ namespace RestaurantSystem.Services
                 Socket = socket,
                 OrderIds = orderIds
             });
-        }
-
-        public void RemoveOrderFromTracking(int user_id)
-        {
-            OrderWebSockets.RemoveAll(order => order.UserId == user_id);
         }
 
         public List<WebSocket> GetListenersForOrderId(int order_id)

@@ -4,7 +4,7 @@ namespace RestaurantSystem.Models.View.Order
 {
     public class OrdersViewModel
     {
-        public UserModel? User { get; set; }
-        public List<OrderModel>? Orders { get; set; }
+        public required UserModel User { get; set; }
+        public required Dictionary<OrderModel, List<DishModel>> Orders { get; set; }
     }
 }
