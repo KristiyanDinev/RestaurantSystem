@@ -37,11 +37,12 @@ namespace RestaurantSystem.Services
         public async Task<CuponModel?> CreateCupon(string cuponCode, string name,
             DateTime expirationDate, decimal discountPercent)
         {
-            CuponModel cupon = new CuponModel();
-            cupon.ExpirationDate = expirationDate;
-            cupon.DiscountPercent = discountPercent;
-            cupon.CuponCode = cuponCode;
-            cupon.Name = name;
+            CuponModel cupon = new CuponModel() { 
+                Name = name,
+                CuponCode = cuponCode,
+                DiscountPercent = discountPercent,
+                ExpirationDate = expirationDate
+            };
 
             await _databaseContext.Cupons.AddAsync(cupon);
 

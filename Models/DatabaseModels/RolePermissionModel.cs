@@ -2,11 +2,11 @@
 {
     public class RolePermissionModel
     {
-        public string RoleName { get; set; }  // PK, FK
-        public RoleModel Role { get; set; }
+        public required string RoleName { get; set; }  // PK, FK
+        public RoleModel Role { get; set; } = null!;
 
 
-        public string ServicePath { get; set; }  // PK, FK
-        public ServiceModel Service { get; set; }
+        public required string ServicePath { get; set; }  // PK, FK
+        public ServiceModel Service { get; set; } = null!;
     }
 }

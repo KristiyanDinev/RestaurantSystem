@@ -2,14 +2,14 @@
 {
     public class TimeTableModel
     {
-        public int RestuarantId;
-        public RestaurantModel Restuarant;
+        public required int RestuarantId { get; set; }
+        public RestaurantModel Restuarant { get; set; } = null!;
 
-        public string UserAddress;
-        public string UserCity;
-        public string? UserState;
-        public string UserCountry;
+        public required string UserAddress { get; set; }
+        public required string UserCity { get; set; }
+        public string? UserState { get; set; }
+        public required string UserCountry { get; set; }
 
-        public string AvrageDeliverTime;
+        public required string AvrageDeliverTime { get; set; }
     }
 }

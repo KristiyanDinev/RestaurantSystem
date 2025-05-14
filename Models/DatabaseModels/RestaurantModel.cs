@@ -11,20 +11,20 @@
         public bool DoDelivery { get; set; }
         public bool ServeCustomersInPlace { get; set; }
 
-        public int ReservationMaxChildren { get; set; }
-        public int ReservationMinChildren { get; set; }
-        public int ReservationMaxAdults { get; set; }
-        public int ReservationMinAdults { get; set; }
+        public required int ReservationMaxChildren { get; set; }
+        public required int ReservationMinChildren { get; set; }
+        public required int ReservationMaxAdults { get; set; }
+        public required int ReservationMinAdults { get; set; }
 
-        public decimal Price_Per_Adult { get; set; }
+        public required decimal Price_Per_Adult { get; set; }
 
-        public decimal Price_Per_Children { get; set; }
+        public required decimal Price_Per_Children { get; set; }
 
 
         // navigation
-        public ICollection<OrderModel> Orders { get; set; }
-        public ICollection<ReservationModel> Reservations { get; set; }
-        public ICollection<TimeTableModel> TimeTables { get; set; }
-        public ICollection<UserModel> Employees { get; set; }
+        public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
+        public ICollection<ReservationModel> Reservations { get; set; } = new List<ReservationModel>();
+        public ICollection<TimeTableModel> TimeTables { get; set; } = new List<TimeTableModel>();
+        public ICollection<UserModel> Employees { get; set; } = new List<UserModel>();
     }
 }

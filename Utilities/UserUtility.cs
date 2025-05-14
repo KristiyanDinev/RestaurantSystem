@@ -84,7 +84,7 @@ namespace RestaurantSystem.Utilities
 
                 return await _userService.GetUser(Id);
 
-            } catch (Exception e)
+            } catch (Exception)
             {
                 return null;
             }

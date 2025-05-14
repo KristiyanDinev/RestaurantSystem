@@ -41,8 +41,8 @@ namespace RestaurantSystem.Utilities {
                 if (res.IsValid) {
                     Dictionary<string, object> claims = res.Claims.ToDictionary();
 
-                    string exp = claims["_exp"].ToString();
-                    if (exp.Length > 0 && DateTime.Parse(exp) <= DateTime.Now)
+                    string? exp = claims["_exp"].ToString();
+                    if (exp != null && exp.Length > 0 && DateTime.Parse(exp) <= DateTime.Now)
                     {
                         return null;
                     }

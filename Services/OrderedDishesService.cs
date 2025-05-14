@@ -7,6 +7,7 @@ namespace RestaurantSystem.Services
     public class OrderedDishesService
     {
         private DatabaseContext _databaseContext;
+
         public OrderedDishesService(DatabaseContext databaseContext)
         {
             _databaseContext = databaseContext;
@@ -19,7 +20,8 @@ namespace RestaurantSystem.Services
             {
                 OrderId = orderModelId,
                 DishId = dishModelId,
-                Notes = notes
+                Notes = notes,
+                CurrentStatus = _databaseContext.DefaultOrderedDish_CurrentStatus
             };
 
             await _databaseContext.OrderedDishes.AddAsync(orderedDishes);

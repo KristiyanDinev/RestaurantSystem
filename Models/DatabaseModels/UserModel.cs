@@ -25,9 +25,9 @@
 
 
         // navigation
-        public ICollection<UserRoleModel> Roles { get; set; }
-        public ICollection<OrderModel> Orders { get; set; }
-        public ICollection<ReservationModel> Reservations { get; set; }
+        public ICollection<UserRoleModel> Roles { get; set; } = new List<UserRoleModel>();
+        public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
+        public ICollection<ReservationModel> Reservations { get; set; } = new List<ReservationModel>();
 
     }
 }

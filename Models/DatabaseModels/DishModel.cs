@@ -15,10 +15,10 @@
 
 
         public required int RestaurantId { get; set; }
-        public RestaurantModel Restaurant { get; set; }
+        public RestaurantModel Restaurant { get; set; } = null!;
 
 
         // navigation
-        public ICollection<OrderedDishesModel> OrderedDishes { get; set; }
+        public ICollection<OrderedDishesModel> OrderedDishes { get; set; } = new List<OrderedDishesModel>();
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Database {
     public class DatabaseContext : DbContext {
@@ -17,6 +16,10 @@ namespace RestaurantSystem.Database {
         public DbSet<ReservationModel> Reservations { get; set; }
         public DbSet<RestaurantModel> Restaurants { get; set; }
         public DbSet<TimeTableModel> TimeTables { get; set; }
+
+        public readonly string DefaultOrder_CurrentStatus = "pending";
+        public readonly string DefaultOrderedDish_CurrentStatus = "pending";
+        public readonly string DefaultReservation_CurrentStatus = "pending";
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) {}
 
@@ -58,92 +61,9 @@ namespace RestaurantSystem.Database {
             // RolePermissionModel
             BuildRolePermissionModel(ref builder);
 
-            // Setup Default Data
-            AddDefaultData(ref builder);
-
             base.OnModelCreating(builder);
         }
 
-        private void AddDefaultData(ref ModelBuilder builder)
-        {
-            builder.Entity<UserModel>()
-                .HasData(new UserModel()
-                {
-                    Name = "John",
-                    Email = "john@example.com",
-                    Address = "ul. Home1",
-                    City = "Sofia",
-                    Country = "Bulgaria",
-                    Password = Convert.ToBase64String(
-                        EncryptionUtility.HashIt("123")),
-                    PhoneNumber = "+359878661224",
-                    PostalCode = "1212"
-                });
-
-            builder.Entity<RestaurantModel>()
-                .HasData(new RestaurantModel()
-                {
-                    Address = "ul. Test",
-                    City = "Sofia",
-                    Country = "Bulgaria",
-                    PostalCode = "1313"
-                },
-                new RestaurantModel()
-                {
-                    Address = "ul. Test2",
-                    City = "Sofia",
-                    Country = "Bulgaria",
-                    PostalCode = "1314"
-                });
-
-            builder.Entity<DishModel>()
-                .HasData(new DishModel()
-                {
-                    Name = "Some salad",
-                    Price = (decimal)10.50,
-                    Grams = 200,
-                    Ingredients = "salad stuff..., tomatos, etc.",
-                    IsAvailable = true,
-                    Type_Of_Dish = "salad",
-                    AvrageTimeToCook = "2-3 minutes",
-                    RestaurantId = 1
-                },
-                new DishModel()
-                {
-                    Name = "Some salad 2",
-                    Price = (decimal)12,
-                    Grams = 220,
-                    Ingredients = "salad stuff..., tomatos, etc.",
-                    IsAvailable = false,
-                    Type_Of_Dish = "salad",
-                    AvrageTimeToCook = "2-3 minutes",
-                    RestaurantId = 1
-                },
-
-
-                new DishModel()
-                {
-                    Name = "Some salad 3",
-                    Price = (decimal)11.50,
-                    Grams = 200,
-                    Ingredients = "salad stuff..., tomatos, etc.",
-                    IsAvailable = true,
-                    Type_Of_Dish = "salad",
-                    AvrageTimeToCook = "2-3 minutes",
-                    RestaurantId = 2
-                },
-                new DishModel()
-                {
-                    Name = "Some salad 4",
-                    Price = (decimal)13,
-                    Grams = 220,
-                    Ingredients = "salad stuff..., tomatos, etc.",
-                    IsAvailable = false,
-                    Type_Of_Dish = "salad",
-                    AvrageTimeToCook = "2-3 minutes",
-                    RestaurantId = 2
-                });
-        }
 
         private void BuildUserModel(ref ModelBuilder builder)
         {
@@ -163,6 +83,26 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<UserModel>()
+                .Property(user => user.PostalCode)
+                .IsRequired();
+
+            builder.Entity<UserModel>()
+                .Property(user => user.Address)
+                .IsRequired();
+
+            builder.Entity<UserModel>()
+                .Property(user => user.City)
+                .IsRequired();
+
+            builder.Entity<UserModel>()
+                .Property(user => user.Country)
+                .IsRequired();
+
+            builder.Entity<UserModel>()
+                .Property(user => user.PhoneNumber)
+                .IsRequired();
+
+            builder.Entity<UserModel>()
                 .Property(user => user.Email)
                 .IsRequired();
 
@@ -175,37 +115,21 @@ namespace RestaurantSystem.Database {
                 .HasDefaultValue(null);
 
             builder.Entity<UserModel>()
-                .Property(user => user.Address)
-                .IsRequired();
-
-            builder.Entity<UserModel>()
-                .Property(user => user.City)
-                .IsRequired();
-
-            builder.Entity<UserModel>()
                 .Property(user => user.State)
                 .HasDefaultValue(null);
-
-            builder.Entity<UserModel>()
-                .Property(user => user.Country)
-                .IsRequired();
-
-            builder.Entity<UserModel>()
-                .Property(user => user.PhoneNumber)
-                .IsRequired();
 
             builder.Entity<UserModel>()
                 .Property(user => user.Notes)
                 .HasDefaultValue(null);
 
             builder.Entity<UserModel>()
+                .Property(user => user.RestaurantId)
+                .HasDefaultValue(null);
+
+            builder.Entity<UserModel>()
                 .Property(user => user.CreatedAt)
                 .IsRequired()
                 .HasDefaultValueSql("NOW()");
-
-            builder.Entity<UserModel>()
-                .Property(user => user.RestaurantId)
-                .HasDefaultValue(null);
 
             builder.Entity<UserModel>()
                 .HasOne(user => user.Restaurant)
@@ -220,10 +144,6 @@ namespace RestaurantSystem.Database {
                 .HasKey(service => service.Path);
 
             builder.Entity<ServiceModel>()
-                .Property(service => service.Path)
-                .IsRequired();
-
-            builder.Entity<ServiceModel>()
                 .Property(service => service.Description)
                 .HasDefaultValue(null);
         }
@@ -233,7 +153,10 @@ namespace RestaurantSystem.Database {
             builder.Entity<RolePermissionModel>().ToTable("Role_Permissions");
 
             builder.Entity<RolePermissionModel>()
-                .HasKey(rp => new { rp.RoleName, rp.ServicePath });
+                .HasKey(rp => rp.RoleName);
+
+            builder.Entity<RolePermissionModel>()
+                .HasKey(rp =>  rp.ServicePath);
 
             builder.Entity<RolePermissionModel>()
                 .HasOne(role => role.Role)
@@ -251,20 +174,10 @@ namespace RestaurantSystem.Database {
             builder.Entity<UserRoleModel>().ToTable("User_Roles");
 
             builder.Entity<UserRoleModel>()
-                .HasKey(role => new { role.UserId, role.RoleName });
+                .HasKey(role => role.UserId);
 
             builder.Entity<UserRoleModel>()
-                .Property(user => user.UserId)
-                .IsRequired();
-
-            builder.Entity<UserRoleModel>()
-                .Property(user => user.RoleName)
-                .IsRequired();
-
-            builder.Entity<UserRoleModel>()
-                .HasOne(user => user.User)
-                .WithMany(user => user.Roles)
-                .HasForeignKey(user => user.UserId);
+                .HasKey(role => role.RoleName);
 
             builder.Entity<UserRoleModel>()
                 .HasOne(user => user.User)
@@ -298,31 +211,23 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.Address)
-                .IsRequired();
+                .IsRequired()
+                .IsUnicode();
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.City)
-                .IsRequired();
+                .IsRequired()
+                .IsUnicode();
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.PostalCode)
-                .IsRequired();
-
-            builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.State)
-                .HasDefaultValue(null);
+                .IsRequired()
+                .IsUnicode();
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.Country)
-                .IsRequired();
-
-            builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.DoDelivery)
-                .HasDefaultValue(true);
-
-            builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.ServeCustomersInPlace)
-                .HasDefaultValue(true);
+                .IsRequired()
+                .IsUnicode();
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.ReservationMaxAdults)
@@ -330,18 +235,10 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.ReservationMinAdults)
-                .HasDefaultValue(1);
+                .IsRequired();
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.ReservationMaxChildren)
-                .IsRequired();
-
-            builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.ReservationMinChildren)
-                .IsRequired();
-
-            builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.ReservationMinChildren)
                 .IsRequired();
 
             builder.Entity<RestaurantModel>()
@@ -355,6 +252,18 @@ namespace RestaurantSystem.Database {
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.Price_Per_Adult)
                 .IsRequired();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.State)
+                .HasDefaultValue(null);
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.DoDelivery)
+                .HasDefaultValue(true);
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.ServeCustomersInPlace)
+                .HasDefaultValue(true);
         }
 
         private void BuildTimeTableModel(ref ModelBuilder builder)
@@ -373,16 +282,20 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<TimeTableModel>()
-                .Property(time => time.UserState)
-                .HasDefaultValue(null);
-
-            builder.Entity<TimeTableModel>()
                 .Property(time => time.UserCountry)
                 .IsRequired();
 
             builder.Entity<TimeTableModel>()
                 .Property(time => time.AvrageDeliverTime)
                 .IsRequired();
+
+            builder.Entity<TimeTableModel>()
+                .Property(time => time.RestuarantId)
+                .IsRequired();
+
+            builder.Entity<TimeTableModel>()
+                .Property(time => time.UserState)
+                .HasDefaultValue(null);
 
             builder.Entity<TimeTableModel>()
                 .HasOne(time => time.Restuarant)
@@ -417,16 +330,16 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<DishModel>()
-                .Property(dish => dish.IsAvailable)
-                .HasDefaultValue(true);
-
-            builder.Entity<DishModel>()
                 .Property(dish => dish.RestaurantId)
                 .IsRequired();
 
             builder.Entity<DishModel>()
                 .Property(dish => dish.AvrageTimeToCook)
                 .IsRequired();
+
+            builder.Entity<DishModel>()
+                .Property(dish => dish.IsAvailable)
+                .HasDefaultValue(true);
 
             builder.Entity<DishModel>()
                 .Property(dish => dish.Image)
@@ -441,8 +354,12 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<OrderModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue("pending")
+                .HasDefaultValue(DefaultOrder_CurrentStatus)
                 .IsRequired();
+
+            builder.Entity<OrderModel>()
+                .Property(order => order.TableNumber)
+                .HasDefaultValue(null);
 
             builder.Entity<OrderModel>()
                 .Property(order => order.Notes)
@@ -474,14 +391,13 @@ namespace RestaurantSystem.Database {
                 .HasOne(order => order.Restaurant)
                 .WithMany(restauratn => restauratn.Orders)
                 .HasForeignKey(order => order.RestaurantId);
-
-            builder.Entity<OrderModel>()
-                .Property(order => order.TableNumber)
-                .HasDefaultValue(null);
         }
 
         private void BuildOrderedDishes(ref ModelBuilder builder) {
             builder.Entity<OrderedDishesModel>().ToTable("Ordered_Dishes");
+
+            builder.Entity<OrderedDishesModel>()
+                .HasKey(order => order.Id);
 
             builder.Entity<OrderedDishesModel>()
                 .Property(order => order.Notes)
@@ -489,7 +405,7 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<OrderedDishesModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue("preparing")
+                .HasDefaultValue(DefaultOrderedDish_CurrentStatus)
                 .IsRequired();
 
             builder.Entity<OrderedDishesModel>()
@@ -524,7 +440,7 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<ReservationModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue("pending")
+                .HasDefaultValue(DefaultReservation_CurrentStatus)
                 .IsRequired();
 
             builder.Entity<ReservationModel>()
@@ -536,16 +452,16 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<ReservationModel>()
-                .Property(order => order.Amount_Of_Adults)
-                .HasDefaultValue(1)
-                .IsRequired();
-
-            builder.Entity<ReservationModel>()
                 .Property(order => order.Amount_Of_Children)
                 .IsRequired();
 
             builder.Entity<ReservationModel>()
                 .Property(order => order.At_Date)
+                .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.Amount_Of_Adults)
+                .HasDefaultValue(1)
                 .IsRequired();
 
             builder.Entity<ReservationModel>()
@@ -572,6 +488,10 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<CuponModel>()
                 .Property(cupon => cupon.Name)
+                .IsRequired();
+
+            builder.Entity<CuponModel>()
+                .Property(cupon => cupon.CuponCode)
                 .IsRequired();
 
             builder.Entity<CuponModel>()

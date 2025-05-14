@@ -20,7 +20,8 @@ namespace RestaurantSystem.Services
             return await _databaseContext.TimeTables
                 .Include(times => times.Restuarant)
                 .Where(
-                times => times.Restuarant.DoDelivery &&
+                times => 
+                times.Restuarant.DoDelivery &&
                 times.UserCity.Equals(user.City) &&
                 times.UserCountry.Equals(user.Country) &&
                 times.UserState == user.State

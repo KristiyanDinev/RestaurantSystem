@@ -12,7 +12,6 @@ namespace RestaurantSystem.Services
 
         private DatabaseContext _databaseContext;
         private OrderedDishesService _orderedDishesDatabaseHandler;
-        private readonly string PendingStatus = "pending";
 
         private List<OrderWebSocketModel> OrderWebSockets;
 
@@ -31,7 +30,7 @@ namespace RestaurantSystem.Services
             OrderModel order = new OrderModel {
                 Notes = notes,
                 RestaurantId = restaurantId,
-                CurrentStatus = PendingStatus,
+                CurrentStatus = _databaseContext.DefaultOrder_CurrentStatus,
                 TotalPrice = totalPrice,
                 UserId = userId,
                 TableNumber = tableNumber
@@ -61,7 +60,8 @@ namespace RestaurantSystem.Services
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
 
-            if (order == null || !order.CurrentStatus.Equals(PendingStatus))
+            if (order == null || !order.CurrentStatus.Equals(
+                _databaseContext.DefaultOrder_CurrentStatus))
             {
                 return false;
             }

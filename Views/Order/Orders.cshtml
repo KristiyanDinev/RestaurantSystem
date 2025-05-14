@@ -46,9 +46,11 @@
                 </div>
 
                 <p class="part">TotalPrice: @orderModel.TotalPrice lv.</p>
+
                 <p class="part">Restorant Address: @string.Join(", ", 
                 orderModel.Restaurant.Address, orderModel.Restaurant.City, 
                 orderModel.Restaurant.State, orderModel.Restaurant.Country)</p>
+
                 <p class="part">Ordered At: @orderModel.OrderedAt.ToString()</p>
 
                 @if (!orderModel.CurrentStatus.Equals("pending"))

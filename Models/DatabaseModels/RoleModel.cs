@@ -2,12 +2,12 @@
 {
     public class RoleModel
     {
-        public string Name { get; set; }  // PK
+        public required string Name { get; set; }  // PK
         public string? Description { get; set; }
 
 
         // Navigation properties
-        public ICollection<UserRoleModel> UserRoles { get; set; }
-        public ICollection<RolePermissionModel> RolePermissions { get; set; }
+        public ICollection<UserRoleModel> UserRoles { get; set; } = new List<UserRoleModel>();
+        public ICollection<RolePermissionModel> RolePermissions { get; set; } = new List<RolePermissionModel>();
     }
 }

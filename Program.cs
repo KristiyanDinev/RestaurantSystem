@@ -39,17 +39,17 @@ namespace RestaurantSystem
             builder.Services.AddScoped<RoleService>();
             builder.Services.AddScoped<ReservationService>();
 
-            builder.Services.AddSingleton<EncryptionUtility>(
+            builder.Services.AddScoped<EncryptionUtility>(_ =>
                 new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??
                 "D471E0624EA5A7FFFABAA918E87"));
 
-            builder.Services.AddSingleton<JWTUtility>(
+            builder.Services.AddScoped<JWTUtility>(_ =>
                 new JWTUtility(builder.Configuration.GetValue<string>("JWT_Key") ?? 
                 "234w13543ewf53erdfa"));
 
-            builder.Services.AddSingleton<Utility>();
-            builder.Services.AddSingleton<UserUtility>();
-            builder.Services.AddSingleton<WebSocketService>();
+            builder.Services.AddScoped<Utility>();
+            builder.Services.AddScoped<UserUtility>();
+            builder.Services.AddScoped<WebSocketService>();
 
             string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
                     ?? "ugyw89ub9Y9H8OP9j1wsfwedS";
@@ -83,13 +83,14 @@ namespace RestaurantSystem
 
             app.MapControllers();
             
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
+            //AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
 
             app.Run();
         }
 
+        /*
         public static void OnApplicationExit(object sender, EventArgs e)
         {
-        }
+        }*/
     }
 }

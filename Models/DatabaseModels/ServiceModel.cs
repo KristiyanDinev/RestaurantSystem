@@ -3,12 +3,12 @@
     public class ServiceModel
     {
 
-        public string Path { get; set; }  // PK
+        public required string Path { get; set; }  // PK
         public string? Description { get; set; }
 
 
         // Navigation property
-        public ICollection<RolePermissionModel> RolePermissions { get; set; }
+        public ICollection<RolePermissionModel> RolePermissions { get; set; } = new List<RolePermissionModel>();
 
     }
 }

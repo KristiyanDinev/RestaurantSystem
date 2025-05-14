@@ -2,10 +2,10 @@
 {
     public class UserRoleModel
     {
-        public int UserId { get; set; }
-        public UserModel User { get; set; }
+        public required int UserId { get; set; }
+        public UserModel User { get; set; } = null!;
 
-        public string RoleName { get; set; } 
-        public RoleModel Role { get; set; }
+        public required string RoleName { get; set; }
+        public RoleModel Role { get; set; } = null!;
     }
 }

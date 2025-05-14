@@ -16,17 +16,22 @@ You need to select a restaurant, before you got to see the dishes.
 ## Orders
 
 You can't cancel your order, when the current status of the order is other then `pending`.
-*Note: the pending status check is located in `Services/OrderService.cs function DeleteOrder(int orderId)`*
+*Note: the pending status check is located in `Services/OrderService.cs function DeleteOrder(int orderId)`,
+but the string itself is in `Database/DatabaseContext.cs string DefaultOrder_CurrentStatus`*
 
 Users can order home delivery from `POST /Order/Start` endpoint.
-
-Waitress staff can place orders in the restaurant they work in from `... work in progress..` endpoint.
+Waitress staff can place orders in the restaurant they work in from `... work in progress...` endpoint.
 
 When client starts a websocket and starts to track his own orders.
 He sends a JSON like: `{"orders": [1, 2, 3]}`
 - The orders, which will be tracked by the websocket. No matter what kind of order it is. Still, it will be tracked.
 
 Orders have a `TableNumber`, which is a string and it can be null if it is a online order.
+
+The only websocket for now is `/ws/orders` which is to set listeners for all of the order ids.
+That client should only receive JSON data from teh server regarding updates on only these orders, no matter if they
+are the user's or not.
+
 ## Cart
 
 You need an account and selected restaurant, so you can ses your cart.
@@ -95,3 +100,10 @@ Staff endpoints:
 - database: Restorant
 - user: ResturantUser
 - password: password123
+
+Add test data
+```sql
+INSERT INTO "Restaurants" VALUES 
+(),
+();
+```

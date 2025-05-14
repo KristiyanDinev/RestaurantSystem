@@ -9,7 +9,6 @@ namespace RestaurantSystem.Services
 
         private DatabaseContext _databaseContext;
         private RestaurantService _restaurantDatabaseHandler;
-        private readonly string pendingStatus = "pending";
 
         public ReservationService(DatabaseContext databaseContext,
             RestaurantService restaurantDatabaseHandler)
@@ -28,7 +27,7 @@ namespace RestaurantSystem.Services
                 Amount_Of_Children = amount_Of_Children,
                 At_Date = dateTime,
                 Notes = notes,
-                CurrentStatus = pendingStatus
+                CurrentStatus = _databaseContext.DefaultReservation_CurrentStatus
             };
 
             if (!await _restaurantDatabaseHandler.CheckForReservation(reservation)) {

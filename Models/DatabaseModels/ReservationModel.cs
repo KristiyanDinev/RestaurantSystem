@@ -7,12 +7,12 @@
         public required string CurrentStatus { get; set; }
 
 
-        public int UserId { get; set; }
-        public UserModel User { get; set; }
+        public required int UserId { get; set; }
+        public UserModel User { get; set; } = null!;
 
 
-        public int RestaurantId { get; set; }
-        public RestaurantModel Restaurant { get; set; }
+        public required int RestaurantId { get; set; }
+        public RestaurantModel Restaurant { get; set; } = null!;
 
 
 
