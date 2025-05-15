@@ -69,6 +69,8 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Index", "Restaurant");
             }
 
+            dishType = dishType.ToLower();
+
             return View(new DishesTypeViewModel()
             {
                 Dishes = await _dishService.GetDishesByTypeAndRestaurantId(

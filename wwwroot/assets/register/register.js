@@ -46,7 +46,7 @@ function submit() {
     
     
     let formData = new FormData()
-    formData.append("Username", username.value)
+    formData.append("Name", username.value)
     formData.append("Password", password.value)
     formData.append("Email", email.value)
     formData.append("Notes", document.getElementById("Notes").value)
@@ -57,8 +57,7 @@ function submit() {
     formData.append("PhoneNumber", document.getElementById("Phone").value)
     formData.append("Image", ImageFile)
     formData.append("PostalCode", document.getElementById("PostalCode").value)
-    formData.append("RememberMe", document.querySelector('#RememberMe:checked') === null ?
-                                 "off" : "on")
+    formData.append("RememberMe", document.querySelector('#RememberMe:checked') !== null)
 
     fetch(getDataFromLocalStorage("Host") + "/register", {
         method: "POST",

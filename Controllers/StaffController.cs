@@ -11,10 +11,9 @@ namespace RestaurantSystem.Controllers
 
     [ApiController]
     [EnableRateLimiting("fixed")]
-    public class AdminController : Controller
+    public class StaffController : Controller
     {
-        private readonly string _restaurant_error = "Please update your profile or tell the Manager to update your profile address, city, state and country to align with the address of the Restaurant you work in.";
-        private readonly string _manager_restaurant_error = "Please update your profile or tell the Owner to update your profile address, city, state and country to align with the address of the Restaurant you work in.";
+        private readonly string _restaurant_error = "Can't determin in which restaurant you work in. Please contact your manager.";
 
         private RoleService _roleService;
         private OrderService _orderService;
@@ -25,7 +24,7 @@ namespace RestaurantSystem.Controllers
         private UserService _userService;
         private WebSocketService _webSocketService;
 
-        public AdminController(UserUtility userUtils,
+        public StaffController(UserUtility userUtils,
             Utility _utils, RoleService roleService,
             OrderService orderService, RestaurantService restaurantService,
             OrderedDishesService orderedDishesService, ReservationService reservationService,
@@ -42,13 +41,13 @@ namespace RestaurantSystem.Controllers
         }
 
         [HttpGet]
-        [Route("Admin")]
-        [Route("Admin/Index")]
+        [Route("Staff")]
+        [Route("Staff/Index")]
         public async Task<IActionResult> Index()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/admin")))
+                !(await _roleService.CanUserAccessService(user.Id, "/staff")))
             {
                 return RedirectToAction("Login", "User");
             }
@@ -58,14 +57,14 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Admin/Dishes")]
+        [Route("Staff/Dishes")]
         public async Task<IActionResult> Dishes()
         {
             // Chief in the kitchen
 
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/admin/dishes")))
+                !(await _roleService.CanUserAccessService(user.Id, "/staff/dishes")))
             {
                 return RedirectToAction("Login", "User");
             }
@@ -93,7 +92,7 @@ namespace RestaurantSystem.Controllers
         }
 
         [HttpPost]
-        [Route("Admin/Dishes")]
+        [Route("Staff/Dishes")]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> DishesUpdate([FromForm] OrderUpdateFormModel orderUpdateFormModel)
         {
@@ -105,7 +104,7 @@ namespace RestaurantSystem.Controllers
 
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/admin/dishes")))
+                !(await _roleService.CanUserAccessService(user.Id, "/staff/dishes")))
             {
                 return RedirectToAction("Login", "User");
             }
@@ -149,18 +148,18 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Admin/Reservations")]
+        [Route("Staff/Reservations")]
         public async Task<IActionResult> Reservations()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/admin/reservations")))
+                !(await _roleService.CanUserAccessService(user.Id, "/staff/reservations")))
             {
                 return RedirectToAction("Login", "User");
             }
 
             RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
-            AdminReservationViewModel reservationViewModel = new AdminReservationViewModel();
+            StaffReservationViewModel reservationViewModel = new StaffReservationViewModel();
 
             if (restaurant == null)
             {
@@ -177,13 +176,13 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Admin/Manager")]
+        [Route("Staff/Manager")]
         public async Task<IActionResult> Manager()
         {
             // One Manager per restaurant
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/admin/manager")))
+                !(await _roleService.CanUserAccessService(user.Id, "/staff/manager")))
             {
                 return RedirectToAction("Login", "User");
             }
@@ -193,7 +192,7 @@ namespace RestaurantSystem.Controllers
 
             if (restaurant == null)
             {
-                managerViewModel.Error = _manager_restaurant_error;
+                managerViewModel.Error = _restaurant_error;
                 return View(managerViewModel);
             }
 
@@ -207,7 +206,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Admin/Delivery")]
+        [Route("Staff/Delivery")]
         public async Task<IActionResult> Delivery()
         {
             // Delivery people can take orders from different restaurants in their own city.
@@ -215,27 +214,25 @@ namespace RestaurantSystem.Controllers
             // orders and deliver them
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/admin/delivery")))
+                !(await _roleService.CanUserAccessService(user.Id, "/staff/delivery")))
             {
                 return RedirectToAction("Login", "User");
             }
 
-            Dictionary<TimeTableModel, List<OrderModel>> orders = new ();
+            Dictionary<RestaurantModel, List<OrderModel>> orders = new ();
 
-            foreach (TimeTableModel timeTable in await _restaurantService
-                .GetRestaurantsForDelivery_ForUser(user)) {
+            foreach (RestaurantModel restaurant in await _restaurantService
+                .GetDeliveryGuy_Restaurants(user)) {
 
-                orders.Add(timeTable, await _orderService
-                    .Get_HomeDelivery_OrdersBy_RestaurantId(timeTable.Restuarant.Id));
+                orders.Add(restaurant, await _orderService
+                    .Get_HomeDelivery_OrdersBy_RestaurantId(restaurant.Id));
             }
 
-            DeliveryViewModel deliveryViewModel = new DeliveryViewModel()
+            return View(new DeliveryViewModel()
             {
                 Staff = user,
                 Orders = orders
-            };
-
-            return View(deliveryViewModel);
+            });
         }
     }
 }

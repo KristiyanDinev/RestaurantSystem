@@ -33,10 +33,6 @@ function removeDishFromCart(id, name) {
     //document.cookie = "cart."+id +'=; path=/; domain=127.0.0.1; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 }
 
-function restorantAddressChange() {
-    document.cookie = "RestorantId="+document.getElementById('restorant_address').value;
-}
-
 
 
 var params = new URLSearchParams()
@@ -47,28 +43,24 @@ function goToDish(id) {
 }
 
 function goToSalads() {
-    params.append("type", "salad")
-    window.location.href = "/dish?" + params.toString()
+    window.location.href = "/Dishes/salad"
 }
 
 function goToAppetizers() {
-    params.append("type", "appetizers")
-    window.location.href = "/dish?" + params.toString()
+    window.location.href = "/Dishes/appetizers"
 }
 
 function goToDishesFood() {
-    params.append("type", "dishes")
-    window.location.href = "/dish?" + params.toString()
+    window.location.href = "/Dishes/dishes"
 }
 
 function goToDrinks() {
     params.append("type", "drink")
-    params.append("restorant_id", String(document.getElementById('restorant_address').value))
-    window.location.href = "/dish?" + params.toString()
+    window.location.href = "/Dishes/drinks"
 }
 
 function goToDesserts() {
     params.append("type", "desserts")
-    window.location.href = "/dish?" + params.toString()
+    window.location.href = "/Dishes/desserts"
 }
 

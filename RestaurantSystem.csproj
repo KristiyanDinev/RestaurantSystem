@@ -7,13 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\dishes\drinks\**" />
+    <Compile Remove="wwwroot\assets\dishes\drinks\**" />
     <Compile Remove="wwwroot\user\**" />
-    <Content Remove="wwwroot\dishes\drinks\**" />
+    <Content Remove="wwwroot\assets\dishes\drinks\**" />
     <Content Remove="wwwroot\user\**" />
-    <EmbeddedResource Remove="wwwroot\dishes\drinks\**" />
+    <EmbeddedResource Remove="wwwroot\assets\dishes\drinks\**" />
     <EmbeddedResource Remove="wwwroot\user\**" />
-    <None Remove="wwwroot\dishes\drinks\**" />
+    <None Remove="wwwroot\assets\dishes\drinks\**" />
     <None Remove="wwwroot\user\**" />
   </ItemGroup>
 

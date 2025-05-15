@@ -15,7 +15,6 @@ namespace RestaurantSystem.Database {
         public DbSet<RoleModel> Roles { get; set; }
         public DbSet<ReservationModel> Reservations { get; set; }
         public DbSet<RestaurantModel> Restaurants { get; set; }
-        public DbSet<TimeTableModel> TimeTables { get; set; }
 
         public readonly string DefaultOrder_CurrentStatus = "pending";
         public readonly string DefaultOrderedDish_CurrentStatus = "pending";
@@ -36,9 +35,6 @@ namespace RestaurantSystem.Database {
 
             // RestaurantModel
             BuildRestaurantModel(ref builder);
-
-            // TimeTableModel
-            BuildTimeTableModel(ref builder);
 
             // DishModel
             BuildDishModel(ref builder);
@@ -264,43 +260,6 @@ namespace RestaurantSystem.Database {
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.ServeCustomersInPlace)
                 .HasDefaultValue(true);
-        }
-
-        private void BuildTimeTableModel(ref ModelBuilder builder)
-        {
-            builder.Entity<TimeTableModel>().ToTable("TimeTable");
-
-            builder.Entity<TimeTableModel>()
-                .HasKey(time => time.RestuarantId);
-
-            builder.Entity<TimeTableModel>()
-                .Property(time => time.UserAddress)
-                .IsRequired();
-
-            builder.Entity<TimeTableModel>()
-                .Property(time => time.UserCity)
-                .IsRequired();
-
-            builder.Entity<TimeTableModel>()
-                .Property(time => time.UserCountry)
-                .IsRequired();
-
-            builder.Entity<TimeTableModel>()
-                .Property(time => time.AvrageDeliverTime)
-                .IsRequired();
-
-            builder.Entity<TimeTableModel>()
-                .Property(time => time.RestuarantId)
-                .IsRequired();
-
-            builder.Entity<TimeTableModel>()
-                .Property(time => time.UserState)
-                .HasDefaultValue(null);
-
-            builder.Entity<TimeTableModel>()
-                .HasOne(time => time.Restuarant)
-                .WithMany(restaurant => restaurant.TimeTables)
-                .HasForeignKey(time => time.RestuarantId);
         }
 
         private void BuildDishModel(ref ModelBuilder builder) {

@@ -15,43 +15,40 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<List<TimeTableModel>> GetRestaurantsForDelivery_ForUser(UserModel user)
+        public async Task<List<RestaurantModel>> GetDeliveryGuy_Restaurants(UserModel user)
         {
-            return await _databaseContext.TimeTables
-                .Include(times => times.Restuarant)
+            return await _databaseContext.Restaurants
                 .Where(
                 times => 
-                times.Restuarant.DoDelivery &&
-                times.UserCity.Equals(user.City) &&
-                times.UserCountry.Equals(user.Country) &&
-                times.UserState == user.State
+                times.DoDelivery &&
+                times.City.Equals(user.City) &&
+                times.Country.Equals(user.Country) &&
+                times.State == user.State
                 )
                 .ToListAsync();
         }
 
-        public async Task<List<TimeTableModel>> GetAllRestaurantsForUser(UserModel user)
+        public async Task<List<RestaurantModel>> GetAllRestaurantsForUser(UserModel user)
         {
-            return await _databaseContext.TimeTables
-                .Include(times => times.Restuarant)
+            return await _databaseContext.Restaurants
                 .Where(
                 times =>
-                times.UserCity.Equals(user.City) &&
-                times.UserCountry.Equals(user.Country) &&
-                times.UserState == user.State
+                times.City.Equals(user.City) &&
+                times.Country.Equals(user.Country) &&
+                times.State == user.State
                 )
                 .ToListAsync();
         }
 
 
-        public async Task<List<TimeTableModel>> GetRestaurantsForServingPeople_ForUser(UserModel user)
+        public async Task<List<RestaurantModel>> GetRestaurantsThatServingPeople_ForUser(UserModel user)
         {
-            return await _databaseContext.TimeTables
-                .Include(times => times.Restuarant)
+            return await _databaseContext.Restaurants
                 .Where(
-                times => times.Restuarant.ServeCustomersInPlace &&
-                times.UserCity.Equals(user.City) &&
-                times.UserCountry.Equals(user.Country) &&
-                times.UserState == user.State
+                times => times.ServeCustomersInPlace &&
+                times.City.Equals(user.City) &&
+                times.Country.Equals(user.Country) &&
+                times.State == user.State
                 )
                 .ToListAsync();
         }

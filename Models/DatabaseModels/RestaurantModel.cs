@@ -24,7 +24,6 @@
         // navigation
         public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
         public ICollection<ReservationModel> Reservations { get; set; } = new List<ReservationModel>();
-        public ICollection<TimeTableModel> TimeTables { get; set; } = new List<TimeTableModel>();
         public ICollection<UserModel> Employees { get; set; } = new List<UserModel>();
     }
 }

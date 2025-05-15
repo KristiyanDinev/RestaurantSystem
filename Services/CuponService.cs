@@ -35,7 +35,7 @@ namespace RestaurantSystem.Services
         }
 
         public async Task<CuponModel?> CreateCupon(string cuponCode, string name,
-            DateTime expirationDate, decimal discountPercent)
+            DateOnly expirationDate, int discountPercent)
         {
             CuponModel cupon = new CuponModel() { 
                 Name = name,

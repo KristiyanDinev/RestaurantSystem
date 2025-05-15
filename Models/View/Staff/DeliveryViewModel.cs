@@ -9,6 +9,6 @@ namespace RestaurantSystem.Models.View.Admin
 
         public UserModel? Staff { get; set; }
 
-        public Dictionary<TimeTableModel, List<OrderModel>>? Orders { get; set; }
+        public Dictionary<RestaurantModel, List<OrderModel>>? Orders { get; set; }
     }
 }

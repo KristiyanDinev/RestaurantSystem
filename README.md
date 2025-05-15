@@ -61,11 +61,11 @@ When browsing through your orders you only need to be logged in.
 ## Roles and Services
 
 services: 
-- `/admin`
-- `/admin/dishes`
-- `/admin/manager`
-- `/admin/reservations`
-- `/admin/delivery`
+- `/staff`
+- `/staff/dishes`
+- `/staff/manager`
+- `/staff/reservations`
+- `/staff/delivery`
 
 roles:
 - `delivery`
@@ -102,8 +102,82 @@ Staff endpoints:
 - password: password123
 
 Add test data
+*Note: Make sure that this will be the first data inserted in the tables in the database.*
+
 ```sql
-INSERT INTO "Restaurants" VALUES 
-(),
-();
+INSERT INTO "Restaurants" 
+("Address", "City", "State", "Country", 
+"PostalCode", "DoDelivery", "ServeCustomersInPlace", 
+"ReservationMaxChildren", "ReservationMinChildren", 
+"ReservationMaxAdults", "ReservationMinAdults", 
+"Price_Per_Adult", "Price_Per_Children") 
+VALUES 
+('ul. Test', 'Sofia', NULL, 'Bulgaria', '1234', TRUE, TRUE, 10, 0, 4, 1, 5, 3.50),
+('ul. Test2', 'Sofia', NULL, 'Bulgaria', '1235', TRUE, FALSE, 10, 0, 4, 1, 5, 3),
+('ul. Test3', 'Sofia', NULL, 'Bulgaria', '1236', FALSE, TRUE, 10, 0, 4, 1, 6, 4);
+
+INSERT INTO "Dishes" 
+("Name", "Price", "Grams", "Image", "Ingredients", 
+"Type_Of_Dish", "IsAvailable", "AvrageTimeToCook", "Notes", "RestaurantId")
+VALUES 
+('Some salad', 22.30, 220, '/assets/images/salad/1.png', 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 'Some notes on the dish', 1),
+('Some salad2', 2.30, 210, NULL, 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 'Some notes on the dish', 1),
+('Some salad3', 10, 100, NULL, 'Ingredients...', 'salad', FALSE, '2 - 3 minutes', 'Some notes on the dish', 1),
+
+('Some drink', 31, 210, NULL, 'Ingredients...', 'drink', TRUE, '2 - 3 minutes', 'Some notes on the dish', 1),
+('Some drink2', 12, 100, NULL, 'Ingredients...', 'drink', FALSE, '2 - 3 minutes', 'Some notes on the dish', 1),
+
+('Premium Some salad', 22.30, 220, '/assets/images/salad/1.png', 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 'Some notes on the dish', 2),
+('Premium Some salad2', 2.30, 210, NULL, 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 'Some notes on the dish', 2),
+('Premium Some salad3', 10, 100, NULL, 'Ingredients...', 'salad', FALSE, '2 - 3 minutes', 'Some notes on the dish', 2),
+
+('Premium Some drink', 31, 210, NULL, 'Ingredients...', 'drink', TRUE, '2 - 3 minutes', 'Some notes on the dish', 2),
+('Premium Some drink2', 12, 100, NULL, 'Ingredients...', 'drink', FALSE, '2 - 3 minutes', 'Some notes on the dish', 2);
+
+
+INSERT INTO "Roles"
+("Name", "Description")
+VALUES
+('staff', 'Access to staff.'),
+('delivery', 'Access to online delivery.'),
+('waitress', 'Access to serving the people in place and handling reservations.'),
+('manager', 'Access to handle all staff for a specific restaurant.'),
+('cook', 'Access to see the orders and their dishes to cook them for that restaurant. Includes online orders.');
+
+INSERT INTO "Cupons" 
+("Name", "CuponCode", "DiscountPercent", "ExpirationDate")
+VALUES
+('Summer', 'Summer123', 15, '01-01-2027'),
+('Winter', 'Winter123', 20, '01-01-2027');
+
+INSERT INTO "Services" 
+("Path", "Description")
+VALUES
+('/staff', 'Staff home service.'),
+('/staff/dishes', 'The cook service.'),
+('/staff/manager', 'The manager service.'),
+('/staff/reservations', 'Reservations for waitresses.'),
+('/staff/delivery', 'Delivery page for the delivery staff.');
 ```
+
+Add migration
+```bash
+dotnet ef migrations add NameOfMigration
+```
+
+Apply migration
+```bash
+dotnet ef database update
+```
+
+### Local testing notes:
+
+Username: Bob
+Email: bob@example.com
+Password: 123
+Address: ul. Home
+City: Sofia
+State: *(empty)*
+Country: Bulgaria
+Postal Code: 1234
+PhoneNumber: +3592523523

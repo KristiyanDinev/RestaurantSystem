@@ -2,7 +2,7 @@
 
 namespace RestaurantSystem.Models.View.Admin
 {
-    public class AdminReservationViewModel
+    public class StaffReservationViewModel
     {
         public string? Error { get; set; }
 

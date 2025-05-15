@@ -4,7 +4,7 @@
 
         public required string Name { get; set; }
         public required string CuponCode { get; set; }
-        public required decimal DiscountPercent { get; set; }
-        public required DateTime ExpirationDate { get; set; }
+        public required int DiscountPercent { get; set; }
+        public required DateOnly ExpirationDate { get; set; }
     }
 }

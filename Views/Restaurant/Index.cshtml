@@ -1,37 +1,33 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels;
-@model List<RestaurantSystem.Models.DatabaseModels.TimeTableModel>
+@model List<RestaurantSystem.Models.DatabaseModels.RestaurantModel>
 
 @{
     ViewData["Title"] = "Restaurants";
 }
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href="~/restaurant/restaurant.css">
+    <link rel='stylesheet' type='text/css' media='screen' href="~/assets/restaurant/restaurant.css">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@ViewData["Title"]</title>
 
-    <script src="~/index.js"></script>
+    <script src="~/assets/index.js"></script>
+    <script src="~/assets/restaurant/restaurant.js"></script>
 </head>
 
 <div>
 
     @{
-        foreach (TimeTableModel timeTable in Model)
+        foreach (RestaurantModel restaurant in Model)
         {
-            RestaurantModel restaurant = timeTable.Restuarant;
-
             string delivery = restaurant.DoDelivery ? "Yes" : "No";
             string serve = restaurant.ServeCustomersInPlace ? "Yes" : "No";
 
-            <div class="restaurant" onclick="choose('@restaurant.Id')">
+            <button class="restaurant" onclick="choose('@restaurant.Id')">
+                
                 <p>@string.Join(", ", restaurant.Address,
                          restaurant.City, restaurant.State, restaurant.Country)</p>
-
-                <br />
-
-                <p>Avrage Delivery Time: @timeTable.AvrageDeliverTime</p>
 
                 <br />
 
@@ -65,7 +61,7 @@
                 <p>Min Children: @restaurant.ReservationMinChildren</p>
                 <br />
 
-            </div>
+            </button>
         }
     }
 
