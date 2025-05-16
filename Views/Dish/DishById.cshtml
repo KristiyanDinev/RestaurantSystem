@@ -16,6 +16,7 @@
     <title>@ViewData["Title"]</title>
 
     <script src="~/assets/index.js"></script>
+    <script src='~/assets/dishes/dish.js'></script>
 </head>
 
 
@@ -41,7 +42,5 @@
             <button class="order" onclick="addDishToCart('@Model.Dish.Id', '@Model.Dish.Name')">Add to order</button>
         </div>
     </div>
-
-    <script src='~/assets/dishes/dish.js'></script>
 
 </body>

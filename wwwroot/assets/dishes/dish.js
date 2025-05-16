@@ -9,14 +9,13 @@ function addDishToCart(id, name) {
 
     let cart = getCookie(cart_header)
     if (cart.length == 0) {
-        document.cookie = cart_header+"="+id;
+        document.cookie = cart_header+"="+id + "; path=/";
 
     } else {
-        document.cookie = cart_header + "=" + cart + _cart_seperator + id;
+        document.cookie = cart_header + "=" + cart + _cart_seperator + id + '; path=/';
     }
 
     alert("Added 1 x "+name+" to your cart")
-    window.location.reload()
 }
 
 function removeDishFromCart(id, name) {
@@ -27,10 +26,9 @@ function removeDishFromCart(id, name) {
         if (index > -1) {
             dishes.splice(index, 1);
         }
-        document.cookie = cart_header + "=" + dishes.join(_cart_seperator)
+        document.cookie = cart_header + "=" + dishes.join(_cart_seperator) + "; path=/"
     }
     alert("Removed 1 x "+name+" from your cart")
-    window.location.reload()
     //document.cookie = "cart."+id +'=; path=/; domain=127.0.0.1; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 }
 
