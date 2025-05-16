@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Utilities;
 using RestaurantSystem.Models.View.Order;
 using RestaurantSystem.Models.Form;
+using RestaurantSystem.Models;
 
 namespace RestaurantSystem.Controllers {
 
@@ -17,17 +18,20 @@ namespace RestaurantSystem.Controllers {
         private DishService _dishService;
         private UserUtility _userUtility;
         private CuponService _cuponService;
+        private OrderedDishesService _orderedDishesService;
         private RestaurantService _restaurantService;
 
         public OrderController(OrderService orderService, 
             DishService dishService, UserUtility userUtility,
-            RestaurantService restaurantService, CuponService cuponService)
+            RestaurantService restaurantService, CuponService cuponService, 
+            OrderedDishesService orderedDishesService)
         {
             _orderService = orderService;
             _dishService = dishService;
             _userUtility = userUtility;
             _restaurantService = restaurantService;
             _cuponService = cuponService;
+            _orderedDishesService = orderedDishesService;
         }
 
         [HttpGet]
@@ -41,12 +45,15 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            Dictionary<OrderModel, List<DishModel>> orders = new Dictionary<OrderModel, List<DishModel>>();
+            List<OrderWithDishesCountModel> orders = new ();
 
             foreach (OrderModel order in await _orderService.GetOrdersByUser(user.Id))
             {
-                orders.Add(order, await _dishService.GetDishesByIds(
-                    order.OrderedDishes.Select(dish => dish.DishId).ToList()));
+                await _orderedDishesService.GetDishesFromOrder(order.Id);
+                orders.Add(new OrderWithDishesCountModel() {
+                    Order = order,
+                    DishesCount = 
+                });
             }
 
             return View("Orders", new OrdersViewModel()
@@ -82,7 +89,7 @@ namespace RestaurantSystem.Controllers {
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OrderStart([FromForm] OrderFormModel order)
         {
-            if (!ModelState.IsValid || order.Dishes.Length == 0)
+            if (!ModelState.IsValid)
             {
                 return RedirectToAction("Dishes", "Dish");
             }
@@ -101,14 +108,7 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            List<int> DishIds = new List<int>();
-            foreach (string dishId in order.Dishes.Split("-"))
-            {
-                if (int.TryParse(dishId, out int id))
-                {
-                    DishIds.Add(id);
-                }
-            }
+            List<int> DishIds = _dishService.GetDishIDsFromCart(HttpContext);
 
             decimal totalPrice = 0;
             List<int> CoutingDishId = new List<int>(DishIds);
@@ -116,7 +116,7 @@ namespace RestaurantSystem.Controllers {
             foreach (DishModel dishModel in await _dishService.GetDishesByIds(DishIds.ToHashSet()))
             {
                 int beforeRemovalCount = CoutingDishId.Count;
-                CoutingDishId.Remove(dishModel.Id);
+                CoutingDishId.RemoveAll(id => id == dishModel.Id);
 
                 totalPrice += dishModel.Price * (beforeRemovalCount - CoutingDishId.Count);
             }
@@ -132,10 +132,11 @@ namespace RestaurantSystem.Controllers {
             if ((await _orderService.AddOrder(user.Id, restaurant.Id,
                 DishIds, order.Notes, totalPrice, null, order.CuponCode)) == null)
             {
-                ViewData["StartedOrder"] = "There was a problem while starting that order.";
+                TempData["Error"] = "There was a problem while starting that order.";
                 return RedirectToAction("Index", "Cart");
             }
 
+            TempData["StartedOrder"] = "Successfully started your order!";
             return RedirectToAction("Orders");
         }
 

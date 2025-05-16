@@ -3,19 +3,13 @@
 
 @{
     ViewData["Title"] = "Cart";
-    Model.StartedOrder = (string?) ViewData["StartedOrder"];
 }
 
 
 <head>
     <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
     <link rel='stylesheet' type='text/css' media='screen' href='~/assets/dishes/dish.css'>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@ViewData["Title"]</title>
-
-    <script src="~/assets/index.js"></script>
+    @await Html.PartialAsync("_Imports")
     <script src='~/assets/dishes/dish.js'></script>
     <script src='~/assets/cart/cart.js'></script>
 </head>
@@ -75,9 +69,9 @@
 
     <p>Total Price (not counting discounted price): @sum</p>
 
-    @if (Model.StartedOrder != null)
+    @if (ViewData["Error"] != null)
     {
-        <p>Error: @Model.StartedOrder</p>
+        <p>Error: @ViewData["Error"]</p>
     }
 
     <div class="start_order noselect">

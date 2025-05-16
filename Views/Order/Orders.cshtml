@@ -1,4 +1,5 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels;
+@using RestaurantSystem.Models;
 @model RestaurantSystem.Models.View.Order.OrdersViewModel;
 
 @{
@@ -9,12 +10,8 @@
     <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
     <link rel='stylesheet' type='text/css' media='screen' href='~/assets/dishes/dish.css'>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@ViewData["Title"]</title>
+    @await Html.PartialAsync("_Imports")
 
-    <script src="~/assets/index.js"></script>
     <script src='~/assets/orders/orders.js'></script>
     <script src='~/assets/dishes/dish.js'></script>
 </head>
@@ -24,42 +21,49 @@
 
     <h1>Orders</h1>
 
+    @if (TempData["StartedOrder"] != null)
+    {
+        <h3>@TempData["StartedOrder"]</h3>
+    }
+
     <div id="orders">
-        @foreach (OrderModel orderModel in Model.Orders.Keys)
+        @foreach (OrderWithDishesCountModel orderWithDish in Model.Orders)
         {
             <div class="order_view">
-                <p class="status" id="status_@orderModel.Id">CurrentStatus: @orderModel.CurrentStatus</p>
+                <p class="status" id="status_@orderWithDish.Order.Id">CurrentStatus: @orderWithDish.Order.CurrentStatus</p>
 
                 <div class="notes_view">
                     <p class="notes_title">Notes: </p>
-                    <p class="notes">@orderModel.Notes</p>
+                    <p class="notes">@orderWithDish.Order.Notes</p>
                 </div>
 
                 <div class="dish_list">
-                    @foreach (DishModel dish in Model.Orders[orderModel])
+                    @foreach (DishModel dish in orderWithDish.DishesCount.Keys)
                     {
-
-                        <p class="list_dish"> x {{Dish.Amount}}  {{Dish.Name}} - {{Dish.AvrageTimeToCook}} minute/s</p>
+                        <p class="list_dish"> x @orderWithDish.DishesCount[dish] @dish.Name - @dish.AvrageTimeToCook minute/s</p>
                     }
                 </div>
 
-                <p class="part">TotalPrice: @orderModel.TotalPrice lv.</p>
+                <p class="part">TotalPrice: @orderWithDish.Order.TotalPrice lv.</p>
 
                 <p class="part">Restorant Address: @string.Join(", ", 
-                orderModel.Restaurant.Address, orderModel.Restaurant.City, 
-                orderModel.Restaurant.State, orderModel.Restaurant.Country)</p>
+                orderWithDish.Order.Restaurant.Address, orderWithDish.Order.Restaurant.City,
+                orderWithDish.Order.Restaurant.State, orderWithDish.Order.Restaurant.Country)
+                </p>
 
-                <p class="part">Ordered At: @orderModel.OrderedAt.ToString()</p>
+                <p class="part">Ordered At: @orderWithDish.Order.OrderedAt.ToString()</p>
 
-                @if (!orderModel.CurrentStatus.Equals("pending"))
+                @if (!orderWithDish.Order.CurrentStatus.Equals("pending"))
                 {
-                    <button class="cancel noselect" style="opacity: 50%">Can't Cancel</button>
+                    <button class="cancel noselect" style="opacity: 50%">Can't Stop Order</button>
 
                 } else
                 {
                     <button class="cancel noselect"
                     style="opacity: 100%"
-                    onclick="cancelOrder('@orderModel.Id')">Cancel</button>
+                            onclick="cancelOrder('@orderWithDish.Order.Id')">
+                        Cancel
+                    </button>
                 }
 
             </div>

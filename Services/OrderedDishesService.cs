@@ -71,7 +71,7 @@ namespace RestaurantSystem.Services
             }
 
             return await _databaseContext.Dishies.Where(
-                dish => IDs.Contains(dish.Id))
+                dish => 
                 .ToListAsync();
         }
     }

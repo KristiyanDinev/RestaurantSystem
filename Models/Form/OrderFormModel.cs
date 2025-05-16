@@ -5,7 +5,5 @@
         public string? Notes { get; set; }
 
         public string? CuponCode { get; set; }
-
-        public required string Dishes { get; set; }
     }
 }

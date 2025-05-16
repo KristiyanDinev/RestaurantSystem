@@ -55,7 +55,7 @@ namespace RestaurantSystem.Controllers
             foreach (int eachDishId in hash_ids)
             {
                 int countOfItems = ids.Count;
-                ids.Remove(eachDishId);
+                ids.RemoveAll(id => id == eachDishId);
 
                 DishModel? dish = dishModels.FirstOrDefault(dish => dish.Id == eachDishId);
 

@@ -7,8 +7,7 @@ async function startOrder() {
         return;
     }
 
-    let cartCookie = getCookie(cart_header)
-    if (cartCookie.length == 0) {
+    if (getCookie(cart_header).length == 0) {
         alert("You don't have any dishes to order as of now.")
         window.location.href = "/dishes"
         return;
@@ -17,7 +16,6 @@ async function startOrder() {
     var formData = new FormData()
     formData.append("Notes", document.getElementById("notes").value)
     formData.append("CuponCode", document.getElementById("cupon_input").value)
-    formData.append("Dishes", cartCookie)
 
     const res = await fetch(getDataFromLocalStorage("Host") + '/order/start', {
         method: 'POST',
