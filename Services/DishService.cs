@@ -22,7 +22,7 @@ namespace RestaurantSystem.Services
         public async Task<DishModel?> GetDishById(int id) {
             return await _databaseContext.Dishies.FirstOrDefaultAsync(dish => dish.Id == id);
         }
-        public async Task<List<DishModel>> GetDishesByIds(List<int> IDs)
+        public async Task<List<DishModel>> GetDishesByIds(HashSet<int> IDs)
         {
             return IDs.Count == 0 ? new List<DishModel>() : await _databaseContext.Dishies.Where(
                 dish => IDs.Contains(dish.Id))

@@ -38,10 +38,10 @@ async function cancelOrder(id) {
     })
 
     if (res.status !== 200) {
-        alert("Can't cancel the order")
+        alert("Can't stop the order")
         return;
     }
 
-    alert("Cancelled the order")
+    alert("Stopped the order")
     window.location.reload()
 }

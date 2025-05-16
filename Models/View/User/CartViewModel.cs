@@ -4,8 +4,12 @@ namespace RestaurantSystem.Models.View.User
 {
     public class CartViewModel
     {
+        public string? StartedOrder { get; set; }
+
         public required UserModel User { get; set; }
+
         public required Dictionary<DishModel, int> Dishes { get; set; }
+
         public required RestaurantModel Restaurant { get; set; }
     }
 }

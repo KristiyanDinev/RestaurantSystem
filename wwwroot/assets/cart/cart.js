@@ -1,6 +1,12 @@
 
 
 async function startOrder() {
+    if (getCookie(restaurantId_header).length == 0) {
+        alert("Select a restorant")
+        window.location.href = "/restaurants"
+        return;
+    }
+
     let cartCookie = getCookie(cart_header)
     if (cartCookie.length == 0) {
         alert("You don't have any dishes to order as of now.")
@@ -8,21 +14,10 @@ async function startOrder() {
         return;
     }
 
-    if (getCookie(restaurantId_header).length == 0) {
-        alert("Select a restorant")
-        window.location.href = "/restaurants"
-        return;
-    }
-
-    let dishes = []
-    for (let dish in cartCookie.split(_cart_seperator)) {
-        dishes.push(Number(dish))
-    }
-
     var formData = new FormData()
     formData.append("Notes", document.getElementById("notes").value)
     formData.append("CuponCode", document.getElementById("cupon_input").value)
-    formData.append("Dishes", dishes)
+    formData.append("Dishes", cartCookie)
 
     const res = await fetch(getDataFromLocalStorage("Host") + '/order/start', {
         method: 'POST',
@@ -31,7 +26,7 @@ async function startOrder() {
     })
 
     if (res.status === 200) {
-        alert("Your started your order.")
+        alert("Ordered successfully.")
         window.location.href = "/orders"
 
     } else {

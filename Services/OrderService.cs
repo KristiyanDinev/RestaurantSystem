@@ -23,14 +23,12 @@ namespace RestaurantSystem.Services
         }
 
         public async Task<OrderModel?> AddOrder(int userId, int restaurantId,
-            List<int> dishesId, string notes, decimal totalPrice,
+            List<int> dishesId, string? notes, decimal totalPrice,
             string? tableNumber, string? cupon_code)
         {
-
-
-
+            // total price here is with applied discount if the code is correct.
             OrderModel order = new OrderModel {
-                Notes = notes.Replace(" ", "").Length == 0 ? null : notes,
+                Notes = notes != null && notes.Replace(" ", "").Length == 0 ? null : notes,
                 RestaurantId = restaurantId,
                 CurrentStatus = _databaseContext.DefaultOrder_CurrentStatus,
                 TotalPrice = totalPrice,

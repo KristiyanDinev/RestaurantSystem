@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Cart";
+    Model.StartedOrder = (string?) ViewData["StartedOrder"];
 }
 
 
@@ -71,8 +72,13 @@
         <p>Cupon Code</p>
         <input id="cupon_input" maxlength="25" placeholder="Cupon Code">
     </div>
-    
+
     <p>Total Price (not counting discounted price): @sum</p>
+
+    @if (Model.StartedOrder != null)
+    {
+        <p>Error: @Model.StartedOrder</p>
+    }
 
     <div class="start_order noselect">
         <button onclick="startOrder()">Order</button>

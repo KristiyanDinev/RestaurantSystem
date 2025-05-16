@@ -2,9 +2,10 @@
 {
     public class OrderFormModel
     {
-        public required string Notes { get; set; }
-        public required string CuponCode { get; set; }
+        public string? Notes { get; set; }
 
-        public List<int> Dishes { get; set; } = new List<int>();
+        public string? CuponCode { get; set; }
+
+        public required string Dishes { get; set; }
     }
 }

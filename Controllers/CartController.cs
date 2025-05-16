@@ -45,28 +45,31 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Index", "Restaurant");
             }
 
-            Dictionary<DishModel, int> dishCounting = new();
+            Dictionary<DishModel, int> dishes = new();
 
             List<int> ids = _dishService.GetDishIDsFromCart(HttpContext);
+            HashSet<int> hash_ids = new(ids);
 
-            int counting = 0;
-            foreach (DishModel dish in await _dishService.GetDishesByIds(ids)) {
-                counting = 0;
-                foreach (int id in ids)
+            List<DishModel> dishModels = await _dishService.GetDishesByIds(hash_ids);
+
+            foreach (int eachDishId in hash_ids)
+            {
+                int countOfItems = ids.Count;
+                ids.Remove(eachDishId);
+
+                DishModel? dish = dishModels.FirstOrDefault(dish => dish.Id == eachDishId);
+
+                if (dish != null)
                 {
-                    if (dish.Id == id)
-                    {
-                        counting++;
-                    }
+                    dishes.Add(dish, countOfItems - ids.Count);
                 }
-                dishCounting.TryAdd(dish, counting);
             }
 
             return View(new CartViewModel()
             {
                 User = user,
                 Restaurant = restaurant,
-                Dishes = dishCounting
+                Dishes = dishes
             });
         }
     }
