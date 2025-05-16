@@ -72,7 +72,7 @@ namespace RestaurantSystem.Services
 
             List<int> dishesIds = new List<int>();
 
-            foreach (string dishIdStr in cart.Split(',').ToList())
+            foreach (string dishIdStr in cart.Split('-').ToList())
             {
                 if (int.TryParse(dishIdStr, out int dishId))
                 {

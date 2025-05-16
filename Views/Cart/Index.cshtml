@@ -28,29 +28,34 @@
 
     <div id="dishes">
         @{
-            foreach (DishModel dish in Model.Dishes)
+            decimal sum = 0;
+
+            foreach (DishModel dish in Model.Dishes.Keys)
             {
                 dish.Image ??= "";
+
+                int count = Model.Dishes[dish];
+                sum += dish.Price * count;
 
                 <div id="whole_food">
                     <div class="food" onclick="goToDish('@dish.Id')">
                         <p class="food_name">@dish.Name</p>
                         <p class="food_grams">grams: /@dish.Grams/</p>
-                        <img class="food_image" src="@dish.Image">
+
+                        @if (dish.Image.Length > 0)
+                        {
+                            <img class="food_image" src="@dish.Image">
+                        }
                         <p class="food_price">@dish.Price lv.</p>
                     </div>
 
                     <div class="quantity">
-                        <label id="q_@dish.Id"></label>
+                        <label>Quantity: @count</label>
 
-                        <button class="remove_dish" onclick="removeDishFromCart('@dish.Id', '@dish.Name')">Remove Dish</button>
-                        <button class="add_dish" onclick="addDishToCart('@dish.Id', '@dish.Name')">+</button>
+                        <button class="remove_dish" onclick="removeDishFromCart('@dish.Id', '@dish.Name', true)">Remove</button>
+                        <button class="add_dish" onclick="addDishToCart('@dish.Id', '@dish.Name', true)">Add</button>
                     </div>
                 </div>
-
-                <script>
-                    calculateQuantity('@dish.Id');
-                </script>
             }
         }
     </div>
@@ -67,6 +72,7 @@
         <input id="cupon_input" maxlength="25" placeholder="Cupon Code">
     </div>
     
+    <p>Total Price (not counting discounted price): @sum</p>
 
     <div class="start_order noselect">
         <button onclick="startOrder()">Order</button>

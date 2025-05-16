@@ -1,16 +1,5 @@
 
 
-function calculateQuantity(dishId) {
-    let count = 0;
-    for (let i in getCookie(cart_header).split(_cart_seperator)) {
-        if (Number(i) == Number(dishId)) {
-            count++;
-        }
-    }
-    document.getElementById('q_' + dishId).innerHTML = "Quantity: " + count;
-}
-
-
 async function startOrder() {
     let cartCookie = getCookie(cart_header)
     if (cartCookie.length == 0) {

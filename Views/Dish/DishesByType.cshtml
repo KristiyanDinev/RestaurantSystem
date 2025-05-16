@@ -52,7 +52,7 @@
                     @if (dishModel.IsAvailable)
                     {
                         <button id="order" style="opacity: 100%;"
-                                onclick="addDishToCart('@dishModel.Id', '@dishModel.Name')">
+                                onclick="addDishToCart('@dishModel.Id', '@dishModel.Name', false)">
                             Add to order
                         </button>
                     }

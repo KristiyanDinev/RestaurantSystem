@@ -1,5 +1,5 @@
 
-function addDishToCart(id, name) {
+function addDishToCart(id, name, isInCart) {
     let restorantId = getCookie(restaurantId_header)
     if (restorantId.length == 0) {
         alert("Select a restaurant first.")
@@ -15,10 +15,13 @@ function addDishToCart(id, name) {
         document.cookie = cart_header + "=" + cart + _cart_seperator + id + '; path=/';
     }
 
-    alert("Added 1 x "+name+" to your cart")
+    alert("Added 1 x " + name + " to your cart")
+    if (isInCart) {
+        window.location.reload()
+    }
 }
 
-function removeDishFromCart(id, name) {
+function removeDishFromCart(id, name, isInCart) {
     let cart = getCookie(cart_header)
     if (cart.length > 0) {
         let dishes = cart.split(_cart_seperator)
@@ -28,7 +31,10 @@ function removeDishFromCart(id, name) {
         }
         document.cookie = cart_header + "=" + dishes.join(_cart_seperator) + "; path=/"
     }
-    alert("Removed 1 x "+name+" from your cart")
+    alert("Removed 1 x " + name + " from your cart")
+    if (isInCart) {
+        window.location.reload()
+    }
     //document.cookie = "cart."+id +'=; path=/; domain=127.0.0.1; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 }
 
