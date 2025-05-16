@@ -129,7 +129,14 @@ body {
 
 .food {
     cursor: pointer;
+    opacity: 100%;
 }
+
+.food-opacity {
+    cursor: pointer;
+    opacity: 50%;
+}
+
 
 .restorant {
     align-items: center;

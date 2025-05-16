@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Utilities;
 using RestaurantSystem.Models.View.Order;
 using RestaurantSystem.Models.Form;
-using System.Collections.Generic;
 
 namespace RestaurantSystem.Controllers {
 
@@ -17,20 +16,23 @@ namespace RestaurantSystem.Controllers {
         private OrderService _orderService;
         private DishService _dishService;
         private UserUtility _userUtility;
+        private CuponService _cuponService;
         private RestaurantService _restaurantService;
 
         public OrderController(OrderService orderService, 
             DishService dishService, UserUtility userUtility,
-            RestaurantService restaurantService) {
+            RestaurantService restaurantService, CuponService cuponService)
+        {
             _orderService = orderService;
             _dishService = dishService;
             _userUtility = userUtility;
             _restaurantService = restaurantService;
+            _cuponService = cuponService;
         }
 
         [HttpGet]
-        [Route("Orders")]
-        [Route("Orders/Index")]
+        [Route("/orders")]
+        [Route("/orders/index")]
         public async Task<IActionResult> Orders()
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -56,7 +58,7 @@ namespace RestaurantSystem.Controllers {
 
 
         [HttpGet]
-        [Route("Order/{orderId}")]
+        [Route("/order/{orderId}")]
         public async Task<IActionResult> Order(int orderId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -76,7 +78,7 @@ namespace RestaurantSystem.Controllers {
 
 
         [HttpPost]
-        [Route("Order/Start")]
+        [Route("/order/start")]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OrderStart([FromBody] OrderFormModel order)
         {
@@ -94,22 +96,28 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
+            decimal totalPrice = (await _dishService.GetDishesByIds(order.Dishes)).Sum(dish => dish.Price);
+
+            if (order.CuponCode.Replace(" ", "").Length > 0) {
+                CuponModel? cupon = await _cuponService.GetCuponByCode(order.CuponCode);
+                if (cupon != null)
+                {
+                    totalPrice = _cuponService.HandleCuponDiscount(cupon.DiscountPercent, totalPrice);
+                }
+            }
+
             return View(new OrderStartViewModel()
             {
                 User = user,
                 Restaurant = restaurant,
                 Order = await _orderService.AddOrder(user.Id, restaurant.Id,
-                order.Dishes, order.Notes,
-
-                (await _dishService.GetDishesByIds(order.Dishes)).Sum(dish => dish.Price)
-
-                , order.TableNumber)
+                order.Dishes, order.Notes, totalPrice, null, order.CuponCode)
             });
         }
 
 
         [HttpPost]
-        [Route("Order/Stop/{orderId}")]
+        [Route("/order/stop/{orderId}")]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OrderStop(int orderId)
         {
@@ -127,13 +135,11 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            OrderStopView orderStopView = new OrderStopView()
+            return View(new OrderStopView()
             {
                 User = user,
                 Success = await _orderService.DeleteOrder(orderId)
-            };
-
-            return View(orderStopView);
+            });
         }
     }
 }

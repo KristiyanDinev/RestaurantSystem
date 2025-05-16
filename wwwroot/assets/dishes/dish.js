@@ -1,32 +1,33 @@
 
-
 function addDishToCart(id, name) {
-    let restorantId = getCookie("restaurant_id")
+    let restorantId = getCookie(restaurantId_header)
     if (restorantId.length == 0) {
         alert("Select a restaurant first.")
+        window.location.href = "/restaurants"
         return
     }
 
-    let cart = getCookie("cart")
+    let cart = getCookie(cart_header)
     if (cart.length == 0) {
-        document.cookie = "cart="+id;
+        document.cookie = cart_header+"="+id;
 
     } else {
-        document.cookie = "cart="+cart +"-"+ id;
+        document.cookie = cart_header + "=" + cart + _cart_seperator + id;
     }
+
     alert("Added 1 x "+name+" to your cart")
     window.location.reload()
 }
 
 function removeDishFromCart(id, name) {
-    let cart = getCookie("cart")
+    let cart = getCookie(cart_header)
     if (cart.length > 0) {
-        let dishes = cart.split('-')
+        let dishes = cart.split(_cart_seperator)
         var index = dishes.indexOf(id);
         if (index > -1) {
             dishes.splice(index, 1);
         }
-        document.cookie = "cart="+dishes.join('-')
+        document.cookie = cart_header + "=" + dishes.join(_cart_seperator)
     }
     alert("Removed 1 x "+name+" from your cart")
     window.location.reload()
@@ -38,29 +39,28 @@ function removeDishFromCart(id, name) {
 var params = new URLSearchParams()
 
 function goToDish(id) {
-    params.append("dishId", String(id))
-    window.location.href = "/single_dish?" + params.toString()
+    window.location.href = "/dish/" + Number(id)
 }
 
 function goToSalads() {
-    window.location.href = "/Dishes/salad"
+    window.location.href = "/dishes/salad"
 }
 
 function goToAppetizers() {
-    window.location.href = "/Dishes/appetizers"
+    window.location.href = "/dishes/appetizers"
 }
 
 function goToDishesFood() {
-    window.location.href = "/Dishes/dishes"
+    window.location.href = "/dishes/dishes"
 }
 
 function goToDrinks() {
     params.append("type", "drink")
-    window.location.href = "/Dishes/drinks"
+    window.location.href = "/dishes/drink"
 }
 
 function goToDesserts() {
     params.append("type", "desserts")
-    window.location.href = "/Dishes/desserts"
+    window.location.href = "/dishes/desserts"
 }
 

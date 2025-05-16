@@ -26,8 +26,8 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("/Cart")]
-        [Route("/Cart/Index")]
+        [Route("/cart")]
+        [Route("/cart/index")]
         public async Task<IActionResult> Index()
         {
 
@@ -45,15 +45,13 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Index", "Restaurant");
             }
 
-            CartViewModel cartViewModel = new CartViewModel()
+            return View(new CartViewModel()
             {
                 User = user,
                 Restaurant = restaurant,
                 Dishes = await _dishService.GetDishesByIds(
                 _dishService.GetDishIDsFromCart(HttpContext))
-            };
-
-            return View(cartViewModel);
+            });
         }
     }
 }

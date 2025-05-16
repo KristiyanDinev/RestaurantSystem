@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Models.Form;
 using RestaurantSystem.Models.WebSockets;
 using System.Net.WebSockets;
 
@@ -24,11 +23,14 @@ namespace RestaurantSystem.Services
         }
 
         public async Task<OrderModel?> AddOrder(int userId, int restaurantId,
-            List<int> dishesId, string? notes, decimal totalPrice,
-            string? tableNumber)
+            List<int> dishesId, string notes, decimal totalPrice,
+            string? tableNumber, string? cupon_code)
         {
+
+
+
             OrderModel order = new OrderModel {
-                Notes = notes,
+                Notes = notes.Replace(" ", "").Length == 0 ? null : notes,
                 RestaurantId = restaurantId,
                 CurrentStatus = _databaseContext.DefaultOrder_CurrentStatus,
                 TotalPrice = totalPrice,

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 
@@ -65,7 +64,7 @@ namespace RestaurantSystem.Services
 
         public List<int> GetDishIDsFromCart(HttpContext context)
         {
-            context.Request.Cookies.TryGetValue("cart", out string? cart);
+            context.Request.Cookies.TryGetValue("cart_items", out string? cart);
             if (cart == null || cart.Length == 0)
             {
                 return new List<int>();
@@ -73,7 +72,7 @@ namespace RestaurantSystem.Services
 
             List<int> dishesIds = new List<int>();
 
-            foreach (string dishIdStr in cart.Split('-').ToList())
+            foreach (string dishIdStr in cart.Split(',').ToList())
             {
                 if (int.TryParse(dishIdStr, out int dishId))
                 {

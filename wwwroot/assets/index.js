@@ -1,4 +1,6 @@
-
+var restaurantId_header = "restaurant_id";
+var cart_header = "cart_items";
+var _cart_seperator = ',';
 
 function getCookie(cname) {
     let name = cname + "=";
@@ -96,7 +98,7 @@ function goToReservations() {
 }
 
 function goToReservationsToCreate() {
-    window.location.href = getDataFromLocalStorage("Host") + '/reservations/create'
+    window.location.href = getDataFromLocalStorage("Host") + '/reservation'
 }
 
 

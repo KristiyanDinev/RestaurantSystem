@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <partial name="NavBar" model="Model.User" />
+    @await Html.PartialAsync("_NavBar", Model.User)
 
     <h1>Profile</h1>
 
@@ -41,7 +41,7 @@
                 <p>Username: @Model.User.Name</p>
                 <br>
                 <input type="text" id="username"
-                       maxlength="255" value="@Model.User.Name" placeholder="Username" required>
+                maxlength="255" value="@Model.User.Name" placeholder="Username" required>
             </div>
             <br>
 
@@ -77,8 +77,8 @@
 
             <div class="input_center">
                 <p>Notes: <p>@Model.User.State</p>
-                <br>
-                <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">@Model.User.Notes</textarea>
+                    <br>
+                    <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">@Model.User.Notes</textarea>
             </div>
 
             <div class="input_center">
@@ -89,7 +89,10 @@
     </div>
 
 
-    <p id="Stats"></p>
+    @if (Model.UpdatedSuccessfully != null)
+    {
+        <p id="Stats">Model.UpdatedSuccessfully</p>
+    }
     <br>
 
     <button id="edit" onclick="updateUser()">Edit</button>

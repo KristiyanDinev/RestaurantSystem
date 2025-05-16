@@ -21,8 +21,8 @@
 
 <body>
 
-    <partial name="NavBar" model="Model.User" />
-    <partial name="RestaurantBar" model="Model.Restaurant" />
+    @await Html.PartialAsync("_NavBar", Model.User)
+    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
     <div class="menu">
         <p class="name">@Model.Dish.Name</p>

@@ -8,7 +8,7 @@ namespace RestaurantSystem.Services
         private readonly List<string> non_login_endpoints = 
             ["/login", "/register"];
 
-        private readonly string admin_endpoint_prefix = "/admin";
+        private readonly string staff_endpoint_prefix = "/staff";
 
         private readonly RequestDelegate _next;
         public AuthenticationMiddleware(RequestDelegate next)
@@ -25,13 +25,13 @@ namespace RestaurantSystem.Services
                 return;
             }
 
-            bool isAdminEndpoint = ("/"+path.Split("/")[0]).Equals(admin_endpoint_prefix);
+            bool isAdminEndpoint = ("/"+path.Split("/")[0]).Equals(staff_endpoint_prefix);
             UserModel? user = await userUtility.GetUserByJWT(context);
 
             if (user != null && non_login_endpoints.Contains(path))
             {
                 // user is logged in and tries to login in.
-                context.Response.Redirect("/Dishes");
+                context.Response.Redirect("/restaurants");
                 return;
 
             }
@@ -58,7 +58,7 @@ namespace RestaurantSystem.Services
                     // user doesn't have the roles to do so.
                     Console.WriteLine("\n"+user.Name +" was trying to reach to admin page. Service: "+
                         path+" without the proper roles.\n");
-                    context.Response.Redirect("/Dishes");
+                    context.Response.Redirect("/restaurants");
                     return;
                 }
             }

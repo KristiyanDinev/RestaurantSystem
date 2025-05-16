@@ -13,12 +13,9 @@ async function submit() {
 
 
     let formData = new FormData()
-    formData.append("password", password.value)
-    formData.append("email", email.value)
-
-
-    formData.append("rememberMe", document.querySelector('#RememberMe:checked') === null ?
-                                 "off" : "on")
+    formData.append("Password", password.value)
+    formData.append("Email", email.value)
+    formData.append("RememberMe", document.querySelector('#RememberMe:checked') !== null)
 
     const res = await fetch(getDataFromLocalStorage("Host") + "/login", {
         method: "POST",

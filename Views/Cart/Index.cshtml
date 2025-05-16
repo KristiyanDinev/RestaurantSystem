@@ -21,7 +21,8 @@
 
 
 <body>
-    <partial name="NavBar" model="Model.User" />
+    @await Html.PartialAsync("_NavBar", Model.User)
+    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
     <h1>Your Cart</h1>
 
@@ -65,12 +66,7 @@
         <p>Cupon Code</p>
         <input id="cupon_input" maxlength="25" placeholder="Cupon Code">
     </div>
-
-    <div class="input_center">
-        <p>Restorant Address: @string.Join(", ", Model.Restaurant.Address,
-                Model.Restaurant.City, Model.Restaurant.State, Model.Restaurant.Country)
-        </p>
-    </div>
+    
 
     <div class="start_order noselect">
         <button onclick="startOrder()">Order</button>

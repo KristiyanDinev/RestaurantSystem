@@ -15,7 +15,7 @@ namespace RestaurantSystem.Controllers
 
         private UserUtility _userUtility;
         private RestaurantService _restaurantService;
-        private readonly string restaurant_id = "restaurant_id";
+        //private readonly string restaurant_id = "restaurant_id";
 
         public RestaurantController(UserUtility userUtility, 
             RestaurantService restaurantService) {
@@ -25,7 +25,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Restaurants")]
+        [Route("/restaurants")]
         public async Task<IActionResult> Index()
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -35,16 +35,6 @@ namespace RestaurantSystem.Controllers
             }
 
             return View(await _restaurantService.GetAllRestaurantsForUser(user));
-        }
-
-        [HttpPost]
-        [Route("Restaurant")]
-        [IgnoreAntiforgeryToken]
-        public IActionResult Restaurant([FromForm] int restaurantId)
-        {
-            HttpContext.Response.Cookies.Delete(restaurant_id);
-            HttpContext.Response.Cookies.Append(restaurant_id, restaurantId.ToString());
-            return RedirectToAction("Dishes", "Dish");
         }
     }
 }

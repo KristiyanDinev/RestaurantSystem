@@ -27,8 +27,8 @@ namespace RestaurantSystem.Controllers {
 
 
         [HttpGet]
-        [Route("/Dishes")]
-        [Route("/Dishes/Index")]
+        [Route("/dishes")]
+        [Route("/dishes/index")]
         public async Task<IActionResult> Dishes()
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -52,7 +52,7 @@ namespace RestaurantSystem.Controllers {
 
 
         [HttpGet]
-        [Route("/Dishes/{dishType}")]
+        [Route("/dishes/{dishType}")]
         public async Task<IActionResult> DishesByType(string dishType)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -83,7 +83,7 @@ namespace RestaurantSystem.Controllers {
 
 
         [HttpGet]
-        [Route("/Dish/{dishId}")]
+        [Route("/dish/{dishId}")]
         public async Task<IActionResult> DishById(int dishId)
         {
             Console.WriteLine("Dish Id: " + dishId);

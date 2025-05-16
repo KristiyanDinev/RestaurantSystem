@@ -48,5 +48,10 @@ namespace RestaurantSystem.Services
 
             return await _databaseContext.SaveChangesAsync() > 0 ? cupon : null;
         }
+
+        public decimal HandleCuponDiscount(int discountPercent, decimal totalPrice)
+        {
+            return totalPrice - (totalPrice / discountPercent);
+        }
     }
 }

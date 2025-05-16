@@ -18,7 +18,7 @@ namespace RestaurantSystem.Controllers {
         }
 
         [HttpPost]
-        [Route("/Cupon")]
+        [Route("/cupon")]
         [IgnoreAntiforgeryToken]
         public async Task<IResult> Cupon(string code)
         {

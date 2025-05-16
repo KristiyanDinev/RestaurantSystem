@@ -18,8 +18,8 @@
 </head>
 
 <body>
-    <partial name="NavBar" model="Model.User" />
-    <partial name="RestaurantBar" model="Model.Restaurant" />
+    @await Html.PartialAsync("_NavBar", Model.User)
+    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
     <p id="dish_stats"></p>
 
@@ -41,7 +41,9 @@
                     <p class="food_name">@dishModel.Name</p>
                     <p class="food_grams">grams: /@dishModel.Grams/</p>
 
-                    <img class="food_image" src="@dishModel.Image">
+                    @if (dishModel.Image.Length > 0) {
+                        <img class="food_image" src="@dishModel.Image">
+                    }
 
                     <p class="food_price">@dishModel.Price lv.</p>
                 </div>

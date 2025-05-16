@@ -19,14 +19,14 @@
 
 <body>
 
-    <partial name="NavBar" model="Model.User" />
-    <partial name="RestaurantBar" model="Model.Restaurant" />
+    @await Html.PartialAsync("_NavBar", Model.User)
+    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
-        <button onclick="goToSalads()" id="dish">Salads</button>
-        <button onclick="goToAppetizers()" id="dish">Appetizers</button>
-        <button onclick="goToDishesFood()" id="dish">Dishes</button>
-        <button onclick="goToDrinks()" id="dish">Drinks</button>
-        <button onclick="goToDesserts()" id="dish">Desserts</button>
+    <button onclick="goToSalads()" id="dish">Salads</button>
+    <button onclick="goToAppetizers()" id="dish">Appetizers</button>
+    <button onclick="goToDishesFood()" id="dish">Dishes</button>
+    <button onclick="goToDrinks()" id="dish">Drinks</button>
+    <button onclick="goToDesserts()" id="dish">Desserts</button>
 
 
 </body>

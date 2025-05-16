@@ -20,9 +20,7 @@
 </head>
 
 <body>
-
-
-    <partial name="NavBar" model="Model.User" />
+    @await Html.PartialAsync("_NavBar", Model.User)
 
     <h1>Orders</h1>
 

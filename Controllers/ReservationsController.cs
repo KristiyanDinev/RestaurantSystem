@@ -29,7 +29,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Reservation")]
+        [Route("/reservation")]
         public async Task<IActionResult> Reservation()
         {
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
@@ -57,7 +57,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Reservations")]
+        [Route("/reservations")]
         public async Task<IActionResult> Reservations()
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -77,7 +77,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Reservation/{reservationId}")]
+        [Route("/reservation/{reservationId}")]
         public async Task<IActionResult> ReservationById(int reservationId) {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
@@ -96,7 +96,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpPost]
-        [Route("Reservation/Create")]
+        [Route("/reservation/Create")]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> ReservationCreate(
             [FromForm] ReservationFormModel reservationFormModel)
@@ -129,7 +129,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpPost]
-        [Route("Reservation/Delete/{reservationId}")]
+        [Route("/reservation/Delete/{reservationId}")]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> ReservationDelete(int reservationId)
         {

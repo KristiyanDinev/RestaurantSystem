@@ -51,9 +51,6 @@ namespace RestaurantSystem
             builder.Services.AddScoped<UserUtility>();
             builder.Services.AddScoped<WebSocketService>();
 
-            string secretKey = builder.Configuration.GetValue<string>("JWT_SecurityKey")
-                    ?? "ugyw89ub9Y9H8OP9j1wsfwedS";
-
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options => {
                     options.PermitLimit = 1;
@@ -79,7 +76,7 @@ namespace RestaurantSystem
             app.UseWebSocketMiddleware();
 
             app.UseHttpLogging();
-            //app.UseLoggingMiddleware();
+            app.UseLoggingMiddleware();
 
             app.MapControllers();
             
