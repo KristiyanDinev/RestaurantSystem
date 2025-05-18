@@ -24,6 +24,8 @@ namespace RestaurantSystem.Database {
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             // UserModel
             BuildUserModel(ref builder);
 
@@ -56,8 +58,6 @@ namespace RestaurantSystem.Database {
 
             // RolePermissionModel
             BuildRolePermissionModel(ref builder);
-
-            base.OnModelCreating(builder);
         }
 
 

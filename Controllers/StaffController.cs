@@ -11,6 +11,7 @@ namespace RestaurantSystem.Controllers
 
     [ApiController]
     [EnableRateLimiting("fixed")]
+    [IgnoreAntiforgeryToken]
     public class StaffController : Controller
     {
         private readonly string _restaurant_error = "Can't determin in which restaurant you work in. Please contact your manager.";
@@ -41,8 +42,8 @@ namespace RestaurantSystem.Controllers
         }
 
         [HttpGet]
-        [Route("Staff")]
-        [Route("Staff/Index")]
+        [Route("/staff")]
+        [Route("/staff/index")]
         public async Task<IActionResult> Index()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
@@ -57,7 +58,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Staff/Dishes")]
+        [Route("/staff/dishes")]
         public async Task<IActionResult> Dishes()
         {
             // Chief in the kitchen
@@ -92,8 +93,7 @@ namespace RestaurantSystem.Controllers
         }
 
         [HttpPost]
-        [Route("Staff/Dishes")]
-        [IgnoreAntiforgeryToken]
+        [Route("/staff/dishes")]
         public async Task<IActionResult> DishesUpdate([FromForm] OrderUpdateFormModel orderUpdateFormModel)
         {
             if (!ModelState.IsValid)
@@ -148,7 +148,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Staff/Reservations")]
+        [Route("/staff/reservations")]
         public async Task<IActionResult> Reservations()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
@@ -176,7 +176,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Staff/Manager")]
+        [Route("/staff/manager")]
         public async Task<IActionResult> Manager()
         {
             // One Manager per restaurant
@@ -206,7 +206,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("Staff/Delivery")]
+        [Route("/staff/delivery")]
         public async Task<IActionResult> Delivery()
         {
             // Delivery people can take orders from different restaurants in their own city.

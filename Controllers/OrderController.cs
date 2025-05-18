@@ -12,6 +12,7 @@ namespace RestaurantSystem.Controllers {
 
     [ApiController]
     [EnableRateLimiting("fixed")]
+    [IgnoreAntiforgeryToken]
     public class OrderController : Controller {
 
         private OrderService _orderService;
@@ -86,7 +87,6 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("/order/start")]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OrderStart([FromForm] OrderFormModel order)
         {
             if (!ModelState.IsValid)
@@ -143,7 +143,6 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("/order/stop/{orderId}")]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OrderStop(int orderId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);

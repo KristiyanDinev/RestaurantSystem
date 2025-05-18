@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
@@ -12,6 +13,7 @@ namespace RestaurantSystem.Controllers {
 
     [ApiController]
     [EnableRateLimiting("fixed")]
+    [IgnoreAntiforgeryToken]
     public class UserController : Controller {
 
 
@@ -48,9 +50,7 @@ namespace RestaurantSystem.Controllers {
 
 
         [HttpPost]
-        [Route("/")]
         [Route("/login")]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> LoginUser(
             [FromForm] LoginFormModel loginFormModel)
         {
@@ -84,7 +84,6 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("/register")]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> RegisterUser(
             [FromForm] RegisterFormModel registerFormModel)
         {

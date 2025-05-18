@@ -12,6 +12,7 @@ namespace RestaurantSystem.Controllers
 
     [ApiController]
     [EnableRateLimiting("fixed")]
+    [IgnoreAntiforgeryToken]
     public class ReservationsController : Controller
     {
 
@@ -97,7 +98,6 @@ namespace RestaurantSystem.Controllers
 
         [HttpPost]
         [Route("/reservation/Create")]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> ReservationCreate(
             [FromForm] ReservationFormModel reservationFormModel)
         {
@@ -130,7 +130,6 @@ namespace RestaurantSystem.Controllers
 
         [HttpPost]
         [Route("/reservation/Delete/{reservationId}")]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> ReservationDelete(int reservationId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
