@@ -149,10 +149,7 @@ namespace RestaurantSystem.Database {
             builder.Entity<RolePermissionModel>().ToTable("Role_Permissions");
 
             builder.Entity<RolePermissionModel>()
-                .HasKey(rp => rp.RoleName);
-
-            builder.Entity<RolePermissionModel>()
-                .HasKey(rp =>  rp.ServicePath);
+                .HasKey(role => role.Id);
 
             builder.Entity<RolePermissionModel>()
                 .HasOne(role => role.Role)
@@ -170,10 +167,7 @@ namespace RestaurantSystem.Database {
             builder.Entity<UserRoleModel>().ToTable("User_Roles");
 
             builder.Entity<UserRoleModel>()
-                .HasKey(role => role.UserId);
-
-            builder.Entity<UserRoleModel>()
-                .HasKey(role => role.RoleName);
+                .HasKey(role => role.Id);
 
             builder.Entity<UserRoleModel>()
                 .HasOne(user => user.User)

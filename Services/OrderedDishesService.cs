@@ -59,20 +59,45 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<DishModel>> GetDishesFromOrder(int orderId)
+        /*
+         * Converts OrderedDishes to a list of dishes.
+         */
+        public async Task<Dictionary<DishModel, int>> CountDishesByOrder(int orderId)
         {
-            List<OrderedDishesModel> orderedDishes = await _databaseContext.OrderedDishes.Where(
-                order => order.OrderId == orderId)
-                .ToListAsync();
-
             List<int> IDs = new List<int>();
-            foreach (OrderedDishesModel orderedDish in orderedDishes) {
+            foreach (OrderedDishesModel orderedDish in 
+
+                await _databaseContext.OrderedDishes.Where(
+                order => order.OrderId == orderId)
+                .ToListAsync()) {
+
                 IDs.Add(orderedDish.DishId);
             }
 
-            return await _databaseContext.Dishies.Where(
-                dish => 
+            List<DishModel> dishes = await _databaseContext.Dishies.Where(
+                dish => IDs.Contains(dish.Id))
                 .ToListAsync();
+
+            Dictionary<DishModel, int> result = new ();
+            foreach (int id in IDs)
+            {
+                DishModel? dish = dishes.Find(dish => dish.Id == id);
+                if (dish == null)
+                {
+                    continue;
+                }
+
+                if (result.ContainsKey(dish))
+                {
+                    result[dish] = ++result[dish];
+
+                } else
+                {
+                    result[dish] = 1;
+                }
+            }
+
+            return result;
         }
     }
 }

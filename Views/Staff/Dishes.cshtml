@@ -1,14 +1,25 @@
 ﻿@using RestaurantSystem.Models.View.Admin
 @model DishesViewModel
 
-
 @{
-    if (Model.Error != null)
+    ViewData["Title"] = "Cook";
+}
+
+<head>
+    @await Html.PartialAsync("_Imports")
+</head>
+
+
+<body>
+    @if (Model.Error != null)
     {
         <h1>Error</h1>
-        <h2>Model.Error</h2>
+        <h2>@Model.Error</h2>
     }
-}
+
+
+
+</body>
 
 
 

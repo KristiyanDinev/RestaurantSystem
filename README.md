@@ -101,7 +101,13 @@ Staff endpoints:
 - user: ResturantUser
 - password: password123
 
-Add test data
+### TODO
+
+- Work on `/ws/orders` websocket on client is not connecting.
+- Check to see if client sends the correct JSON data to the server over `/ws/orders` websocket.
+- Fix `/wwwroot/assets/staff/cook/cook.js` to send the correct data.
+
+### Add test data
 *Note: Make sure that this will be the first data inserted in the tables in the database.*
 
 ```sql
@@ -158,6 +164,35 @@ VALUES
 ('/staff/manager', 'The manager service.'),
 ('/staff/reservations', 'Reservations for waitresses.'),
 ('/staff/delivery', 'Delivery page for the delivery staff.');
+
+INSERT INTO "Role_Permissions" 
+("RoleName", "ServicePath")
+VALUES
+('staff', '/staff'),
+('delivery', '/staff/delivery'),
+('delivery', '/staff'),
+('waitress', '/staff/reservations'),
+('waitress', '/staff'),
+('manager', '/staff/manager'),
+('manager', '/staff'),
+('manager', '/staff/dishes'),
+('manager', '/staff/reservations'),
+('manager', '/staff/delivery'),
+('cook', '/staff/dishes'),
+('cook', '/staff');
+```
+
+Add Role
+```sql
+INSERT INTO "User_Roles" 
+("UserId", "RoleName")
+VALUES
+(2, 'manager');
+```
+
+Remove Role
+```sql
+DELETE FROM "User_Roles" WHERE "UserId" = 2 AND "RoleName" = 'manager';
 ```
 
 Add migration
@@ -181,3 +216,16 @@ State: *(empty)*
 Country: Bulgaria
 Postal Code: 1234
 PhoneNumber: +3592523523
+
+
+Staff manager
+Username: John
+Email: john@example.com
+Password: 1234
+Address: ul. Home1
+City: Sofia
+State: *(empty)*
+Country: Bulgaria
+Postal Code: 12345
+PhoneNumber: +3592523511
+Roles: manager

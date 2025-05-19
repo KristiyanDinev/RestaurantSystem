@@ -103,7 +103,8 @@ namespace RestaurantSystem.Services
         public async Task<List<OrderModel>> Get_HomeDelivery_OrdersBy_RestaurantId(int restaurantId)
         {
             return await _databaseContext.Orders.Where(
-                order => order.RestaurantId == restaurantId &&
+                order => 
+                order.RestaurantId == restaurantId &&
                 order.TableNumber == null)
                 .ToListAsync();
         }

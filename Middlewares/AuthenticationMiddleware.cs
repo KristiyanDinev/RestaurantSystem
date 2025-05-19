@@ -25,7 +25,7 @@ namespace RestaurantSystem.Services
                 return;
             }
 
-            bool isAdminEndpoint = ("/"+path.Split("/")[0]).Equals(staff_endpoint_prefix);
+            bool isAdminEndpoint = path.StartsWith(staff_endpoint_prefix);
             UserModel? user = await userUtility.GetUserByJWT(context);
 
             if (user != null && non_login_endpoints.Contains(path))
@@ -50,15 +50,11 @@ namespace RestaurantSystem.Services
                 {
                     path = path.Split('?')[0];
                 }
-                List<string> splited = path.Split("/").ToList();
-                splited.RemoveAt(0);
-                path = "/" + string.Join("/", splited);
+
                 if (!await roleService.CanUserAccessService(user.Id, path))
                 {
                     // user doesn't have the roles to do so.
-                    Console.WriteLine("\n"+user.Name +" was trying to reach to admin page. Service: "+
-                        path+" without the proper roles.\n");
-                    context.Response.Redirect("/restaurants");
+                    context.Response.Redirect("/login");
                     return;
                 }
             }

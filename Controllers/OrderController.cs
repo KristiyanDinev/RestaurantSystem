@@ -50,10 +50,9 @@ namespace RestaurantSystem.Controllers {
 
             foreach (OrderModel order in await _orderService.GetOrdersByUser(user.Id))
             {
-                await _orderedDishesService.GetDishesFromOrder(order.Id);
                 orders.Add(new OrderWithDishesCountModel() {
                     Order = order,
-                    DishesCount = 
+                    DishesCount = await _orderedDishesService.CountDishesByOrder(order.Id)
                 });
             }
 
@@ -137,6 +136,7 @@ namespace RestaurantSystem.Controllers {
             }
 
             TempData["StartedOrder"] = "Successfully started your order!";
+            HttpContext.Response.Cookies.Delete("cart_items");
             return RedirectToAction("Orders");
         }
 
@@ -153,6 +153,7 @@ namespace RestaurantSystem.Controllers {
 
             if (!(await _orderService.DeleteOrder(orderId)))
             {
+                TempData["Error"] = "There was a problem while stopping that order.";
                 return RedirectToAction("Orders");
             }
 

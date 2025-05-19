@@ -2,6 +2,7 @@
 {
     public class UserRoleModel
     {
+        public int Id { get; set; }
         public required int UserId { get; set; }
         public UserModel User { get; set; } = null!;
 

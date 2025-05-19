@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
 using RestaurantSystem.Models.View.Admin;
@@ -79,15 +80,18 @@ namespace RestaurantSystem.Controllers
                 return View(adminDishesModel);
             }
 
-            Dictionary<OrderModel, List<DishModel>> dishes = new ();
+            List<OrderWithDishesCountModel> dishes = new ();
             foreach (OrderModel order in await _orderService.GetOrdersByRestaurantId(restaurant.Id))
             {
-                dishes.Add(order, await _orderedDishesService.GetDishesFromOrder(order.Id));
+                dishes.Add(new OrderWithDishesCountModel() { 
+                    Order = order,
+                    DishesCount = await _orderedDishesService.CountDishesByOrder(order.Id)
+                });
             }
 
             adminDishesModel.Restaurant = restaurant;
             adminDishesModel.Staff = user;
-            adminDishesModel.Dishes = dishes;
+            adminDishesModel.OrderWithDishesCount = dishes;
 
             return View(adminDishesModel);
         }
@@ -98,7 +102,7 @@ namespace RestaurantSystem.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewData["ErrorMessage"] = "Invalid form submission";
+                TempData["Error"] = "Invalid form submission";
                 return RedirectToAction("Dishes");
             }
 
@@ -116,7 +120,7 @@ namespace RestaurantSystem.Controllers
                 if (!(await _orderService.UpdateOrderCurrentStatusById((int)orderUpdateFormModel.OrderId,
                 orderUpdateFormModel.OrderCurrentStatus)))
                 {
-                    ViewData["ErrorMessage"] = "Can't update order's current status.";
+                    TempData["Error"] = "Can't update order's current status.";
                     return View("Dishes");
                 }
 
@@ -130,7 +134,7 @@ namespace RestaurantSystem.Controllers
                 if(!(await _orderedDishesService.UpdateOrderedDishStatusById((int)orderUpdateFormModel.DishId,
                     orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus)))
                 {
-                    ViewData["ErrorMessage"] = "Can't update dish's current status.";
+                    ViewData["Error"] = "Can't update dish's current status.";
                     return View("Dishes");
                 }
 
@@ -139,7 +143,7 @@ namespace RestaurantSystem.Controllers
 
             if (updateMessage.Length > 8)
             {
-                ViewData["SuccessMessage"] = updateMessage;
+                TempData["Success"] = updateMessage;
                 await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
                      _orderService.GetListenersForOrderId(orderUpdateFormModel.OrderId));
             }

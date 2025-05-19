@@ -1,10 +1,14 @@
 var socket = null
-var regiseredOrders = [];
+var registeredOrders = [];
 
 function onopen() {
+    if (registeredOrders.length == 0) {
+        socket.close()
+        return
+    }
+    console.log('{"orders": ' + registeredOrders + '}')
     // convert this to a json: {"orders": [1, 2, 3]}
-    regiseredOrders
-    socket.send()
+    socket.send('{"orders": ' + registeredOrders +'}')
 }
 
 function onclose() {
@@ -13,10 +17,29 @@ function onclose() {
 function onmessage(event) {
     const data = event.data
     if (data.length == 0) {
-        return;
+        return
     }
 
     // convert this to a json.
+    //   public required int OrderId { get; set; }
+    //    public string ? OrderCurrentStatus { get; set; }
+
+    //    public int ? DishId { get; set; }
+    //    public string ? DishCurrentStatus { get; set; }
+
+    const obj = JSON.parse(data)
+    if (!regiseredOrders.includes(Number(obj.OrderId))) {
+        return
+    }
+
+    if (obj.OrderCurrentStatus !== null && obj.OrderCurrentStatus !== undefined) {
+        document.getElementById("orderstatus_" + obj.OrderId).innerHTML = "CurrentStatus: " + obj.OrderCurrentStatus
+    }
+
+    if ((obj.DishId !== null && obj.DishId !== undefined) &&
+        (obj.DishCurrentStatus !== null && obj.DishCurrentStatus !== undefined)) {
+        document.getElementById("dishstatus_" + obj.OrderId + " " + obj.DishId).innerHTML = "CurrentStatus: " + obj.DishCurrentStatus
+    }
 }
 
 function onerror(event) {
@@ -43,5 +66,5 @@ async function cancelOrder(id) {
     }
 
     alert("Stopped the order")
-    window.location.reload()
+    registeredOrders = registeredOrders.filter(orderId => orderId !== Number(id));
 }
