@@ -17,16 +17,15 @@ namespace RestaurantSystem.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            PathString path = context.Request.Path;
-            if (path.StartsWithSegments("/ws/"))
+            string? path = context.Request.Path.Value?.ToLower();
+            if (path != null && path.StartsWith("/ws/"))
             {
                 if (context.WebSockets.IsWebSocketRequest)
                 {
-                    string endpoint = path.ToString().ToLower();
                     using WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
                     TaskCompletionSource<object> socketFinishedTcs = new TaskCompletionSource<object>();
-                    await _webSocketManager.HandleWebSocketAsync(endpoint, webSocket, socketFinishedTcs);
+                    await _webSocketManager.HandleWebSocketAsync(path, webSocket, socketFinishedTcs);
                     await socketFinishedTcs.Task;
                 }
                 else

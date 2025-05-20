@@ -5,9 +5,6 @@ namespace RestaurantSystem.Services
 {
     public class AuthenticationMiddleware
     {
-        private readonly List<string> non_login_endpoints = 
-            ["/login", "/register"];
-
         private readonly string staff_endpoint_prefix = "/staff";
 
         private readonly RequestDelegate _next;
@@ -16,42 +13,27 @@ namespace RestaurantSystem.Services
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, UserUtility userUtility, 
-            RoleService roleService)
+        public async Task InvokeAsync(HttpContext context, 
+            UserUtility userUtility, RoleService roleService)
         {
             string path = context.Request.Path.Value ?? "/";
-            if (path.Equals('/'))
+
+            if (path.StartsWith(staff_endpoint_prefix))
             {
-                return;
-            }
-
-            bool isAdminEndpoint = path.StartsWith(staff_endpoint_prefix);
-            UserModel? user = await userUtility.GetUserByJWT(context);
-
-            if (user != null && non_login_endpoints.Contains(path))
-            {
-                // user is logged in and tries to login in.
-                context.Response.Redirect("/restaurants");
-                return;
-
-            }
-            else if (user == null && (!non_login_endpoints.Contains(path) || isAdminEndpoint))
-            {
-                // user is not logged in and it tries to visit an endpoint that requires login
-                context.Response.Redirect("/login");
-                return;
-
-            }
-
-            if (isAdminEndpoint && user != null)
-            {
-                // the user is logged in
                 if (path.Contains('?'))
                 {
                     path = path.Split('?')[0];
                 }
 
-                if (!await roleService.CanUserAccessService(user.Id, path))
+                Dictionary<string, object>? claims = await userUtility.GetAuthClaimFromJWT(context);
+
+                if (claims == null || !claims.TryGetValue("Id", out object? value) ||
+                    !int.TryParse((string?)value, out int Id))
+                {
+                    return;
+                }
+
+                if (!await roleService.CanUserAccessService(Id, path))
                 {
                     // user doesn't have the roles to do so.
                     context.Response.Redirect("/login");

@@ -1,5 +1,6 @@
-﻿@using RestaurantSystem.Models.View.Admin
-@model DishesViewModel
+﻿@using RestaurantSystem.Models;
+@using RestaurantSystem.Models.DatabaseModels;
+@model RestaurantSystem.Models.View.Admin.DishesViewModel
 
 @{
     ViewData["Title"] = "Cook";
@@ -7,19 +8,133 @@
 
 <head>
     @await Html.PartialAsync("_Imports")
+
+    <script src='~/assets/staff/cook/cook.js'></script>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/single_dish/single_dish.css'>
 </head>
 
 
 <body>
-    @if (Model.Error != null)
+    <p>Logged in as: @Model.Staff.Name</p>
+
+    @if (Model.Staff.Image != null)
     {
-        <h1>Error</h1>
-        <h2>@Model.Error</h2>
+        <img hight="500" width="500" src="~@Model.Staff.Image">
     }
 
+    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
+
+    @if (Model.OrderWithDishesCount.Count > 0)
+    {
+        <h1>All Dishes to cook per order.</h1>
+
+    } else
+    {
+        <h1>No Dishes to cook.</h1>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <p>Error: @TempData["Error"]</p>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <p>Success: @TempData["Success"]</p>
+    }
+
+    <div>
+        @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.OrderWithDishesCount)
+        {
+            OrderModel order = orderWithDishesCount.Order;
+
+            <script>
+                registeredOrders.push(Number(@order.Id))
+            </script>
+
+            <div class="order_view">
+
+                <p class="status" id="status_@order.Id">
+                    CurrentStatus: @order.CurrentStatus
+                </p>
+
+                <div class="notes_view">
+                    <p class="notes_title">Notes: </p>
+                    <p class="notes">@order.Notes</p>
+                </div>
+
+                <p class="part">@order.OrderedAt</p>
+
+                <p class="part">TotalPrice: @order.TotalPrice</p>
+
+                @foreach (DishWithStatusModel dishWithStatus in orderWithDishesCount.DishesCount.Keys)
+                {
+                    <div class="menu">
+
+                        <p class="part">Amount: @orderWithDishesCount.DishesCount[dishWithStatus]</p>
+
+                        <p class="part" id="dishstatus,@order.Id,@dishWithStatus.Dish.Id">
+                            Dish Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
+
+                        <p class="name">@dishWithStatus.Dish.Name</p>
+
+                        <p class="grams">grams /@dishWithStatus.Dish.Grams/</p>
+
+                        <p class="ingr">Ingredients: @dishWithStatus.Dish.Ingredients</p>
+
+                        @if (dishWithStatus.Dish.Image != null)
+                        {
+                            <img src="~@dishWithStatus.Dish.Image" class="image" alt="No image for now">
+                        }
+
+                        <p class="avg_time_to_took">Avrage time to cook: @dishWithStatus.Dish.AvrageTimeToCook minute/s</p>
+
+                        <p class="price">@dishWithStatus.Dish.Price lv.</p>
+
+                        <p id="error,@order.Id,@dishWithStatus.Dish.Id"></p>
+
+                        @if (dishWithStatus.OrderedDish.CurrentStatus.Equals("pending"))
+                        {
+                            <button class="order noselect"
+                            onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', 'preparing')">
+                                Start cooking
+                            </button>
+                        }
+                        else if (dishWithStatus.OrderedDish.CurrentStatus.Equals("preparing"))
+                        {
+                            <div class="row noselect">
+                                <button class="undo"
+                                onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', 'pending')">
+                                    UnDo
+                                </button>
+
+                                <button class="order"
+                                onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', 'ready')">
+                                    Ready
+                                </button>
+                            </div>
+
+                        }
+                        else if (dishWithStatus.OrderedDish.CurrentStatus.Equals("ready"))
+                        {
+                            <button class="undo noselect"
+                                    onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', 'preparing')">
+                                UnDo
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
 
 
+    @if (Model.OrderWithDishesCount.Count > 0)
+    {
+        <script>
+            startWebSocket()
+        </script>
+    }
 </body>
-
-
 

@@ -6,7 +6,7 @@ namespace RestaurantSystem.Models
     {
         public required OrderModel Order { get; set; }
 
-        // Dishes with their count
-        public required Dictionary<DishModel, int> DishesCount { get; set; }
+        // Dishes with their count and status
+        public required Dictionary<DishWithStatusModel, int> DishesCount { get; set; }
     }
 }

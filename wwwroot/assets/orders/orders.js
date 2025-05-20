@@ -6,9 +6,7 @@ function onopen() {
         socket.close()
         return
     }
-    console.log('{"orders": ' + registeredOrders + '}')
-    // convert this to a json: {"orders": [1, 2, 3]}
-    socket.send('{"orders": ' + registeredOrders +'}')
+    socket.send('{"orders": [' + registeredOrders +']}')
 }
 
 function onclose() {

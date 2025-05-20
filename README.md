@@ -103,9 +103,8 @@ Staff endpoints:
 
 ### TODO
 
-- Work on `/ws/orders` websocket on client is not connecting.
-- Check to see if client sends the correct JSON data to the server over `/ws/orders` websocket.
 - Fix `/wwwroot/assets/staff/cook/cook.js` to send the correct data.
+- Refactor the Views and JS.
 
 ### Add test data
 *Note: Make sure that this will be the first data inserted in the tables in the database.*
@@ -193,6 +192,16 @@ VALUES
 Remove Role
 ```sql
 DELETE FROM "User_Roles" WHERE "UserId" = 2 AND "RoleName" = 'manager';
+```
+
+Add Restaurant To User
+```sql
+UPDATE "Users" SET "RestaurantId" = 1 WHERE "Id" = 2;
+```
+
+Remove Restaurant From User
+```sql
+UPDATE "Users" SET "RestaurantId" = NULL WHERE "Id" = 2;
 ```
 
 Add migration

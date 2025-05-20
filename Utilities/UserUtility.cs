@@ -11,6 +11,8 @@ namespace RestaurantSystem.Utilities
         private UserService _userService;
 
         private readonly string authHeader = "Authentication";
+        private readonly string userIdClaimKey = "Id";
+        private readonly string bearerHeaderStart = "Bearer ";
 
         public UserUtility(EncryptionUtility encryptionUtility, JWTUtility jwtUtility,
             UserService userService)
@@ -26,7 +28,7 @@ namespace RestaurantSystem.Utilities
 
         private string? _ExtractJWTFromHeader(string? header)
         {
-            return header != null && header.StartsWith("Bearer ") ? header.Substring(7) : null;
+            return header != null && header.StartsWith(bearerHeaderStart) ? header.Substring(7) : null;
         }
 
         /*
@@ -38,7 +40,7 @@ namespace RestaurantSystem.Utilities
         public string GenerateAuthBearerHeader_JWT(UserModel model, bool remeberMe)
         {
             List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim("Id", model.Id.ToString()));
+            claims.Add(new Claim(userIdClaimKey, model.Id.ToString()));
 
             return _encryptionUtility.Encrypt(
                 _jwtUtility.GenerateJWT(claims,
@@ -55,7 +57,22 @@ namespace RestaurantSystem.Utilities
         public void SetUserAuthBearerHeader(HttpContext context, string jwt)
         {
             RemoveAuthBearerHeader(context);
-            context.Response.Cookies.Append(authHeader, "Bearer " + jwt);
+            context.Response.Cookies.Append(authHeader, bearerHeaderStart + jwt);
+        }
+
+        public async Task<Dictionary<string, object>?> GetAuthClaimFromJWT(HttpContext context)
+        {
+            try
+            {
+                return await _jwtUtility.VerifyJWT(
+                   _encryptionUtility.Decrypt(
+                       _ExtractJWTFromHeader(context.Request.Cookies[authHeader]
+                       )));
+
+            } catch (Exception)
+            {
+                return null;
+            }
         }
 
         /*
@@ -71,13 +88,10 @@ namespace RestaurantSystem.Utilities
         {
             try
             {
-                Dictionary<string, object>? claims = await _jwtUtility.VerifyJWT(
-                   _encryptionUtility.Decrypt(
-                       _ExtractJWTFromHeader(context.Request.Cookies[authHeader]
-                       )));
+                Dictionary<string, object>? claims = await GetAuthClaimFromJWT(context);
 
-                if (claims == null || !claims.ContainsKey("Id") ||
-                    !int.TryParse(claims["Id"].ToString(), out int Id))
+                if (claims == null || !claims.ContainsKey(userIdClaimKey) ||
+                    !int.TryParse(claims[userIdClaimKey].ToString(), out int Id))
                 {
                     return null;
                 }

@@ -30,7 +30,7 @@
         @foreach (OrderWithDishesCountModel orderWithDish in Model.Orders)
         {
             <script>
-                registeredOrders .push(Number(@orderWithDish.Order.Id))
+                registeredOrders.push(Number(@orderWithDish.Order.Id))
             </script>
 
             <div class="order_view">
@@ -42,10 +42,13 @@
                 </div>
 
                 <div class="dish_list">
-                    @foreach (DishModel dish in orderWithDish.DishesCount.Keys)
+                    @foreach (DishWithStatusModel dishWithStatus in orderWithDish.DishesCount.Keys)
                     {
-                        <p id="dishstatus_@orderWithDish.Order.Id @dish.Id">Current Status: pending</p>
-                        <p class="list_dish"> x @orderWithDish.DishesCount[dish] @dish.Name : @dish.AvrageTimeToCook</p>
+                        <p id="dishstatus_@orderWithDish.Order.Id @dishWithStatus.Dish.Id">
+                            Current Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
+
+                        <p class="list_dish"> x @orderWithDish.DishesCount[dishWithStatus] 
+                            @dishWithStatus.Dish.Name : @dishWithStatus.Dish.AvrageTimeToCook</p>
                     }
                 </div>
 

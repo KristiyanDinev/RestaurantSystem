@@ -5,8 +5,6 @@ using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Middlewares;
 using RestaurantSystem.Utilities;
-using System;
-using System.Runtime.Intrinsics.X86;
 
 namespace RestaurantSystem
 {

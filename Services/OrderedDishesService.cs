@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
+using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
 
 namespace RestaurantSystem.Services
@@ -62,15 +63,14 @@ namespace RestaurantSystem.Services
         /*
          * Converts OrderedDishes to a list of dishes.
          */
-        public async Task<Dictionary<DishModel, int>> CountDishesByOrder(int orderId)
+        public async Task<Dictionary<DishWithStatusModel, int>> CountDishesByOrder(int orderId)
         {
-            List<int> IDs = new List<int>();
-            foreach (OrderedDishesModel orderedDish in 
-
-                await _databaseContext.OrderedDishes.Where(
+            List<OrderedDishesModel> orderedDishes = await _databaseContext.OrderedDishes.Where(
                 order => order.OrderId == orderId)
-                .ToListAsync()) {
+                .ToListAsync();
 
+            List<int> IDs = new List<int>();
+            foreach (OrderedDishesModel orderedDish in orderedDishes) {
                 IDs.Add(orderedDish.DishId);
             }
 
@@ -78,22 +78,30 @@ namespace RestaurantSystem.Services
                 dish => IDs.Contains(dish.Id))
                 .ToListAsync();
 
-            Dictionary<DishModel, int> result = new ();
+            Dictionary<DishWithStatusModel, int> result = new ();
             foreach (int id in IDs)
             {
+                OrderedDishesModel orderedDish = orderedDishes
+                    .Find(orderedDishes => orderedDishes.DishId == id)!;
                 DishModel? dish = dishes.Find(dish => dish.Id == id);
                 if (dish == null)
                 {
                     continue;
                 }
 
-                if (result.ContainsKey(dish))
+                DishWithStatusModel dishWithStatus = new DishWithStatusModel()
                 {
-                    result[dish] = ++result[dish];
+                    Dish = dish,
+                    OrderedDish = orderedDish
+                };
+
+                if (result.ContainsKey(dishWithStatus))
+                {
+                    result[dishWithStatus] = ++result[dishWithStatus];
 
                 } else
                 {
-                    result[dish] = 1;
+                    result[dishWithStatus] = 1;
                 }
             }
 

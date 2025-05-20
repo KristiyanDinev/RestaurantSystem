@@ -13,15 +13,13 @@
         public async Task InvokeAsync(HttpContext context)
         {
             Console.WriteLine("Custom Logging:\n");
-            Console.WriteLine("\n" + context.Request.Method + ": " + context.Request.Path.Value);
+            Console.WriteLine(context.Request.Method + ": " + context.Request.Path.Value);
             Console.WriteLine("\n----\nCookies:");
             foreach (var cookie in context.Request.Cookies)
             {
                 Console.WriteLine(cookie);
             }
             Console.WriteLine("----\n");
-
-            Console.WriteLine("End of custom Logging:\n");
 
             await _next(context);
         }

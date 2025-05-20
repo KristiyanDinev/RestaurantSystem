@@ -17,7 +17,6 @@ namespace RestaurantSystem.Controllers
     {
         private readonly string _restaurant_error = "Can't determin in which restaurant you work in. Please contact your manager.";
 
-        private RoleService _roleService;
         private OrderService _orderService;
         private UserUtility _userUtils;
         private RestaurantService _restaurantService;
@@ -27,13 +26,13 @@ namespace RestaurantSystem.Controllers
         private WebSocketService _webSocketService;
 
         public StaffController(UserUtility userUtils,
-            Utility _utils, RoleService roleService,
-            OrderService orderService, RestaurantService restaurantService,
-            OrderedDishesService orderedDishesService, ReservationService reservationService,
+            Utility _utils, OrderService orderService, 
+            RestaurantService restaurantService,
+            OrderedDishesService orderedDishesService, 
+            ReservationService reservationService,
             UserService userService, WebSocketService webSocketService)
         {
             _userUtils = userUtils;
-            _roleService = roleService;
             _orderService = orderService;
             _restaurantService = restaurantService;
             _orderedDishesService = orderedDishesService;
@@ -48,8 +47,7 @@ namespace RestaurantSystem.Controllers
         public async Task<IActionResult> Index()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
-            if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/staff")))
+            if (user == null)
             {
                 return RedirectToAction("Login", "User");
             }
@@ -65,19 +63,16 @@ namespace RestaurantSystem.Controllers
             // Chief in the kitchen
 
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
-            if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/staff/dishes")))
+            if (user == null)
             {
                 return RedirectToAction("Login", "User");
             }
 
             RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
 
-            DishesViewModel adminDishesModel = new DishesViewModel();
             if (restaurant == null)
             {
-                adminDishesModel.Error = _restaurant_error;
-                return View(adminDishesModel);
+                return RedirectToAction("Index", "Restaurant");
             }
 
             List<OrderWithDishesCountModel> dishes = new ();
@@ -89,11 +84,12 @@ namespace RestaurantSystem.Controllers
                 });
             }
 
-            adminDishesModel.Restaurant = restaurant;
-            adminDishesModel.Staff = user;
-            adminDishesModel.OrderWithDishesCount = dishes;
-
-            return View(adminDishesModel);
+            return View(new DishesViewModel()
+            {
+                Restaurant = restaurant,
+                Staff = user,
+                OrderWithDishesCount = dishes
+            });
         }
 
         [HttpPost]
@@ -102,13 +98,11 @@ namespace RestaurantSystem.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Invalid form submission";
-                return RedirectToAction("Dishes");
+                return BadRequest();
             }
 
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
-            if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/staff/dishes")))
+            if (user == null)
             {
                 return RedirectToAction("Login", "User");
             }
@@ -134,7 +128,7 @@ namespace RestaurantSystem.Controllers
                 if(!(await _orderedDishesService.UpdateOrderedDishStatusById((int)orderUpdateFormModel.DishId,
                     orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus)))
                 {
-                    ViewData["Error"] = "Can't update dish's current status.";
+                    TempData["Error"] = "Can't update dish's current status.";
                     return View("Dishes");
                 }
 
@@ -156,8 +150,7 @@ namespace RestaurantSystem.Controllers
         public async Task<IActionResult> Reservations()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
-            if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/staff/reservations")))
+            if (user == null)
             {
                 return RedirectToAction("Login", "User");
             }
@@ -185,8 +178,7 @@ namespace RestaurantSystem.Controllers
         {
             // One Manager per restaurant
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
-            if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/staff/manager")))
+            if (user == null)
             {
                 return RedirectToAction("Login", "User");
             }
@@ -217,8 +209,7 @@ namespace RestaurantSystem.Controllers
             // They just have to update their profile in order to change which restaurants they can take 
             // orders and deliver them
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
-            if (user == null ||
-                !(await _roleService.CanUserAccessService(user.Id, "/staff/delivery")))
+            if (user == null)
             {
                 return RedirectToAction("Login", "User");
             }
