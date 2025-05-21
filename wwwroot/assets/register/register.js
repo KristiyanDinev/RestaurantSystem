@@ -65,8 +65,8 @@ function submit() {
         redirect: 'follow',
         
     }).then((res) => {
-        if (res.status === 200) {
-            window.location.reload()
+        if (res.status == 200) {
+            window.location.pathname = "/restaurants"
         }
     })
 

@@ -4,10 +4,9 @@ namespace RestaurantSystem.Models.View.Admin
 {
     public class StaffReservationViewModel
     {
-        public string? Error { get; set; }
 
-        public UserModel? Staff { get; set; }
+        public required UserModel Staff { get; set; }
 
-        public List<ReservationModel>? Reservations { get; set; }
+        public List<ReservationModel> Reservations { get; set; } = new List<ReservationModel>();
     }
 }

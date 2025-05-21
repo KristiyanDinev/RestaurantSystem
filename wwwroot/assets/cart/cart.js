@@ -23,11 +23,12 @@ async function startOrder() {
         redirect: 'follow',
     })
 
-    if (res.status === 200) {
+    if (res.status == 200) {
         alert("Ordered successfully.")
-        window.location.href = "/orders"
+        window.location.pathname = "/orders"
 
     } else {
         alert("Couldn't start your order.")
+        //document.getElementById("cupon_input").value = ""
     }
 }

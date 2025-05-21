@@ -15,7 +15,6 @@ namespace RestaurantSystem.Controllers
 
         private UserUtility _userUtility;
         private RestaurantService _restaurantService;
-        //private readonly string restaurant_id = "restaurant_id";
 
         public RestaurantController(UserUtility userUtility, 
             RestaurantService restaurantService) {

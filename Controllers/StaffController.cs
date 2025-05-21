@@ -47,12 +47,7 @@ namespace RestaurantSystem.Controllers
         public async Task<IActionResult> Index()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-
-            return View(user);
+            return user == null ? RedirectToAction("Login", "User") : View(user);
         }
 
 
@@ -72,7 +67,8 @@ namespace RestaurantSystem.Controllers
 
             if (restaurant == null)
             {
-                return RedirectToAction("Index", "Restaurant");
+                TempData["Error"] = _restaurant_error;
+                return View();
             }
 
             List<OrderWithDishesCountModel> dishes = new ();
@@ -92,6 +88,7 @@ namespace RestaurantSystem.Controllers
             });
         }
 
+
         [HttpPost]
         [Route("/staff/dishes")]
         public async Task<IActionResult> DishesUpdate([FromForm] OrderUpdateFormModel orderUpdateFormModel)
@@ -104,7 +101,7 @@ namespace RestaurantSystem.Controllers
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return BadRequest();
             }
 
             string updateMessage = "Updated ";
@@ -114,8 +111,7 @@ namespace RestaurantSystem.Controllers
                 if (!(await _orderService.UpdateOrderCurrentStatusById((int)orderUpdateFormModel.OrderId,
                 orderUpdateFormModel.OrderCurrentStatus)))
                 {
-                    TempData["Error"] = "Can't update order's current status.";
-                    return View("Dishes");
+                    return BadRequest();
                 }
 
                 updateMessage += "order's current status: " + orderUpdateFormModel.DishCurrentStatus+". ";
@@ -128,20 +124,21 @@ namespace RestaurantSystem.Controllers
                 if(!(await _orderedDishesService.UpdateOrderedDishStatusById((int)orderUpdateFormModel.DishId,
                     orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus)))
                 {
-                    TempData["Error"] = "Can't update dish's current status.";
-                    return View("Dishes");
+                    return BadRequest();
                 }
 
                 updateMessage += "dish current status: " + orderUpdateFormModel.DishCurrentStatus+". ";
             }
 
-            if (updateMessage.Length > 8)
+            if (updateMessage.Length <= 8)
             {
-                TempData["Success"] = updateMessage;
-                await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
-                     _orderService.GetListenersForOrderId(orderUpdateFormModel.OrderId));
+                return BadRequest();
             }
-            return RedirectToAction("Dishes");
+
+            await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
+                     _orderService.GetListenersForOrderId(orderUpdateFormModel.OrderId));
+
+            return Ok(updateMessage);
         }
 
 
@@ -156,19 +153,19 @@ namespace RestaurantSystem.Controllers
             }
 
             RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
-            StaffReservationViewModel reservationViewModel = new StaffReservationViewModel();
 
             if (restaurant == null)
             {
-                reservationViewModel.Error = _restaurant_error;
-                return View(reservationViewModel);
+                TempData["Error"] = _restaurant_error;
+                return View();
             }
 
-            reservationViewModel.Staff = user;
-            reservationViewModel.Reservations = await _reservationService
-                .GetReservationsByRestaurantId(restaurant.Id);
-
-            return View(reservationViewModel);
+            return View(new StaffReservationViewModel()
+            {
+                Staff = user,
+                Reservations = await _reservationService
+                .GetReservationsByRestaurantId(restaurant.Id)
+            });
         }
 
 
@@ -184,20 +181,19 @@ namespace RestaurantSystem.Controllers
             }
 
             RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
-            ManagerViewModel managerViewModel = new ManagerViewModel();
 
             if (restaurant == null)
             {
-                managerViewModel.Error = _restaurant_error;
-                return View(managerViewModel);
+                TempData["Error"] = _restaurant_error;
+                return View();
             }
 
-            managerViewModel.Staff = user;
-            managerViewModel.Restaurant = restaurant;
-            managerViewModel.Employees = await _restaurantService
-                .GetRestaurantEmployeesByRestaurantId(restaurant.Id);
-
-            return View(managerViewModel);
+            return View(new ManagerViewModel() {
+                Staff = user,
+                Restaurant = restaurant,
+                Employees = await _restaurantService
+                    .GetRestaurantEmployeesByRestaurantId(restaurant.Id)
+            });
         }
 
 

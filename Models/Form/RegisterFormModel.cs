@@ -17,6 +17,5 @@
         public bool RememberMe { get; set; }
         public required string PostalCode { get; set; }
 
-        public string? Error { get; set; }
     }
 }

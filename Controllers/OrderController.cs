@@ -74,13 +74,11 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            OrderViewModel orderViewModel = new OrderViewModel()
+            return View(new OrderViewModel()
             {
                 User = user,
                 Order = await _orderService.GetOrderById(orderId)
-            };
-
-            return View(orderViewModel);
+            });
         }
 
 
@@ -90,7 +88,7 @@ namespace RestaurantSystem.Controllers {
         {
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Dishes", "Dish");
+                return BadRequest();
             }
 
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
@@ -98,13 +96,13 @@ namespace RestaurantSystem.Controllers {
 
             if (restaurant == null)
             {
-                return RedirectToAction("Index", "Restaurant");
+                return BadRequest();
             }
 
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return BadRequest();
             }
 
             List<int> DishIds = _dishService.GetDishIDsFromCart(HttpContext);
@@ -131,13 +129,10 @@ namespace RestaurantSystem.Controllers {
             if ((await _orderService.AddOrder(user.Id, restaurant.Id,
                 DishIds, order.Notes, totalPrice, null, order.CuponCode)) == null)
             {
-                TempData["Error"] = "There was a problem while starting that order.";
-                return RedirectToAction("Index", "Cart");
+                return BadRequest();
             }
-
-            TempData["StartedOrder"] = "Successfully started your order!";
             HttpContext.Response.Cookies.Delete("cart_items");
-            return RedirectToAction("Orders");
+            return Ok();
         }
 
 
@@ -148,16 +143,15 @@ namespace RestaurantSystem.Controllers {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return BadRequest();
             }
 
             if (!(await _orderService.DeleteOrder(orderId)))
             {
-                TempData["Error"] = "There was a problem while stopping that order.";
-                return RedirectToAction("Orders");
+                return BadRequest();
             }
 
-            return RedirectToAction("Orders");
+            return BadRequest();
         }
     }
 }

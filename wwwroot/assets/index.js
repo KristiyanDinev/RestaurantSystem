@@ -67,38 +67,38 @@ function startOrderWebSocket(onopen, onclose, onerror, onmessage) {
 
 
 function goToProfile() {
-    window.location.href = getDataFromLocalStorage("Host") + "/profile"
+    window.location.pathname = "/profile"
 }
 
 
 
 function goToRegister() {
-    window.location.href = getDataFromLocalStorage("Host") + '/register'
+    window.location.pathname = '/register'
 }
 
 
 function goToLogin() {
-    window.location.href = getDataFromLocalStorage("Host") + '/login'
+    window.location.pathname = '/login'
 }
 
 function goToDishes() {
-    window.location.href = getDataFromLocalStorage("Host") + '/dishes'
+    window.location.pathname = '/dishes'
 }
 
 function goToCart() {
-    window.location.href = getDataFromLocalStorage("Host") + '/cart'
+    window.location.pathname = '/cart'
 }
 
 function goToOrders() {
-    window.location.href = getDataFromLocalStorage("Host") + '/orders'
+    window.location.pathname = '/orders'
 }
 
 function goToReservations() {
-    window.location.href = getDataFromLocalStorage("Host") + '/reservations'
+    window.location.pathname = '/reservations'
 }
 
 function goToReservationsToCreate() {
-    window.location.href = getDataFromLocalStorage("Host") + '/reservation'
+    window.location.pathname =  '/reservation'
 }
 
 

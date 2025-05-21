@@ -104,6 +104,7 @@ Staff endpoints:
 ### TODO
 
 - Fix `/wwwroot/assets/staff/cook/cook.js` to send the correct data.
+- Let all elements thata are handles by JS be in good format.
 - Refactor the Views and JS.
 
 ### Add test data

@@ -47,13 +47,11 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            ReservationFormViewModel reservationViewModel = new ()
+            return View(new ReservationFormViewModel()
             {
                 User = user,
                 Restaurant = restaurant
-            };
-
-            return View(reservationViewModel);
+            });
         }
 
 
@@ -67,13 +65,11 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            ReservationsViewModel reservationsViewModel = new ()
+            return View(new ReservationsViewModel()
             {
                 User = user,
                 Reservations = await _reservationService.GetReservationsByUserId(user.Id)
-            };
-
-            return View(reservationsViewModel);
+            });
         }
 
 
@@ -86,13 +82,11 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            ReservationViewModel reservationViewModel = new ()
+            return View(new ReservationViewModel()
             {
                 User = user,
                 Reservation = await _reservationService.GetReservationById(reservationId)
-            };
-
-            return View(reservationViewModel);
+            });
         }
 
 
@@ -106,25 +100,19 @@ namespace RestaurantSystem.Controllers
 
             if (restaurant == null)
             {
-                return RedirectToAction("Index", "Restaurant");
+                return BadRequest();
             }
 
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return BadRequest();
             }
-            
-            ReservationCreateViewModel reservationCreateViewModel = new ()
-            {
-                User = user,
-                Restaurant = restaurant,
-                Reservation = await _reservationService.CreateReservation(user.Id, restaurant.Id,
+
+            return await _reservationService.CreateReservation(user.Id, restaurant.Id,
                 reservationFormModel.Amount_Of_Adults, reservationFormModel.Amount_Of_Children,
                 reservationFormModel.At_Date, reservationFormModel.Notes)
-            };
-
-            return View(reservationCreateViewModel);
+                != null ? Ok() : BadRequest();
         }
 
 
@@ -135,16 +123,11 @@ namespace RestaurantSystem.Controllers
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return BadRequest();
             }
 
-            ReservationDeleteViewModel reservationDeleteViewModel = new ()
-            {
-                User = user,
-                Success = await _reservationService.DeleteReservation(reservationId)
-            };
-
-            return View(reservationDeleteViewModel);
+            return await _reservationService.DeleteReservation(reservationId)
+                ? Ok() : BadRequest();
         }
     }
 }

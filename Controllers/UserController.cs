@@ -16,7 +16,6 @@ namespace RestaurantSystem.Controllers {
     [IgnoreAntiforgeryToken]
     public class UserController : Controller {
 
-
         private UserService _userService;
         private UserUtility _userUtility;
         private RoleService _roleService;
@@ -56,12 +55,8 @@ namespace RestaurantSystem.Controllers {
         {
             if (!ModelState.IsValid)
             {
-                return View("Login", loginFormModel);
-            }
-
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
-            if (user != null) {
-                return RedirectToAction("Index", "Restaurant");
+                TempData["Login"] = loginFormModel;
+                return BadRequest();
             }
 
             UserModel? loggedIn = await _userService.LoginUser(
@@ -69,8 +64,9 @@ namespace RestaurantSystem.Controllers {
 
             if (loggedIn == null)
             {
-                loginFormModel.Error = "Invalid login attempt.";
-                return View("Login", loginFormModel);
+                TempData["Error"] = "Invalid login attempt.";
+                TempData["Login"] = loginFormModel;
+                return BadRequest();
             }
 
             _userUtility.SetUserAuthBearerHeader(
@@ -78,7 +74,7 @@ namespace RestaurantSystem.Controllers {
                 _userUtility.GenerateAuthBearerHeader_JWT(
                     loggedIn, loginFormModel.RememberMe));
 
-            return RedirectToAction("Index", "Restaurant");
+            return Ok();
         }
 
 
@@ -89,20 +85,14 @@ namespace RestaurantSystem.Controllers {
         {
             if (!ModelState.IsValid)
             {
-                return View("Register", registerFormModel);
-            }
-
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
-            if (user != null)
-            {
-                return RedirectToAction("Index", "Restaurant");
+                return BadRequest();
             }
 
             UserModel? registered = await _userService.RegisterUser(registerFormModel);
             if (registered == null)
             {
-                registerFormModel.Error = "Registration failed. Please try again.";
-                return View("Register", registerFormModel);
+                TempData["Error"] = "Invalid registration attempt.";
+                return BadRequest();
             }
 
             _userUtility.SetUserAuthBearerHeader(
@@ -110,7 +100,7 @@ namespace RestaurantSystem.Controllers {
                 _userUtility.GenerateAuthBearerHeader_JWT(
                     registered, registerFormModel.RememberMe));
 
-            return RedirectToAction("Index", "Restaurant");
+            return Ok();
         }
 
 
@@ -141,13 +131,13 @@ namespace RestaurantSystem.Controllers {
 
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Profile");
+                return BadRequest();
             }
 
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login");
+                return BadRequest();
             }
 
             if (!user.City.Equals(profileUpdateFormModel.City) ||
@@ -164,21 +154,9 @@ namespace RestaurantSystem.Controllers {
                 }
             }
 
-            bool updateSuccessful = await _userService.UpdateUser(user, 
-                profileUpdateFormModel);
-            user = await _userService.GetUser(user.Id);
-            if (user == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            ProfileViewModel profileViewModel = new ProfileViewModel()
-            {
-                UpdatedSuccessfully = updateSuccessful ? "Profile updated successfully!" : null,
-                User = user
-            };
-
-            return View("Profile", profileViewModel);
+            return await _userService.UpdateUser(user,
+                profileUpdateFormModel) ?
+                Ok() : BadRequest();
         }
 
 
@@ -187,8 +165,7 @@ namespace RestaurantSystem.Controllers {
         public IActionResult Logout()
         {
             _userUtility.RemoveAuthBearerHeader(HttpContext);
-
-            return RedirectToAction("Login");
+            return Ok();
         }
     }
 }
