@@ -1,4 +1,4 @@
-﻿using RestaurantSystem.Models.DatabaseModels;
+﻿
 using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Services
@@ -24,6 +24,8 @@ namespace RestaurantSystem.Services
                 {
                     path = path.Split('?')[0];
                 }
+
+                path = path.Last() == '/' ? path.Substring(0, path.Length - 1) : path;
 
                 Dictionary<string, object>? claims = await userUtility.GetAuthClaimFromJWT(context);
 

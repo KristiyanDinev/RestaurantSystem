@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
+using RestaurantSystem.Utilities;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Models.WebSockets;
-using System.Net.WebSockets;
 
 namespace RestaurantSystem.Services
 {
@@ -12,14 +11,12 @@ namespace RestaurantSystem.Services
         private DatabaseContext _databaseContext;
         private OrderedDishesService _orderedDishesDatabaseHandler;
 
-        private List<OrderWebSocketModel> OrderWebSockets;
-
         public OrderService(DatabaseContext databaseContext, 
-            OrderedDishesService orderedDishesDatabaseHandler)
+            OrderedDishesService orderedDishesDatabaseHandler,
+            WebSocketUtility webSocketUtility)
         {
             _databaseContext = databaseContext;
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;
-            OrderWebSockets = new List<OrderWebSocketModel>();
         }
 
         public async Task<OrderModel?> AddOrder(int userId, int restaurantId,
@@ -117,25 +114,5 @@ namespace RestaurantSystem.Services
                 .FirstOrDefaultAsync(order => order.Id == orderId);
         }
 
-        public void AddOrdersToListenTo(List<int> orderIds, WebSocket socket)
-        {
-            if (OrderWebSockets.Any(order => order.Socket.Equals(socket)))
-            {
-                return;
-            }
-
-            OrderWebSockets.Add(new OrderWebSocketModel()
-            {
-                Socket = socket,
-                OrderIds = orderIds
-            });
-        }
-
-        public List<WebSocket> GetListenersForOrderId(int order_id)
-        {
-            return OrderWebSockets
-                .Where(order => order.OrderIds.Contains(order_id))
-                .Select(order => order.Socket).ToList();
-        }
     }
 }

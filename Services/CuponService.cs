@@ -51,7 +51,7 @@ namespace RestaurantSystem.Services
 
         public decimal HandleCuponDiscount(int discountPercent, decimal totalPrice)
         {
-            return totalPrice - (totalPrice / discountPercent);
+            return totalPrice - (totalPrice * (discountPercent / 100));
         }
     }
 }

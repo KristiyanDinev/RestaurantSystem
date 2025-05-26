@@ -69,10 +69,7 @@
 
     <p>Total Price (not counting discounted price): @sum</p>
 
-    @if (ViewData["Error"] != null)
-    {
-        <p>Error: @ViewData["Error"]</p>
-    }
+    <p id="error"></p>
 
     <div class="start_order noselect">
         <button onclick="startOrder()">Order</button>

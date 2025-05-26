@@ -50,6 +50,7 @@ namespace RestaurantSystem
             builder.Services.AddScoped<Utility>();
             builder.Services.AddScoped<UserUtility>();
             builder.Services.AddScoped<WebSocketService>();
+            builder.Services.AddSingleton<WebSocketUtility>();
 
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options => {

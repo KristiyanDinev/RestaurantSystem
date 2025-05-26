@@ -24,11 +24,9 @@ async function startOrder() {
     })
 
     if (res.status == 200) {
-        alert("Ordered successfully.")
         window.location.pathname = "/orders"
 
     } else {
-        alert("Couldn't start your order.")
-        //document.getElementById("cupon_input").value = ""
+        document.getElementById("error").value = "Error: Couldn't start your order."
     }
 }

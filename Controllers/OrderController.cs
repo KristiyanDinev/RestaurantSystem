@@ -64,24 +64,6 @@ namespace RestaurantSystem.Controllers {
         }
 
 
-        [HttpGet]
-        [Route("/order/{orderId}")]
-        public async Task<IActionResult> Order(int orderId)
-        {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-
-            return View(new OrderViewModel()
-            {
-                User = user,
-                Order = await _orderService.GetOrderById(orderId)
-            });
-        }
-
-
         [HttpPost]
         [Route("/order/start")]
         public async Task<IActionResult> OrderStart([FromForm] OrderFormModel order)
@@ -131,7 +113,9 @@ namespace RestaurantSystem.Controllers {
             {
                 return BadRequest();
             }
+
             HttpContext.Response.Cookies.Delete("cart_items");
+            TempData["Success"] = "Ordered successful";
             return Ok();
         }
 

@@ -1,65 +1,71 @@
-var socket = null
-var registeredOrders = []
+let socket = null;
+const registeredOrders = [];
 
+// Update only the dish status for a specific order and dish
 async function setStatus(orderId, dishId, status) {
-    if (socket == null) {
+    if (!socket) return;
+
+    const formData = new FormData();
+    formData.append('OrderId', Number(orderId));
+    formData.append('OrderCurrentStatus', '');
+    formData.append('DishId', Number(dishId));
+    formData.append('DishCurrentStatus', status);
+
+    try {
+        const res = await fetch(`${getDataFromLocalStorage("Host")}/staff/dishes/`, {
+            method: 'POST',
+            body: formData,
+            redirect: 'follow'
+        });
+
+        const elementId = res.status === 200
+            ? `success,${orderId},${dishId}`
+            : `error,${orderId},${dishId}`;
+
+        const message = res.status === 200
+            ? `Successfully updated the dish status to ${status}`
+            : `Can't update dish status`;
+
+        document.getElementById(elementId).innerHTML = message;
+    } catch (error) {
+        console.error('Error updating dish status:', error);
+        document.getElementById(`error,${orderId},${dishId}`).innerHTML = "Can't update dish status";
+    }
+}
+
+// WebSocket open event handler
+function onopen() {
+    if (registeredOrders.length == 0) {
+        socket.close()
         return
     }
-
-    /*
-
-    update only the dish status
-
-        public required int OrderId { get; set; }
-        public string? OrderCurrentStatus { get; set; }
-
-        public int? DishId { get; set; }
-        public string? DishCurrentStatus { get; set; }
-        */
-
-    let formData = new FormData()
-    formData.append('OrderId', Number(orderId))
-    formData.append('OrderCurrentStatus', null)
-    formData.append('DishId', Number(dishId))
-    formData.append('DishCurrentStatus', status)
-
-    const res = await fetch(getDataFromLocalStorage("Host") + '/staff/dishes/', {
-        method: 'POST',
-        body: formData,
-        redirect: 'follow'
-    })
-
-    if (res.status === 200) {
-        // document.getElementById('error').innerHTML = 'Error: ' + res.statusText
-        //document.getElementById("error," + orderId + "," + dishId).innerHTML = "Status of dish is not updated!"
-
-    }
-
-    //document.getElementById("dishstatus," + orderId + "," + dishId).innerHTML = "Dish Status: " + status
+    socket.send(JSON.stringify({ orders: registeredOrders }));
 }
 
-function onopen() {
-    socket.send('{"orders": [' + registeredOrders + ']}')
-}
+// WebSocket close event handler (currently empty)
+function onclose() { }
 
-function onclose() {
-}
-
+// WebSocket message event handler
 function onmessage(event) {
-    const data = event.data
-    if (data.length == 0) {
-        return;
+    if (!event.data) return;
+
+    const obj = JSON.parse(event.data);
+
+    if (!registeredOrders.includes(Number(obj.OrderId))) return;
+
+    if (obj.OrderCurrentStatus) {
+        document.getElementById(`orderstatus,${obj.OrderId}`).innerHTML = `CurrentStatus: ${obj.OrderCurrentStatus}`;
     }
 
-    // convert this to a json.
+    if (obj.DishId && obj.DishCurrentStatus) {
+        document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`).innerHTML = `Dish Status: ${obj.DishCurrentStatus}`;
+    }
 }
 
-function onerror(event) {
-}
+// WebSocket error event handler (currently empty)
+function onerror(event) { }
 
-
-
+// Start the WebSocket connection
 function startWebSocket() {
-    socket = startOrderWebSocket(onopen, onclose, onerror, onmessage)
+    socket = startOrderWebSocket(onopen, onclose, onerror, onmessage);
 }
-

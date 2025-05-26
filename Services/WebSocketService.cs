@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using RestaurantSystem.Utilities;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
@@ -10,11 +11,11 @@ namespace RestaurantSystem.Services
     {
         // Dictionary of endpoint -> set of sockets
         private ConcurrentDictionary<string, ConcurrentBag<WebSocket>> _endpointSockets = new();
-        private OrderService _orderService;
+        private WebSocketUtility _webSocketUtility;
 
-        public WebSocketService(OrderService orderService)
+        public WebSocketService(WebSocketUtility webSocketUtility)
         {
-            _orderService = orderService;
+            _webSocketUtility = webSocketUtility;
         }
 
         private void HandleJsonMessages(Dictionary<string, object> data, WebSocket socket)
@@ -29,7 +30,7 @@ namespace RestaurantSystem.Services
                     return;
                 }
 
-                _orderService.AddOrdersToListenTo(ids, socket);
+                _webSocketUtility.AddOrdersToListenTo(ids, socket);
             }
         }
 
@@ -102,7 +103,7 @@ namespace RestaurantSystem.Services
             {
                 if (!socket.State.Equals(WebSocketState.Open))
                 {
-                    return;
+                    continue;
                 }
 
                 string json = JsonSerializer.Serialize(data);

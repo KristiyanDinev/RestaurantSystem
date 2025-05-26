@@ -1,68 +1,74 @@
-var socket = null
-var registeredOrders = [];
+let socket = null
+const registeredOrders = [];
 
+// WebSocket open event handler
 function onopen() {
     if (registeredOrders.length == 0) {
         socket.close()
         return
     }
-    socket.send('{"orders": [' + registeredOrders +']}')
+    socket.send(JSON.stringify({ orders: registeredOrders }));
 }
 
+// WebSocket close event handler (currently empty)
 function onclose() {
 }
 
+// WebSocket message event handler
 function onmessage(event) {
     const data = event.data
     if (data.length == 0) {
         return
     }
 
-    // convert this to a json.
-    //   public required int OrderId { get; set; }
-    //    public string ? OrderCurrentStatus { get; set; }
-
-    //    public int ? DishId { get; set; }
-    //    public string ? DishCurrentStatus { get; set; }
-
     const obj = JSON.parse(data)
-    if (!regiseredOrders.includes(Number(obj.OrderId))) {
+
+    if (!registeredOrders.includes(Number(obj.OrderId))) {
         return
     }
 
-    if (obj.OrderCurrentStatus !== null && obj.OrderCurrentStatus !== undefined) {
-        document.getElementById("orderstatus_" + obj.OrderId).innerHTML = "CurrentStatus: " + obj.OrderCurrentStatus
+    if (obj.OrderCurrentStatus) {
+        document.getElementById(`orderstatus,${obj.OrderId}`)
+            .innerHTML = "CurrentStatus: " + obj.OrderCurrentStatus
     }
 
-    if ((obj.DishId !== null && obj.DishId !== undefined) &&
-        (obj.DishCurrentStatus !== null && obj.DishCurrentStatus !== undefined)) {
-        document.getElementById("dishstatus_" + obj.OrderId + " " + obj.DishId).innerHTML = "CurrentStatus: " + obj.DishCurrentStatus
+    if (obj.DishId && obj.DishCurrentStatus) {
+        document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`)
+            .innerHTML = "CurrentStatus: " + obj.DishCurrentStatus
     }
 }
 
+// WebSocket error event handler (currently empty)
 function onerror(event) {
 }
 
+
+// Start the WebSocket connection
 function startWebSocket() {
     socket = startOrderWebSocket(onopen, onclose, onerror, onmessage)
 }
 
-
+// Cancel an order by its ID
 async function cancelOrder(id) {
     if (!confirm("Do you really want to cancel the order?")) {
-        return;
+        return
     }
 
-    const res = await fetch(getDataFromLocalStorage("Host") + '/order/stop/'+id, {
-        method: 'POST',
-        redirect: 'follow'
-    })
+    try {
+        const res = await fetch(getDataFromLocalStorage("Host") + '/order/stop/' + id, {
+            method: 'POST',
+            redirect: 'follow'
+        })
 
-    if (res.status !== 200) {
-        alert("Can't stop the order")
-        return;
+        if (res.status !== 200) {
+            document.getElementById(`error,${id}`).innerHTML = "Can't cancel order";
+            return
+        }
+
+        window.location.pathname = '/orders';
+
+    } catch {
+        console.error('Error updating dish status:', error);
+        document.getElementById(`error,${id}`).innerHTML = "Can't cancel order";
     }
-
-    alert("Stopped the order")
-    registeredOrders = registeredOrders.filter(orderId => orderId !== Number(id));
 }

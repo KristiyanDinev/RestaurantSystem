@@ -6,6 +6,8 @@
     ViewData["Title"] = "Cook";
 }
 
+<!DOCTYPE html>
+
 <head>
     @await Html.PartialAsync("_Imports")
 
@@ -34,16 +36,6 @@
         <h1>No Dishes to cook.</h1>
     }
 
-    @if (TempData["Error"] != null)
-    {
-        <p>Error: @TempData["Error"]</p>
-    }
-
-    @if (TempData["Success"] != null)
-    {
-        <p>Success: @TempData["Success"]</p>
-    }
-
     <div>
         @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.OrderWithDishesCount)
         {
@@ -55,7 +47,7 @@
 
             <div class="order_view">
 
-                <p class="status" id="status_@order.Id">
+                <p class="status" id="orderstatus,@order.Id">
                     CurrentStatus: @order.CurrentStatus
                 </p>
 
@@ -93,6 +85,7 @@
                         <p class="price">@dishWithStatus.Dish.Price lv.</p>
 
                         <p id="error,@order.Id,@dishWithStatus.Dish.Id"></p>
+                        <p id="success,@order.Id,@dishWithStatus.Dish.Id"></p>
 
                         @if (dishWithStatus.OrderedDish.CurrentStatus.Equals("pending"))
                         {

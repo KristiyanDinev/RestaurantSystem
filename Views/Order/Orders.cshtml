@@ -21,9 +21,9 @@
 
     <h1>Orders</h1>
 
-    @if (TempData["StartedOrder"] != null)
+    @if (TempData["Success"] != null)
     {
-        <h3>@TempData["StartedOrder"]</h3>
+        <h3>@TempData["Success"]</h3>
     }
 
     <div id="orders">
@@ -34,7 +34,7 @@
             </script>
 
             <div class="order_view">
-                <p class="status" id="orderstatus_@orderWithDish.Order.Id">CurrentStatus: @orderWithDish.Order.CurrentStatus</p>
+                <p class="status" id="orderstatus,@orderWithDish.Order.Id">CurrentStatus: @orderWithDish.Order.CurrentStatus</p>
 
                 <div class="notes_view">
                     <p class="notes_title">Notes: </p>
@@ -44,7 +44,7 @@
                 <div class="dish_list">
                     @foreach (DishWithStatusModel dishWithStatus in orderWithDish.DishesCount.Keys)
                     {
-                        <p id="dishstatus_@orderWithDish.Order.Id @dishWithStatus.Dish.Id">
+                        <p id="dishstatus,@orderWithDish.Order.Id,@dishWithStatus.Dish.Id">
                             Current Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
 
                         <p class="list_dish"> x @orderWithDish.DishesCount[dishWithStatus] 
@@ -67,6 +67,7 @@
 
                 } else
                 {
+                    <p id="error,@orderWithDish.Order.Id"></p>
                     <button class="cancel noselect"
                     style="opacity: 100%"
                             onclick="cancelOrder('@orderWithDish.Order.Id')">

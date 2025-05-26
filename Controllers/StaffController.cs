@@ -24,13 +24,15 @@ namespace RestaurantSystem.Controllers
         private ReservationService _reservationService;
         private UserService _userService;
         private WebSocketService _webSocketService;
+        private WebSocketUtility _webSocketUtility;
 
         public StaffController(UserUtility userUtils,
             Utility _utils, OrderService orderService, 
             RestaurantService restaurantService,
             OrderedDishesService orderedDishesService, 
             ReservationService reservationService,
-            UserService userService, WebSocketService webSocketService)
+            UserService userService, WebSocketService webSocketService, 
+            WebSocketUtility webSocketUtility)
         {
             _userUtils = userUtils;
             _orderService = orderService;
@@ -39,6 +41,7 @@ namespace RestaurantSystem.Controllers
             _reservationService = reservationService;
             _userService = userService;
             _webSocketService = webSocketService;
+            _webSocketUtility = webSocketUtility;
         }
 
         [HttpGet]
@@ -104,7 +107,7 @@ namespace RestaurantSystem.Controllers
                 return BadRequest();
             }
 
-            string updateMessage = "Updated ";
+            bool updated = false;
 
             if (orderUpdateFormModel.OrderCurrentStatus != null)
             {
@@ -114,11 +117,10 @@ namespace RestaurantSystem.Controllers
                     return BadRequest();
                 }
 
-                updateMessage += "order's current status: " + orderUpdateFormModel.DishCurrentStatus+". ";
+                updated = true;
             }
 
-            if (orderUpdateFormModel.DishCurrentStatus != null &&
-                orderUpdateFormModel.DishId != null)
+            if (orderUpdateFormModel.DishCurrentStatus != null)
             {
 
                 if(!(await _orderedDishesService.UpdateOrderedDishStatusById((int)orderUpdateFormModel.DishId,
@@ -127,18 +129,18 @@ namespace RestaurantSystem.Controllers
                     return BadRequest();
                 }
 
-                updateMessage += "dish current status: " + orderUpdateFormModel.DishCurrentStatus+". ";
+                updated = true;
             }
 
-            if (updateMessage.Length <= 8)
+            if (!updated)
             {
                 return BadRequest();
             }
 
             await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
-                     _orderService.GetListenersForOrderId(orderUpdateFormModel.OrderId));
-
-            return Ok(updateMessage);
+                     _webSocketUtility.GetListenersForOrderId(orderUpdateFormModel.OrderId));
+            // make sure to handle the order status, before giving the OK response.
+            return Ok();
         }
 
 
