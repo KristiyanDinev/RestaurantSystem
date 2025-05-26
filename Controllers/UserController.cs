@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
@@ -55,7 +54,6 @@ namespace RestaurantSystem.Controllers {
         {
             if (!ModelState.IsValid)
             {
-                TempData["Login"] = loginFormModel;
                 return BadRequest();
             }
 

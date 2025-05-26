@@ -59,15 +59,21 @@ function submit() {
     formData.append("PostalCode", document.getElementById("PostalCode").value)
     formData.append("RememberMe", document.querySelector('#RememberMe:checked') !== null)
 
-    fetch(getDataFromLocalStorage("Host") + "/register", {
-        method: "POST",
-        body: formData,
-        redirect: 'follow',
-        
-    }).then((res) => {
-        if (res.status == 200) {
-            window.location.pathname = "/restaurants"
-        }
-    })
+    try {
+        fetch(getDataFromLocalStorage("Host") + "/register", {
+            method: "POST",
+            body: formData,
+            redirect: 'follow',
 
+        }).then((res) => {
+            if (res.status == 200) {
+                window.location.reload()
+                return
+            }
+
+            document.getElementById("Stats").innerHTML = "Invalid register"
+        })
+    } catch {
+        console.error("Error during register request");
+    }
 }

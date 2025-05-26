@@ -17,14 +17,21 @@ async function submit() {
     formData.append("Email", email.value)
     formData.append("RememberMe", document.querySelector('#RememberMe:checked') !== null)
 
-    const res = await fetch(getDataFromLocalStorage("Host") + "/login", {
-        method: "POST",
-        body: formData,
-        redirect: 'follow',
-    })
+    try {
+        const res = await fetch(getDataFromLocalStorage("Host") + "/login", {
+            method: "POST",
+            body: formData,
+            redirect: 'follow',
+        })
 
-    if (res.status === 200) {
-        window.location.reload()
+        if (res.status === 200) {
+            window.location.reload()
+            return
+        }
+
+        document.getElementById("Stats").innerHTML = "Invalid login"
+
+    } catch {
+        console.error("Error during login request");
     }
-
 }

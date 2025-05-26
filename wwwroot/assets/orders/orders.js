@@ -1,6 +1,30 @@
 let socket = null
 const registeredOrders = [];
 
+
+const Status = {
+    Pending: "Pending",
+    Preparing: "Preparing",
+    Ready: "Ready"
+};
+
+// helper function
+function setCancelButton(orderId, status) {
+    const btn = document.getElementById(`cancel,${orderId}`);
+    btn.className = "cancel noselect";
+
+    if (status.toLowerCase() !== Status.Pending.toLowerCase()) {
+        btn.style = "opacity: 50%";
+        btn.innerHTML = "Can't Cancel Order";
+        return
+    }
+    btn.style = "opacity: 100%";
+    btn.innerHTML = "Cancel";
+    btn.onclick = () => cancelOrder(orderId);
+}
+
+
+
 // WebSocket open event handler
 function onopen() {
     if (registeredOrders.length == 0) {
@@ -36,6 +60,8 @@ function onmessage(event) {
         document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`)
             .innerHTML = "CurrentStatus: " + obj.DishCurrentStatus
     }
+
+    setCancelButton(obj.OrderId, obj.OrderCurrentStatus)
 }
 
 // WebSocket error event handler (currently empty)

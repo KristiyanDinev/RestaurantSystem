@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
@@ -109,21 +110,11 @@ namespace RestaurantSystem.Controllers
 
             bool updated = false;
 
-            if (orderUpdateFormModel.OrderCurrentStatus != null)
-            {
-                if (!(await _orderService.UpdateOrderCurrentStatusById((int)orderUpdateFormModel.OrderId,
-                orderUpdateFormModel.OrderCurrentStatus)))
-                {
-                    return BadRequest();
-                }
-
-                updated = true;
-            }
-
             if (orderUpdateFormModel.DishCurrentStatus != null)
             {
 
-                if(!(await _orderedDishesService.UpdateOrderedDishStatusById((int)orderUpdateFormModel.DishId,
+                if(!(await _orderedDishesService
+                    .UpdateOrderedDishStatusById((int)orderUpdateFormModel.DishId,
                     orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus)))
                 {
                     return BadRequest();
@@ -131,15 +122,41 @@ namespace RestaurantSystem.Controllers
 
                 updated = true;
             }
+           
+            List<string> status = await _orderedDishesService
+                .GetDishCurrectStatus(orderUpdateFormModel.OrderId);
+
+            string orderStatus;
+
+            string ready = Status.Ready.ToString();
+            string preparing = Status.Preparing.ToString();
+
+            if (status.All(s => s.Equals(ready, StringComparison.OrdinalIgnoreCase)))
+            {
+                orderStatus = ready;
+
+            }
+            else if (status.Any(s => s.Equals(preparing, StringComparison.OrdinalIgnoreCase))) {
+                orderStatus = preparing;
+
+            } else
+            {
+                orderStatus = Status.Pending.ToString();
+            }
+
+            updated = updated && await _orderService
+                .UpdateOrderCurrentStatusById(orderUpdateFormModel.OrderId, orderStatus);
 
             if (!updated)
             {
                 return BadRequest();
             }
 
+            orderUpdateFormModel.OrderCurrentStatus = orderStatus;
+
             await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
                      _webSocketUtility.GetListenersForOrderId(orderUpdateFormModel.OrderId));
-            // make sure to handle the order status, before giving the OK response.
+            
             return Ok();
         }
 

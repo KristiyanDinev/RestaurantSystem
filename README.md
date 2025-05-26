@@ -103,9 +103,7 @@ Staff endpoints:
 
 ### TODO
 
-- Fix `/wwwroot/assets/staff/cook/cook.js` to send the correct data.
-- Let all elements thata are handles by JS be in good format.
-- Refactor the Views and JS.
+- Add profile access even on the restaurant part.
 
 ### Add test data
 *Note: Make sure that this will be the first data inserted in the tables in the database.*

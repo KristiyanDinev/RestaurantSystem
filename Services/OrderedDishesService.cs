@@ -60,6 +60,14 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
+        public async Task<List<string>> GetDishCurrectStatus(int orderId)
+        {
+            return await _databaseContext.OrderedDishes
+                .Where(order => order.OrderId == orderId)
+                .Select(orderedDish => orderedDish.CurrentStatus)
+                .ToListAsync();
+        }
+
         /*
          * Converts OrderedDishes to a list of dishes.
          */

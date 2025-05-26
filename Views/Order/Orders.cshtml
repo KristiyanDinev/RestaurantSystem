@@ -21,17 +21,14 @@
 
     <h1>Orders</h1>
 
-    @if (TempData["Success"] != null)
+    @if (TempData["OrderedSuccess"] != null)
     {
-        <h3>@TempData["Success"]</h3>
+        <h3>Ordered successful</h3>
     }
 
     <div id="orders">
         @foreach (OrderWithDishesCountModel orderWithDish in Model.Orders)
         {
-            <script>
-                registeredOrders.push(Number(@orderWithDish.Order.Id))
-            </script>
 
             <div class="order_view">
                 <p class="status" id="orderstatus,@orderWithDish.Order.Id">CurrentStatus: @orderWithDish.Order.CurrentStatus</p>
@@ -47,6 +44,11 @@
                         <p id="dishstatus,@orderWithDish.Order.Id,@dishWithStatus.Dish.Id">
                             Current Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
 
+                        @if (dishWithStatus.Dish.Image != null)
+                        {
+                            <img src="@dishWithStatus.Dish.Image" class="food_image"/>
+                        }
+
                         <p class="list_dish"> x @orderWithDish.DishesCount[dishWithStatus] 
                             @dishWithStatus.Dish.Name : @dishWithStatus.Dish.AvrageTimeToCook</p>
                     }
@@ -60,22 +62,16 @@
                 </p>
 
                 <p class="part">Ordered At: @orderWithDish.Order.OrderedAt.ToString()</p>
+                <p id="error,@orderWithDish.Order.Id"></p>
 
-                @if (!orderWithDish.Order.CurrentStatus.Equals("pending"))
-                {
-                    <button class="cancel noselect" style="opacity: 50%">Can't Stop Order</button>
-
-                } else
-                {
-                    <p id="error,@orderWithDish.Order.Id"></p>
-                    <button class="cancel noselect"
-                    style="opacity: 100%"
-                            onclick="cancelOrder('@orderWithDish.Order.Id')">
-                        Cancel
-                    </button>
-                }
+                <button id="cancel,@orderWithDish.Order.Id"></button>
 
             </div>
+
+            <script>
+                registeredOrders.push(Number(@orderWithDish.Order.Id))
+                setCancelButton('@orderWithDish.Order.Id', '@orderWithDish.Order.CurrentStatus')
+            </script>
         }
     </div>
 

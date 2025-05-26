@@ -1,5 +1,13 @@
-﻿@{
+﻿@using RestaurantSystem.Models.Form;
+
+@{
     ViewData["Title"] = "Login";
+    LoginFormModel login = TempData["Login"] as LoginFormModel ?? new LoginFormModel()
+    {
+                Email = string.Empty,
+                Password = string.Empty,
+                RememberMe = false
+    };
 }
 
 
@@ -18,13 +26,13 @@
     <div class="login">
 
         <label>Email</label>
-        <input type="email" id="Email" maxlength="50" placeholder="Email" required>
+        <input type="email" id="Email" maxlength="50" placeholder="Email" value="@login.Email" required>
         <br>
         <label>Password</label>
-        <input type="password" id="Password" placeholder="Password" required>
+        <input type="password" id="Password" placeholder="Password" value="@login.Password" required>
         <br>
         <label>Remember Me?</label>
-        <input type="checkbox" id="RememberMe">
+        <input type="checkbox" id="RememberMe" value="@login.RememberMe">
         <br>
         <p id="Stats"></p>
         <br>

@@ -1,5 +1,6 @@
 ﻿@using RestaurantSystem.Models;
 @using RestaurantSystem.Models.DatabaseModels;
+@using RestaurantSystem.Enums;
 @model RestaurantSystem.Models.View.Admin.DishesViewModel
 
 @{
@@ -77,7 +78,7 @@
 
                         @if (dishWithStatus.Dish.Image != null)
                         {
-                            <img src="~@dishWithStatus.Dish.Image" class="image" alt="No image for now">
+                            <img src="@dishWithStatus.Dish.Image" class="image" alt="No image for now">
                         }
 
                         <p class="avg_time_to_took">Avrage time to cook: @dishWithStatus.Dish.AvrageTimeToCook minute/s</p>
@@ -87,35 +88,45 @@
                         <p id="error,@order.Id,@dishWithStatus.Dish.Id"></p>
                         <p id="success,@order.Id,@dishWithStatus.Dish.Id"></p>
 
-                        @if (dishWithStatus.OrderedDish.CurrentStatus.Equals("pending"))
-                        {
-                            <button class="order noselect"
-                            onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', 'preparing')">
-                                Start cooking
-                            </button>
-                        }
-                        else if (dishWithStatus.OrderedDish.CurrentStatus.Equals("preparing"))
-                        {
-                            <div class="row noselect">
-                                <button class="undo"
-                                onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', 'pending')">
+                        <div class="row noselect" 
+                            id="dish_buttons,@dishWithStatus.OrderedDish.OrderId,@dishWithStatus.OrderedDish.DishId">
+
+                        @{
+                            string pending = Status.Pending.ToString().ToLower();
+                            string preparing = Status.Preparing.ToString().ToLower();
+                            string ready = Status.Ready.ToString().ToLower();
+
+                            @if (dishWithStatus.OrderedDish.CurrentStatus.Equals(pending, StringComparison.OrdinalIgnoreCase))
+                            {
+                                <button class="order noselect"
+                                        onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">
+                                    Start cooking
+                                </button>
+                            }
+                            else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(preparing, StringComparison.OrdinalIgnoreCase))
+                            {
+                                <div class="row noselect">
+                                    <button class="undo"
+                                    onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@pending')">
+                                        UnDo
+                                    </button>
+
+                                    <button class="order"
+                                            onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@ready')">
+                                        Dish Ready
+                                    </button>
+                                </div>
+
+                            }
+                            else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(ready, StringComparison.OrdinalIgnoreCase))
+                            {
+                                <button class="undo noselect"
+                                        onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">
                                     UnDo
                                 </button>
-
-                                <button class="order"
-                                onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', 'ready')">
-                                    Ready
-                                </button>
-                            </div>
-
+                            }
                         }
-                        else if (dishWithStatus.OrderedDish.CurrentStatus.Equals("ready"))
-                        {
-                            <button class="undo noselect"
-                                    onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', 'preparing')">
-                                UnDo
-                            </button>
-                        }
+                        </div>
                     </div>
                 }
             </div>

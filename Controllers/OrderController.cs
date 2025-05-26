@@ -115,7 +115,7 @@ namespace RestaurantSystem.Controllers {
             }
 
             HttpContext.Response.Cookies.Delete("cart_items");
-            TempData["Success"] = "Ordered successful";
+            TempData["OrderedSuccess"] = true;
             return Ok();
         }
 
