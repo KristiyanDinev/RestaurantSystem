@@ -55,43 +55,8 @@ namespace RestaurantSystem.Controllers
         }
 
 
-        [HttpGet]
-        [Route("/reservations")]
-        public async Task<IActionResult> Reservations()
-        {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-
-            return View(new ReservationsViewModel()
-            {
-                User = user,
-                Reservations = await _reservationService.GetReservationsByUserId(user.Id)
-            });
-        }
-
-
-        [HttpGet]
-        [Route("/reservation/{reservationId}")]
-        public async Task<IActionResult> ReservationById(int reservationId) {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-
-            return View(new ReservationViewModel()
-            {
-                User = user,
-                Reservation = await _reservationService.GetReservationById(reservationId)
-            });
-        }
-
-
         [HttpPost]
-        [Route("/reservation/Create")]
+        [Route("/reservation")]
         public async Task<IActionResult> ReservationCreate(
             [FromForm] ReservationFormModel reservationFormModel)
         {
@@ -116,8 +81,26 @@ namespace RestaurantSystem.Controllers
         }
 
 
+        [HttpGet]
+        [Route("/reservations")]
+        public async Task<IActionResult> Reservations()
+        {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            return View(new ReservationsViewModel()
+            {
+                User = user,
+                Reservations = await _reservationService.GetReservationsByUserId(user.Id)
+            });
+        }
+
+
         [HttpPost]
-        [Route("/reservation/Delete/{reservationId}")]
+        [Route("/reservation/delete/{reservationId}")]
         public async Task<IActionResult> ReservationDelete(int reservationId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
