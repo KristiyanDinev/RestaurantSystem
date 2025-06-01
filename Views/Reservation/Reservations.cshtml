@@ -1,0 +1,68 @@
+﻿@using RestaurantSystem.Enums;
+@using RestaurantSystem.Models.DatabaseModels;
+@model RestaurantSystem.Models.View.Reservation.ReservationsViewModel;
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+
+<!DOCTYPE html>
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/reservations/reservations.css'>
+
+    @await Html.PartialAsync("_Imports")
+
+    <script src='~/assets/reservations/reservations.js'></script>
+</head>
+
+
+<body>
+    @await Html.PartialAsync("_NavBar", Model.User)
+
+    <div class="reservation_navigation">
+        <button onclick="goToReservationsToCreate()">Create</button>
+    </div>
+
+    <h1>Reservations</h1>
+
+    @if (TempData["ReservationSuccessfull"] != null)
+    {
+        <p>Reservation created successfully.</p>
+
+    } else if (TempData["CanceledSuccessfull"] != null)
+    {
+        <p>Reservation canceled successfully.</p>
+    }
+
+    <div id="reservations">
+
+            @foreach (ReservationModel reservation in Model.Reservations)
+            {
+                <div class="reservation-card">
+                    <p>At Date: @reservation.At_Date</p>
+                    <p>Current Status: @reservation.CurrentStatus</p>
+
+                    <p>Adults: @reservation.Amount_Of_Adults</p>
+                    <p>Children: @reservation.Amount_Of_Children</p>
+
+                    <div class="notes_view">
+                        <p class="notes_title">Notes:</p>
+                        <p class="notes">@reservation.Notes</p>
+                    </div>
+
+                    <p id="error,@reservation.Id"></p>
+
+                    @if (reservation.CurrentStatus.Equals(Status.Pending.ToString(), 
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <button class="cancel noselect" onclick="cancelReservation('@reservation.Id')">Cancel</button>
+
+                    } else
+                    {
+                        <button class="cancel noselect" style="opacity: 50%;">Can't Cancel</button>
+                    }
+            </div>
+            }
+    </div>
+</body>

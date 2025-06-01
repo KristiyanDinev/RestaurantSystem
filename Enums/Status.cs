@@ -6,5 +6,7 @@
         Preparing = 1,
         Ready = 2,
         Delivered = 3,
+        Accepted = 4,
+        Cancelled = 5,
     }
 }

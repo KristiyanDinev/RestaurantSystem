@@ -57,7 +57,9 @@ namespace RestaurantSystem.Services
         public async Task<bool> CheckForReservation(ReservationModel reservation)
         {
             return await _databaseContext.Restaurants.FirstOrDefaultAsync(
-                restaurant => restaurant.ServeCustomersInPlace &&
+                restaurant => 
+                restaurant.ServeCustomersInPlace &&
+                restaurant.Id == reservation.RestaurantId &&
 
                 restaurant.ReservationMinAdults <= reservation.Amount_Of_Adults &&
                 restaurant.ReservationMaxAdults >= reservation.Amount_Of_Adults

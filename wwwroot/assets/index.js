@@ -65,7 +65,6 @@ function startOrderWebSocket(onopen, onclose, onerror, onmessage) {
         onopen, onclose, onerror, onmessage)
 }
 
-
 function goToProfile() {
     window.location.pathname = "/profile"
 }

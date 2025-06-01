@@ -28,7 +28,7 @@ namespace RestaurantSystem.Services
                 Notes = notes != null && notes.Replace(" ", "").Length == 0 ? null : notes,
                 RestaurantId = restaurantId,
                 CurrentStatus = _databaseContext.DefaultOrder_CurrentStatus,
-                TotalPrice = totalPrice,
+                TotalPrice = decimal.Parse($"{totalPrice:F2}"),
                 UserId = userId,
                 TableNumber = tableNumber
             };

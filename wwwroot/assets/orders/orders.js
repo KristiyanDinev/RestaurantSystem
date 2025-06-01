@@ -81,7 +81,7 @@ async function cancelOrder(id) {
     }
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") + '/order/stop/' + id, {
+        const res = await fetch(getDataFromLocalStorage("Host") + '/order/cancel/' + id, {
             method: 'POST',
             redirect: 'follow'
         })

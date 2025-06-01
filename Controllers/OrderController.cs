@@ -121,7 +121,7 @@ namespace RestaurantSystem.Controllers {
 
 
         [HttpPost]
-        [Route("/order/stop/{orderId}")]
+        [Route("/order/cancel/{orderId}")]
         public async Task<IActionResult> OrderStop(int orderId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -130,9 +130,9 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            if (!(await _orderService.DeleteOrder(orderId)))
+            if (await _orderService.DeleteOrder(orderId))
             {
-                return BadRequest();
+                return Ok();
             }
 
             return BadRequest();

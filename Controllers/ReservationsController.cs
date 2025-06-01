@@ -31,6 +31,7 @@ namespace RestaurantSystem.Controllers
 
         [HttpGet]
         [Route("/reservation")]
+        [Route("/reservation/index")]
         public async Task<IActionResult> Reservation()
         {
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
@@ -74,10 +75,16 @@ namespace RestaurantSystem.Controllers
                 return BadRequest();
             }
 
-            return await _reservationService.CreateReservation(user.Id, restaurant.Id,
+            if (await _reservationService.CreateReservation(user.Id, restaurant.Id,
                 reservationFormModel.Amount_Of_Adults, reservationFormModel.Amount_Of_Children,
                 reservationFormModel.At_Date, reservationFormModel.Notes)
-                != null ? Ok() : BadRequest();
+                != null)
+            {
+                TempData["ReservationSuccessfull"] = true;
+                return Ok();
+            }
+
+            return BadRequest();
         }
 
 
@@ -100,7 +107,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpPost]
-        [Route("/reservation/delete/{reservationId}")]
+        [Route("/reservation/cancel/{reservationId}")]
         public async Task<IActionResult> ReservationDelete(int reservationId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -109,8 +116,13 @@ namespace RestaurantSystem.Controllers
                 return BadRequest();
             }
 
-            return await _reservationService.DeleteReservation(reservationId)
-                ? Ok() : BadRequest();
+            if (await _reservationService.DeleteReservation(reservationId))
+            {
+                TempData["CanceledSuccessfull"] = true;
+                return Ok();
+            }
+
+            return BadRequest();
         }
     }
 }

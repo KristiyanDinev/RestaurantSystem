@@ -16,10 +16,6 @@
         public required int ReservationMaxAdults { get; set; }
         public required int ReservationMinAdults { get; set; }
 
-        public required decimal Price_Per_Adult { get; set; }
-
-        public required decimal Price_Per_Children { get; set; }
-
 
         // navigation
         public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();

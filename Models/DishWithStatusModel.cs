@@ -9,13 +9,21 @@ namespace RestaurantSystem.Models
 
         public override int GetHashCode()
         {
-            return (OrderedDish.DishId, OrderedDish.OrderId, 
-                OrderedDish.CurrentStatus, OrderedDish.Notes).GetHashCode();
+            return $"{OrderedDish.DishId},{OrderedDish.OrderId},{OrderedDish.CurrentStatus},{OrderedDish.Notes}"
+                .GetHashCode();
         }
 
         public override bool Equals(object? other)
         {
-            return this.GetHashCode().Equals(other?.GetHashCode());
+            if (other is not DishWithStatusModel otherModel)
+            {
+                return false;
+            }
+
+            return this.OrderedDish.DishId == otherModel.OrderedDish.DishId &&
+                   this.OrderedDish.OrderId == otherModel.OrderedDish.OrderId &&
+                   this.OrderedDish.CurrentStatus == otherModel.OrderedDish.CurrentStatus &&
+                   this.OrderedDish.Notes == otherModel.OrderedDish.Notes;
         }
     }
 }

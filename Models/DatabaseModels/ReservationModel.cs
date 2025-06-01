@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string? Notes { get; set; }
         public required string CurrentStatus { get; set; }
+        public decimal TotalPrice { get; set; } // default 0.00
 
 
         public required int UserId { get; set; }

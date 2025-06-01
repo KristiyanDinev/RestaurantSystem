@@ -4,7 +4,6 @@ namespace RestaurantSystem.Models.View.Order
 {
     public class OrdersViewModel
     {
-        public string? StartedOrder { get; set; }
 
         public required UserModel User { get; set; }
 

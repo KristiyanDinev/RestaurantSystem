@@ -11,8 +11,8 @@ namespace RestaurantSystem.Models.View.Reservation
     // to have selected a restaurant.
     public class ReservationFormViewModel
     {
-        public UserModel? User { get; set; }
+        public required UserModel User { get; set; }
 
-        public RestaurantModel? Restaurant { get; set; }
+        public required RestaurantModel Restaurant { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
 
-namespace RestaurantSystem.Models.View.Admin
+namespace RestaurantSystem.Models.View.Staff
 {
     public class DeliveryViewModel
     {

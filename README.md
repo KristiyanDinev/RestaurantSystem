@@ -32,16 +32,34 @@ The only websocket for now is `/ws/orders` which is to set listeners for all of 
 That client should only receive JSON data from teh server regarding updates on only these orders, no matter if they
 are the user's or not.
 
+### Order Status
+
+- `pending` - the order is not yet accepted by the staff.
+
+- `preparing` - the order is accepted and the staff is preparing it.
+
+- `ready` - the order is ready to be picked up by the delivery guy or the user.
+
+- `delivered` - the order is delivered to the user.
+
 ## Cart
 
 You need an account and selected restaurant, so you can ses your cart.
 
 ## Reservations
 
-You are required to log in, so you can the reservations feature.
+You are required to log in, so you can use the reservations feature.
 
 To get the reservation form you need to have selected a restaurant.
 The rest of the endpoints don't requre a selected restaurant.
+
+
+### Reservation Status
+- `pending` - the reservation is not yet accepted by the staff.
+
+- `accepted` - the reservation is accepted by the staff.
+
+- `canceled` - the reservation is canceled by the user or the staff.
 
 ## Login
 
@@ -69,6 +87,10 @@ services:
 
 roles:
 - `delivery`
+- `staff`
+- `waitress`
+- `manager`
+- `cook`
 
 ## Staff
 
@@ -113,12 +135,11 @@ INSERT INTO "Restaurants"
 ("Address", "City", "State", "Country", 
 "PostalCode", "DoDelivery", "ServeCustomersInPlace", 
 "ReservationMaxChildren", "ReservationMinChildren", 
-"ReservationMaxAdults", "ReservationMinAdults", 
-"Price_Per_Adult", "Price_Per_Children") 
+"ReservationMaxAdults", "ReservationMinAdults") 
 VALUES 
-('ul. Test', 'Sofia', NULL, 'Bulgaria', '1234', TRUE, TRUE, 10, 0, 4, 1, 5, 3.50),
-('ul. Test2', 'Sofia', NULL, 'Bulgaria', '1235', TRUE, FALSE, 10, 0, 4, 1, 5, 3),
-('ul. Test3', 'Sofia', NULL, 'Bulgaria', '1236', FALSE, TRUE, 10, 0, 4, 1, 6, 4);
+('ul. Test', 'Sofia', NULL, 'Bulgaria', '1234', TRUE, TRUE, 10, 0, 4, 1),
+('ul. Test2', 'Sofia', NULL, 'Bulgaria', '1235', TRUE, FALSE, 10, 0, 4, 1),
+('ul. Test3', 'Sofia', NULL, 'Bulgaria', '1236', FALSE, TRUE, 10, 0, 4, 1);
 
 INSERT INTO "Dishes" 
 ("Name", "Price", "Grams", "Image", "Ingredients", 

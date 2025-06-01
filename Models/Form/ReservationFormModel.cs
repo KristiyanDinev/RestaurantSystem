@@ -2,9 +2,9 @@
 {
     public class ReservationFormModel
     {
-        public string? Notes { get; set; }
-        public int Amount_Of_Adults { get; set; }
-        public int Amount_Of_Children { get; set; }
-        public DateTime At_Date { get; set; }
+        public required string Notes { get; set; }
+        public required int Amount_Of_Adults { get; set; }
+        public required int Amount_Of_Children { get; set; }
+        public required DateTime At_Date { get; set; }
     }
 }

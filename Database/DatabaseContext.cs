@@ -236,14 +236,6 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.Price_Per_Children)
-                .IsRequired();
-
-            builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.Price_Per_Adult)
-                .IsRequired();
-
-            builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.State)
                 .HasDefaultValue(null);
 
@@ -399,6 +391,10 @@ namespace RestaurantSystem.Database {
             builder.Entity<ReservationModel>()
                 .Property(order => order.UserId)
                 .IsRequired();
+
+            builder.Entity<ReservationModel>()
+                .Property(order => order.TotalPrice)
+                .HasDefaultValue(0);
 
             builder.Entity<ReservationModel>()
                 .Property(order => order.RestaurantId)
