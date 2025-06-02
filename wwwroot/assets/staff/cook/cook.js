@@ -21,7 +21,9 @@ function setDishButtons(obj) {
     const container = document.getElementById(`dish_buttons,${obj.OrderId},${obj.DishId}`);
     container.innerHTML = "";
 
-    if (obj.DishCurrentStatus === Status.Pending.toLowerCase()) {
+    const status = obj.DishCurrentStatus.toLowerCase();
+
+    if (status === Status.Pending.toLowerCase()) {
         const startCookingBtn = createButton(
             "order noselect",
             "Start cooking",
@@ -29,19 +31,19 @@ function setDishButtons(obj) {
         );
         container.appendChild(startCookingBtn);
 
-    } else if (obj.DishCurrentStatus === Status.Preparing.toLowerCase()) {
+    } else if (status === Status.Preparing.toLowerCase()) {
         const rowDiv = document.createElement("div");
         rowDiv.className = "row noselect";
 
         const undoBtn = createButton(
-            "undo",
-            "UnDo",
+            "order noselect",
+            "Pending",
             () => setStatus(obj.OrderId, obj.DishId, Status.Pending.toLowerCase())
         );
         rowDiv.appendChild(undoBtn);
 
         const readyBtn = createButton(
-            "order",
+            "order noselect",
             "Dish Ready",
             () => setStatus(obj.OrderId, obj.DishId, Status.Ready.toLowerCase())
         );
@@ -49,10 +51,10 @@ function setDishButtons(obj) {
 
         container.appendChild(rowDiv);
 
-    } else if (obj.DishCurrentStatus === Status.Ready.toLowerCase()) {
+    } else if (status === Status.Ready.toLowerCase()) {
         const undoBtn = createButton(
-            "undo noselect",
-            "UnDo",
+            "order noselect",
+            "Preparing",
             () => setStatus(obj.OrderId, obj.DishId, Status.Preparing.toLowerCase())
         );
         container.appendChild(undoBtn);

@@ -3,7 +3,7 @@ function addDishToCart(id, name, isInCart) {
     let restorantId = getCookie(restaurantId_header)
     if (restorantId.length == 0) {
         alert("Select a restaurant first.")
-        window.location.href = "/restaurants"
+        window.location.pathname = "/restaurants"
         return
     }
 

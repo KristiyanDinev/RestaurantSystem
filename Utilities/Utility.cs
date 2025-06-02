@@ -1,9 +1,23 @@
-﻿using System.Text;
+﻿using RestaurantSystem.Enums;
+using System.Text;
 
 namespace RestaurantSystem.Utilities
 {
     public class Utility
     {
+
+        public bool IsValidDishStatus(string status) { 
+            return status.Equals(Status.Pending.ToString(), StringComparison.OrdinalIgnoreCase) ||
+                   status.Equals(Status.Preparing.ToString(), StringComparison.OrdinalIgnoreCase) ||
+                   status.Equals(Status.Ready.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool IsValidReservationStatus(string status)
+        {
+            return status.Equals(Status.Pending.ToString(), StringComparison.OrdinalIgnoreCase) ||
+                   status.Equals(Status.Accepted.ToString(), StringComparison.OrdinalIgnoreCase) ||
+                   status.Equals(Status.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
 
         public byte[] FromStringToUint8Array(string data)
         {

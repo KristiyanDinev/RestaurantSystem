@@ -20,17 +20,21 @@ namespace RestaurantSystem.Controllers.Staff
         private OrderedDishesService _orderedDishesService;
         private WebSocketService _webSocketService;
         private WebSocketUtility _webSocketUtility;
+        private Utility _utility;
+
         public CookStaffController(UserUtility userUtils,
             OrderService orderService,
             OrderedDishesService orderedDishesService,
             UserService userService, WebSocketService webSocketService,
-            WebSocketUtility webSocketUtility)
+            WebSocketUtility webSocketUtility,
+            Utility utility)
         {
             _userUtils = userUtils;
             _orderService = orderService;
             _orderedDishesService = orderedDishesService;
             _webSocketService = webSocketService;
             _webSocketUtility = webSocketUtility;
+            _utility = utility;
         }
 
         [HttpGet]
@@ -81,7 +85,8 @@ namespace RestaurantSystem.Controllers.Staff
 
             bool updated = false;
 
-            if (orderUpdateFormModel.DishCurrentStatus != null)
+            if (orderUpdateFormModel.DishCurrentStatus != null &&
+                _utility.IsValidDishStatus(orderUpdateFormModel.DishCurrentStatus))
             {
 
                 if (!await _orderedDishesService

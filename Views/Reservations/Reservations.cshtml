@@ -56,7 +56,7 @@
                     @if ((!reservation.CurrentStatus.Equals(Status.Cancelled.ToString(), 
                         StringComparison.OrdinalIgnoreCase)) &&
 
-                        DateTime.Now <= reservation.At_Date.AddHours(-1))
+                        DateTime.UtcNow <= reservation.At_Date.ToUniversalTime().AddHours(-1))
                     {
                         <button class="cancel noselect" onclick="cancelReservation('@reservation.Id')">Cancel</button>
 

@@ -19,7 +19,7 @@
 
 
 <body>
-    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    <p>Logged in as: @Model.Staff.Name</p>
 
     @if (Model.Staff.Image != null)
     {
@@ -92,9 +92,9 @@
                             id="dish_buttons,@dishWithStatus.OrderedDish.OrderId,@dishWithStatus.OrderedDish.DishId">
 
                         @{
-                            string pending = Status.Pending.ToString().ToLower();
-                            string preparing = Status.Preparing.ToString().ToLower();
-                            string ready = Status.Ready.ToString().ToLower();
+                            string pending = Status.Pending.ToString();
+                            string preparing = Status.Preparing.ToString();
+                            string ready = Status.Ready.ToString();
 
                             @if (dishWithStatus.OrderedDish.CurrentStatus.Equals(pending, StringComparison.OrdinalIgnoreCase))
                             {

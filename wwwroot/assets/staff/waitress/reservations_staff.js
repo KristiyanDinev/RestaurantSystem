@@ -26,6 +26,10 @@ async function changeStatus(id, status) {
 
 async function deleteReservation(id) {
 
+    if (!confirm("Are you sure you want to delete this reservation?")) {
+        return;
+    }
+
     try {
         const res = await fetch(getDataFromLocalStorage("Host") +
             "/staff/reservations/delete/" + Number(id), {

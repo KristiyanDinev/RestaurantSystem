@@ -11,7 +11,13 @@
 
 <body>
 
-    @await Html.PartialAsync("_StaffNavBar", Model)
+    <p>Logged in as: @Model.Name</p>
+
+
+    @if (Model.Image != null)
+    {
+        <img hight="500" width="500" src="~@Model.Image">
+    }
 
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 

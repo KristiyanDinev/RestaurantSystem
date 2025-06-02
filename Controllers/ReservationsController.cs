@@ -5,6 +5,7 @@ using RestaurantSystem.Models.Form;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.View.Reservation;
+using RestaurantSystem.Enums;
 
 namespace RestaurantSystem.Controllers
 {
@@ -48,7 +49,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            return View(new ReservationFormViewModel()
+            return View("~/Views/Reservations/Reservation.cshtml", new ReservationFormViewModel()
             {
                 User = user,
                 Restaurant = restaurant
@@ -98,7 +99,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            return View(new ReservationsViewModel()
+            return View("~/Views/Reservations/Reservations.cshtml", new ReservationsViewModel()
             {
                 User = user,
                 Reservations = await _reservationService.GetReservationsByUserId(user.Id)
@@ -116,7 +117,16 @@ namespace RestaurantSystem.Controllers
                 return BadRequest();
             }
 
-            if (await _reservationService.DeleteReservation(reservationId))
+            ReservationModel? reservation = await _reservationService
+                .GetReservationById(reservationId);
+
+            if (reservation == null || DateTime.UtcNow > reservation.At_Date
+                .ToUniversalTime().AddHours(-1)) { 
+                return BadRequest();
+            }
+
+            if (await _reservationService.UpdateReservation(reservationId, 
+                Status.Cancelled.ToString()))
             {
                 TempData["CanceledSuccessfull"] = true;
                 return Ok();

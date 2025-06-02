@@ -40,9 +40,13 @@ async function submit() {
 
 async function cancelReservation(id) {
 
+    if (!check("Are you sure you want to cancel this reservation?")) {
+        return;
+    }
+
     try {
         const res = await fetch(getDataFromLocalStorage("Host") +
-            "/reservations/cancel/" + Number(id), {
+            "/reservation/cancel/" + Number(id), {
             method: 'POST',
             redirect: 'follow'
         })

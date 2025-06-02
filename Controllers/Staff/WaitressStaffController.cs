@@ -16,13 +16,16 @@ namespace RestaurantSystem.Controllers.Staff
     {
         private UserUtility _userUtils;
         private ReservationService _reservationService;
+        private Utility _utility;
 
         public WaitressStaffController(UserUtility userUtils,
             OrderedDishesService orderedDishesService,
-            ReservationService reservationService)
+            ReservationService reservationService, 
+            Utility utility)
         {
             _userUtils = userUtils;
             _reservationService = reservationService;
+            _utility = utility;
         }
 
         [HttpGet]
@@ -35,7 +38,7 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
-            return View(new ReservationViewModel()
+            return View("~/Views/Staff/Reservations.cshtml", new ReservationViewModel()
             {
                 Staff = user,
                 Reservations = await _reservationService
@@ -48,22 +51,22 @@ namespace RestaurantSystem.Controllers.Staff
         public async Task<IActionResult> ReservationUpdate(
             [FromForm] ReservationUpdateFormModel reservationUpdateForm)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || 
+                !_utility.IsValidReservationStatus(reservationUpdateForm.Status))
             {
                 return BadRequest();
             }
 
-
-            return;
+            return await _reservationService.UpdateReservation(reservationUpdateForm.Id,
+                reservationUpdateForm.Status) ? Ok() : BadRequest();
         }
 
         [HttpPost]
         [Route("/staff/reservation/delete/{id}")]
         public async Task<IActionResult> ReservationDelete(int id)
         {
-            
-
-            return;
+            return await _reservationService.DeleteReservation(id) ?
+                Ok() : BadRequest();
         }
     }
 }
