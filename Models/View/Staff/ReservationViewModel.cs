@@ -2,7 +2,7 @@
 
 namespace RestaurantSystem.Models.View.Staff
 {
-    public class StaffReservationViewModel
+    public class ReservationViewModel
     {
 
         public required UserModel Staff { get; set; }

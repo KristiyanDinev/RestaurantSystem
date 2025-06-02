@@ -103,5 +103,27 @@ namespace RestaurantSystem.Utilities
                 return null;
             }
         }
+
+
+        public async Task<UserModel?> GetStaffUserByJWT(HttpContext context)
+        {
+            try
+            {
+                Dictionary<string, object>? claims = await GetAuthClaimFromJWT(context);
+
+                if (claims == null || !claims.ContainsKey(userIdClaimKey) ||
+                    !int.TryParse(claims[userIdClaimKey].ToString(), out int Id))
+                {
+                    return null;
+                }
+
+                return await _userService.GetStaffUser(Id);
+
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 }

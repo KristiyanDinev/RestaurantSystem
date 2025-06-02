@@ -20,6 +20,13 @@ namespace RestaurantSystem.Services
             return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         }
 
+        public async Task<UserModel?> GetStaffUser(int id)
+        {
+            return await _databaseContext.Users
+                .Include(user => user.Restaurant)
+                .FirstOrDefaultAsync(user => user.Id == id);
+        }
+
         public async Task<UserModel?> RegisterUser(RegisterFormModel registerFormModel)
         {
             UserModel user = new UserModel

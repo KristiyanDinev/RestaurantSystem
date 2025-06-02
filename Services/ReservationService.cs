@@ -61,7 +61,9 @@ namespace RestaurantSystem.Services
 
         public async Task<List<ReservationModel>> GetReservationsByRestaurantId(int restaurantId)
         {
-            return await _databaseContext.Reservations.Where(res =>
+            return await _databaseContext.Reservations
+                .Include(reservation => reservation.User)
+                .Where(res =>
                 res.RestaurantId == restaurantId).ToListAsync();
         }
 

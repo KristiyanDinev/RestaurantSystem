@@ -35,36 +35,29 @@ function removeDishFromCart(id, name, isInCart) {
     if (isInCart) {
         window.location.reload()
     }
-    //document.cookie = "cart."+id +'=; path=/; domain=127.0.0.1; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 }
 
-
-
-var params = new URLSearchParams()
-
 function goToDish(id) {
-    window.location.href = "/dish/" + Number(id)
+    window.location.pathname = "/dish/" + Number(id)
 }
 
 function goToSalads() {
-    window.location.href = "/dishes/salad"
+    window.location.pathname = "/dishes/salad"
 }
 
 function goToAppetizers() {
-    window.location.href = "/dishes/appetizers"
+    window.location.pathname = "/dishes/appetizers"
 }
 
 function goToDishesFood() {
-    window.location.href = "/dishes/dishes"
+    window.location.pathname = "/dishes/dishes"
 }
 
 function goToDrinks() {
-    params.append("type", "drink")
-    window.location.href = "/dishes/drink"
+    window.location.pathname = "/dishes/drink"
 }
 
 function goToDesserts() {
-    params.append("type", "desserts")
-    window.location.href = "/dishes/desserts"
+    window.location.pathname = "/dishes/desserts"
 }
 

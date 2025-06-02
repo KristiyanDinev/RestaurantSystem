@@ -19,14 +19,14 @@
 
 
 <body>
-    <p>Logged in as: @Model.Staff.Name</p>
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
 
     @if (Model.Staff.Image != null)
     {
         <img hight="500" width="500" src="~@Model.Staff.Image">
     }
 
-    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
     @if (Model.OrderWithDishesCount.Count > 0)
     {
@@ -106,9 +106,9 @@
                             else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(preparing, StringComparison.OrdinalIgnoreCase))
                             {
                                 <div class="row noselect">
-                                    <button class="undo"
+                                    <button class="order"
                                     onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@pending')">
-                                        UnDo
+                                        Pending
                                     </button>
 
                                     <button class="order"
@@ -120,9 +120,9 @@
                             }
                             else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(ready, StringComparison.OrdinalIgnoreCase))
                             {
-                                <button class="undo noselect"
+                                <button class="order noselect"
                                         onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">
-                                    UnDo
+                                    Preparing
                                 </button>
                             }
                         }

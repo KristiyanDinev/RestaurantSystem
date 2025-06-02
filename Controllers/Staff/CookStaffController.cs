@@ -17,23 +17,18 @@ namespace RestaurantSystem.Controllers.Staff
     {
         private OrderService _orderService;
         private UserUtility _userUtils;
-        private RestaurantService _restaurantService;
         private OrderedDishesService _orderedDishesService;
-        private UserService _userService;
         private WebSocketService _webSocketService;
         private WebSocketUtility _webSocketUtility;
         public CookStaffController(UserUtility userUtils,
             OrderService orderService,
-            RestaurantService restaurantService,
             OrderedDishesService orderedDishesService,
             UserService userService, WebSocketService webSocketService,
             WebSocketUtility webSocketUtility)
         {
             _userUtils = userUtils;
             _orderService = orderService;
-            _restaurantService = restaurantService;
             _orderedDishesService = orderedDishesService;
-            _userService = userService;
             _webSocketService = webSocketService;
             _webSocketUtility = webSocketUtility;
         }
@@ -44,22 +39,14 @@ namespace RestaurantSystem.Controllers.Staff
         {
             // Chief in the kitchen
 
-            UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
-            if (user == null)
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
             }
 
-            RestaurantModel? restaurant = await _userService.GetRestaurantWhereUserWorksIn(user);
-
-            if (restaurant == null)
-            {
-                TempData["Error"] = StaffController.RestaurantNotFountError;
-                return View();
-            }
-
             List<OrderWithDishesCountModel> dishes = new();
-            foreach (OrderModel order in await _orderService.GetOrdersByRestaurantId(restaurant.Id))
+            foreach (OrderModel order in await _orderService.GetOrdersByRestaurantId(user.Restaurant.Id))
             {
                 dishes.Add(new OrderWithDishesCountModel()
                 {
@@ -70,7 +57,6 @@ namespace RestaurantSystem.Controllers.Staff
 
             return View(new DishesViewModel()
             {
-                Restaurant = restaurant,
                 Staff = user,
                 OrderWithDishesCount = dishes
             });

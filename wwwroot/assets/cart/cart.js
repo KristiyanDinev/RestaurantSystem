@@ -3,13 +3,13 @@
 async function startOrder() {
     if (getCookie(restaurantId_header).length == 0) {
         alert("Select a restorant")
-        window.location.href = "/restaurants"
+        window.location.pathname = "/restaurants"
         return;
     }
 
     if (getCookie(cart_header).length == 0) {
         alert("You don't have any dishes to order as of now.")
-        window.location.href = "/dishes"
+        window.location.pathname = "/dishes"
         return;
     }
 

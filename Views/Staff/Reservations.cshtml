@@ -1,0 +1,101 @@
+﻿@using RestaurantSystem.Models.DatabaseModels;
+@using RestaurantSystem.Enums;
+@model RestaurantSystem.Models.View.Staff.ReservationViewModel;
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+
+<head>
+    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/reservations/reservations.css'>
+
+    @await Html.PartialAsync("_Imports")
+
+    <script src='~/assets/reservations/reservations.js'></script>
+</head>
+
+<body>
+
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+
+    @foreach (ReservationModel reservation in Model.Reservations)
+    {
+        <div class="reservation-card">
+            <h3>User</h3>
+            <p>Name: @reservation.User.Name</p>
+
+            <h4>Contact</h4>
+            <p>Email: @reservation.User.Email</p>
+            <p>Phone: @reservation.User.PhoneNumber</p>
+
+            <h4>Address</h4>
+            <p>Country: @reservation.User.Country</p>
+            <p>State: @reservation.User.State</p>
+            <p>City: @reservation.User.City</p>
+            <p>Address: @reservation.User.Address</p>
+            <p>Postal Code: @reservation.User.PostalCode</p>
+
+            <h4>Reservation</h4>
+            <p>At Date: @reservation.At_Date</p>
+            <p>Adults: @reservation.Amount_Of_Adults</p>
+            <p>Children: @reservation.Amount_Of_Children</p>
+
+            <p>Total Price: @reservation.TotalPrice</p>
+
+            <div class="notes_view">
+                <p class="notes_title">Notes: </p>
+                <p class="notes">@reservation.Notes</p>
+            </div>
+
+            @{
+                string pending = Status.Pending.ToString().ToLower();
+                string accepted = Status.Accepted.ToString().ToLower();
+                string cancelled = Status.Cancelled.ToString().ToLower();
+
+                @if (reservation.CurrentStatus.Equals(pending, 
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    <button class="noselect"
+                            onclick="changeStatus('@reservation.Id', '@accepted')">
+                            Accept
+                    </button>
+
+                    <button class="noselect"
+                            onclick="changeStatus('@reservation.Id', '@cancelled')">
+                            Cancel
+                    </button>
+
+                } else if (reservation.CurrentStatus.Equals(accepted, 
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    <button class="noselect"
+                            onclick="changeStatus('@reservation.Id', '@pending')">
+                            Pending
+                    </button>
+
+                    <button class="noselect"
+                            onclick="changeStatus('@reservation.Id', '@cancelled')">
+                            Cancel
+                    </button>
+
+                } else if (reservation.CurrentStatus.Equals(cancelled, 
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    <button class="noselect"
+                            onclick="deleteReservation('@reservation.Id')">
+                            Delete
+                    </button>
+                }
+                            
+            }
+
+            <p id="error,@reservation.Id"></p>
+        </div>
+    }
+)
+
+</body>
+
+

@@ -25,7 +25,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/index")]
         public async Task<IActionResult> Index()
         {
-            UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
             return user == null ? RedirectToAction("Login", "User") : View(user);
         }
 

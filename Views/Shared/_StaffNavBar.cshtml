@@ -1,0 +1,9 @@
+﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+
+<p>Logged in as: @Model.Name</p>
+
+
+@if (Model.Image != null)
+{
+    <img hight="500" width="500" src="~@Model.Image">
+}
