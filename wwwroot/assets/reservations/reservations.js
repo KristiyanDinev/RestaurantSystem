@@ -7,8 +7,8 @@ async function submit() {
     let amount_of_adults = document.getElementById('adults').value
 
     if (at_date.length == 0 || at_time.length == 0 || Number(amount_of_children) < 0 ||
-        Number(amount_of_adults) < 0) {
-        document.getElementById('reservation_status').innerHTML = "Invalid inputs. Specify positive numbers."
+        Number(amount_of_adults) <= 0) {
+        document.getElementById('reservation_status').innerHTML = "Invalid inputs. Specify positive numbers. Make sure you have at least 1 adult."
         return;
     }
 
@@ -16,10 +16,10 @@ async function submit() {
     formData.append('Notes', notes)
     formData.append('Amount_Of_Children', Number(amount_of_children))
     formData.append('Amount_Of_Adults', Number(amount_of_adults))
-    formData.append('At_Date', String(at_date + ' '+at_time))
+    formData.append('At_Date', String(at_date + 'T'+at_time))
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") + "/reservations/create", {
+        const res = await fetch(getDataFromLocalStorage("Host") + "/reservation", {
             method: 'POST',
             body: formData,
             redirect: 'follow',

@@ -137,7 +137,7 @@ namespace RestaurantSystem.Services
 
             // Check if any of the user's roles has access to the service
             return await _databaseContext.RolePermissions
-                .AnyAsync(rp => rp.ServicePath.Equals(servicePath) && 
+                .AnyAsync(rp => servicePath.StartsWith(rp.ServicePath) && 
                     userRoles.Contains(rp.RoleName));
         }
 

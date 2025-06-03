@@ -15,14 +15,7 @@
 </head>
 
 <body>
-
-    <p>Logged in as: @Model.Staff.Name</p>
-
-
-    @if (Model.Staff.Image != null)
-    {
-        <img hight="500" width="500" src="~@Model.Staff.Image">
-    }
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
 
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
@@ -44,7 +37,9 @@
             <p>Postal Code: @reservation.User.PostalCode</p>
 
             <h4>Reservation</h4>
-            <p>At Date: @reservation.At_Date</p>
+            <p>Current Status: @reservation.CurrentStatus</p>
+            <p>Reservation At: @reservation.At_Date.ToLocalTime()</p>
+            <p>Reserved At: @reservation.Created_At.ToLocalTime()</p>
             <p>Adults: @reservation.Amount_Of_Adults</p>
             <p>Children: @reservation.Amount_Of_Children</p>
 
@@ -100,7 +95,6 @@
             <p id="error,@reservation.Id"></p>
         </div>
     }
-)
 
 </body>
 

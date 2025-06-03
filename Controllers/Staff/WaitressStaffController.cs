@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
 using RestaurantSystem.Models.View.Staff;
@@ -38,7 +39,7 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
-            return View("~/Views/Staff/Reservations.cshtml", new ReservationViewModel()
+            return View(new ReservationViewModel()
             {
                 Staff = user,
                 Reservations = await _reservationService
@@ -47,7 +48,7 @@ namespace RestaurantSystem.Controllers.Staff
         }
 
         [HttpPost]
-        [Route("/staff/reservation")]
+        [Route("/staff/reservations")]
         public async Task<IActionResult> ReservationUpdate(
             [FromForm] ReservationUpdateFormModel reservationUpdateForm)
         {
@@ -61,11 +62,20 @@ namespace RestaurantSystem.Controllers.Staff
                 reservationUpdateForm.Status) ? Ok() : BadRequest();
         }
 
+
         [HttpPost]
-        [Route("/staff/reservation/delete/{id}")]
+        [Route("/staff/reservations/delete/{id}")]
         public async Task<IActionResult> ReservationDelete(int id)
         {
-            return await _reservationService.DeleteReservation(id) ?
+            ReservationModel? reservation = await _reservationService
+                .GetReservationById(id);
+
+            if (reservation == null || !reservation.CurrentStatus.Equals(Status.Cancelled.ToString(),
+                StringComparison.OrdinalIgnoreCase)) { 
+                return BadRequest();
+            }
+            
+            return await _reservationService.DeleteReservation(reservation.Id) ?
                 Ok() : BadRequest();
         }
     }

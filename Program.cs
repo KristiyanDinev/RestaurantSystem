@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Middlewares;
 using RestaurantSystem.Utilities;
 using RestaurantSystem.Enums;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace RestaurantSystem
 {
@@ -18,7 +19,6 @@ namespace RestaurantSystem
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddHttpLogging(o => { });
 
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
@@ -76,8 +76,6 @@ namespace RestaurantSystem
 
             app.UseAuthenticationMiddleware();
             app.UseWebSocketMiddleware();
-
-            app.UseHttpLogging();
             app.UseLoggingMiddleware();
 
             app.MapControllers();

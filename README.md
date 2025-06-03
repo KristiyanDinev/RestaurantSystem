@@ -53,6 +53,11 @@ You are required to log in, so you can use the reservations feature.
 To get the reservation form you need to have selected a restaurant.
 The rest of the endpoints don't requre a selected restaurant.
 
+**Waitress Staff**
+
+You need first to cancel the reservation, before you delete it.
+
+Users can't cancel their reservation, if it is already canceled or it is 2 hours before the reservation time.
 
 ### Reservation Status
 - `pending` - the reservation is not yet accepted by the staff.

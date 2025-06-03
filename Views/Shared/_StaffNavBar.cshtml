@@ -1,0 +1,20 @@
+﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+
+<body>
+    <div>
+        <a href="/staff/dishes">Dishes</a>
+        <a href="/staff/reservations">Reservations</a>
+        <a href="/staff/delivery">Delivery</a>
+        <a href="/staff/manager">Manager</a>
+
+        <p>Logged in as: @Model.Name</p>
+
+        @if (Model.Image != null)
+        {
+            <img hight="500" width="500" src="~@Model.Image">
+        }
+
+    </div>
+
+</body>
+

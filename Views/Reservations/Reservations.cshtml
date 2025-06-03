@@ -40,7 +40,8 @@
             @foreach (ReservationModel reservation in Model.Reservations)
             {
                 <div class="reservation-card">
-                    <p>At Date: @reservation.At_Date</p>
+                    <p>Reservation At: @reservation.At_Date.ToLocalTime()</p>
+                    <p>Reserved At: @reservation.Created_At.ToLocalTime()</p>
                     <p>Current Status: @reservation.CurrentStatus</p>
 
                     <p>Adults: @reservation.Amount_Of_Adults</p>
@@ -53,8 +54,8 @@
 
                     <p id="error,@reservation.Id"></p>
 
-                    @if ((!reservation.CurrentStatus.Equals(Status.Cancelled.ToString(), 
-                        StringComparison.OrdinalIgnoreCase)) &&
+                    @if (!reservation.CurrentStatus.Equals(Status.Cancelled.ToString(), 
+                        StringComparison.OrdinalIgnoreCase) &&
 
                         DateTime.UtcNow <= reservation.At_Date.ToUniversalTime().AddHours(-1))
                     {

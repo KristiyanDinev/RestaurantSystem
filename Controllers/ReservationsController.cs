@@ -49,7 +49,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            return View("~/Views/Reservations/Reservation.cshtml", new ReservationFormViewModel()
+            return View(new ReservationFormViewModel()
             {
                 User = user,
                 Restaurant = restaurant
@@ -62,16 +62,21 @@ namespace RestaurantSystem.Controllers
         public async Task<IActionResult> ReservationCreate(
             [FromForm] ReservationFormModel reservationFormModel)
         {
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
-                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
-
-            if (restaurant == null)
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
+            {
+                return BadRequest();
+            }
+
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
+                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+
+            if (restaurant == null)
             {
                 return BadRequest();
             }
@@ -99,7 +104,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            return View("~/Views/Reservations/Reservations.cshtml", new ReservationsViewModel()
+            return View(new ReservationsViewModel()
             {
                 User = user,
                 Reservations = await _reservationService.GetReservationsByUserId(user.Id)
@@ -120,8 +125,8 @@ namespace RestaurantSystem.Controllers
             ReservationModel? reservation = await _reservationService
                 .GetReservationById(reservationId);
 
-            if (reservation == null || DateTime.UtcNow > reservation.At_Date
-                .ToUniversalTime().AddHours(-1)) { 
+            if (reservation == null || 
+                DateTime.UtcNow > reservation.At_Date.ToUniversalTime().AddHours(-1)) { 
                 return BadRequest();
             }
 

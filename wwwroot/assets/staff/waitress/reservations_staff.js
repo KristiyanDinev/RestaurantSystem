@@ -5,7 +5,7 @@ async function changeStatus(id, status) {
     formData.append('Status', status)
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") + "/staff/reservation", {
+        const res = await fetch(getDataFromLocalStorage("Host") + "/staff/reservations", {
             method: 'POST',
             body: formData,
             redirect: 'follow'
