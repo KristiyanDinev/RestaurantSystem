@@ -7,6 +7,7 @@ namespace RestaurantSystem.Services
     public class DishService
     {
         private DatabaseContext _databaseContext;
+
         public DishService(DatabaseContext databaseContext) {
             _databaseContext = databaseContext;
         }
@@ -49,7 +50,7 @@ namespace RestaurantSystem.Services
 
             await _databaseContext.Dishies.AddAsync(dish);
 
-            return await _databaseContext.SaveChangesAsync() >= 1 ? dish : null;
+            return await _databaseContext.SaveChangesAsync() > 0 ? dish : null;
         }
 
         public async Task<bool> DeleteDish(int id)

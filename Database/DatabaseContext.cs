@@ -15,6 +15,7 @@ namespace RestaurantSystem.Database {
         public DbSet<RoleModel> Roles { get; set; }
         public DbSet<ReservationModel> Reservations { get; set; }
         public DbSet<RestaurantModel> Restaurants { get; set; }
+        public DbSet<DeliveryModel> Delivery { get; set; }
 
         public readonly string DefaultOrder_CurrentStatus = "pending";
         public readonly string DefaultOrderedDish_CurrentStatus = "pending";
@@ -58,6 +59,9 @@ namespace RestaurantSystem.Database {
 
             // RolePermissionModel
             BuildRolePermissionModel(ref builder);
+
+            // DeliveryModel
+            BuildDeliveryModel(ref builder);
         }
 
 
@@ -168,6 +172,14 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<UserRoleModel>()
                 .HasKey(role => role.Id);
+
+            builder.Entity<UserRoleModel>()
+                .Property(user => user.UserId)
+                .IsRequired();
+
+            builder.Entity<UserRoleModel>()
+                .Property(user => user.RoleName)
+                .IsRequired();
 
             builder.Entity<UserRoleModel>()
                 .HasOne(user => user.User)
@@ -450,6 +462,41 @@ namespace RestaurantSystem.Database {
             builder.Entity<CuponModel>()
                 .Property(cupon => cupon.ExpirationDate)
                 .IsRequired();
+        }
+
+        private void BuildDeliveryModel(ref ModelBuilder builder) {
+            builder.Entity<DeliveryModel>().ToTable("Delivery");
+
+            builder.Entity<DeliveryModel>()
+                .HasKey(delivery => delivery.Id);
+
+            builder.Entity<DeliveryModel>()
+                .Property(delivery => delivery.UserId)
+                .IsRequired();
+
+            builder.Entity<DeliveryModel>()
+                .Property(delivery => delivery.OrderId)
+                .IsRequired();
+
+            builder.Entity<DeliveryModel>()
+                .HasIndex(delivery => delivery.UserId)
+                .IsUnique();
+
+            builder.Entity<DeliveryModel>()
+                .HasIndex(delivery => delivery.OrderId)
+                .IsUnique();
+
+            builder.Entity<DeliveryModel>()
+                .HasOne(delivery => delivery.User)
+                .WithOne(user => user.Delivery)
+                .HasForeignKey<DeliveryModel>(
+                    delivery => delivery.UserId);
+
+            builder.Entity<DeliveryModel>()
+                .HasOne(delivery => delivery.Order)
+                .WithOne(order => order.Delivery)
+                .HasForeignKey<DeliveryModel>(
+                    delivery => delivery.OrderId);
         }
     }
 }

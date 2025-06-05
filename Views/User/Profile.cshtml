@@ -1,4 +1,4 @@
-﻿@model RestaurantSystem.Models.View.User.ProfileViewModel;
+﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
 @{
     ViewData["Title"] = "Profile";
     Model.User.Image ??= "";
@@ -12,14 +12,14 @@
 </head>
 
 <body>
-    @await Html.PartialAsync("_NavBar", Model.User)
+    @await Html.PartialAsync("_NavBar", Model)
 
     <h1>Profile</h1>
 
     <div>
         <label id="profile_value">Image</label>
         <br>
-        <image id="image" src="~@Model.User.Image" alt="user image">
+        <image id="image" src="~@Model.Image" alt="user image">
             <br>
 
             <input type="file" accept="image/*" id="_image">
@@ -33,61 +33,58 @@
             <button onclick="toggleDeleteImage()">Toggle Delete Image</button>
             <br>
             <div class="input_center">
-                <p>Username: @Model.User.Name</p>
+                <p>Username: @Model.Name</p>
                 <br>
                 <input type="text" id="username"
-                maxlength="255" value="@Model.User.Name" placeholder="Username" required>
+                maxlength="255" value="@Model.Name" placeholder="Username" required>
             </div>
             <br>
 
             <div class="input_center">
-                <p>Email: @Model.User.Email</p>
+                <p>Email: @Model.Email</p>
                 <br>
-                <input type="email" id="email" maxlength="50" value="@Model.User.Email" placeholder="Email" required>
+                <input type="email" id="email" maxlength="50" value="@Model.Email" placeholder="Email" required>
             </div>
 
             <div class="input_center">
                 <p>Address</p>
                 <br>
-                <input type="text" id="address" placeholder="Address" value="@Model.User.Address" required>
+                <input type="text" id="address" placeholder="Address" value="@Model.Address" required>
             </div>
 
             <div class="input_center">
                 <p>City</p>
                 <br>
-                <input type="text" id="city" placeholder="City" value="@Model.User.City" required>
+                <input type="text" id="city" placeholder="City" value="@Model.City" required>
             </div>
 
             <div class="input_center">
-                <p>State @Model.User.State</p>
+                <p>State @Model.State</p>
                 <br>
-                <input type="text" id="state" value="@Model.User.State" placeholder="State (leave it empty if you don't live in a State')" required>
+                <input type="text" id="state" value="@Model.State" placeholder="State (leave it empty if you don't live in a State')" required>
             </div>
 
             <div class="input_center">
                 <p>Country</p>
                 <br>
-                <input type="text" id="country" placeholder="Country" value="@Model.User.Country" required>
+                <input type="text" id="country" placeholder="Country" value="@Model.Country" required>
             </div>
 
             <div class="input_center">
-                <p>Notes: <p>@Model.User.State</p>
+                <p>Notes: <p>@Model.State</p>
                     <br>
-                    <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">@Model.User.Notes</textarea>
+                    <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">@Model.Notes</textarea>
             </div>
 
             <div class="input_center">
-                <p>Phone Number: @Model.User.PhoneNumber</p>
+                <p>Phone Number: @Model.PhoneNumber</p>
                 <br>
-                <input type="text" id="phone" value="@Model.User.PhoneNumber" maxlength="15" placeholder="Phone Number">
+                <input type="text" id="phone" value="@Model.PhoneNumber" maxlength="15" placeholder="Phone Number">
             </div>
     </div>
 
+    <p id="Stats"></p>
 
-    @if (Model.UpdatedSuccessfully != null)
-    {
-        <p id="Stats">Model.UpdatedSuccessfully</p>
-    }
     <br>
 
     <button id="edit" onclick="updateUser()">Edit</button>

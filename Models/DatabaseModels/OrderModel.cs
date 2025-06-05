@@ -20,5 +20,6 @@
 
         // navigation
         public ICollection<OrderedDishesModel> OrderedDishes { get; set; } = new List<OrderedDishesModel>();
+        public DeliveryModel Delivery { get; set; } = null!;
     }
 }

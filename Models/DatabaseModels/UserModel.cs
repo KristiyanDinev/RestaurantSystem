@@ -28,6 +28,7 @@
         public ICollection<UserRoleModel> Roles { get; set; } = new List<UserRoleModel>();
         public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
         public ICollection<ReservationModel> Reservations { get; set; } = new List<ReservationModel>();
+        public DeliveryModel Delivery { get; set; } = null!;
 
     }
 }
