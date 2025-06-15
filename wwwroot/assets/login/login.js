@@ -1,27 +1,23 @@
 
 
 async function submit() {
-    let password = document.getElementById("Password")
-    let email = document.getElementById("Email")
+    let password = document.getElementById("Password").value
+    let email = document.getElementById("Email").value
 
-    if (password.value.replace(" ", "").length === 0 ||
-        email.value.replace(" ", "").length === 0) {
-
-        document.getElementById("Stats").innerHTML = "Fill all Inputs"
+    if (!password || !email) {
+        document.getElementById("Stats").innerHTML = "Fill all Inputs correctly."
         return;
     }
 
-
     let formData = new FormData()
-    formData.append("Password", password.value)
-    formData.append("Email", email.value)
-    formData.append("RememberMe", document.querySelector('#RememberMe:checked') !== null)
+    formData.append("Password", password)
+    formData.append("Email", email)
+    formData.append("RememberMe", document.getElementById('RememberMe').checked)
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") + "/login", {
+        const res = await fetch("/login", {
             method: "POST",
             body: formData,
-            redirect: 'follow',
         })
 
         if (res.status === 200) {
@@ -29,9 +25,8 @@ async function submit() {
             return
         }
 
-        document.getElementById("Stats").innerHTML = "Invalid login"
-
     } catch {
-        console.error("Error during login request");
     }
+
+    document.getElementById("Stats").innerHTML = "Invalid login"
 }

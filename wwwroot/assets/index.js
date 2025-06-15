@@ -57,11 +57,10 @@ var __port = (document.location.port.length == 0 ? "" : ":"+ document.location.p
 setDataToLocalStorage("WebSocketHost", (document.location.protocol === "https:" ? "wss" : "ws") +
      "://" + document.location.hostname + __port)
 
-setDataToLocalStorage("Host", document.location.protocol+"//" + document.location.hostname + __port)
-
 
 function startOrderWebSocket(onopen, onclose, onerror, onmessage) {
-    return UseWebSockets(getDataFromLocalStorage("WebSocketHost") + "/ws/orders", 
+    // getDataFromLocalStorage("WebSocketHost") + 
+    return UseWebSockets("/ws/orders", 
         onopen, onclose, onerror, onmessage)
 }
 
@@ -102,7 +101,7 @@ function goToReservationsToCreate() {
 
 
 function Logout() {
-    fetch(getDataFromLocalStorage("Host")  + "/logout", {
+    fetch("/logout", {
         method: "POST",
         redirect: 'follow',
 
@@ -112,3 +111,5 @@ function Logout() {
         }
     })
 }
+
+

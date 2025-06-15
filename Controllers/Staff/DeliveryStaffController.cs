@@ -41,12 +41,13 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
 
-
+            return View();
+            /*
             return View(new DeliveryOrderViewModel()
             {
                 Staff = user,
                 Order = 
-            });
+            });*/
         }
 
 
@@ -86,6 +87,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/delivery")]
         public async Task<IActionResult> UpdateDelivery()
         {
+            return Ok();
         }
     }
 }

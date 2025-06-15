@@ -17,16 +17,15 @@ async function startOrder() {
     formData.append("Notes", document.getElementById("notes").value)
     formData.append("CuponCode", document.getElementById("cupon_input").value)
 
-    const res = await fetch(getDataFromLocalStorage("Host") + '/order/start', {
+    const res = await fetch('/order/start', {
         method: 'POST',
         body: formData,
-        redirect: 'follow',
     })
 
     if (res.status == 200) {
         window.location.pathname = "/orders"
 
     } else {
-        document.getElementById("error").value = "Error: Couldn't start your order."
+        document.getElementById("error").innerHTML = "Error: Couldn't start your order."
     }
 }

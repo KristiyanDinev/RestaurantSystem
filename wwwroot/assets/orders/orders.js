@@ -81,20 +81,18 @@ async function cancelOrder(id) {
     }
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") + '/order/cancel/' + id, {
+        const res = await fetch('/order/cancel/' + id, {
             method: 'POST',
             redirect: 'follow'
         })
 
-        if (res.status !== 200) {
-            document.getElementById(`error,${id}`).innerHTML = "Can't cancel order";
+        if (res.status == 200) {
+            window.location.pathname = '/orders';
             return
         }
 
-        window.location.pathname = '/orders';
-
     } catch {
-        console.error('Error updating dish status:', error);
-        document.getElementById(`error,${id}`).innerHTML = "Can't cancel order";
     }
+
+    document.getElementById(`error,${id}`).innerHTML = "Can't cancel order";
 }

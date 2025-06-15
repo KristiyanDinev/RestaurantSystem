@@ -52,24 +52,38 @@ function toggleDeleteImage() {
 }
 
 async function updateUser() {
+    let status = document.getElementById('Stats')
+    status.innerHTML = "Updating..."
+
     let addr = document.getElementById('address').value
     let city = document.getElementById('city').value
     let state = document.getElementById('state').value
     let country = document.getElementById('country').value
+    let username = document.getElementById('username').value
+    let email = document.getElementById('email').value
+    let postal_code = document.getElementById('postal_code').value
+    let phoneNumber = document.getElementById('phone').value
+
+    if (country && country == '')
+
+    if (!addr || !city || ) {
+
+    }
 
     let status = document.getElementById('Stats')
     status.innerHTML = "Updating..."
 
     let formData = new FormData()
-    formData.append('Username', document.getElementById('username').value)
-    formData.append('Email', document.getElementById('email').value)
+    formData.append('Username', username)
+    formData.append('Email', email)
     formData.append('Address', addr)
     formData.append('City', city)
     formData.append('State', state)
     formData.append('Country', country)
     formData.append('Notes', document.getElementById('notes').value)
-    formData.append('PhoneNumber', document.getElementById('phone').value)
-    formData.append('Image', ImageFile)
+    formData.append('PhoneNumber', phoneNumber)
+    formData.append('PostalCode', postal_code)
+    formData.append('Image', document.getElementById("_image").value)
     formData.append('DeleteImage', delete_image_data)
 
     const res = await fetch(getDataFromLocalStorage("Host") + '/profile/edit', {

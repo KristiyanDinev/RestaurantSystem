@@ -36,13 +36,19 @@ fileSelection.addEventListener('change', async function (e) {
     }
 })
 
+let countryEle = document.getElementById("country")
+countryEle.addEventListener('change', async function (e) {
+    document.getElementById("state").style.display = "block"
+})
+
 function submit() {
-    let username = document.getElementById("Username")
-    let password = document.getElementById("Password")
-    let address = document.getElementById("Address")
-    let city = document.getElementById("City")
-    let country = document.getElementById("Country")
-    let email = document.getElementById("Email")
+    let username = document.getElementById("Username").value
+    let password = document.getElementById("Password").value
+    let address = document.getElementById("Address").value
+    let city = document.getElementById("city").value
+    let country = document.getElementById("country").value
+    let state = document.getElementById("state").value
+    let email = document.getElementById("Email").value
     
     
     let formData = new FormData()
@@ -57,7 +63,7 @@ function submit() {
     formData.append("PhoneNumber", document.getElementById("Phone").value)
     formData.append("Image", ImageFile)
     formData.append("PostalCode", document.getElementById("PostalCode").value)
-    formData.append("RememberMe", document.querySelector('#RememberMe:checked') !== null)
+    formData.append("RememberMe", document.querySelector('RememberMe').checked)
 
     try {
         fetch(getDataFromLocalStorage("Host") + "/register", {

@@ -6,6 +6,6 @@ namespace RestaurantSystem.Models.View.Staff
     {
         public required UserModel Staff { get; set; }
 
-        public required RestaurantWithOrdersModel Order { get; set; }
+        public required List<RestaurantWithOrdersModel> Order { get; set; } = new List<RestaurantWithOrdersModel>();
     }
 }

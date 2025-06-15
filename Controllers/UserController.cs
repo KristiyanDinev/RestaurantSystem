@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
-using RestaurantSystem.Models.View.User;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
@@ -109,7 +108,7 @@ namespace RestaurantSystem.Controllers {
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             return user == null ? RedirectToAction("Login") :
-                View(new ProfileViewModel { User = user });
+                View(user);
         }
 
 

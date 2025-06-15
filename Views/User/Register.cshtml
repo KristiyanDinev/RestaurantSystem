@@ -5,7 +5,6 @@
 
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/register/register.css'>
     
     @await Html.PartialAsync("_Imports")
 
@@ -13,57 +12,98 @@
 
 <body>
 
-    <h1>Register</h1>
+    <div class="container-fluid">
+        <div class="register-container">
+            <h1 class="form-title">Create Your Account</h1>
 
-    <div class="register">
+            <form id="registerForm" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="Username" class="form-label">Username <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="Username" maxlength="100" placeholder="Enter username" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="Email" class="form-label">Email <span class="required">*</span></label>
+                        <input type="email" class="form-control" id="Email" maxlength="100" placeholder="Enter email" required>
+                    </div>
+                </div>
 
-        <label>Username</label>
-        <input type="text" id="Username" maxlength="100" placeholder="Username" required>
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Password <span class="required">*</span></label>
+                    <input type="password" class="form-control" id="Password" placeholder="Enter password" required>
+                    <div class="form-text">Password must be at least 6 characters long</div>
+                </div>
 
-        <br>
-        <label>Email</label>
-        <input type="email" id="Email" maxlength="100" placeholder="Email" required>
-        <br>
-        <label>Password</label>
-        <input type="password" id="Password" placeholder="Password" required>
-        <br>
-        <label>Image</label>
-        <input type="file" accept="image/*" id="Image">
-        <br>
-        <img id="review" src="#" alt="your image" />
-        <br>
-        <label>Notes</label>
-        <textarea id="Notes" cols="50" rows="10" maxlength="255" placeholder="Notes"></textarea>
-        <br>
-        <label>Address</label>
-        <input type="text" id="Address" placeholder="Address" required>
-        <br>
-        <label>City</label>
-        <input type="text" id="City" placeholder="City" required>
-        <br>
-        <br>
-        <label>State</label>
-        <input type="text" id="State" placeholder="State (if you have no state then you can leave it empty)">
-        <br>
-        <label>Country</label>
-        <input type="text" id="Country" placeholder="Country" required>
-        <br>
-        <label>Postal Code</label>
-        <input type="text" id="PostalCode" placeholder="PostalCode: 1234" required>
-        <br>
-        <label>Phone</label>
-        <input type="text" id="Phone" maxlength="15" placeholder="Phone Number">
-        <br>
-        <label>Remember Me?</label>
-        <input type="checkbox" id="RememberMe">
-        <br>
-        <p id="Stats"></p>
-        <br>
+                <div class="mb-3">
+                    <label for="Image" class="form-label">Profile Image</label>
+                    <input type="file" class="form-control" id="Image" accept="image/*">
+                    <img id="review" src="#" alt="Profile preview" class="mt-2" />
+                </div>
 
-        <button onclick="submit()">Register</button>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="country" class="form-label">Country <span class="required">*</span></label>
+                        <select id="country" name="country" class="form-select" required>
+                            <option value="" selected disabled>Select Country</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="state" class="form-label">State/Province</label>
+                        <select id="state" name="state" class="form-select" disabled>
+                            <option value="" selected disabled>Select State/Province</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <select id="city" name="city" class="form-select" disabled>
+                            <option value="" selected disabled>Select City</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="PostalCode" class="form-label">Postal Code <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="PostalCode" placeholder="12345" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="Address" class="form-label">Address <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="Address" placeholder="Enter full address" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="Phone" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="Phone" maxlength="15" placeholder="Enter phone number">
+                </div>
+
+                <div class="mb-3">
+                    <label for="Notes" class="form-label">Notes</label>
+                    <textarea class="form-control" id="Notes" rows="4" maxlength="255" placeholder="Additional notes (optional)"></textarea>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="RememberMe">
+                    <label class="form-check-label" for="RememberMe">
+                        Remember me
+                    </label>
+                </div>
+
+                <div id="Stats" class="mb-3"></div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <button type="button" class="btn btn-primary btn-lg me-md-2" onclick="submitForm()">
+                        Create Account
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="goToLogin()">
+                        Go to Login
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <button onclick="goToLogin()">Go to Login</button>
-    <script src="~/assets/index.js"></script>
+    @await Html.PartialAsync("_BottomImports")
+    <script src='~/assets/user_location.js'></script>
     <script src='~/assets/register/register.js'></script>
 </body>
