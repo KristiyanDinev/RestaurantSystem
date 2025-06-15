@@ -12,14 +12,14 @@ namespace RestaurantSystem.Services
         {
             _databaseContext = databaseContext;
         }
-        public async Task<DeliveryModel?> GetDelivery(int user_id)
+        public async Task<DeliveryModel?> GetDeliveryAsync(int user_id)
         {
             return await _databaseContext.Delivery
                 .FirstOrDefaultAsync(d => d.UserId == user_id);
         }
 
 
-        public async Task<bool> AddDelivery(int user_id, int order_id)
+        public async Task<bool> AddDeliveryAsync(int user_id, int order_id)
         {
             DeliveryModel delivery = new ()
             {
@@ -33,9 +33,9 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> RemoveDelivery(int user_id)
+        public async Task<bool> RemoveDeliveryAsync(int user_id)
         {
-            DeliveryModel? delivery = await GetDelivery(user_id);
+            DeliveryModel? delivery = await GetDeliveryAsync(user_id);
             if (delivery == null)
             {
                 return false;

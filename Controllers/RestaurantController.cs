@@ -33,7 +33,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            return View(await _restaurantService.GetAllRestaurantsForUser(user));
+            return View(await _restaurantService.GetAllRestaurantsForUserAsync(user));
         }
     }
 }

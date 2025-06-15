@@ -96,7 +96,7 @@ namespace RestaurantSystem.Utilities
                     return null;
                 }
 
-                return await _userService.GetUser(Id);
+                return await _userService.GetUserAsync(Id);
 
             } catch (Exception)
             {
@@ -117,7 +117,7 @@ namespace RestaurantSystem.Utilities
                     return null;
                 }
 
-                return await _userService.GetStaffUser(Id);
+                return await _userService.GetStaffUserAsync(Id);
 
             }
             catch (Exception)

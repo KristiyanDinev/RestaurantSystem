@@ -35,8 +35,8 @@ namespace RestaurantSystem.Controllers
         [Route("/reservation/index")]
         public async Task<IActionResult> Reservation()
         {
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
-                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
             if (restaurant == null)
             {
@@ -73,15 +73,15 @@ namespace RestaurantSystem.Controllers
                 return BadRequest();
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
-                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
             if (restaurant == null)
             {
                 return BadRequest();
             }
 
-            if (await _reservationService.CreateReservation(user.Id, restaurant.Id,
+            if (await _reservationService.CreateReservationAsync(user.Id, restaurant.Id,
                 reservationFormModel.Amount_Of_Adults, reservationFormModel.Amount_Of_Children,
                 reservationFormModel.At_Date, reservationFormModel.Notes)
                 != null)
@@ -107,7 +107,7 @@ namespace RestaurantSystem.Controllers
             return View(new ReservationsViewModel()
             {
                 User = user,
-                Reservations = await _reservationService.GetReservationsByUserId(user.Id)
+                Reservations = await _reservationService.GetReservationsByUserIdAsync(user.Id)
             });
         }
 
@@ -123,14 +123,14 @@ namespace RestaurantSystem.Controllers
             }
 
             ReservationModel? reservation = await _reservationService
-                .GetReservationById(reservationId);
+                .GetReservationByIdAsync(reservationId);
 
             if (reservation == null || 
                 DateTime.UtcNow > reservation.At_Date.ToUniversalTime().AddHours(-1)) { 
                 return BadRequest();
             }
 
-            if (await _reservationService.UpdateReservation(reservationId, 
+            if (await _reservationService.UpdateReservationAsync(reservationId, 
                 Status.Cancelled.ToString()))
             {
                 TempData["CanceledSuccessfull"] = true;

@@ -48,11 +48,11 @@ namespace RestaurantSystem.Controllers {
 
             List<OrderWithDishesCountModel> orders = new ();
 
-            foreach (OrderModel order in await _orderService.GetOrdersByUser(user.Id))
+            foreach (OrderModel order in await _orderService.GetOrdersByUserAsync(user.Id))
             {
                 orders.Add(new OrderWithDishesCountModel() {
                     Order = order,
-                    DishesCount = await _orderedDishesService.CountDishesByOrder(order.Id)
+                    DishesCount = await _orderedDishesService.CountDishesByOrderAsync(order.Id)
                 });
             }
 
@@ -73,8 +73,8 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
-                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
             if (restaurant == null)
             {
@@ -87,12 +87,12 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            List<int> DishIds = _dishService.GetDishIDsFromCart(HttpContext);
+            List<int> DishIds = _dishService.GetDishIDsFromCartAsync(HttpContext);
 
             decimal totalPrice = 0;
             List<int> CoutingDishId = new List<int>(DishIds);
 
-            foreach (DishModel dishModel in await _dishService.GetDishesByIds(DishIds.ToHashSet()))
+            foreach (DishModel dishModel in await _dishService.GetDishesByIdsAsync(DishIds.ToHashSet()))
             {
                 int beforeRemovalCount = CoutingDishId.Count;
                 CoutingDishId.RemoveAll(id => id == dishModel.Id);
@@ -101,14 +101,14 @@ namespace RestaurantSystem.Controllers {
             }
 
             if (order.CuponCode != null && order.CuponCode.Replace(" ", "").Length > 0) {
-                CuponModel? cupon = await _cuponService.GetCuponByCode(order.CuponCode);
+                CuponModel? cupon = await _cuponService.GetCuponByCodeAsync(order.CuponCode);
                 if (cupon != null)
                 {
                     totalPrice = _cuponService.HandleCuponDiscount(cupon.DiscountPercent, totalPrice);
                 }
             }
 
-            if ((await _orderService.AddOrder(user.Id, restaurant.Id,
+            if ((await _orderService.AddOrderAsync(user.Id, restaurant.Id,
                 DishIds, order.Notes, totalPrice, null, order.CuponCode)) == null)
             {
                 return BadRequest();
@@ -130,7 +130,7 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            if (await _orderService.DeleteOrder(orderId))
+            if (await _orderService.DeleteOrderAsync(orderId))
             {
                 return Ok();
             }

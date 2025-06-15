@@ -5,8 +5,6 @@ using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Middlewares;
 using RestaurantSystem.Utilities;
-using RestaurantSystem.Enums;
-using Microsoft.AspNetCore.HttpLogging;
 
 namespace RestaurantSystem
 {
@@ -39,6 +37,7 @@ namespace RestaurantSystem
             builder.Services.AddScoped<OrderService>();
             builder.Services.AddScoped<RoleService>();
             builder.Services.AddScoped<ReservationService>();
+            builder.Services.AddScoped<LocationService>();
 
             builder.Services.AddScoped<EncryptionUtility>(_ =>
                 new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??

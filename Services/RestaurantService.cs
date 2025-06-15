@@ -15,7 +15,7 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<List<RestaurantModel>> GetDeliveryGuy_Restaurants(UserModel user)
+        public async Task<List<RestaurantModel>> GetDeliveryGuy_RestaurantsAsync(UserModel user)
         {
             return await _databaseContext.Restaurants
                 .Where(
@@ -28,7 +28,7 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<List<RestaurantModel>> GetAllRestaurantsForUser(UserModel user)
+        public async Task<List<RestaurantModel>> GetAllRestaurantsForUserAsync(UserModel user)
         {
             return await _databaseContext.Restaurants
                 .Where(
@@ -41,7 +41,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<List<RestaurantModel>> GetRestaurantsThatServingPeople_ForUser(UserModel user)
+        public async Task<List<RestaurantModel>> GetRestaurantsThatServingPeople_ForUserAsync(UserModel user)
         {
             return await _databaseContext.Restaurants
                 .Where(
@@ -54,7 +54,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> CheckForReservation(ReservationModel reservation)
+        public async Task<bool> CheckForReservationAsync(ReservationModel reservation)
         {
             return await _databaseContext.Restaurants.FirstOrDefaultAsync(
                 restaurant => 
@@ -70,7 +70,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public int? GetRestaurantIdFromCookieHeader(HttpContext context)
+        public int? GetRestaurantIdFromCookieHeaderAsync(HttpContext context)
         {
             context.Request.Cookies.TryGetValue(restaurantId, out string? restaurant_id_str);
             if (!int.TryParse(restaurant_id_str, out int restaurant_id))
@@ -82,7 +82,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<List<UserModel>> GetRestaurantEmployeesByRestaurantId(int restaurantId)
+        public async Task<List<UserModel>> GetRestaurantEmployeesByRestaurantIdAsync(int restaurantId)
         {
             ICollection<UserModel>? employees = await _databaseContext.Restaurants
                 .Include(restaurant => restaurant.Employees)
@@ -93,7 +93,7 @@ namespace RestaurantSystem.Services
             return employees == null ? new List<UserModel>() : employees.ToList();
         }
 
-        public async Task<RestaurantModel?> GetRestaurantById(int? restaurantId)
+        public async Task<RestaurantModel?> GetRestaurantByIdAsync(int? restaurantId)
         {
             return restaurantId == null ? null : await _databaseContext.Restaurants
                 .FirstOrDefaultAsync(restaurant => restaurant.Id == restaurantId);

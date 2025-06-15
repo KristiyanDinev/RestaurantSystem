@@ -37,8 +37,8 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
-                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
             if (restaurant == null) {
                 return RedirectToAction("Index", "Restaurant");
@@ -61,8 +61,8 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
-                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
             if (restaurant == null)
             {
@@ -73,7 +73,7 @@ namespace RestaurantSystem.Controllers {
 
             return View(new DishesTypeViewModel()
             {
-                Dishes = await _dishService.GetDishesByTypeAndRestaurantId(
+                Dishes = await _dishService.GetDishesByTypeAndRestaurantIdAsync(
                     dishType, restaurant.Id),
                 Restaurant = restaurant,
                 User = user,
@@ -94,15 +94,15 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Login", "User");
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
-                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
             if (restaurant == null)
             {
                 return RedirectToAction("Index", "Restaurant");
             }
 
-            DishModel? dish = await _dishService.GetDishById(dishId);
+            DishModel? dish = await _dishService.GetDishByIdAsync(dishId);
             if (dish == null)
             {
                 return RedirectToAction("Dishes");

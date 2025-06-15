@@ -35,7 +35,7 @@ namespace RestaurantSystem.Services
                     return;
                 }
 
-                if (!await roleService.CanUserAccessService(Id, path))
+                if (!await roleService.CanUserAccessServiceAsync(Id, path))
                 {
                     // user doesn't have the roles to do so.
                     context.Response.Redirect("/login");

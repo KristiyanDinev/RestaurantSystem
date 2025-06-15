@@ -64,14 +64,14 @@ namespace RestaurantSystem.Controllers.Staff
             List<RestaurantWithOrdersModel> orders = new();
 
             foreach (RestaurantModel restaurant in await _restaurantService
-                .GetDeliveryGuy_Restaurants(user))
+                .GetDeliveryGuy_RestaurantsAsync(user))
             {
 
                 orders.Add(new RestaurantWithOrdersModel()
                 {
                     Restaurant = restaurant,
                     Orders = await _orderService
-                        .Get_HomeDelivery_OrdersBy_RestaurantId(restaurant.Id)
+                        .Get_HomeDelivery_OrdersBy_RestaurantIdAsync(restaurant.Id)
                 });
             }
 

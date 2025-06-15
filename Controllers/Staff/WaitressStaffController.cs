@@ -43,7 +43,7 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 Staff = user,
                 Reservations = await _reservationService
-                .GetReservationsByRestaurantId(user.Restaurant.Id)
+                .GetReservationsByRestaurantIdAsync(user.Restaurant.Id)
             });
         }
 
@@ -58,7 +58,7 @@ namespace RestaurantSystem.Controllers.Staff
                 return BadRequest();
             }
 
-            return await _reservationService.UpdateReservation(reservationUpdateForm.Id,
+            return await _reservationService.UpdateReservationAsync(reservationUpdateForm.Id,
                 reservationUpdateForm.Status) ? Ok() : BadRequest();
         }
 
@@ -68,14 +68,14 @@ namespace RestaurantSystem.Controllers.Staff
         public async Task<IActionResult> ReservationDelete(int id)
         {
             ReservationModel? reservation = await _reservationService
-                .GetReservationById(id);
+                .GetReservationByIdAsync(id);
 
             if (reservation == null || !reservation.CurrentStatus.Equals(Status.Cancelled.ToString(),
                 StringComparison.OrdinalIgnoreCase)) { 
                 return BadRequest();
             }
             
-            return await _reservationService.DeleteReservation(reservation.Id) ?
+            return await _reservationService.DeleteReservationAsync(reservation.Id) ?
                 Ok() : BadRequest();
         }
     }

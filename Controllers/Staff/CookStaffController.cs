@@ -50,12 +50,12 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             List<OrderWithDishesCountModel> dishes = new();
-            foreach (OrderModel order in await _orderService.GetOrdersByRestaurantId(user.Restaurant.Id))
+            foreach (OrderModel order in await _orderService.GetOrdersByRestaurantIdAsync(user.Restaurant.Id))
             {
                 dishes.Add(new OrderWithDishesCountModel()
                 {
                     Order = order,
-                    DishesCount = await _orderedDishesService.CountDishesByOrder(order.Id)
+                    DishesCount = await _orderedDishesService.CountDishesByOrderAsync(order.Id)
                 });
             }
 
@@ -90,7 +90,7 @@ namespace RestaurantSystem.Controllers.Staff
             {
 
                 if (!await _orderedDishesService
-                    .UpdateOrderedDishStatusById(orderUpdateFormModel.DishId,
+                    .UpdateOrderedDishStatusByIdAsync(orderUpdateFormModel.DishId,
                     orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus))
                 {
                     return BadRequest();
@@ -100,7 +100,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             List<string> status = await _orderedDishesService
-                .GetDishCurrectStatus(orderUpdateFormModel.OrderId);
+                .GetDishCurrectStatusAsync(orderUpdateFormModel.OrderId);
 
             string orderStatus;
 
@@ -123,7 +123,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             updated = updated && await _orderService
-                .UpdateOrderCurrentStatusById(orderUpdateFormModel.OrderId, orderStatus);
+                .UpdateOrderCurrentStatusByIdAsync(orderUpdateFormModel.OrderId, orderStatus);
 
             if (!updated)
             {

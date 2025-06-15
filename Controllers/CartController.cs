@@ -37,8 +37,8 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantById(
-                _restaurantService.GetRestaurantIdFromCookieHeader(HttpContext));
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
             if (restaurant == null)
             {
@@ -47,10 +47,10 @@ namespace RestaurantSystem.Controllers
 
             Dictionary<DishModel, int> dishes = new();
 
-            List<int> ids = _dishService.GetDishIDsFromCart(HttpContext);
+            List<int> ids = _dishService.GetDishIDsFromCartAsync(HttpContext);
             HashSet<int> hash_ids = new(ids);
 
-            List<DishModel> dishModels = await _dishService.GetDishesByIds(hash_ids);
+            List<DishModel> dishModels = await _dishService.GetDishesByIdsAsync(hash_ids);
 
             foreach (int eachDishId in hash_ids)
             {

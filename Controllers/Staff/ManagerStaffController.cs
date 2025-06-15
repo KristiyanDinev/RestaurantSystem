@@ -39,7 +39,7 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 Staff = user,
                 Employees = await _restaurantService
-                    .GetRestaurantEmployeesByRestaurantId(user.Restaurant.Id)
+                    .GetRestaurantEmployeesByRestaurantIdAsync(user.Restaurant.Id)
             });
         }
     }

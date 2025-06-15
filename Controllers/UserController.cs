@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
+using RestaurantSystem.Models.Query;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
@@ -56,7 +57,7 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            UserModel? loggedIn = await _userService.LoginUser(
+            UserModel? loggedIn = await _userService.LoginUserAsync(
                 loginFormModel.Email, loginFormModel.Password);
 
             if (loggedIn == null)
@@ -85,7 +86,7 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            UserModel? registered = await _userService.RegisterUser(registerFormModel);
+            UserModel? registered = await _userService.RegisterUserAsync(registerFormModel);
             if (registered == null)
             {
                 TempData["Error"] = "Invalid registration attempt.";
@@ -142,7 +143,7 @@ namespace RestaurantSystem.Controllers {
                 user.State != profileUpdateFormModel.State)
             {
                 // user changed city, country and state
-                List<string> roles = await _roleService.GetUserRoles(user.Id);
+                List<string> roles = await _roleService.GetUserRolesAsync(user.Id);
                 if (roles.Contains(deliveryRoleName)) {
                     // that user is a delivery guy
                     profileUpdateFormModel.City = user.City;
@@ -151,7 +152,7 @@ namespace RestaurantSystem.Controllers {
                 }
             }
 
-            return await _userService.UpdateUser(user,
+            return await _userService.UpdateUserAsync(user,
                 profileUpdateFormModel) ?
                 Ok() : BadRequest();
         }

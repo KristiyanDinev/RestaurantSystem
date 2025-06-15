@@ -22,7 +22,7 @@ namespace RestaurantSystem.Controllers {
         [Route("/cupon")]
         public async Task<IResult> Cupon(string code)
         {
-            return Results.Json<CuponModel?>(await _cuponDatabaseHandler.GetCuponByCode(code));
+            return Results.Json<CuponModel?>(await _cuponDatabaseHandler.GetCuponByCodeAsync(code));
         }
     }
 }

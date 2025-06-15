@@ -14,7 +14,7 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<bool> CreateRole(string roleName, string? description = null)
+        public async Task<bool> CreateRoleAsync(string roleName, string? description = null)
         {
             if (await _databaseContext.Roles.AnyAsync(r => r.Name.Equals(roleName)))
             {
@@ -30,7 +30,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> CreateService(string path, string? description = null)
+        public async Task<bool> CreateServiceAsync(string path, string? description = null)
         {
             if (await _databaseContext.Services.AnyAsync(s => s.Path.Equals(path)))
             {
@@ -46,7 +46,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> AssignRoleToUser(int userId, string roleName)
+        public async Task<bool> AssignRoleToUserAsync(int userId, string roleName)
         {
             // Check if user and role exist
             bool userExists = await _databaseContext.Users.AnyAsync(u => u.Id == userId);
@@ -73,7 +73,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> RemoveRoleFromUser(int userId, string roleName)
+        public async Task<bool> RemoveRoleFromUserAsync(int userId, string roleName)
         {
             UserRoleModel? userRole = await _databaseContext.UserRoles.FindAsync(userId, roleName);
 
@@ -85,7 +85,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> GrantServiceAccessToRole(string servicePath, string roleName)
+        public async Task<bool> GrantServiceAccessToRoleAsync(string servicePath, string roleName)
         {
             // Check if service and role exist
             bool serviceExists = await _databaseContext.Services.AnyAsync(s => s.Path.Equals(servicePath));
@@ -111,7 +111,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> RevokeServiceAccessFromRole(string servicePath, string roleName)
+        public async Task<bool> RevokeServiceAccessFromRoleAsync(string servicePath, string roleName)
         {
             RolePermissionModel? permission = await _databaseContext.RolePermissions.FindAsync(roleName, servicePath);
 
@@ -123,7 +123,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> CanUserAccessService(int userId, string servicePath)
+        public async Task<bool> CanUserAccessServiceAsync(int userId, string servicePath)
         {
             // Get all roles for the user
             List<string> userRoles = await _databaseContext.UserRoles
@@ -142,7 +142,7 @@ namespace RestaurantSystem.Services
         }
 
         // list of role names for user
-        public async Task<List<string>> GetUserRoles(int userId)
+        public async Task<List<string>> GetUserRolesAsync(int userId)
         {
             return await _databaseContext.UserRoles
                 .Where(ur => ur.UserId == userId)
@@ -151,7 +151,7 @@ namespace RestaurantSystem.Services
         }
 
         // List of names of the services
-        public async Task<List<string>> GetRoleServices(string roleName)
+        public async Task<List<string>> GetRoleServicesAsync(string roleName)
         {
             return await _databaseContext.RolePermissions
                 .Where(rp => rp.RoleName.Equals(roleName))
@@ -160,7 +160,7 @@ namespace RestaurantSystem.Services
         }
 
         // List of service names, whcih the user can access
-        public async Task<List<string>> GetUserAccessibleServices(int userId)
+        public async Task<List<string>> GetUserAccessibleServicesAsync(int userId)
         {
             // Get user's roles
             List<string> userRoles = await _databaseContext.UserRoles
@@ -182,7 +182,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<List<UserModel>> GetUsersWithAccessToServices(List<string> services)
+        public async Task<List<UserModel>> GetUsersWithAccessToServicesAsync(List<string> services)
         {
             return await _databaseContext.Users
                 .Include(user => user.Roles)

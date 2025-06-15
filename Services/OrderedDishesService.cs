@@ -14,7 +14,7 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<OrderedDishesModel> CreateOrderedDish(int dishModelId, 
+        public async Task<OrderedDishesModel> CreateOrderedDishAsync(int dishModelId, 
             int orderModelId, string? notes)
         {
             OrderedDishesModel orderedDishes = new OrderedDishesModel()
@@ -31,7 +31,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> UpdateOrderedDishStatusById(int dishId, int orderId, string status)
+        public async Task<bool> UpdateOrderedDishStatusByIdAsync(int dishId, int orderId, string status)
         {
             OrderedDishesModel? orderedDishes = await _databaseContext.OrderedDishes
                 .FirstOrDefaultAsync(
@@ -47,7 +47,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DeleteOrderedDishes(int orderId)
+        public async Task<bool> DeleteOrderedDishesAsync(int orderId)
         {
             List<OrderedDishesModel> dishes = await _databaseContext.OrderedDishes
                 .Where(order => order.OrderId == orderId)
@@ -60,7 +60,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<string>> GetDishCurrectStatus(int orderId)
+        public async Task<List<string>> GetDishCurrectStatusAsync(int orderId)
         {
             return await _databaseContext.OrderedDishes
                 .Where(order => order.OrderId == orderId)
@@ -71,7 +71,7 @@ namespace RestaurantSystem.Services
         /*
          * Converts OrderedDishes to a list of dishes.
          */
-        public async Task<Dictionary<DishWithStatusModel, int>> CountDishesByOrder(int orderId)
+        public async Task<Dictionary<DishWithStatusModel, int>> CountDishesByOrderAsync(int orderId)
         {
             List<OrderedDishesModel> orderedDishes = await _databaseContext.OrderedDishes.Where(
                 order => order.OrderId == orderId)

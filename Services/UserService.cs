@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
@@ -7,7 +8,6 @@ namespace RestaurantSystem.Services
 {
     public class UserService
     {
-
         private DatabaseContext _databaseContext;
 
         public UserService(DatabaseContext databaseContext)
@@ -15,19 +15,19 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<UserModel?> GetUser(int id)
+        public async Task<UserModel?> GetUserAsync(int id)
         {
             return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         }
 
-        public async Task<UserModel?> GetStaffUser(int id)
+        public async Task<UserModel?> GetStaffUserAsync(int id)
         {
             return await _databaseContext.Users
                 .Include(user => user.Restaurant)
                 .FirstOrDefaultAsync(user => user.Id == id);
         }
 
-        public async Task<UserModel?> RegisterUser(RegisterFormModel registerFormModel)
+        public async Task<UserModel?> RegisterUserAsync(RegisterFormModel registerFormModel)
         {
             UserModel user = new UserModel
             {
@@ -49,7 +49,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0 ? user : null;
         }
 
-        public async Task<UserModel?> LoginUser(string email, string no_hash_password)
+        public async Task<UserModel?> LoginUserAsync(string email, string no_hash_password)
         {
             string hash_password = Convert.ToBase64String(EncryptionUtility.HashIt(no_hash_password));
             return await _databaseContext.Users.FirstOrDefaultAsync(
@@ -58,7 +58,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> UpdateUser(UserModel user, 
+        public async Task<bool> UpdateUserAsync(UserModel user, 
             ProfileUpdateFormModel profileUpdateFormModel)
         {
             user.State = profileUpdateFormModel.State;
@@ -74,7 +74,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> DeleteUser(int userId)
+        public async Task<bool> DeleteUserAsync(int userId)
         {
             UserModel? user = await _databaseContext.Users.FirstOrDefaultAsync(
                 user => user.Id == userId);
@@ -90,7 +90,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<RestaurantModel?> GetRestaurantWhereUserWorksIn(UserModel user)
+        public async Task<RestaurantModel?> GetRestaurantWhereUserWorksInAsync(UserModel user)
         {
             return await _databaseContext.Restaurants
                 .Where(restaurant => restaurant.Id == user.RestaurantId)

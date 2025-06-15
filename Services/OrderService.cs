@@ -19,7 +19,7 @@ namespace RestaurantSystem.Services
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;
         }
 
-        public async Task<OrderModel?> AddOrder(int userId, int restaurantId,
+        public async Task<OrderModel?> AddOrderAsync(int userId, int restaurantId,
             List<int> dishesId, string? notes, decimal totalPrice,
             string? tableNumber, string? cupon_code)
         {
@@ -41,7 +41,7 @@ namespace RestaurantSystem.Services
 
             foreach (int id in dishesId)
             {
-                await _orderedDishesDatabaseHandler.CreateOrderedDish(id, order.Id, null);
+                await _orderedDishesDatabaseHandler.CreateOrderedDishAsync(id, order.Id, null);
             }
 
             if (await _databaseContext.SaveChangesAsync() <= 0)
@@ -52,7 +52,7 @@ namespace RestaurantSystem.Services
             return order;
         }
 
-        public async Task<bool> DeleteOrder(int orderId)
+        public async Task<bool> DeleteOrderAsync(int orderId)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
@@ -63,14 +63,14 @@ namespace RestaurantSystem.Services
                 return false;
             }
 
-            await _orderedDishesDatabaseHandler.DeleteOrderedDishes(orderId);
+            await _orderedDishesDatabaseHandler.DeleteOrderedDishesAsync(orderId);
 
             _databaseContext.Orders.Remove(order);
 
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateOrderCurrentStatusById(int orderId, string status)
+        public async Task<bool> UpdateOrderCurrentStatusByIdAsync(int orderId, string status)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId) ?? throw new Exception();
@@ -80,7 +80,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<OrderModel>> GetOrdersByUser(int userId)
+        public async Task<List<OrderModel>> GetOrdersByUserAsync(int userId)
         {
             return await _databaseContext.Orders
                 .Include(order => order.Restaurant)
@@ -90,14 +90,15 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<List<OrderModel>> GetOrdersByRestaurantId(int restaurantId)
+        public async Task<List<OrderModel>> GetOrdersByRestaurantIdAsync(int restaurantId)
         {
             return await _databaseContext.Orders.Where(
                 order => order.RestaurantId == restaurantId)
                 .ToListAsync();
         }
 
-        public async Task<List<OrderModel>> Get_HomeDelivery_OrdersBy_RestaurantId(int restaurantId)
+        public async Task<List<OrderModel>> Get_HomeDelivery_OrdersBy_RestaurantIdAsync(
+            int restaurantId)
         {
             return await _databaseContext.Orders.Where(
                 order => 
@@ -106,7 +107,7 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<OrderModel?> GetOrderById(int orderId)
+        public async Task<OrderModel?> GetOrderByIdAsync(int orderId)
         {
             return await _databaseContext.Orders
                 .Include(order => order.OrderedDishes)

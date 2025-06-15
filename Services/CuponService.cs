@@ -14,9 +14,9 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> DeleteCupon(string cuponCode)
+        public async Task<bool> DeleteCuponAsync(string cuponCode)
         {
-            CuponModel? cupon = await GetCuponByCode(cuponCode);
+            CuponModel? cupon = await GetCuponByCodeAsync(cuponCode);
 
             if (cupon == null)
             {
@@ -28,13 +28,13 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<CuponModel?> GetCuponByCode(string cuponCode)
+        public async Task<CuponModel?> GetCuponByCodeAsync(string cuponCode)
         {
             return await _databaseContext.Cupons.FirstOrDefaultAsync(
                 c => c.CuponCode == cuponCode);
         }
 
-        public async Task<CuponModel?> CreateCupon(string cuponCode, string name,
+        public async Task<CuponModel?> CreateCuponAsync(string cuponCode, string name,
             DateOnly expirationDate, int discountPercent)
         {
             CuponModel cupon = new CuponModel() { 
