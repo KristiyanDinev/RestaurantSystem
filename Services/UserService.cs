@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
 using RestaurantSystem.Utilities;
+
 namespace RestaurantSystem.Services
 {
     public class UserService
@@ -31,17 +31,10 @@ namespace RestaurantSystem.Services
         {
             UserModel user = new UserModel
             {
-                PhoneNumber = registerFormModel.PhoneNumber,
-                Address = registerFormModel.Address,
-                City = registerFormModel.City,
-                State = registerFormModel.State,
-                Country = registerFormModel.Country,
-                Email = registerFormModel.Email,
-                Image = registerFormModel.Image,
                 Name = registerFormModel.Name,
+                Email = registerFormModel.Email,
+                Image = await Utility.UploadImageAsync(registerFormModel.Image),
                 Password = Convert.ToBase64String(EncryptionUtility.HashIt(registerFormModel.Password)),
-                Notes = registerFormModel.Notes,
-                PostalCode = registerFormModel.PostalCode
             };
 
             await _databaseContext.Users.AddAsync(user);
@@ -59,16 +52,26 @@ namespace RestaurantSystem.Services
 
 
         public async Task<bool> UpdateUserAsync(UserModel user, 
-            ProfileUpdateFormModel profileUpdateFormModel)
+            ProfileUpdateFormModel profileUpdateForm)
         {
-            user.State = profileUpdateFormModel.State;
-            user.Address = profileUpdateFormModel.Address;
-            user.City = profileUpdateFormModel.City;
-            user.Country = profileUpdateFormModel.Country;
-            user.PhoneNumber = profileUpdateFormModel.PhoneNumber;
-            user.Image = profileUpdateFormModel.Image;
-            user.Name = profileUpdateFormModel.Name;
-            user.Notes = profileUpdateFormModel.Notes;
+            if (profileUpdateForm.DeleteImage)
+            {
+                Utility.DeleteImage(user.Image);
+                user.Image = null;
+
+            } else
+            {
+                string? img = await Utility.UpdateImage(user.Image,
+                    profileUpdateForm.Image);
+
+                if (img != null)
+                {
+                    user.Image = img;
+                }
+            }
+
+            user.Name = profileUpdateForm.Name;
+            user.Email = profileUpdateForm.Email;
 
             return await _databaseContext.SaveChangesAsync() > 0;
         }

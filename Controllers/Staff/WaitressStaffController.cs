@@ -53,7 +53,7 @@ namespace RestaurantSystem.Controllers.Staff
             [FromForm] ReservationUpdateFormModel reservationUpdateForm)
         {
             if (!ModelState.IsValid || 
-                !_utility.IsValidReservationStatus(reservationUpdateForm.Status))
+                !Utility.IsValidReservationStatus(reservationUpdateForm.Status))
             {
                 return BadRequest();
             }

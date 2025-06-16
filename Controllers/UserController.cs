@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
-using RestaurantSystem.Models.Query;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
@@ -17,15 +16,11 @@ namespace RestaurantSystem.Controllers {
 
         private UserService _userService;
         private UserUtility _userUtility;
-        private RoleService _roleService;
-        private readonly string deliveryRoleName = "delivery";
 
-        public UserController(UserService userService, UserUtility userUtility,
-            RoleService roleService)
+        public UserController(UserService userService, UserUtility userUtility)
         {
             _userService = userService;
             _userUtility = userUtility;
-            _roleService = roleService;
         }
 
         [HttpGet]
@@ -108,8 +103,7 @@ namespace RestaurantSystem.Controllers {
         public async Task<IActionResult> Profile()
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
-            return user == null ? RedirectToAction("Login") :
-                View(user);
+            return user == null ? RedirectToAction("Login") : View(user);
         }
 
 
@@ -118,15 +112,6 @@ namespace RestaurantSystem.Controllers {
         public async Task<IActionResult> ProfileUpdate(
             [FromForm] ProfileUpdateFormModel profileUpdateFormModel)
         {
-            // Client wants to update their own profile. Allow all changes.
-
-            // Check if that client is a delivery guy and if it is,
-            // then do not update the city, country and state
-            // Update these values only by an admin
-
-            // profileUpdateFormModel contains the new/updated information.
-            // It also may contain some old information.
-
             if (!ModelState.IsValid)
             {
                 return BadRequest();
@@ -138,22 +123,7 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            if (!user.City.Equals(profileUpdateFormModel.City) ||
-               !user.Country.Equals(profileUpdateFormModel.Country) ||
-                user.State != profileUpdateFormModel.State)
-            {
-                // user changed city, country and state
-                List<string> roles = await _roleService.GetUserRolesAsync(user.Id);
-                if (roles.Contains(deliveryRoleName)) {
-                    // that user is a delivery guy
-                    profileUpdateFormModel.City = user.City;
-                    profileUpdateFormModel.Country = user.Country;
-                    profileUpdateFormModel.State = user.State;
-                }
-            }
-
-            return await _userService.UpdateUserAsync(user,
-                profileUpdateFormModel) ?
+            return await _userService.UpdateUserAsync(user, profileUpdateFormModel) ?
                 Ok() : BadRequest();
         }
 

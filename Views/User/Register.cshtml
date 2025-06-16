@@ -16,7 +16,7 @@
         <div class="register-container">
             <h1 class="form-title">Create Your Account</h1>
 
-            <form id="registerForm" novalidate>
+            <div novalidate>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="Username" class="form-label">Username <span class="required">*</span></label>
@@ -31,56 +31,13 @@
                 <div class="mb-3">
                     <label for="Password" class="form-label">Password <span class="required">*</span></label>
                     <input type="password" class="form-control" id="Password" placeholder="Enter password" required>
-                    <div class="form-text">Password must be at least 6 characters long</div>
                 </div>
 
                 <div class="mb-3">
                     <label for="Image" class="form-label">Profile Image</label>
+                    <button class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
                     <input type="file" class="form-control" id="Image" accept="image/*">
-                    <img id="review" src="#" alt="Profile preview" class="mt-2" />
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="country" class="form-label">Country <span class="required">*</span></label>
-                        <select id="country" name="country" class="form-select" required>
-                            <option value="" selected disabled>Select Country</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="state" class="form-label">State/Province</label>
-                        <select id="state" name="state" class="form-select" disabled>
-                            <option value="" selected disabled>Select State/Province</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-8 mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <select id="city" name="city" class="form-select" disabled>
-                            <option value="" selected disabled>Select City</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="PostalCode" class="form-label">Postal Code <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="PostalCode" placeholder="12345" required>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="Address" class="form-label">Address <span class="required">*</span></label>
-                    <input type="text" class="form-control" id="Address" placeholder="Enter full address" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="Phone" class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" id="Phone" maxlength="15" placeholder="Enter phone number">
-                </div>
-
-                <div class="mb-3">
-                    <label for="Notes" class="form-label">Notes</label>
-                    <textarea class="form-control" id="Notes" rows="4" maxlength="255" placeholder="Additional notes (optional)"></textarea>
+                    <img id="preview" src="#" alt="Profile preview" class="mt-2 rounded img-thumbnail" />
                 </div>
 
                 <div class="form-check mb-4">
@@ -93,17 +50,16 @@
                 <div id="Stats" class="mb-3"></div>
 
                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <button type="button" class="btn btn-primary btn-lg me-md-2" onclick="submitForm()">
+                    <button type="button" class="btn btn-primary btn-lg me-md-2" onclick="submit()">
                         Create Account
                     </button>
                     <button type="button" class="btn btn-secondary btn-lg" onclick="goToLogin()">
                         Go to Login
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
     @await Html.PartialAsync("_BottomImports")
-    <script src='~/assets/user_location.js'></script>
     <script src='~/assets/register/register.js'></script>
 </body>

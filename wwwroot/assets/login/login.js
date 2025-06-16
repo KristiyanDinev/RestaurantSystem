@@ -20,7 +20,7 @@ async function submit() {
             body: formData,
         })
 
-        if (res.status === 200) {
+        if (res.ok) {
             window.location.reload()
             return
         }

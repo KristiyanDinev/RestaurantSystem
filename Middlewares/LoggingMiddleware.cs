@@ -12,8 +12,14 @@
 
         public async Task InvokeAsync(HttpContext context)
         {
+            string? path = context.Request.Path.Value;
+            if (path != null && path.StartsWith("/assets"))
+            {
+                await _next(context);
+            }
+
             Console.WriteLine("Custom Logging:\n");
-            Console.WriteLine(context.Request.Method + ": " + context.Request.Path.Value);
+            Console.WriteLine(context.Request.Method + ": " + path);
             Console.WriteLine("\n----\nCookies:");
             foreach (var cookie in context.Request.Cookies)
             {

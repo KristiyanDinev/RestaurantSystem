@@ -1,10 +1,13 @@
-using RestaurantSystem.Database;
-using RestaurantSystem.Services;
 using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
+using RestaurantSystem.Database;
 using RestaurantSystem.Middlewares;
+using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
+using System.Data;
+using System.Threading.RateLimiting;
 
 namespace RestaurantSystem
 {
@@ -13,16 +16,13 @@ namespace RestaurantSystem
         public static void Main(string[] args)
         {
             Console.WriteLine("Current Working Directory: "+ Directory.GetCurrentDirectory());
-
+            Console.WriteLine("Configuring...");
             var builder = WebApplication.CreateBuilder(args);
-
             builder.Services.AddControllersWithViews();
-
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
 
             builder.WebHost.UseUrls([uri]);
-
             // postgresql 17 5432
             builder.Services.AddDbContext<DatabaseContext>(options =>
             {
@@ -38,6 +38,7 @@ namespace RestaurantSystem
             builder.Services.AddScoped<RoleService>();
             builder.Services.AddScoped<ReservationService>();
             builder.Services.AddScoped<LocationService>();
+            builder.Services.AddScoped<AddressService>();
 
             builder.Services.AddScoped<EncryptionUtility>(_ =>
                 new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??
@@ -47,7 +48,6 @@ namespace RestaurantSystem
                 new JWTUtility(builder.Configuration.GetValue<string>("JWT_Key") ?? 
                 "234w13543ewf53erdfa"));
 
-            builder.Services.AddScoped<Utility>();
             builder.Services.AddScoped<UserUtility>();
             builder.Services.AddScoped<WebSocketService>();
             builder.Services.AddSingleton<WebSocketUtility>();
@@ -61,8 +61,7 @@ namespace RestaurantSystem
                 })
             );
 
-            var app = builder.Build();
-
+            WebApplication app = builder.Build();
             app.UseWebSockets(new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(2),
@@ -72,21 +71,33 @@ namespace RestaurantSystem
             app.UseRateLimiter();
             app.UseRouting();
             app.UseStaticFiles();
-
             app.UseAuthenticationMiddleware();
             app.UseWebSocketMiddleware();
             app.UseLoggingMiddleware();
-
             app.MapControllers();
-            
-            //AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
+
+            Console.WriteLine("Start up SQL executing...");
+            string? sqlFile = builder.Configuration.GetValue<string>("StartUpSQLFile");
+            if (sqlFile != null && File.Exists(sqlFile)) {
+                using IServiceScope scope = app.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                using var connection = dbContext.Database.GetDbConnection();
+                if (connection.State != ConnectionState.Open)
+                {
+                    connection.Open();
+                }
+
+                using var command = connection.CreateCommand();
+                command.CommandText = File.ReadAllText(sqlFile);
+                command.CommandTimeout = 300000;
+                command.Transaction = dbContext.Database.BeginTransaction().GetDbTransaction();
+
+                command.ExecuteNonQuery();
+            }
+
+            Console.WriteLine("SQL executed");
 
             app.Run();
         }
-
-        /*
-        public static void OnApplicationExit(object sender, EventArgs e)
-        {
-        }*/
     }
 }

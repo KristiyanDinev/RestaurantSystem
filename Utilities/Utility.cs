@@ -1,67 +1,70 @@
-﻿using RestaurantSystem.Enums;
-using System.Text;
-
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Enums;
 namespace RestaurantSystem.Utilities
 {
     public class Utility
     {
+        public readonly static int pageSize = 10;
+        private readonly static string deliveryRoleName = "delivery";
 
-        public bool IsValidDishStatus(string status) { 
+        public static bool IsValidDishStatus(string status) { 
             return status.Equals(Status.Pending.ToString(), StringComparison.OrdinalIgnoreCase) ||
                    status.Equals(Status.Preparing.ToString(), StringComparison.OrdinalIgnoreCase) ||
                    status.Equals(Status.Ready.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
-        public bool IsValidReservationStatus(string status)
+        public static bool IsValidReservationStatus(string status)
         {
             return status.Equals(Status.Pending.ToString(), StringComparison.OrdinalIgnoreCase) ||
                    status.Equals(Status.Accepted.ToString(), StringComparison.OrdinalIgnoreCase) ||
                    status.Equals(Status.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
-        public byte[] FromStringToUint8Array(string data)
+        public static async Task<string?> UploadImageAsync(IFormFile? Image)
         {
-            string[] dataNumbers = data.Split(",");
-            byte[] byteArray = new byte[dataNumbers.Length];
-            for (int i = 0; i < dataNumbers.Length; i++)
+            if (Image == null)
             {
-                byteArray[i] = Convert.ToByte(dataNumbers[i]);
+                return null;
             }
-            return byteArray;
+            
+            string imageName = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+            try
+            {
+                using FileStream fileStream = new FileStream("wwwroot/assets/images/user/" + imageName, FileMode.Create);
+                await Image.CopyToAsync(fileStream);
+                return "/assets/images/user/" + imageName;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
-        private void RemoveImage(string image)
+        public static void DeleteImage(string? img)
         {
-            if (File.Exists(image))
+            string oldImagePath = "wwwroot" + img;
+            if (File.Exists(oldImagePath))
             {
-                File.Delete(image);
+                File.Delete(oldImagePath);
             }
         }
 
-        public async Task<string?> UploadImage(string image)
-        {
-            // image.png;safawfedscwad==
-            string[] imageParts = image.Split(';');
-            string imageName = imageParts[0];
-            string imageData = imageParts[1];
+        public static async Task<string?> UpdateImage(string? OldImage, IFormFile? Image) {
 
-            string byteData = Encoding.UTF8.GetString(
-                Convert.FromBase64String(imageData));
-            if (!(imageName.Contains('\\') ||
-                imageName.Contains('/') ||
-                imageName.Contains('\'') ||
-                byteData.EndsWith(',') ||
-                byteData.StartsWith(',')))
+            if (OldImage != null)
             {
-                string imgPath = "wwwroot/images/user/" + imageName;
-                RemoveImage(imgPath);
-                using FileStream fs =
-                    File.Create("wwwroot/images/user/" + imageName);
-                await fs.WriteAsync(FromStringToUint8Array(byteData));
-
-                return "/images/user/" + imageName;
+                DeleteImage(OldImage);
             }
-            return null;
+
+            return await UploadImageAsync(Image);
+        }
+
+        public static async Task<List<T>> GetPageAsync<T>(IQueryable<T> query, int pageNumber)
+        {
+            return await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
     }
 }

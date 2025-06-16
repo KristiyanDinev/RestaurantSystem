@@ -22,6 +22,50 @@ namespace RestaurantSystem.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.AddressModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .IsUnicode(true)
+                        .HasColumnType("text");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .IsUnicode(true)
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .IsUnicode(true)
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("State")
+                        .IsUnicode(true)
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Addresses", (string)null);
+                });
+
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.CuponModel", b =>
                 {
                     b.Property<string>("CuponCode")
@@ -40,6 +84,31 @@ namespace RestaurantSystem.Migrations
                     b.HasKey("CuponCode");
 
                     b.ToTable("Cupons", (string)null);
+                });
+
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DeliveryModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Delivery", (string)null);
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DishModel", b =>
@@ -338,18 +407,6 @@ namespace RestaurantSystem.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -367,27 +424,12 @@ namespace RestaurantSystem.Migrations
                         .IsUnicode(true)
                         .HasColumnType("text");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("text");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .IsUnicode(true)
-                        .HasColumnType("text");
-
                     b.Property<int?>("RestaurantId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("State")
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -421,6 +463,36 @@ namespace RestaurantSystem.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("User_Roles", (string)null);
+                });
+
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.AddressModel", b =>
+                {
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
+                        .WithMany("Addresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DeliveryModel", b =>
+                {
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.OrderModel", "Order")
+                        .WithOne("Delivery")
+                        .HasForeignKey("RestaurantSystem.Models.DatabaseModels.DeliveryModel", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
+                        .WithOne("Delivery")
+                        .HasForeignKey("RestaurantSystem.Models.DatabaseModels.DeliveryModel", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DishModel", b =>
@@ -545,6 +617,9 @@ namespace RestaurantSystem.Migrations
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.OrderModel", b =>
                 {
+                    b.Navigation("Delivery")
+                        .IsRequired();
+
                     b.Navigation("OrderedDishes");
                 });
 
@@ -571,6 +646,11 @@ namespace RestaurantSystem.Migrations
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.UserModel", b =>
                 {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("Delivery")
+                        .IsRequired();
+
                     b.Navigation("Orders");
 
                     b.Navigation("Reservations");

@@ -62,6 +62,9 @@ namespace RestaurantSystem.Database {
 
             // DeliveryModel
             BuildDeliveryModel(ref builder);
+
+            // AddressModel
+            BuildAddressModel(ref builder);
         }
 
 
@@ -78,28 +81,9 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<UserModel>()
-                .Property(user => user.PostalCode)
-                .IsUnicode()
-                .IsRequired();
-
-            builder.Entity<UserModel>()
-                .Property(user => user.PostalCode)
-                .IsRequired();
-
-            builder.Entity<UserModel>()
-                .Property(user => user.Address)
-                .IsRequired();
-
-            builder.Entity<UserModel>()
-                .Property(user => user.City)
-                .IsRequired();
-
-            builder.Entity<UserModel>()
-                .Property(user => user.Country)
-                .IsRequired();
-
-            builder.Entity<UserModel>()
-                .Property(user => user.PhoneNumber)
+                .HasMany(user => user.Addresses)
+                .WithOne(address => address.User)
+                .HasForeignKey(address => address.UserId)
                 .IsRequired();
 
             builder.Entity<UserModel>()
@@ -114,13 +98,6 @@ namespace RestaurantSystem.Database {
                 .Property(user => user.Image)
                 .HasDefaultValue(null);
 
-            builder.Entity<UserModel>()
-                .Property(user => user.State)
-                .HasDefaultValue(null);
-
-            builder.Entity<UserModel>()
-                .Property(user => user.Notes)
-                .HasDefaultValue(null);
 
             builder.Entity<UserModel>()
                 .Property(user => user.RestaurantId)
@@ -497,6 +474,41 @@ namespace RestaurantSystem.Database {
                 .WithOne(order => order.Delivery)
                 .HasForeignKey<DeliveryModel>(
                     delivery => delivery.OrderId);
+        }
+
+        private void BuildAddressModel(ref ModelBuilder builder) {
+            builder.Entity<AddressModel>().ToTable("Addresses");
+
+            builder.Entity<AddressModel>()
+                  .HasKey(address => address.Id);
+
+            builder.Entity<AddressModel>()
+                .Property(address => address.Country)
+                .IsRequired()
+                .IsUnicode();
+
+            builder.Entity<AddressModel>()
+                .Property(address => address.State)
+                .HasDefaultValue(null)
+                .IsUnicode();
+
+            builder.Entity<AddressModel>()
+                .Property(address => address.City)
+                .IsRequired()
+                .IsUnicode();
+
+            builder.Entity<AddressModel>()
+                .Property(address => address.Address)
+                .IsRequired()
+                .IsUnicode();
+
+            builder.Entity<AddressModel>()
+                .Property(address => address.PhoneNumber)
+                .IsRequired();
+
+            builder.Entity<AddressModel>()
+                .Property(address => address.Notes)
+                .HasDefaultValue(null);
         }
     }
 }

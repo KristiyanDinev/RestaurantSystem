@@ -86,7 +86,7 @@ namespace RestaurantSystem.Controllers.Staff
             bool updated = false;
 
             if (orderUpdateFormModel.DishCurrentStatus != null &&
-                _utility.IsValidDishStatus(orderUpdateFormModel.DishCurrentStatus))
+                Utility.IsValidDishStatus(orderUpdateFormModel.DishCurrentStatus))
             {
 
                 if (!await _orderedDishesService

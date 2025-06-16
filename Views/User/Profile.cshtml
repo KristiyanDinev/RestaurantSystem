@@ -1,13 +1,11 @@
 ﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
 @{
     ViewData["Title"] = "Profile";
-    Model.Image ??= "";
-    Model.State ??= "";
 }
 
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/profile/profile.css'>
+   
     @await Html.PartialAsync("_Imports")
 </head>
 
@@ -18,77 +16,38 @@
 
     <div>
         <label id="profile_value">Image</label>
-        <br>
-        <image id="image" src="~@Model.Image" alt="user image">
-            <br>
 
-            <input type="file" accept="image/*" id="_image">
-            <br>
-            <label id="profile_value">Preview</label>
-            <br>
-            <img id="review" alt="your image" />
-            <br>
-            <label id="delete_image_status"></label>
-            <br>
+        @if (Model.Image != null)
+        {
+            <img id="image" src="@Model.Image" alt="user image" class="mt-2 rounded img-thumbnail">
+        }
+
+            <input type="file" accept="image/*" id="Image">
+
+        <button class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
+
+            <img id="preview" alt="Profile Image Preview" class="mt-2 rounded img-thumbnail" />
+   
+            <label id="delete_image_status">Delete Image: No</label>
+      
             <button onclick="toggleDeleteImage()">Toggle Delete Image</button>
-            <br>
+     
             <div class="input_center">
                 <p>Username: @Model.Name</p>
-                <br>
                 <input type="text" id="username"
                 maxlength="255" value="@Model.Name" placeholder="Username" required>
             </div>
-            <br>
 
             <div class="input_center">
                 <p>Email: @Model.Email</p>
-                <br>
                 <input type="email" id="email" maxlength="50" value="@Model.Email" placeholder="Email" required>
-            </div>
-
-            <div class="input_center">
-                <p>Address</p>
-                <br>
-                <input type="text" id="address" placeholder="Address" value="@Model.Address" required>
-            </div>
-
-            <div class="input_center">
-                <p>City</p>
-                <br>
-                <input type="text" id="city" placeholder="City" value="@Model.City" required>
-            </div>
-
-            <div class="input_center">
-                <p>State @Model.State</p>
-                <br>
-                <input type="text" id="state" value="@Model.State" placeholder="State (leave it empty if you don't live in a State')" required>
-            </div>
-
-            <div class="input_center">
-                <p>Country</p>
-                <br>
-                <input type="text" id="country" placeholder="Country" value="@Model.Country" required>
-            </div>
-
-            <div class="input_center">
-                <p>Notes: <p>@Model.State</p>
-                    <br>
-                    <textarea id="notes" cols="50" rows="10" maxlength="255" placeholder="Notes">@Model.Notes</textarea>
-            </div>
-
-            <div class="input_center">
-                <p>Phone Number: @Model.PhoneNumber</p>
-                <br>
-                <input type="text" id="phone" value="@Model.PhoneNumber" maxlength="15" placeholder="Phone Number">
             </div>
     </div>
 
     <p id="Stats"></p>
 
-    <br>
-
-    <button id="edit" onclick="updateUser()">Edit</button>
-
+    <button type="button" onclick="updateUser()">Edit</button>
+    @await Html.PartialAsync("_BottomImports")
     <script src='~/assets/profile/profile.js'></script>
 </body>
 

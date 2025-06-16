@@ -12,7 +12,6 @@ namespace RestaurantSystem.Utilities
 
         private readonly string authHeader = "Authentication";
         private readonly string userIdClaimKey = "Id";
-        private readonly string bearerHeaderStart = "Bearer ";
 
         public UserUtility(EncryptionUtility encryptionUtility, JWTUtility jwtUtility,
             UserService userService)
@@ -22,14 +21,6 @@ namespace RestaurantSystem.Utilities
             _userService = userService;
         }
 
-        /*
-         * A clean and easy way to extract the JWT from the header.
-         */
-
-        private string? _ExtractJWTFromHeader(string? header)
-        {
-            return header != null && header.StartsWith(bearerHeaderStart) ? header.Substring(7) : null;
-        }
 
         /*
          * Generates a JWT:
@@ -57,7 +48,7 @@ namespace RestaurantSystem.Utilities
         public void SetUserAuthBearerHeader(HttpContext context, string jwt)
         {
             RemoveAuthBearerHeader(context);
-            context.Response.Cookies.Append(authHeader, bearerHeaderStart + jwt);
+            context.Response.Cookies.Append(authHeader, jwt);
         }
 
         public async Task<Dictionary<string, object>?> GetAuthClaimFromJWT(HttpContext context)
@@ -66,8 +57,8 @@ namespace RestaurantSystem.Utilities
             {
                 return await _jwtUtility.VerifyJWT(
                    _encryptionUtility.Decrypt(
-                       _ExtractJWTFromHeader(context.Request.Cookies[authHeader]
-                       )));
+                       context.Request.Cookies[authHeader]
+                       ));
 
             } catch (Exception)
             {

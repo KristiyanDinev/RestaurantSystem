@@ -21,9 +21,9 @@ namespace RestaurantSystem.Services
                 .Where(
                 times => 
                 times.DoDelivery &&
-                times.City.Equals(user.City) &&
-                times.Country.Equals(user.Country) &&
-                times.State == user.State
+                times.City.Equals("") &&
+                times.Country.Equals("") &&
+                times.State == ""
                 )
                 .ToListAsync();
         }
@@ -33,9 +33,9 @@ namespace RestaurantSystem.Services
             return await _databaseContext.Restaurants
                 .Where(
                 times =>
-                times.City.Equals(user.City) &&
-                times.Country.Equals(user.Country) &&
-                times.State == user.State
+                times.City.Equals("") &&
+                times.Country.Equals("") &&
+                times.State == ""
                 )
                 .ToListAsync();
         }
@@ -46,9 +46,9 @@ namespace RestaurantSystem.Services
             return await _databaseContext.Restaurants
                 .Where(
                 times => times.ServeCustomersInPlace &&
-                times.City.Equals(user.City) &&
-                times.Country.Equals(user.Country) &&
-                times.State == user.State
+                times.City.Equals("") &&
+                times.Country.Equals("") &&
+                times.State == ""
                 )
                 .ToListAsync();
         }
