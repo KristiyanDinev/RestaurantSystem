@@ -13,10 +13,7 @@
 
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/login/login.css'>
-
-    @await Html.PartialAsync("_Imports")
-
+    @await Html.PartialAsync("_Header")
 </head>
 
 <body>
@@ -37,10 +34,10 @@
         <p id="Stats"></p>
         <br>
 
-        <button onclick="submit()">Login</button>
+        <button type="button" onclick="submit()">Login</button>
     </div>
 
-    <button onclick="goToRegister()">Go to Register</button>
-    @await Html.PartialAsync("_BottomImports")
+    <button type="button" onclick="goToRegister()">Go to Register</button>
+    @await Html.PartialAsync("_Footer")
     <script src='~/assets/login/login.js'></script>
 </body>

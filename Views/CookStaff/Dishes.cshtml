@@ -7,14 +7,9 @@
     ViewData["Title"] = "Cook";
 }
 
-<!DOCTYPE html>
-
 <head>
-    @await Html.PartialAsync("_Imports")
-
+    @await Html.PartialAsync("_Header")
     <script src='~/assets/staff/cook/cook.js'></script>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/single_dish/single_dish.css'>
 </head>
 
 
@@ -101,12 +96,12 @@
                             else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(preparing, StringComparison.OrdinalIgnoreCase))
                             {
                                 <div class="row noselect">
-                                    <button class="order"
+                                    <button type="button" class="order"
                                     onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@pending')">
                                         Pending
                                     </button>
 
-                                    <button class="order"
+                                    <button type="button" class="order"
                                             onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@ready')">
                                         Dish Ready
                                     </button>
@@ -115,7 +110,7 @@
                             }
                             else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(ready, StringComparison.OrdinalIgnoreCase))
                             {
-                                <button class="order noselect"
+                                <button type="button" class="order noselect"
                                         onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">
                                     Preparing
                                 </button>
@@ -135,5 +130,7 @@
             startWebSocket()
         </script>
     }
+
+    @await Html.PartialAsync("_Footer")
 </body>
 

@@ -8,7 +8,7 @@
         public decimal TotalPrice { get; set; } // default 0.00
 
 
-        public required int UserId { get; set; }
+        public required long UserId { get; set; }
         public UserModel User { get; set; } = null!;
 
 

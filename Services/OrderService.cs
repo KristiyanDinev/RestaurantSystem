@@ -19,7 +19,7 @@ namespace RestaurantSystem.Services
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;
         }
 
-        public async Task<OrderModel?> AddOrderAsync(int userId, int restaurantId,
+        public async Task<OrderModel?> AddOrderAsync(long userId, int restaurantId,
             List<int> dishesId, string? notes, decimal totalPrice,
             string? tableNumber, string? cupon_code)
         {
@@ -80,7 +80,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<OrderModel>> GetOrdersByUserAsync(int userId)
+        public async Task<List<OrderModel>> GetOrdersByUserAsync(long userId)
         {
             return await _databaseContext.Orders
                 .Include(order => order.Restaurant)

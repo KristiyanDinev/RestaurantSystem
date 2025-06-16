@@ -3,12 +3,8 @@
     ViewData["Title"] = "Reservation";
 }
 
-<!DOCTYPE html>
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/reservations/reservations.css'>
-
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
 
     <script src='~/assets/reservations/reservations.js'></script>
 </head>
@@ -46,7 +42,9 @@
         <p id="reservation_status"></p>
 
         <div class="noselect reserve">
-            <button onclick="submit()">Reserve</button>
+            <button type="button" onclick="submit()">Reserve</button>
         </div>
     </div>
+
+    @await Html.PartialAsync("_Footer")
 </body>

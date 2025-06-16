@@ -7,9 +7,7 @@
 
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/reservations/reservations.css'>
-
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
 
     <script src='~/assets/staff/waitress/reservations_staff.js'></script>
 </head>
@@ -50,12 +48,12 @@
                 @if (reservation.CurrentStatus.Equals(pending, 
                     StringComparison.OrdinalIgnoreCase))
                 {
-                    <button class="noselect"
+                    <button type="button" class="noselect"
                             onclick="changeStatus('@reservation.Id', '@accepted')">
                             Accept
                     </button>
 
-                    <button class="noselect"
+                    <button type="button" class="noselect"
                             onclick="changeStatus('@reservation.Id', '@cancelled')">
                             Cancel
                     </button>
@@ -63,12 +61,12 @@
                 } else if (reservation.CurrentStatus.Equals(accepted, 
                     StringComparison.OrdinalIgnoreCase))
                 {
-                    <button class="noselect"
+                    <button type="button" class="noselect"
                             onclick="changeStatus('@reservation.Id', '@pending')">
                             Pending
                     </button>
 
-                    <button class="noselect"
+                    <button type="button" class="noselect"
                             onclick="changeStatus('@reservation.Id', '@cancelled')">
                             Cancel
                     </button>
@@ -76,7 +74,7 @@
                 } else if (reservation.CurrentStatus.Equals(cancelled, 
                     StringComparison.OrdinalIgnoreCase))
                 {
-                    <button class="noselect"
+                    <button type="button" class="noselect"
                             onclick="deleteReservation('@reservation.Id')">
                             Delete
                     </button>
@@ -88,6 +86,8 @@
         </div>
     }
 
+
+    @await Html.PartialAsync("_Footer")
 </body>
 
 

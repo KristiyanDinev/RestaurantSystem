@@ -1,0 +1,92 @@
+﻿@using RestaurantSystem.Models.DatabaseModels;
+@model RestaurantSystem.Models.View.Address.AddressesViewModel;
+@{
+    ViewData["Title"] = "Update Address";
+    AddressModel address = Model.Addresses.First();
+}
+
+<head>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/address/address.js"></script>
+</head>
+
+<body>
+    @await Html.PartialAsync("_NavBar", Model.User)
+
+    <button onclick="goToAddresses()" type="button" class="btn btn-primary m-2">Go to Addresses</button>
+
+    <div class="card">
+        <div class="card-body form-group">
+            <h5 class="card-title">Address Information</h5>
+            <div class="card-text">
+                <label for="country" class="form-lable">Country:</label>
+                <p>@address.Country</p>
+                <div class="input-group">
+                    <select id="country" class="form-control" required>
+                    </select>
+                </div>
+            </div>
+            <div class="card-text">
+                <label for="state" class="form-lable">State / Province / Region:</label>
+                <p>@address.State</p>
+                <div class="input-group">
+                    <select id="state" class="form-control">
+                    </select>
+                </div>
+            </div>
+            <div class="card-text">
+                <label for="city" class="form-lable">City:</label>
+                <p>@address.City</p>
+                <div class="input-group">
+                    <select id="city" class="form-control" required>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card-text">
+                <label for="address" class="form-lable">Address/Streat:</label>
+                <p>@address.Address</p>
+                <div class="input-group">
+                    <input type="text" id="address" class="form-control" value="@address.Address" placeholder="Your Streat address" required>
+                </div>
+            </div>
+
+            <div class="card-text">
+                <label for="phoneNumber" class="form-lable">Phone Number:</label>
+                <p>@address.PhoneNumber</p>
+                <div class="input-group">
+                    <input type="text" id="phoneNumber" class="form-control" placeholder="Your Phone Number: +1 1234567" value="@address.PhoneNumber" required />
+                </div>
+            </div>
+
+            <div class="card-text">
+                <label for="postalCode" class="form-lable">Postal/Zip Code:</label>
+                <p>@address.PostalCode</p>
+                <div class="input-group">
+                    <input type="text" id="postalCode" class="form-control" value="@address.PostalCode" placeholder="Your Postal/Zip Code: 12345" required />
+                </div>
+            </div>
+
+            <div class="card-text">
+                <label for="notes" class="form-lable">Notes:</label>
+                <p>@address.Notes</p>
+                <div class="input-group">
+                    <textarea rows="3" id="notes" class="form-control">@address.Notes</textarea>
+                </div>
+            </div>
+
+            <p id="status"></p>
+
+            <div class="card-text">
+                <button onclick="updateAddress('@address.Id')" type="button" class="btn btn-success m-2">Update</button>
+            </div>
+        </div>
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+    <script src='~/assets/user_location.js'></script>
+
+    <script>
+        load('@address.Country', '@address.State', '@address.City')
+    </script>
+</body>

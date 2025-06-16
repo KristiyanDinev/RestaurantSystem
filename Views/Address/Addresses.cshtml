@@ -1,0 +1,53 @@
+﻿@using RestaurantSystem.Models.DatabaseModels;
+@model RestaurantSystem.Models.View.Address.AddressesViewModel;
+@{
+    ViewData["Title"] = "Addresses";
+}
+
+
+<head>
+    @await Html.PartialAsync("_Header")
+
+</head>
+
+
+<body>
+    @await Html.PartialAsync("_NavBar", Model.User)
+
+    @if (TempData["Success"] != null)
+    {
+        <p>@TempData["Success"]</p>
+    }
+
+    <button onclick="goToAddAddress()" type="button" class="btn btn-primary m-2">Add Address</button>
+
+    <div class="m-3 row container">
+
+        @foreach (AddressModel address in Model.Addresses)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Address Information</h5>
+                        <p class="card-text">
+                            <strong>Country:</strong> @address.Country<br />
+                            <strong>State / Province / Region:</strong> @address.State<br />
+                            <strong>City:</strong> @address.City<br />
+                            <strong>Address:</strong> @address.Address<br />
+                            <strong>Postal/Zip Code:</strong> @address.PostalCode<br />
+                            <strong>Phone Number:</strong> @address.PhoneNumber<br />
+                            <strong>Notes:</strong> @address.Notes<br />
+                        </p>
+                        <p class="card-text">
+                            <button onclick="goToEditAddress('@address.Id')" type="button" class="btn btn-warn m-2">Edit</button>
+                            <button onclick="deleteAddress('@address.Id')" type="button" class="btn btn-danager m-2">Delete</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+    <script src="~/assets/address/address.js"></script>
+</body>

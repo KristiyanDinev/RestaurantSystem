@@ -6,7 +6,7 @@
 
 <head>
     
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
 
 </head>
 
@@ -35,7 +35,7 @@
 
                 <div class="mb-3">
                     <label for="Image" class="form-label">Profile Image</label>
-                    <button class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
+                    <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
                     <input type="file" class="form-control" id="Image" accept="image/*">
                     <img id="preview" src="#" alt="Profile preview" class="mt-2 rounded img-thumbnail" />
                 </div>
@@ -60,6 +60,6 @@
             </div>
         </div>
     </div>
-    @await Html.PartialAsync("_BottomImports")
+    @await Html.PartialAsync("_Footer")
     <script src='~/assets/register/register.js'></script>
 </body>

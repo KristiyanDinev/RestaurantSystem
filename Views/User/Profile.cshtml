@@ -6,7 +6,7 @@
 
 <head>
    
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
 </head>
 
 <body>
@@ -24,7 +24,7 @@
 
             <input type="file" accept="image/*" id="Image">
 
-        <button class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
+        <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
 
             <img id="preview" alt="Profile Image Preview" class="mt-2 rounded img-thumbnail" />
    
@@ -47,7 +47,7 @@
     <p id="Stats"></p>
 
     <button type="button" onclick="updateUser()">Edit</button>
-    @await Html.PartialAsync("_BottomImports")
+    @await Html.PartialAsync("_Footer")
     <script src='~/assets/profile/profile.js'></script>
 </body>
 

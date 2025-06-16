@@ -16,6 +16,7 @@ namespace RestaurantSystem.Database {
         public DbSet<ReservationModel> Reservations { get; set; }
         public DbSet<RestaurantModel> Restaurants { get; set; }
         public DbSet<DeliveryModel> Delivery { get; set; }
+        public DbSet<AddressModel> Addresses { get; set; }
 
         public readonly string DefaultOrder_CurrentStatus = "pending";
         public readonly string DefaultOrderedDish_CurrentStatus = "pending";
@@ -494,7 +495,7 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<AddressModel>()
                 .Property(address => address.City)
-                .IsRequired()
+                .HasDefaultValue(null)
                 .IsUnicode();
 
             builder.Entity<AddressModel>()
@@ -504,6 +505,11 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<AddressModel>()
                 .Property(address => address.PhoneNumber)
+                .IsRequired();
+
+            builder.Entity<AddressModel>()
+                .Property(address => address.PostalCode)
+                .IsUnicode()
                 .IsRequired();
 
             builder.Entity<AddressModel>()

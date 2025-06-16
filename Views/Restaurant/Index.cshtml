@@ -6,8 +6,7 @@
 }
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href="~/assets/restaurant/restaurant.css">
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
     <script src="~/assets/restaurant/restaurant.js"></script>
 </head>
 
@@ -19,7 +18,7 @@
             string delivery = restaurant.DoDelivery ? "Yes" : "No";
             string serve = restaurant.ServeCustomersInPlace ? "Yes" : "No";
 
-            <button class="restaurant" onclick="choose('@restaurant.Id')">
+            <button type="button" class="restaurant" onclick="choose('@restaurant.Id')">
                 
                 <p>@string.Join(", ", restaurant.Address,
                          restaurant.City, restaurant.State, restaurant.Country)</p>
@@ -54,4 +53,6 @@
         }
     }
 
+
+    @await Html.PartialAsync("_Footer")
 </div>

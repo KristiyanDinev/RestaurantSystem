@@ -1,0 +1,66 @@
+﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+@{
+    ViewData["Title"] = "Add Address";
+}
+
+<head>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/address/address.js"></script>
+</head>
+
+<body>
+    @await Html.PartialAsync("_NavBar", Model)
+
+    <button onclick="goToAddresses()" type="button" class="btn btn-primary m-2">Go to Addresses</button>
+
+    <div class="container mt-5">
+        <h2>Add Address</h2>
+        <div id="addressForm" method="post" action="/Address/Create">
+            <div class="mb-3">
+                <label for="country" class="form-label">Country</label>
+                <select id="country" required>
+                    <option value="" selected disabled>Select Country</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="state" class="form-label">State / Province / Region</label>
+                <select id="state">
+                    <option value="" selected disabled>Select State / Province / Region</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <select id="city" required>
+                    <option value="" selected disabled>Select City</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <input type="text" class="form-control" id="address" name="Address" required>
+            </div>
+            <div class="mb-3">
+                <label for="postalCode" class="form-label">Postal/Zip Code</label>
+                <input type="text" class="form-control" id="postalCode" name="PostalCode" required>
+            </div>
+            <div class="mb-3">
+                <label for="phoneNumber" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phoneNumber" name="PhoneNumber">
+            </div>
+            <div class="mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea class="form-control" id="notes" name="Notes"></textarea>
+            </div>
+
+            <p id="status"></p>
+
+            <button onclick="addAddress()" type="button" class="btn btn-success">Add</button>
+        </div>
+    </div>
+    @await Html.PartialAsync("_Footer")
+    <script src="~/assets/user_location.js"></script>
+
+    <script>
+        load()
+    </script>
+</body>
+

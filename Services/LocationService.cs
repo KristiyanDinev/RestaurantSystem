@@ -6,9 +6,9 @@ namespace RestaurantSystem.Services
 {
     public class LocationService
     {
-        private readonly string _getCountriesQuery = "SELECT name FROM public.countries ORDER BY name;";
-        private readonly string _getStatesQuery = "SELECT s.name FROM public.states AS s JOIN public.countries AS c ON s.country_id = c.id WHERE c.name = :country ORDER BY name;";
-        private readonly string _getCitiesQuery = "SELECT city.name FROM public.countries AS cn JOIN public.states AS st ON st.country_id = cn.id JOIN public.cities AS city ON city.state_id = st.id WHERE cn.name = :country AND st.name = :state ORDER BY name;";
+        private readonly string _getCountriesQuery = "SELECT DISTINCT name FROM public.countries ORDER BY name;";
+        private readonly string _getStatesQuery = "SELECT DISTINCT s.name FROM public.states AS s JOIN public.countries AS c ON s.country_id = c.id WHERE c.name = :country ORDER BY name;";
+        private readonly string _getCitiesQuery = "SELECT DISTINCT city.name FROM public.countries AS cn JOIN public.states AS st ON st.country_id = cn.id JOIN public.cities AS city ON city.state_id = st.id WHERE cn.name = :country AND st.name = :state ORDER BY name;";
         private DatabaseContext _databaseContext;
 
         public LocationService(DatabaseContext databaseContext)

@@ -10,6 +10,7 @@ namespace RestaurantSystem.Controllers
 
     [ApiController]
     [EnableRateLimiting("fixed")]
+    [IgnoreAntiforgeryToken]
     public class CartController : Controller
     {
         private UserUtility _userUtility;

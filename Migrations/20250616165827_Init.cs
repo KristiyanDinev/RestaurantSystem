@@ -42,9 +42,7 @@ namespace RestaurantSystem.Migrations
                     ReservationMaxChildren = table.Column<int>(type: "integer", nullable: false),
                     ReservationMinChildren = table.Column<int>(type: "integer", nullable: false),
                     ReservationMaxAdults = table.Column<int>(type: "integer", nullable: false),
-                    ReservationMinAdults = table.Column<int>(type: "integer", nullable: false),
-                    Price_Per_Adult = table.Column<decimal>(type: "numeric", nullable: false),
-                    Price_Per_Children = table.Column<decimal>(type: "numeric", nullable: false)
+                    ReservationMinAdults = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -107,19 +105,12 @@ namespace RestaurantSystem.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
                     Image = table.Column<string>(type: "text", nullable: true),
-                    Notes = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: false),
-                    City = table.Column<string>(type: "text", nullable: false),
-                    State = table.Column<string>(type: "text", nullable: true),
-                    Country = table.Column<string>(type: "text", nullable: false),
-                    PostalCode = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     RestaurantId = table.Column<int>(type: "integer", nullable: true)
                 },
@@ -137,17 +128,20 @@ namespace RestaurantSystem.Migrations
                 name: "Role_Permissions",
                 columns: table => new
                 {
-                    ServicePath = table.Column<string>(type: "text", nullable: false),
-                    RoleName = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleName = table.Column<string>(type: "text", nullable: false),
+                    ServicePath = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Role_Permissions", x => x.ServicePath);
+                    table.PrimaryKey("PK_Role_Permissions", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Role_Permissions_Roles_RoleName",
                         column: x => x.RoleName,
                         principalTable: "Roles",
-                        principalColumn: "Name");
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Role_Permissions_Services_ServicePath",
                         column: x => x.ServicePath,
@@ -157,17 +151,43 @@ namespace RestaurantSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Addresses",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
+                    State = table.Column<string>(type: "text", nullable: true),
+                    City = table.Column<string>(type: "text", nullable: true),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
+                    PostalCode = table.Column<string>(type: "text", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Addresses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Addresses_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CurrentStatus = table.Column<string>(type: "text", nullable: false, defaultValue: "pending"),
                     Notes = table.Column<string>(type: "text", nullable: true),
                     OrderedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     TableNumber = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
                     RestaurantId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -195,7 +215,8 @@ namespace RestaurantSystem.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Notes = table.Column<string>(type: "text", nullable: true),
                     CurrentStatus = table.Column<string>(type: "text", nullable: false, defaultValue: "pending"),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "numeric", nullable: false, defaultValue: 0m),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
                     RestaurantId = table.Column<int>(type: "integer", nullable: false),
                     Amount_Of_Adults = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),
                     Amount_Of_Children = table.Column<int>(type: "integer", nullable: false),
@@ -223,12 +244,14 @@ namespace RestaurantSystem.Migrations
                 name: "User_Roles",
                 columns: table => new
                 {
-                    RoleName = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    RoleName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User_Roles", x => x.RoleName);
+                    table.PrimaryKey("PK_User_Roles", x => x.Id);
                     table.ForeignKey(
                         name: "FK_User_Roles_Roles_RoleName",
                         column: x => x.RoleName,
@@ -244,12 +267,38 @@ namespace RestaurantSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Delivery",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    OrderId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Delivery", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Delivery_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Delivery_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Ordered_Dishes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    OrderId = table.Column<int>(type: "integer", nullable: false),
+                    OrderId = table.Column<long>(type: "bigint", nullable: false),
                     DishId = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: true),
                     CurrentStatus = table.Column<string>(type: "text", nullable: false, defaultValue: "pending")
@@ -270,6 +319,23 @@ namespace RestaurantSystem.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Addresses_UserId",
+                table: "Addresses",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Delivery_OrderId",
+                table: "Delivery",
+                column: "OrderId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Delivery_UserId",
+                table: "Delivery",
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Dishes_RestaurantId",
@@ -312,6 +378,16 @@ namespace RestaurantSystem.Migrations
                 column: "RoleName");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Role_Permissions_ServicePath",
+                table: "Role_Permissions",
+                column: "ServicePath");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Roles_RoleName",
+                table: "User_Roles",
+                column: "RoleName");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_User_Roles_UserId",
                 table: "User_Roles",
                 column: "UserId");
@@ -332,7 +408,13 @@ namespace RestaurantSystem.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Addresses");
+
+            migrationBuilder.DropTable(
                 name: "Cupons");
+
+            migrationBuilder.DropTable(
+                name: "Delivery");
 
             migrationBuilder.DropTable(
                 name: "Ordered_Dishes");

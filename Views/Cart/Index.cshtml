@@ -7,9 +7,7 @@
 
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/dishes/dish.css'>
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
     <script src='~/assets/dishes/dish.js'></script>
     <script src='~/assets/cart/cart.js'></script>
 </head>
@@ -47,8 +45,8 @@
                     <div class="quantity">
                         <label>Quantity: @count</label>
 
-                        <button class="remove_dish" onclick="removeDishFromCart('@dish.Id', '@dish.Name', true)">Remove</button>
-                        <button class="add_dish" onclick="addDishToCart('@dish.Id', '@dish.Name', true)">Add</button>
+                        <button type="button" class="remove_dish" onclick="removeDishFromCart('@dish.Id', '@dish.Name', true)">Remove</button>
+                        <button type="button" class="add_dish" onclick="addDishToCart('@dish.Id', '@dish.Name', true)">Add</button>
                     </div>
                 </div>
             }
@@ -74,4 +72,6 @@
     <div class="start_order noselect">
         <button onclick="startOrder()">Order</button>
     </div>
+
+    @await Html.PartialAsync("_Footer")
 </body>

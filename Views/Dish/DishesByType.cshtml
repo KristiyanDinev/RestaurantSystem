@@ -6,9 +6,7 @@
 }
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/dishes/dish.css'>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
     <script src='~/assets/dishes/dish.js'></script>
 </head>
 
@@ -27,7 +25,6 @@
                 @{
                     string foodClass = dishModel.IsAvailable ? "food" : "food-opacity";
                     string clickAction = dishModel.IsAvailable ? "goToDish('" + dishModel.Id + "')" : "";
-                    // food = style="opacity: 100%;" | food-opacity = style="opacity: 50%;"
                 }
 
                 <div class="@foodClass" onclick="@clickAction">
@@ -46,14 +43,14 @@
                 <div>
                     @if (dishModel.IsAvailable)
                     {
-                        <button id="order" style="opacity: 100%;"
+                        <button type="button" id="order" style="opacity: 100%;"
                                 onclick="addDishToCart('@dishModel.Id', '@dishModel.Name', false)">
                             Add to order
                         </button>
                     }
                     else
                     {
-                        <button id="order" style="opacity: 50%;">Not available</button>
+                        <button type="button" id="order" style="opacity: 50%;">Not available</button>
                     }
                 </div>
             </div>
@@ -61,4 +58,5 @@
 
     </div>
 
+    @await Html.PartialAsync("_Footer")
 </body>

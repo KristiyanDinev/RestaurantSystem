@@ -15,7 +15,7 @@ namespace RestaurantSystem.Services
         }
 
         public async Task<OrderedDishesModel> CreateOrderedDishAsync(int dishModelId, 
-            int orderModelId, string? notes)
+            long orderModelId, string? notes)
         {
             OrderedDishesModel orderedDishes = new OrderedDishesModel()
             {
@@ -71,7 +71,7 @@ namespace RestaurantSystem.Services
         /*
          * Converts OrderedDishes to a list of dishes.
          */
-        public async Task<Dictionary<DishWithStatusModel, int>> CountDishesByOrderAsync(int orderId)
+        public async Task<Dictionary<DishWithStatusModel, int>> CountDishesByOrderAsync(long orderId)
         {
             List<OrderedDishesModel> orderedDishes = await _databaseContext.OrderedDishes.Where(
                 order => order.OrderId == orderId)

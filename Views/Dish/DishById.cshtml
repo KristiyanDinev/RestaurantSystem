@@ -7,10 +7,7 @@
 
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/single_dish/single_dish.css'>
-
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
     <script src='~/assets/dishes/dish.js'></script>
 </head>
 
@@ -34,8 +31,9 @@
         <p class="price">@Model.Dish.Price lv.</p>
 
         <div id="orderbttn">
-            <button class="order" onclick="addDishToCart('@Model.Dish.Id', '@Model.Dish.Name', false)">Add to order</button>
+            <button type="button" class="order" onclick="addDishToCart('@Model.Dish.Id', '@Model.Dish.Name', false)">Add to order</button>
         </div>
     </div>
 
+    @await Html.PartialAsync("_Footer")
 </body>

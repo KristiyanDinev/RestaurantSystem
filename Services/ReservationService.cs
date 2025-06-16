@@ -18,7 +18,7 @@ namespace RestaurantSystem.Services
             _restaurantDatabaseHandler = restaurantDatabaseHandler;
         }
 
-        public async Task<ReservationModel?> CreateReservationAsync(int userId, int restaurantId,
+        public async Task<ReservationModel?> CreateReservationAsync(long userId, int restaurantId,
             int amount_Of_Adults, int amount_Of_Children, DateTime dateTime, string? notes)
         {
             ReservationModel reservation = new ReservationModel()
@@ -42,7 +42,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0 ? reservation : null;
         }
 
-        public async Task<List<ReservationModel>> GetReservationsByUserIdAsync(int userId)
+        public async Task<List<ReservationModel>> GetReservationsByUserIdAsync(long userId)
         {
             return await _databaseContext.Reservations.Where(res =>
                 res.UserId == userId).ToListAsync();

@@ -1,7 +1,7 @@
 ﻿namespace RestaurantSystem.Models.DatabaseModels {
     public class OrderModel {
 
-        public int Id { get; set; }
+        public long Id { get; set; }
         public required string CurrentStatus { get; set; }
         public string? Notes { get; set; }
         public DateTime OrderedAt { get; set; }
@@ -9,7 +9,7 @@
         public string? TableNumber { get; set; }
 
 
-        public required int UserId { get; set; }
+        public required long UserId { get; set; }
         public UserModel User { get; set; } = null!;
 
 

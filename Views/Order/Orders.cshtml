@@ -7,10 +7,7 @@
 }
 
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/dishes/dish.css'>
-
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
 
     <script src='~/assets/orders/orders.js'></script>
     <script src='~/assets/dishes/dish.js'></script>
@@ -64,7 +61,7 @@
                 <p class="part">Ordered At: @orderWithDish.Order.OrderedAt.ToString()</p>
                 <p id="error,@orderWithDish.Order.Id"></p>
 
-                <button id="cancel,@orderWithDish.Order.Id"></button>
+                <button type="button" id="cancel,@orderWithDish.Order.Id"></button>
 
             </div>
 
@@ -81,5 +78,7 @@
             startWebSocket()
         </script>
     }
+
+    @await Html.PartialAsync("_Footer")
 </body>
 

@@ -37,6 +37,10 @@ function toggleDeleteImage() {
 }
 
 async function updateUser() {
+    if (!confirm('Are you sure you want to update your profile?')) {
+        return
+    }
+
     let status = document.getElementById('Stats')
     status.innerHTML = "Updating..."
 

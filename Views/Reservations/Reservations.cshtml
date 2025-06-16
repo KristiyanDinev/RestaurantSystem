@@ -5,13 +5,8 @@
     ViewData["Title"] = "Reservations";
 }
 
-
-<!DOCTYPE html>
 <head>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/index.css'>
-    <link rel='stylesheet' type='text/css' media='screen' href='~/assets/reservations/reservations.css'>
-
-    @await Html.PartialAsync("_Imports")
+    @await Html.PartialAsync("_Header")
 
     <script src='~/assets/reservations/reservations.js'></script>
 </head>
@@ -21,7 +16,7 @@
     @await Html.PartialAsync("_NavBar", Model.User)
 
     <div class="reservation_navigation">
-        <button onclick="goToReservationsToCreate()">Create</button>
+        <button type="button" onclick="goToReservationsToCreate()">Create</button>
     </div>
 
     <h1>Reservations</h1>
@@ -59,13 +54,15 @@
 
                         DateTime.UtcNow <= reservation.At_Date.ToUniversalTime().AddHours(-1))
                     {
-                        <button class="cancel noselect" onclick="cancelReservation('@reservation.Id')">Cancel</button>
+                        <button type="button" class="cancel noselect" onclick="cancelReservation('@reservation.Id')">Cancel</button>
 
                     } else
                     {
-                        <button class="cancel noselect" style="opacity: 50%;">Can't Cancel</button>
+                        <button type="button" class="cancel noselect" style="opacity: 50%;">Can't Cancel</button>
                     }
             </div>
             }
     </div>
+
+    @await Html.PartialAsync("_Footer")
 </body>

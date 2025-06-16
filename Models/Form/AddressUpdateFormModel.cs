@@ -1,12 +1,8 @@
-﻿namespace RestaurantSystem.Models.DatabaseModels
+﻿namespace RestaurantSystem.Models.Form
 {
-    public class AddressModel
+    public class AddressUpdateFormModel
     {
-        public long Id { get; set; }
-        
-        public long UserId { get; set; }
-        public UserModel User { get; set; } = null!;
-
+        public required long Id { get; set; }
         public required string Country { get; set; }
         public string? State { get; set; }
         public string? City { get; set; }
