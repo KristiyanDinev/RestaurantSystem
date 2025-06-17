@@ -17,22 +17,21 @@
     @await Html.PartialAsync("_NavBar", Model.User)
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
-    <div class="menu">
-        <p class="name">@Model.Dish.Name</p>
+    <div class="m-2 container">
+        <img src="@Model.Dish.Image" class="img-thumbnail rounded" alt="No image for now"></img>
 
-        <p class="grams">grams /@Model.Dish.Grams/</p>
+        <h4>@Model.Dish.Name</h4>
 
-        <p class="ingr">Ingredients: @Model.Dish.Ingredients</p>
+        <p>Grams /@Model.Dish.Grams/</p>
 
-        <image src="@Model.Dish.Image" class="image" alt="No image for now"></image>
+        <p>Ingredients: @Model.Dish.Ingredients</p>
 
-        <p class="avg_time_to_took">Avrage time to cook: @Model.Dish.AvrageTimeToCook minute/s</p>
+        <p>Avrage time to cook: @Model.Dish.AvrageTimeToCook minute/s</p>
 
-        <p class="price">@Model.Dish.Price lv.</p>
+        <p>@Model.Dish.Price lv.</p>
 
-        <div id="orderbttn">
-            <button type="button" class="order" onclick="addDishToCart('@Model.Dish.Id', '@Model.Dish.Name', false)">Add to order</button>
-        </div>
+        <button type="button" class="btn btn-success m-2" onclick="addDishToCart('@Model.Dish.Id', '@Model.Dish.Name', false)">Add to order</button>
+
     </div>
 
     @await Html.PartialAsync("_Footer")

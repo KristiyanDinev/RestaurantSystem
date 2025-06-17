@@ -1,6 +1,5 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels;
-@model List<RestaurantSystem.Models.DatabaseModels.RestaurantModel>
-
+@model List<RestaurantModel>
 @{
     ViewData["Title"] = "Restaurants";
 }
@@ -10,49 +9,53 @@
     <script src="~/assets/restaurant/restaurant.js"></script>
 </head>
 
-<div>
+<body>
+
+    @if (TempData.Peek("Message") != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["Message"]
+        </div>
+    }
 
     @{
         foreach (RestaurantModel restaurant in Model)
         {
-            string delivery = restaurant.DoDelivery ? "Yes" : "No";
-            string serve = restaurant.ServeCustomersInPlace ? "Yes" : "No";
+            <div style="cursor: pointer;" class="card m-3" onclick="choose('@restaurant.Id')">
 
-            <button type="button" class="restaurant" onclick="choose('@restaurant.Id')">
-                
-                <p>@string.Join(", ", restaurant.Address,
-                         restaurant.City, restaurant.State, restaurant.Country)</p>
+                <div class="card-body">
+                    <h4 class="card-title">
+                        @string.Join(", ", restaurant.Address,
+                        restaurant.City, restaurant.State, restaurant.Country)
+            </h4>
+            @if (restaurant.DoDelivery)
+                    {
+                        <p class="card-text">Restaurant does deliveries</p>
+                    }
+                    else
+                    {
+                        <p class="card-text">Restaurant doesn't do deliveries</p>
+                    }
 
-                <br />
+                    @if (restaurant.ServeCustomersInPlace)
+                    {
+                        <p class="card-text">Restaurant serves customers on-side</p>
+                    }
+                    else
+                    {
+                        <p class="card-text">Restaurant doesn't serve customers on-side</p>
+                    }
 
-                <p>Does Delivery: @delivery</p>
-                <br />
-
-                <p>Serves People at Place: @serve</p>
-                <br />
-
-                <p>Postal Code: @restaurant.PostalCode</p>
-                <br />
-
-                <p>Reservations:</p>
-                <br />
-
-                <p>Max Adults: @restaurant.ReservationMaxAdults</p>
-                <br />
-
-                <p>Min Adults: @restaurant.ReservationMinAdults</p>
-                <br />
-
-                <p>Max Children: @restaurant.ReservationMaxChildren</p>
-                <br />
-
-                <p>Min Children: @restaurant.ReservationMinChildren</p>
-                <br />
-
-            </button>
+                    <p class="card-text">Reservations:</p>
+                    <p class="card-text">Max Adults: @restaurant.ReservationMaxAdults</p>
+                    <p class="card-text">Min Adults: @restaurant.ReservationMinAdults</p>
+                    <p class="card-text">Max Children: @restaurant.ReservationMaxChildren</p>
+                    <p class="card-text">Min Children: @restaurant.ReservationMinChildren</p>
+                </div>
+            </div>
         }
     }
 
 
     @await Html.PartialAsync("_Footer")
-</div>
+</body>

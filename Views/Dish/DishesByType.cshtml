@@ -1,6 +1,5 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels;
 @model RestaurantSystem.Models.View.Dish.DishesTypeViewModel;
-
 @{
     ViewData["Title"] = Model.DishType.Substring(0, 1).ToUpper() + Model.DishType.Substring(1);
 }
@@ -16,47 +15,41 @@
 
     <p id="dish_stats"></p>
 
-    <div id="dishes">
-        @foreach (DishModel dishModel in Model.Dishes)
-        {
-            dishModel.Image ??= "";
+    @foreach (DishModel dishModel in Model.Dishes)
+    {
+        
+       string clickAction = dishModel.IsAvailable ? "goToDish('" + dishModel.Id + "')" : "";
+        
+    
 
-            <div id="whole_food">
-                @{
-                    string foodClass = dishModel.IsAvailable ? "food" : "food-opacity";
-                    string clickAction = dishModel.IsAvailable ? "goToDish('" + dishModel.Id + "')" : "";
+        <div class="card m-5" style="cursor: pointer;">
+            <div class="card-body" onclick="@clickAction">
+                @if (dishModel.Image != null)
+                {
+                    <img class="img-thumbnail rounded" src="@dishModel.Image">
                 }
-
-                <div class="@foodClass" onclick="@clickAction">
-
-
-                    <p class="food_name">@dishModel.Name</p>
-                    <p class="food_grams">grams: /@dishModel.Grams/</p>
-
-                    @if (dishModel.Image.Length > 0) {
-                        <img class="food_image" src="@dishModel.Image">
-                    }
-
-                    <p class="food_price">@dishModel.Price lv.</p>
-                </div>
-
-                <div>
-                    @if (dishModel.IsAvailable)
-                    {
-                        <button type="button" id="order" style="opacity: 100%;"
-                                onclick="addDishToCart('@dishModel.Id', '@dishModel.Name', false)">
-                            Add to order
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button" id="order" style="opacity: 50%;">Not available</button>
-                    }
-                </div>
+                <h4 class="card-title">@dishModel.Name</h4>
+                <p class="card-text">Grams: /@dishModel.Grams/</p>
+                <p class="card-text">@dishModel.Price lv.</p>
+                
             </div>
-        }
 
-    </div>
+            <div>
+                @if (dishModel.IsAvailable)
+                {
+                    <button type="button" id="order" style="opacity: 100%;"
+                            onclick="addDishToCart('@dishModel.Id', '@dishModel.Name', false)">
+                        Add to order
+                    </button>
+                }
+                else
+                {
+                    <button type="button" id="order" style="opacity: 50%;">Not available</button>
+                }
+            </div>
+        </div>
+    }
+
 
     @await Html.PartialAsync("_Footer")
 </body>

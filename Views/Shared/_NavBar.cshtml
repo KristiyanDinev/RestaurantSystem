@@ -3,16 +3,19 @@
 <body>
     <div>
 
-        <button type="button" onclick="goToCart()">🛒</button>
+        <button class="btn btn-primary m-2" type="button" onclick="goToCart()">🛒</button>
 
-        <button type="button" onclick="goToOrders()">Orders</button>
+        <button class="btn btn-primary m-2" type="button" onclick="goToOrders()">Orders</button>
 
-        <button type="button" onclick="goToDishes()">Dishes</button>
+        <button class="btn btn-primary m-2" type="button" onclick="goToDishes()">Dishes</button>
 
-        <button type="button" onclick="goToReservations()">Reservations</button>
-        <button type="button" onclick="goToAddresses()">Your Addresses</button>
+        <button class="btn btn-primary m-2" type="button" onclick="goToReservations()">Reservations</button>
 
-        <button type="button" onclick="goToProfile()">
+        <button class="btn btn-primary m-2" type="button" onclick="goToRestaurants()">Restaurants</button>
+
+        <button class="btn btn-primary m-2" type="button" onclick="goToAddresses()">Your Addresses</button>
+
+        <button class="btn btn-primary m-2" type="button" onclick="goToProfile()">
             @{
                 if (Model.Image != null && Model.Image.Length > 0)
                 {
@@ -22,7 +25,7 @@
             <p>@Model.Name</p>
         </button>
 
-        <button type="button" onclick="Logout()" id="logout">Log Out</button>
+        <button class="btn btn-danger m-2" type="button" onclick="Logout()" id="logout">Log Out</button>
         <i class="bi bi-box-arrow-right"></i>
     </div>
 

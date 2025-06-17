@@ -16,7 +16,7 @@ namespace RestaurantSystem.Controllers
     [IgnoreAntiforgeryToken]
     public class ReservationsController : Controller
     {
-
+        private static readonly string _forbit = "Please select a restaurant, that serves customers on-site";
         private ReservationService _reservationService;
         private UserUtility _userUtility;
         private RestaurantService _restaurantService;
@@ -31,22 +31,50 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpGet]
-        [Route("/reservation")]
-        [Route("/reservation/index")]
-        public async Task<IActionResult> Reservation()
+        [Route("/reservations")]
+        [Route("/reservations/index")]
+        public async Task<IActionResult> Reservations()
         {
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
-                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
-
-            if (restaurant == null)
-            {
-                return RedirectToAction("Index", "Restaurant");
-            }
-
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
+            }
+
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
+
+            if (restaurant == null || !restaurant.ServeCustomersInPlace)
+            {
+                TempData["Message"] = _forbit;
+                return RedirectToAction("Index", "Restaurant");
+            }
+
+            return View(new ReservationsViewModel()
+            {
+                User = user,
+                Reservations = await _reservationService.GetReservationsByUserIdAsync(user.Id)
+            });
+        }
+        
+
+        [HttpGet]
+        [Route("/reservation")]
+        public async Task<IActionResult> Reservation()
+        {
+            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
+                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
+
+            if (restaurant == null || !restaurant.ServeCustomersInPlace)
+            {
+                TempData["Message"] = _forbit;
+                return RedirectToAction("Index", "Restaurant");
             }
 
             return View(new ReservationFormViewModel()
@@ -76,9 +104,10 @@ namespace RestaurantSystem.Controllers
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
                 _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
-            if (restaurant == null)
+            if (restaurant == null || !restaurant.ServeCustomersInPlace)
             {
-                return BadRequest();
+                TempData["Message"] = _forbit;
+                return RedirectToAction("Index", "Restaurant");
             }
 
             if (await _reservationService.CreateReservationAsync(user.Id, restaurant.Id,
@@ -93,23 +122,6 @@ namespace RestaurantSystem.Controllers
             return BadRequest();
         }
 
-
-        [HttpGet]
-        [Route("/reservations")]
-        public async Task<IActionResult> Reservations()
-        {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-
-            return View(new ReservationsViewModel()
-            {
-                User = user,
-                Reservations = await _reservationService.GetReservationsByUserIdAsync(user.Id)
-            });
-        }
 
 
         [HttpPost]

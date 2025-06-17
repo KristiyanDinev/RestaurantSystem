@@ -18,7 +18,7 @@
 
     <h1>Orders</h1>
 
-    @if (TempData["OrderedSuccess"] != null)
+    @if (TempData.Peek("OrderedSuccess") != null)
     {
         <h3>Ordered successful</h3>
     }

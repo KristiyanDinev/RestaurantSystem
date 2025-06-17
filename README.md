@@ -142,9 +142,9 @@ INSERT INTO "Restaurants"
 "ReservationMaxChildren", "ReservationMinChildren", 
 "ReservationMaxAdults", "ReservationMinAdults") 
 VALUES 
-('ul. Test', 'Sofia', NULL, 'Bulgaria', '1234', TRUE, TRUE, 10, 0, 4, 1),
-('ul. Test2', 'Sofia', NULL, 'Bulgaria', '1235', TRUE, FALSE, 10, 0, 4, 1),
-('ul. Test3', 'Sofia', NULL, 'Bulgaria', '1236', FALSE, TRUE, 10, 0, 4, 1);
+('ul. Test', 'Sofia', 'Sofia City', 'Bulgaria', '1234', TRUE, TRUE, 10, 0, 4, 1),
+('ul. Test2', 'Sofia', 'Sofia City', 'Bulgaria', '1235', TRUE, FALSE, 10, 0, 4, 1),
+('ul. Test3', 'Sofia', 'Sofia City', 'Bulgaria', '1236', FALSE, TRUE, 10, 0, 4, 1);
 
 INSERT INTO "Dishes" 
 ("Name", "Price", "Grams", "Image", "Ingredients", 

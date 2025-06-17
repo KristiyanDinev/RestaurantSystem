@@ -21,11 +21,11 @@
 
     <h1>Reservations</h1>
 
-    @if (TempData["ReservationSuccessfull"] != null)
+    @if (TempData.Peek("ReservationSuccessfull") != null)
     {
         <p>Reservation created successfully.</p>
 
-    } else if (TempData["CanceledSuccessfull"] != null)
+    } else if (TempData.Peek("CanceledSuccessfull") != null)
     {
         <p>Reservation canceled successfully.</p>
     }

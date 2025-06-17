@@ -195,11 +195,6 @@ namespace RestaurantSystem.Database {
                 .IsUnicode();
 
             builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.City)
-                .IsRequired()
-                .IsUnicode();
-
-            builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.PostalCode)
                 .IsRequired()
                 .IsUnicode();
@@ -208,6 +203,17 @@ namespace RestaurantSystem.Database {
                 .Property(restaurant => restaurant.Country)
                 .IsRequired()
                 .IsUnicode();
+
+            builder.Entity<RestaurantModel>()
+                .Property(restaurant => restaurant.State)
+                .HasDefaultValue(null)
+                .IsUnicode();
+
+            builder.Entity<RestaurantModel>()
+               .Property(restaurant => restaurant.City)
+               .HasDefaultValue(null)
+               .IsUnicode();
+
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.ReservationMaxAdults)
@@ -224,10 +230,6 @@ namespace RestaurantSystem.Database {
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.ReservationMinChildren)
                 .IsRequired();
-
-            builder.Entity<RestaurantModel>()
-                .Property(restaurant => restaurant.State)
-                .HasDefaultValue(null);
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.DoDelivery)

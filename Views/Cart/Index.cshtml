@@ -47,26 +47,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div>
-                    <div class="food" onclick="goToDish('@dish.Id')">
-                        <p class="food_name">@dish.Name</p>
-                        <p class="food_grams">grams: /@dish.Grams/</p>
-
-                        @if (dish.Image != null)
-                        {
-                            <img class="food_image" src="@dish.Image">
-                        }
-                        <p class="food_price">@dish.Price lv.</p>
-                    </div>
-
-                    <div class="quantity">
-                        <label>Quantity: @count</label>
-
-                        <button type="button" class="remove_dish" onclick="removeDishFromCart('@dish.Id', '@dish.Name', true)">Remove</button>
-                        <button type="button" class="add_dish" onclick="addDishToCart('@dish.Id', '@dish.Name', true)">Add</button>
-                    </div>
-                </div>
             }
         }
     </div>
@@ -91,17 +71,14 @@
             @foreach (var address in Model.Addresses)
             {
                 <option value="@address.Id">
-                    <div class="card">
-                        <div class="card-body">
-                            <strong>Country:</strong> @address.Country<br />
-                            <strong>State / Province / Region:</strong> @address.State<br />
-                            <strong>City:</strong> @address.City<br />
-                            <strong>Address:</strong> @address.Address<br />
-                            <strong>Postal/Zip Code:</strong> @address.PostalCode<br />
-                            <strong>Phone Number:</strong> @address.PhoneNumber<br />
-                            <strong>Notes:</strong> @address.Notes<br />
-                        </div>
-                    </div>
+                         <p>Country: @address.Country</p>
+                            <p>State / Province / Region:@address.State</p>
+                            <p>City: @address.City</p>
+                            <p>Address: @address.Address</p>
+                            <p>Postal/Zip Code: @address.PostalCode</p>
+                            <p>Phone Number: @address.PhoneNumber</p>
+                            <p>Notes: @address.Notes</p>
+                            
                 </option>
             }
         </select>

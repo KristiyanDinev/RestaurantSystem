@@ -19,7 +19,15 @@ namespace RestaurantSystem
             Console.WriteLine("Current Working Directory: "+ Directory.GetCurrentDirectory());
             Console.WriteLine("Configuring...");
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddControllersWithViews();
+
+            builder.Services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            builder.Services.AddControllersWithViews()
+                .AddSessionStateTempDataProvider();
+
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
 
@@ -69,6 +77,7 @@ namespace RestaurantSystem
                 AllowedOrigins = { uri }
             });
 
+            app.UseSession();
             app.UseRateLimiter();
             app.UseRouting();
             app.UseStaticFiles();

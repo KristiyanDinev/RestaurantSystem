@@ -15,7 +15,8 @@ namespace RestaurantSystem.Services
         public async Task<List<DishModel>> GetDishesByTypeAndRestaurantIdAsync(string type, int restaurantId)
         {
             return await _databaseContext.Dishies.Where(
-                dish => dish.Type_Of_Dish.Equals(type) && dish.RestaurantId == restaurantId)
+                dish => dish.Type_Of_Dish.ToLower().Equals(type.ToLower()) && 
+                dish.RestaurantId == restaurantId)
                 .ToListAsync();
         }
 

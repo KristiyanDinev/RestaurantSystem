@@ -64,7 +64,7 @@ namespace RestaurantSystem.Controllers.Staff
             List<RestaurantWithOrdersModel> orders = new();
 
             foreach (RestaurantModel restaurant in await _restaurantService
-                .GetDeliveryGuy_RestaurantsAsync(user))
+                .GetDeliveryGuy_RestaurantsAsync("Bulgaria", null, null, user))
             {
 
                 orders.Add(new RestaurantWithOrdersModel()

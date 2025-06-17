@@ -103,6 +103,10 @@ function goToAddresses() {
     window.location.pathname = `/addresses`;
 }
 
+function goToRestaurants() {
+    window.location.pathname = `/restaurants`;
+}
+
 
 function Logout() {
     fetch("/logout", {

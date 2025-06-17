@@ -6,50 +6,43 @@ namespace RestaurantSystem.Services
 {
     public class RestaurantService
     {
-
+        private AddressService _addressService;
         private DatabaseContext _databaseContext;
         private readonly string restaurantId = "restaurant_id";
 
-        public RestaurantService(DatabaseContext databaseContext)
+        public RestaurantService(DatabaseContext databaseContext, 
+            AddressService addressService)
         {
             _databaseContext = databaseContext;
+            _addressService = addressService;
         }
 
-        public async Task<List<RestaurantModel>> GetDeliveryGuy_RestaurantsAsync(UserModel user)
+        public async Task<List<RestaurantModel>> GetDeliveryGuy_RestaurantsAsync(string country, 
+            string? state, string? city, UserModel user)
         {
             return await _databaseContext.Restaurants
                 .Where(
-                times => 
-                times.DoDelivery &&
-                times.City.Equals("") &&
-                times.Country.Equals("") &&
-                times.State == ""
+                restaurant =>
+                restaurant.DoDelivery &&
+                restaurant.Country.Equals(country, StringComparison.OrdinalIgnoreCase) &&
+                restaurant.State == state &&
+                restaurant.City == city
                 )
                 .ToListAsync();
         }
 
         public async Task<List<RestaurantModel>> GetAllRestaurantsForUserAsync(UserModel user)
         {
-            return await _databaseContext.Restaurants
-                .Where(
-                times =>
-                times.City.Equals("") &&
-                times.Country.Equals("") &&
-                times.State == ""
-                )
-                .ToListAsync();
-        }
+            //List<AddressModel> addresses = await _addressService.GetUserAddressesAsync(user.Id);
 
-
-        public async Task<List<RestaurantModel>> GetRestaurantsThatServingPeople_ForUserAsync(UserModel user)
-        {
             return await _databaseContext.Restaurants
-                .Where(
-                times => times.ServeCustomersInPlace &&
-                times.City.Equals("") &&
-                times.Country.Equals("") &&
-                times.State == ""
-                )
+                .Join(_databaseContext.Addresses,
+                      restaurant => new { restaurant.Country, restaurant.State, restaurant.City },
+                      address => new { address.Country, address.State, address.City },
+                      (restaurant, address) => new { restaurant, address })
+                .Where(joined => joined.address.UserId == user.Id)
+                .Select(joined => joined.restaurant)
+                .Distinct()
                 .ToListAsync();
         }
 

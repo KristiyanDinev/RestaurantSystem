@@ -28,7 +28,6 @@ namespace RestaurantSystem.Controllers {
 
         [HttpGet]
         [Route("/dishes")]
-        [Route("/dishes/index")]
         public async Task<IActionResult> Dishes()
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -68,8 +67,6 @@ namespace RestaurantSystem.Controllers {
             {
                 return RedirectToAction("Index", "Restaurant");
             }
-
-            dishType = dishType.ToLower();
 
             return View(new DishesTypeViewModel()
             {

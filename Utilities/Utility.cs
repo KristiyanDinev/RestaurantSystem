@@ -42,6 +42,10 @@ namespace RestaurantSystem.Utilities
 
         public static void DeleteImage(string? img)
         {
+            if (img == null)
+            {
+                return;
+            }
             string oldImagePath = "wwwroot" + img;
             if (File.Exists(oldImagePath))
             {
