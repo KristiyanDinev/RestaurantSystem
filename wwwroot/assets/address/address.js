@@ -2,9 +2,6 @@
     window.location.pathname = `/address/update/${addressId}`;
 }
 
-function goToAddresses() {
-    window.location.pathname = `/addresses`;
-}
 function goToAddAddress() {
     window.location.pathname = `/address/add`;
 }

@@ -18,6 +18,10 @@
         public RestaurantModel Restaurant { get; set; } = null!;
 
 
+        public long? UserAddressId { get; set; }
+        public AddressModel Address { get; set; } = null!;
+
+
         // navigation
         public ICollection<OrderedDishesModel> OrderedDishes { get; set; } = new List<OrderedDishesModel>();
         public DeliveryModel Delivery { get; set; } = null!;

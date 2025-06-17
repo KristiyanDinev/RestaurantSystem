@@ -11,7 +11,7 @@ namespace RestaurantSystem.Utilities
         {
         }
 
-        public void AddOrdersToListenTo(List<int> orderIds, WebSocket socket)
+        public void AddOrdersToListenTo(List<long> orderIds, WebSocket socket)
         {
             OrderWebSockets.RemoveAll(order => !order.Socket.State.Equals(WebSocketState.Open));
 
@@ -22,7 +22,7 @@ namespace RestaurantSystem.Utilities
             });
         }
 
-        public List<WebSocket> GetListenersForOrderId(int order_id)
+        public List<WebSocket> GetListenersForOrderId(long order_id)
         {
             return OrderWebSockets
                 .Where(order => order.OrderIds.Contains(order_id))

@@ -87,6 +87,12 @@ namespace RestaurantSystem.Services
                 return false;
             }
 
+            // Delete user image if it exists
+            if (user.Image != null)
+            {
+                Utility.DeleteImage(user.Image);
+            }
+
             _databaseContext.Users.Remove(user);
 
             return await _databaseContext.SaveChangesAsync() > 0;

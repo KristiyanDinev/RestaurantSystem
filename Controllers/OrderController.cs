@@ -109,7 +109,7 @@ namespace RestaurantSystem.Controllers {
             }
 
             if ((await _orderService.AddOrderAsync(user.Id, restaurant.Id,
-                DishIds, order.Notes, totalPrice, null, order.CuponCode)) == null)
+                DishIds, order.Notes, totalPrice, null, order.CuponCode, order.AddressId)) == null)
             {
                 return BadRequest();
             }

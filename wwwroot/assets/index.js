@@ -99,6 +99,10 @@ function goToReservationsToCreate() {
     window.location.pathname =  '/reservation'
 }
 
+function goToAddresses() {
+    window.location.pathname = `/addresses`;
+}
+
 
 function Logout() {
     fetch("/logout", {

@@ -23,7 +23,6 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-
         public async Task<List<string>> GetStatesAsync(string country)
         {
             return await _databaseContext.Database

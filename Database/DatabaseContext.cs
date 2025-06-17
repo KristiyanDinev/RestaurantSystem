@@ -318,6 +318,10 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<OrderModel>()
+                .Property(order => order.UserAddressId)
+                .HasDefaultValue(null);
+
+            builder.Entity<OrderModel>()
                 .HasOne(order => order.User)
                 .WithMany(user => user.Orders)
                 .HasForeignKey(order => order.UserId);
@@ -326,6 +330,11 @@ namespace RestaurantSystem.Database {
                 .HasOne(order => order.Restaurant)
                 .WithMany(restauratn => restauratn.Orders)
                 .HasForeignKey(order => order.RestaurantId);
+
+            builder.Entity<OrderModel>()
+                .HasOne(order => order.Address)
+                .WithMany(address => address.Orders)
+                .HasForeignKey(order => order.UserAddressId);
         }
 
         private void BuildOrderedDishes(ref ModelBuilder builder) {

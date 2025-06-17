@@ -197,12 +197,17 @@ namespace RestaurantSystem.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("numeric");
 
+                    b.Property<long?>("UserAddressId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RestaurantId");
+
+                    b.HasIndex("UserAddressId");
 
                     b.HasIndex("UserId");
 
@@ -518,11 +523,17 @@ namespace RestaurantSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.AddressModel", "Address")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserAddressId");
+
                     b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Address");
 
                     b.Navigation("Restaurant");
 
@@ -612,6 +623,11 @@ namespace RestaurantSystem.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.AddressModel", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DishModel", b =>

@@ -24,7 +24,7 @@ namespace RestaurantSystem.Services
             // list of order Ids
             if (data.TryGetValue("orders", out object? orders_obj))
             {
-                List<int>? ids = JsonSerializer.Deserialize<List<int>>(orders_obj.ToString()!);
+                List<long>? ids = JsonSerializer.Deserialize<List<long>>(orders_obj.ToString()!);
                 if (ids == null)
                 {
                     return;

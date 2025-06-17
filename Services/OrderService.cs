@@ -21,7 +21,7 @@ namespace RestaurantSystem.Services
 
         public async Task<OrderModel?> AddOrderAsync(long userId, int restaurantId,
             List<int> dishesId, string? notes, decimal totalPrice,
-            string? tableNumber, string? cupon_code)
+            string? tableNumber, string? cupon_code, long? address_id)
         {
             // total price here is with applied discount if the code is correct.
             OrderModel order = new OrderModel {
@@ -30,7 +30,8 @@ namespace RestaurantSystem.Services
                 CurrentStatus = _databaseContext.DefaultOrder_CurrentStatus,
                 TotalPrice = decimal.Parse($"{totalPrice:F2}"),
                 UserId = userId,
-                TableNumber = tableNumber
+                TableNumber = tableNumber,
+                UserAddressId = address_id
             };
 
             await _databaseContext.Orders.AddAsync(order);
@@ -52,7 +53,7 @@ namespace RestaurantSystem.Services
             return order;
         }
 
-        public async Task<bool> DeleteOrderAsync(int orderId)
+        public async Task<bool> DeleteOrderAsync(long orderId)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
@@ -70,7 +71,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateOrderCurrentStatusByIdAsync(int orderId, string status)
+        public async Task<bool> UpdateOrderCurrentStatusByIdAsync(long orderId, string status)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId) ?? throw new Exception();
@@ -107,7 +108,7 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<OrderModel?> GetOrderByIdAsync(int orderId)
+        public async Task<OrderModel?> GetOrderByIdAsync(long orderId)
         {
             return await _databaseContext.Orders
                 .Include(order => order.OrderedDishes)

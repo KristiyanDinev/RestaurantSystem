@@ -31,7 +31,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> UpdateOrderedDishStatusByIdAsync(int dishId, int orderId, string status)
+        public async Task<bool> UpdateOrderedDishStatusByIdAsync(int dishId, long orderId, string status)
         {
             OrderedDishesModel? orderedDishes = await _databaseContext.OrderedDishes
                 .FirstOrDefaultAsync(
@@ -47,7 +47,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DeleteOrderedDishesAsync(int orderId)
+        public async Task<bool> DeleteOrderedDishesAsync(long orderId)
         {
             List<OrderedDishesModel> dishes = await _databaseContext.OrderedDishes
                 .Where(order => order.OrderId == orderId)
@@ -60,7 +60,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<string>> GetDishCurrectStatusAsync(int orderId)
+        public async Task<List<string>> GetDishCurrectStatusAsync(long orderId)
         {
             return await _databaseContext.OrderedDishes
                 .Where(order => order.OrderId == orderId)

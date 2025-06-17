@@ -2,7 +2,7 @@
 {
     public class OrderUpdateFormModel
     {
-        public required int OrderId { get; set; }
+        public required long OrderId { get; set; }
 
         public string? OrderCurrentStatus { get; set; }
 

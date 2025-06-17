@@ -16,13 +16,15 @@ namespace RestaurantSystem.Controllers
         private UserUtility _userUtility;
         private DishService _dishService;
         private RestaurantService _restaurantService;
+        private AddressService _addressService;
 
         public CartController(DishService dishService, UserUtility userUtility, 
-            RestaurantService restaurantService)
+            RestaurantService restaurantService, AddressService addressService)
         {
             _dishService = dishService;
             _userUtility = userUtility;
             _restaurantService = restaurantService;
+            _addressService = addressService;
         }
 
 
@@ -70,7 +72,8 @@ namespace RestaurantSystem.Controllers
             {
                 User = user,
                 Restaurant = restaurant,
-                Dishes = dishes
+                Dishes = dishes,
+                Addresses = await _addressService.GetUserAddressesAsync(user.Id)
             });
         }
     }

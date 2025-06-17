@@ -14,5 +14,8 @@
         public required string PhoneNumber { get; set; }
         public required string PostalCode { get; set; }
         public string? Notes { get; set; }
+
+        // navigation
+        public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
     }
 }

@@ -3,15 +3,16 @@
 <body>
     <div>
 
-        <button onclick="goToCart()">🛒</button>
+        <button type="button" onclick="goToCart()">🛒</button>
 
-        <button onclick="goToOrders()">Orders</button>
+        <button type="button" onclick="goToOrders()">Orders</button>
 
-        <button onclick="goToDishes()">Dishes</button>
+        <button type="button" onclick="goToDishes()">Dishes</button>
 
-        <button onclick="goToReservations()">Reservations</button>
+        <button type="button" onclick="goToReservations()">Reservations</button>
+        <button type="button" onclick="goToAddresses()">Your Addresses</button>
 
-        <button onclick="goToProfile()">
+        <button type="button" onclick="goToProfile()">
             @{
                 if (Model.Image != null && Model.Image.Length > 0)
                 {
@@ -21,11 +22,8 @@
             <p>@Model.Name</p>
         </button>
 
-
-        <div class="input-group">
-            <button onclick="Logout()" id="logout">Log Out</button>
-            <i class="bi bi-box-arrow-right"></i>
-        </div>
+        <button type="button" onclick="Logout()" id="logout">Log Out</button>
+        <i class="bi bi-box-arrow-right"></i>
     </div>
 
 </body>

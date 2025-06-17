@@ -13,9 +13,16 @@ async function startOrder() {
         return;
     }
 
-    var formData = new FormData()
+    let address_id = document.getElementById("address").value
+    if (!address_id) {
+        document.getElementById("error").innerHTML = "Please select an address to continue."
+        return;
+    }
+
+    let formData = new FormData()
     formData.append("Notes", document.getElementById("notes").value)
     formData.append("CuponCode", document.getElementById("cupon_input").value)
+    formData.append("AddressId", address_id)
 
     const res = await fetch('/order/start', {
         method: 'POST',
@@ -26,6 +33,6 @@ async function startOrder() {
         window.location.pathname = "/orders"
 
     } else {
-        document.getElementById("error").innerHTML = "Error: Couldn't start your order."
+        document.getElementById("error").innerHTML = "Couldn't start your order."
     }
 }
