@@ -44,7 +44,7 @@ function onmessage(event) {
 
     const obj = JSON.parse(data)
 
-    if (!registeredOrders.includes(Number(obj.OrderId))) {
+    if (!registeredOrders.includes(String(obj.OrderId))) {
         return
     }
 

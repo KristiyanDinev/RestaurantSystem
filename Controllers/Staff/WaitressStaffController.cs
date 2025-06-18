@@ -18,13 +18,22 @@ namespace RestaurantSystem.Controllers.Staff
     {
         private UserUtility _userUtils;
         private ReservationService _reservationService;
+        private OrderService _orderService;
+        private OrderedDishesService _orderedDishesService;
+        private DishService _dishService;
 
         public WaitressStaffController(UserUtility userUtils,
             OrderedDishesService orderedDishesService,
-            ReservationService reservationService)
+            ReservationService reservationService,
+            OrderService orderService,
+            OrderedDishesService orderedDishes,
+            DishService dishService)
         {
             _userUtils = userUtils;
             _reservationService = reservationService;
+            _orderService = orderService;
+            _orderedDishesService = orderedDishesService;
+            _dishService = dishService;
         }
 
         [HttpGet]
@@ -89,16 +98,26 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
+            List<OrderWithDishesCountModel> dishes = new();
+            foreach (OrderModel order in await _orderService.GetOrdersByRestaurantIdAsync(user.Restaurant.Id))
+            {
+                dishes.Add(new OrderWithDishesCountModel()
+                {
+                    Order = order,
+                    DishesCount = await _orderedDishesService.CountDishesByOrderAsync(order.Id)
+                });
+            }
+
             return View(new OrdersViewModel
             {
                 Staff = user,
-                Orders = new List<OrderWithDishesCountModel>()
+                Orders = dishes
             });
         }
 
 
         [HttpGet]
-        [Route("/staff/orders/create")]
+        [Route("/staff/order/create")]
         public async Task<IActionResult> OrderCreate()
         {
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
@@ -107,7 +126,40 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
-            return View(user);
+            int restaurantId = user.Restaurant.Id;
+            List<DishModel> salads = await _dishService.GetDishesByTypeAndRestaurantIdAsync("salad", restaurantId);
+            List<DishModel> soups = await _dishService.GetDishesByTypeAndRestaurantIdAsync("soup", restaurantId);
+            List<DishModel> appetizers = await _dishService.GetDishesByTypeAndRestaurantIdAsync("appetizers", restaurantId);
+            List<DishModel> dishes = await _dishService.GetDishesByTypeAndRestaurantIdAsync("dishes", restaurantId);
+            List<DishModel> drinks = await _dishService.GetDishesByTypeAndRestaurantIdAsync("drink", restaurantId);
+            List<DishModel> desserts = await _dishService.GetDishesByTypeAndRestaurantIdAsync("desserts", restaurantId);
+
+            return View(new OrderCreateViewModel { 
+                User = user
+            });
+        }
+
+        [HttpPost]
+        [Route("/staff/orders/create")]
+        public async Task<IActionResult> OrderCreatePost()
+        {
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            /*
+            if (await _orderService.AddOrderAsync())
+            {
+                TempData["OrderedSuccess"] = true;
+                return Ok();
+
+            } else
+            {
+                return BadRequest();
+            }*/
+            return BadRequest();
         }
     }
 }

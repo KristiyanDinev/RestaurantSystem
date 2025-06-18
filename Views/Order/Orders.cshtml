@@ -80,7 +80,7 @@
          </div>
 
             <script>
-                registeredOrders.push(Number(@orderWithDish.Order.Id))
+                registeredOrders.push(String(@orderWithDish.Order.Id))
                 setCancelButton('@orderWithDish.Order.Id', '@orderWithDish.Order.CurrentStatus')
             </script>
         }

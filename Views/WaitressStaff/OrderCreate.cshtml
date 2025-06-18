@@ -4,8 +4,8 @@
 }
 
 <head>
-@await Html.PartialAsync("_Header")
-
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/staff/waitress/order_create_staff.js"></script>
 </head>
 
 <body>
@@ -13,9 +13,29 @@
 
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
-    <a class="btn btn-success m-2" href="/staff/order/create">Make Order</a>
+    
+    <div class="card card-body m-3">
+        <h4 class="card-title">Make an Order</h4>
 
+        <div class="card-text m-2">
+            <label for="table" class="form-label">Table Number</label>
+            <input type="text" id="table" class="form-control" placeholder="Table Number">
+        </div>
 
+        <!-- Dishes -->
+
+        <div class="card-text m-2">
+            <label for="cupon" class="form-label">Cupon Code</label>
+            <input type="text" id="cupon" class="form-control" placeholder="Cupon Code">
+        </div>
+
+        <div class="card-text m-2">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea id="notes" class="form-control"></textarea>>
+        </div>
+
+        <button onclick="submit()" type="button" class="btn btn-success m-2">Order</button>
+    </div>
 
 
     @await Html.PartialAsync("_Footer")

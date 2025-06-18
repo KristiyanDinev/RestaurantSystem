@@ -70,8 +70,7 @@ async function setStatus(orderId, dishId, status) {
     try {
         const res = await fetch('/staff/dishes/', {
             method: 'POST',
-            body: formData,
-            redirect: 'follow'
+            body: formData
         });
 
         const errorElement = document.getElementById(`error,${orderId},${dishId}`);
@@ -110,7 +109,7 @@ function onmessage(event) {
 
     const obj = JSON.parse(event.data);
 
-    if (!registeredOrders.includes(obj.OrderId)) return;
+    if (!registeredOrders.includes(String(obj.OrderId))) return;
 
     if (obj.OrderCurrentStatus) {
         document.getElementById(`orderstatus,${obj.OrderId}`).innerHTML = `Current Status: ${obj.OrderCurrentStatus}`;

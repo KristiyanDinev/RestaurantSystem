@@ -59,7 +59,7 @@ namespace RestaurantSystem.Controllers.Staff
             return View(new DishesViewModel()
             {
                 Staff = user,
-                OrderWithDishesCount = dishes
+                Orders = dishes
             });
         }
 

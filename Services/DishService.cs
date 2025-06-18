@@ -33,7 +33,7 @@ namespace RestaurantSystem.Services
 
         public async Task<DishModel?> CreateDishAsync(string name, string type,
             decimal price, int restaurantModelId, string ingredients, string avrageTimeToCook, 
-            int grams, string? notes, string? image, bool isAvailable)
+            int grams, string? image, bool isAvailable)
         {
             DishModel dish = new DishModel()
             {
@@ -45,7 +45,6 @@ namespace RestaurantSystem.Services
                 AvrageTimeToCook = avrageTimeToCook,
                 Grams = grams,
                 IsAvailable = isAvailable,
-                Notes = notes,
                 Image = image
             };
 

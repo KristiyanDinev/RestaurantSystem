@@ -6,7 +6,7 @@ namespace RestaurantSystem.Models.View.Staff.Cook
     {
         public required UserModel Staff { get; set; }
 
-        public List<OrderWithDishesCountModel> OrderWithDishesCount { get; set; } = 
+        public List<OrderWithDishesCountModel> Orders { get; set; } = 
             new List<OrderWithDishesCountModel>();
     }
 }

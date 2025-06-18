@@ -1,4 +1,6 @@
-﻿@using RestaurantSystem.Models.View.Staff.Waitress
+﻿@using RestaurantSystem.Models
+@using RestaurantSystem.Models.DatabaseModels
+@using RestaurantSystem.Models.View.Staff.Waitress
 @model OrdersViewModel;
 @{
     ViewData["Title"] = "Orders";
@@ -6,6 +8,8 @@
 
 <head>
     @await Html.PartialAsync("_Header")
+    <script src="/assets/index.js"></script>
+    <script src="/assets/staff/waitress/orders_staff.js"></script>
 </head>
 
 
@@ -14,11 +18,72 @@
 
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
-    <a class="btn btn-success m-2" href="/staff/order/create">Make Order</a>
+    <a class="btn btn-success m-2" href="/staff/order/create">Make an Order</a>
 
+    @if (Model.Orders.Count > 0)
+    {
+        <h1>All placed orders</h1>
 
+    } else
+    {
+        <h1>No orders</h1>
+    }
 
+    @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.Orders)
+        {
+            OrderModel order = orderWithDishesCount.Order;
+
+            <script>
+                registeredOrders.push(String(@order.Id))
+            </script>
+
+            <div class="card m-3">
+                 <div class="card-body">
+                     <p class="card-text" id="orderstatus,@order.Id">
+                        CurrentStatus: @order.CurrentStatus
+                     </p>
+                     <p class="card-text">
+                        Notes: @order.Notes
+                     </p>
+                     <p class="card-text">
+                        Ordered At: @order.OrderedAt
+                     </p>
+                     <p class="card-text">
+                        Total Price: @order.TotalPrice
+                     </p>
+                @foreach (DishWithStatusModel dishWithStatus in orderWithDishesCount.DishesCount.Keys)
+                {
+                    <div class="card m-3">
+                     <div class="card-body">
+                         @if (dishWithStatus.Dish.Image != null)
+                        {
+                            <img src="@dishWithStatus.Dish.Image" class="img-thumbnail rounded" alt="No image for now">
+                        }
+
+                        <h4 class="card-title">@dishWithStatus.Dish.Name</h4>
+                        <p class="card-text">Amount: @orderWithDishesCount.DishesCount[dishWithStatus]</p>
+
+                        <p class="card-text" id="dishstatus,@order.Id,@dishWithStatus.Dish.Id">
+                            Dish Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
+
+                        <p class="card-text">Grams: /@dishWithStatus.Dish.Grams/</p>
+                        <p class="card-text">Ingredients: @dishWithStatus.Dish.Ingredients</p>
+
+                        <p class="card-text">Avrage Time To Cook: @dishWithStatus.Dish.AvrageTimeToCook minute/s</p>
+
+                        <p class="card-text">Price: @dishWithStatus.Dish.Price lv.</p>
+                    </div>
+                    </div>
+                }
+                </div>
+            </div>
+        }
+    @if (Model.Orders.Count > 0)
+    {
+        <script>
+            startWebSocket()
+        </script>
+    }
 
     @await Html.PartialAsync("_Footer")
-    <script src="~/assets/index.js"></script>
 </body>

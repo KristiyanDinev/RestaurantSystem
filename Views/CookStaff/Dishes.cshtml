@@ -20,22 +20,21 @@
 
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
-    @if (Model.OrderWithDishesCount.Count > 0)
+    @if (Model.Orders.Count > 0)
     {
-        <h1>All Dishes to cook per order.</h1>
+        <h1>All Dishes to cook per order</h1>
 
     } else
     {
-        <h1>No Dishes to cook.</h1>
+        <h1>No Dishes to cook</h1>
     }
 
-    <div>
-        @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.OrderWithDishesCount)
+        @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.Orders)
         {
             OrderModel order = orderWithDishesCount.Order;
 
             <script>
-                registeredOrders.push(Number(@order.Id))
+                registeredOrders.push(String(@order.Id))
             </script>
 
             <div class="card m-3">
@@ -119,10 +118,9 @@
                       </div>
             </div>
         }
-    </div>
 
 
-    @if (Model.OrderWithDishesCount.Count > 0)
+    @if (Model.Orders.Count > 0)
     {
         <script>
             startWebSocket()

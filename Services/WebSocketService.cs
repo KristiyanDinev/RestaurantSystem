@@ -24,10 +24,23 @@ namespace RestaurantSystem.Services
             // list of order Ids
             if (data.TryGetValue("orders", out object? orders_obj))
             {
-                List<long>? ids = JsonSerializer.Deserialize<List<long>>(orders_obj.ToString()!);
-                if (ids == null)
+                List<string>? idsString = JsonSerializer.Deserialize<List<string>>(orders_obj.ToString()!);
+                if (idsString == null)
                 {
                     return;
+                }
+
+                List<long> ids = new List<long>();
+                foreach (string id in idsString)
+                {
+                    if (long.TryParse(id, out long orderId))
+                    {
+                        ids.Add(orderId);
+
+                    } else
+                    {
+                        return; // Invalid order ID format
+                    }
                 }
 
                 _webSocketUtility.AddOrdersToListenTo(ids, socket);

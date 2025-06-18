@@ -150,19 +150,21 @@ INSERT INTO "Dishes"
 ("Name", "Price", "Grams", "Image", "Ingredients", 
 "Type_Of_Dish", "IsAvailable", "AvrageTimeToCook", "Notes", "RestaurantId")
 VALUES 
-('Some salad', 22.30, 220, '/assets/images/salad/1.png', 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 'Some notes on the dish', 1),
-('Some salad2', 2.30, 210, NULL, 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 'Some notes on the dish', 1),
-('Some salad3', 10, 100, NULL, 'Ingredients...', 'salad', FALSE, '2 - 3 minutes', 'Some notes on the dish', 1),
+('Some salad', 22.30, 220, '/assets/images/salad/1.png', 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 1),
+('Some salad2', 2.30, 210, NULL, 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 1),
+('Some salad3', 10, 100, NULL, 'Ingredients...', 'salad', FALSE, '2 - 3 minutes', 1),
+('Soup Test', 10.30, 220, NULL, 'Ingredients...', 'soup', TRUE, '3 - 4 minutes', 1),
 
-('Some drink', 31, 210, NULL, 'Ingredients...', 'drink', TRUE, '2 - 3 minutes', 'Some notes on the dish', 1),
-('Some drink2', 12, 100, NULL, 'Ingredients...', 'drink', FALSE, '2 - 3 minutes', 'Some notes on the dish', 1),
 
-('Premium Some salad', 22.30, 220, '/assets/images/salad/1.png', 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 'Some notes on the dish', 2),
-('Premium Some salad2', 2.30, 210, NULL, 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 'Some notes on the dish', 2),
-('Premium Some salad3', 10, 100, NULL, 'Ingredients...', 'salad', FALSE, '2 - 3 minutes', 'Some notes on the dish', 2),
+('Some drink', 31, 210, NULL, 'Ingredients...', 'drink', TRUE, '2 - 3 minutes', 1),
+('Some drink2', 12, 100, NULL, 'Ingredients...', 'drink', FALSE, '2 - 3 minutes', 1),
 
-('Premium Some drink', 31, 210, NULL, 'Ingredients...', 'drink', TRUE, '2 - 3 minutes', 'Some notes on the dish', 2),
-('Premium Some drink2', 12, 100, NULL, 'Ingredients...', 'drink', FALSE, '2 - 3 minutes', 'Some notes on the dish', 2);
+('Premium Some salad', 22.30, 220, '/assets/images/salad/1.png', 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 2),
+('Premium Some salad2', 2.30, 210, NULL, 'Ingredients...', 'salad', TRUE, '2 - 3 minutes', 2),
+('Premium Some salad3', 10, 100, NULL, 'Ingredients...', 'salad', FALSE, '2 - 3 minutes', 2),
+
+('Premium Some drink', 31, 210, NULL, 'Ingredients...', 'drink', TRUE, '2 - 3 minutes', 2),
+('Premium Some drink2', 12, 100, NULL, 'Ingredients...', 'drink', FALSE, '2 - 3 minutes', 2);
 
 
 INSERT INTO "Roles"

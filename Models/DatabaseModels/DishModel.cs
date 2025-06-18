@@ -10,7 +10,6 @@
         public required string Type_Of_Dish { get; set; }
         public required bool IsAvailable { get; set; }
         public required string AvrageTimeToCook { get; set; }
-        public string? Notes { get; set; }
 
 
 
