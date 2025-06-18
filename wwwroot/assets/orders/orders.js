@@ -11,14 +11,11 @@ const Status = {
 // helper function
 function setCancelButton(orderId, status) {
     const btn = document.getElementById(`cancel,${orderId}`);
-    btn.className = "cancel noselect";
 
     if (status.toLowerCase() !== Status.Pending.toLowerCase()) {
-        btn.style = "opacity: 50%";
         btn.innerHTML = "Can't Cancel Order";
         return
     }
-    btn.style = "opacity: 100%";
     btn.innerHTML = "Cancel";
     btn.onclick = () => cancelOrder(orderId);
 }
@@ -53,12 +50,12 @@ function onmessage(event) {
 
     if (obj.OrderCurrentStatus) {
         document.getElementById(`orderstatus,${obj.OrderId}`)
-            .innerHTML = "CurrentStatus: " + obj.OrderCurrentStatus
+            .innerHTML = "Current Status: " + obj.OrderCurrentStatus
     }
 
     if (obj.DishId && obj.DishCurrentStatus) {
         document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`)
-            .innerHTML = "CurrentStatus: " + obj.DishCurrentStatus
+            .innerHTML = "Current Status: " + obj.DishCurrentStatus
     }
 
     setCancelButton(obj.OrderId, obj.OrderCurrentStatus)
@@ -81,13 +78,12 @@ async function cancelOrder(id) {
     }
 
     try {
-        const res = await fetch('/order/cancel/' + id, {
-            method: 'POST',
-            redirect: 'follow'
+        const res = await fetch(`/order/cancel/${id}`, {
+            method: 'POST'
         })
 
-        if (res.status == 200) {
-            window.location.pathname = '/orders';
+        if (res.ok) {
+            window.location.reload();
             return
         }
 

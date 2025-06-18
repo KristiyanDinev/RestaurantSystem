@@ -9,10 +9,11 @@ const Status = {
 
 // helper function
 function createButton(className, text, onclickHandler) {
-    const button = document.createElement("button");
-    button.className = className;
-    button.textContent = text;
-    button.onclick = onclickHandler;
+    const button = document.createElement("button")
+    button.className = className
+    button.onclick = onclickHandler
+    button.innerHTML = text
+    button.type = "button"
     return button;
 }
 
@@ -23,37 +24,32 @@ function setDishButtons(obj) {
 
     const status = obj.DishCurrentStatus.toLowerCase();
 
-    if (status === Status.Pending.toLowerCase()) {
+    if (status == Status.Pending.toLowerCase()) {
         const startCookingBtn = createButton(
-            "order noselect",
+            "btn btn-success m-2",
             "Start cooking",
             () => setStatus(obj.OrderId, obj.DishId, Status.Preparing.toLowerCase())
         );
         container.appendChild(startCookingBtn);
 
-    } else if (status === Status.Preparing.toLowerCase()) {
-        const rowDiv = document.createElement("div");
-        rowDiv.className = "row noselect";
-
-        const undoBtn = createButton(
-            "order noselect",
-            "Pending",
-            () => setStatus(obj.OrderId, obj.DishId, Status.Pending.toLowerCase())
-        );
-        rowDiv.appendChild(undoBtn);
-
+    } else if (status == Status.Preparing.toLowerCase()) {
         const readyBtn = createButton(
-            "order noselect",
+            "btn btn-success m-2",
             "Dish Ready",
             () => setStatus(obj.OrderId, obj.DishId, Status.Ready.toLowerCase())
         );
-        rowDiv.appendChild(readyBtn);
+        container.appendChild(readyBtn);
 
-        container.appendChild(rowDiv);
-
-    } else if (status === Status.Ready.toLowerCase()) {
         const undoBtn = createButton(
-            "order noselect",
+            "btn btn-primary m-2",
+            "Pending",
+            () => setStatus(obj.OrderId, obj.DishId, Status.Pending.toLowerCase())
+        );
+        container.appendChild(undoBtn);
+
+    } else if (status == Status.Ready.toLowerCase()) {
+        const undoBtn = createButton(
+            "btn btn-primary m-2",
             "Preparing",
             () => setStatus(obj.OrderId, obj.DishId, Status.Preparing.toLowerCase())
         );
@@ -66,31 +62,33 @@ async function setStatus(orderId, dishId, status) {
     if (!socket) return;
 
     const formData = new FormData();
-    formData.append('OrderId', Number(orderId));
+    formData.append('OrderId', orderId);
     formData.append('OrderCurrentStatus', '');
-    formData.append('DishId', Number(dishId));
+    formData.append('DishId', dishId);
     formData.append('DishCurrentStatus', status);
 
     try {
-        const res = await fetch(`${getDataFromLocalStorage("Host")}/staff/dishes/`, {
+        const res = await fetch('/staff/dishes/', {
             method: 'POST',
             body: formData,
             redirect: 'follow'
         });
 
-        const elementId = res.status === 200
-            ? `success,${orderId},${dishId}`
-            : `error,${orderId},${dishId}`;
+        const errorElement = document.getElementById(`error,${orderId},${dishId}`);
+        const successElement = document.getElementById(`success,${orderId},${dishId}`);
+        errorElement.innerHTML = "";
+        successElement.innerHTML = "";
 
-        const message = res.status === 200
-            ? `Successfully updated the dish status to ${status}`
-            : `Can't update dish status`;
+        if (res.ok) {
+            successElement.innerHTML = `Successfully updated the dish status to ${status}`;
 
-        document.getElementById(elementId).innerHTML = message;
+        } else {
+            errorElement.innerHTML = "Can't update dish status";
+        }
 
     } catch (error) {
-        console.error('Error updating dish status:', error);
         document.getElementById(`error,${orderId},${dishId}`).innerHTML = "Can't update dish status";
+
     }
 }
 
@@ -112,10 +110,10 @@ function onmessage(event) {
 
     const obj = JSON.parse(event.data);
 
-    if (!registeredOrders.includes(Number(obj.OrderId))) return;
+    if (!registeredOrders.includes(obj.OrderId)) return;
 
     if (obj.OrderCurrentStatus) {
-        document.getElementById(`orderstatus,${obj.OrderId}`).innerHTML = `CurrentStatus: ${obj.OrderCurrentStatus}`;
+        document.getElementById(`orderstatus,${obj.OrderId}`).innerHTML = `Current Status: ${obj.OrderCurrentStatus}`;
     }
 
     if (obj.DishId && obj.DishCurrentStatus) {

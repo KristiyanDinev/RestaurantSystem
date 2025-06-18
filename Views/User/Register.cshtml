@@ -2,8 +2,6 @@
     ViewData["Title"] = "Register";
 }
 
-
-
 <head>
     
     @await Html.PartialAsync("_Header")
@@ -53,13 +51,14 @@
                     <button type="button" class="btn btn-primary btn-lg me-md-2" onclick="submit()">
                         Create Account
                     </button>
-                    <button type="button" class="btn btn-secondary btn-lg" onclick="goToLogin()">
+                    <a class="btn btn-secondary btn-lg" href="/login">
                         Go to Login
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
     @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
     <script src='~/assets/register/register.js'></script>
 </body>

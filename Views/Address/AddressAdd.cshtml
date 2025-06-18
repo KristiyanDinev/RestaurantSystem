@@ -11,7 +11,7 @@
 <body>
     @await Html.PartialAsync("_NavBar", Model)
 
-    <button onclick="goToAddresses()" type="button" class="btn btn-primary m-2">Go to Addresses</button>
+    <a href="/addresses" class="btn btn-primary m-2">Go to Addresses</a>
 
     <div class="container mt-5">
         <h2>Add Address</h2>
@@ -57,6 +57,7 @@
         </div>
     </div>
     @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
     <script src="~/assets/user_location.js"></script>
 
     <script>

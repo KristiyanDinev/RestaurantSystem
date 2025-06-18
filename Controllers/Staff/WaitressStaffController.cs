@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Enums;
+using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
-using RestaurantSystem.Models.View.Staff;
+using RestaurantSystem.Models.View.Staff.Waitress;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
@@ -17,16 +18,13 @@ namespace RestaurantSystem.Controllers.Staff
     {
         private UserUtility _userUtils;
         private ReservationService _reservationService;
-        private Utility _utility;
 
         public WaitressStaffController(UserUtility userUtils,
             OrderedDishesService orderedDishesService,
-            ReservationService reservationService, 
-            Utility utility)
+            ReservationService reservationService)
         {
             _userUtils = userUtils;
             _reservationService = reservationService;
-            _utility = utility;
         }
 
         [HttpGet]
@@ -77,6 +75,39 @@ namespace RestaurantSystem.Controllers.Staff
             
             return await _reservationService.DeleteReservationAsync(reservation.Id) ?
                 Ok() : BadRequest();
+        }
+
+
+
+        [HttpGet]
+        [Route("/staff/orders")]
+        public async Task<IActionResult> Orders()
+        {
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            return View(new OrdersViewModel
+            {
+                Staff = user,
+                Orders = new List<OrderWithDishesCountModel>()
+            });
+        }
+
+
+        [HttpGet]
+        [Route("/staff/orders/create")]
+        public async Task<IActionResult> OrderCreate()
+        {
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            return View(user);
         }
     }
 }

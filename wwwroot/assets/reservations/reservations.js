@@ -19,13 +19,12 @@ async function submit() {
     formData.append('At_Date', String(at_date + 'T'+at_time))
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") + "/reservation", {
+        const res = await fetch("/reservation", {
             method: 'POST',
-            body: formData,
-            redirect: 'follow',
+            body: formData
         })
 
-        if (res.status == 200) {
+        if (res.ok) {
             window.location.pathname = "/reservations"
             return
         }
@@ -40,25 +39,23 @@ async function submit() {
 
 async function cancelReservation(id) {
 
-    if (!check("Are you sure you want to cancel this reservation?")) {
+    if (!confirm("Are you sure you want to cancel this reservation?")) {
         return;
     }
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") +
-            "/reservation/cancel/" + Number(id), {
-            method: 'POST',
-            redirect: 'follow'
+        const res = await fetch(`/reservation/cancel/${id}`, {
+            method: 'POST'
         })
 
-        if (res.status === 200) {
+        if (res.ok) {
             window.location.pathname = "/reservations"
             return
         }
 
-        document.getElementById('error,' + id).innerHTML = "Couldn't cancel the reservation."
 
     } catch {
-        document.getElementById('error,' + id).innerHTML = "Couldn't cancel the reservation."
     }
+
+    document.getElementById('error,' + id).innerHTML = "Couldn't cancel the reservation."
 }

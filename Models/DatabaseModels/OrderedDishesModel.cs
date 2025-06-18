@@ -10,7 +10,6 @@
         public required int DishId { get; set; }
         public DishModel Dish { get; set; } = null!;
 
-        public string? Notes { get; set; }
         public required string CurrentStatus { get; set; }
     }
 }

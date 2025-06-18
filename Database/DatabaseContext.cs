@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
 
 namespace RestaurantSystem.Database {
@@ -18,9 +19,6 @@ namespace RestaurantSystem.Database {
         public DbSet<DeliveryModel> Delivery { get; set; }
         public DbSet<AddressModel> Addresses { get; set; }
 
-        public readonly string DefaultOrder_CurrentStatus = "pending";
-        public readonly string DefaultOrderedDish_CurrentStatus = "pending";
-        public readonly string DefaultReservation_CurrentStatus = "pending";
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) {}
 
@@ -291,7 +289,7 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<OrderModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue(DefaultOrder_CurrentStatus)
+                .HasDefaultValue(Status.Pending.ToString())
                 .IsRequired();
 
             builder.Entity<OrderModel>()
@@ -346,12 +344,8 @@ namespace RestaurantSystem.Database {
                 .HasKey(order => order.Id);
 
             builder.Entity<OrderedDishesModel>()
-                .Property(order => order.Notes)
-                .HasDefaultValue(null);
-
-            builder.Entity<OrderedDishesModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue(DefaultOrderedDish_CurrentStatus)
+                .HasDefaultValue(Status.Pending.ToString())
                 .IsRequired();
 
             builder.Entity<OrderedDishesModel>()
@@ -386,7 +380,7 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<ReservationModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue(DefaultReservation_CurrentStatus)
+                .HasDefaultValue(Status.Pending.ToString())
                 .IsRequired();
 
             builder.Entity<ReservationModel>()

@@ -1,6 +1,7 @@
-﻿@using RestaurantSystem.Models.DatabaseModels;
-@using RestaurantSystem.Enums;
-@model RestaurantSystem.Models.View.Staff.ReservationViewModel;
+﻿@using RestaurantSystem.Enums;
+@using RestaurantSystem.Models.DatabaseModels;
+@using RestaurantSystem.Models.View.Staff.Waitress
+@model ReservationViewModel;
 @{
     ViewData["Title"] = "Reservations";
 }
@@ -19,7 +20,7 @@
 
     @foreach (ReservationModel reservation in Model.Reservations)
     {
-        <div class="reservation-card">
+        <div>
             <h3>User</h3>
             <p>Name: @reservation.User.Name</p>
 
@@ -33,7 +34,7 @@
             <p>Adults: @reservation.Amount_Of_Adults</p>
             <p>Children: @reservation.Amount_Of_Children</p>
 
-            <p>Total Price: @reservation.TotalPrice</p>
+            <p>Total Price: @reservation.TotalPrice lv.</p>
 
             <div class="notes_view">
                 <p class="notes_title">Notes: </p>
@@ -48,12 +49,12 @@
                 @if (reservation.CurrentStatus.Equals(pending, 
                     StringComparison.OrdinalIgnoreCase))
                 {
-                    <button type="button" class="noselect"
+                    <button type="button" class="btn btn-success m-2"
                             onclick="changeStatus('@reservation.Id', '@accepted')">
                             Accept
                     </button>
 
-                    <button type="button" class="noselect"
+                    <button type="button" class="btn btn-danger m-2"
                             onclick="changeStatus('@reservation.Id', '@cancelled')">
                             Cancel
                     </button>
@@ -61,12 +62,12 @@
                 } else if (reservation.CurrentStatus.Equals(accepted, 
                     StringComparison.OrdinalIgnoreCase))
                 {
-                    <button type="button" class="noselect"
+                    <button type="button" class="btn btn-primary m-2"
                             onclick="changeStatus('@reservation.Id', '@pending')">
                             Pending
                     </button>
 
-                    <button type="button" class="noselect"
+                    <button type="button" class="btn btn-danger m-2"
                             onclick="changeStatus('@reservation.Id', '@cancelled')">
                             Cancel
                     </button>
@@ -74,7 +75,7 @@
                 } else if (reservation.CurrentStatus.Equals(cancelled, 
                     StringComparison.OrdinalIgnoreCase))
                 {
-                    <button type="button" class="noselect"
+                    <button type="button" class="btn btn-danger m-2"
                             onclick="deleteReservation('@reservation.Id')">
                             Delete
                     </button>
@@ -88,6 +89,7 @@
 
 
     @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
 </body>
 
 

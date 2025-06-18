@@ -1,12 +1,5 @@
 
 function addDishToCart(id, name, isInCart) {
-    let restorantId = getCookie(restaurantId_header)
-    if (restorantId.length == 0) {
-        alert("Select a restaurant first.")
-        window.location.pathname = "/restaurants"
-        return
-    }
-
     let cart = getCookie(cart_header)
     if (cart.length == 0) {
         document.cookie = cart_header+"="+id + "; path=/";
@@ -41,23 +34,4 @@ function goToDish(id) {
     window.location.pathname = "/dish/" + Number(id)
 }
 
-function goToSalads() {
-    window.location.pathname = "/dishes/salad"
-}
-
-function goToAppetizers() {
-    window.location.pathname = "/dishes/appetizers"
-}
-
-function goToDishesFood() {
-    window.location.pathname = "/dishes/dishes"
-}
-
-function goToDrinks() {
-    window.location.pathname = "/dishes/drink"
-}
-
-function goToDesserts() {
-    window.location.pathname = "/dishes/desserts"
-}
 

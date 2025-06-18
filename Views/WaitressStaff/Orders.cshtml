@@ -1,0 +1,24 @@
+﻿@using RestaurantSystem.Models.View.Staff.Waitress
+@model OrdersViewModel;
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<head>
+    @await Html.PartialAsync("_Header")
+</head>
+
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+
+    <a class="btn btn-success m-2" href="/staff/order/create">Make Order</a>
+
+
+
+
+    @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
+</body>

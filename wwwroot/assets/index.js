@@ -64,58 +64,15 @@ function startOrderWebSocket(onopen, onclose, onerror, onmessage) {
         onopen, onclose, onerror, onmessage)
 }
 
-function goToProfile() {
-    window.location.pathname = "/profile"
-}
-
-
-
-function goToRegister() {
-    window.location.pathname = '/register'
-}
-
-
-function goToLogin() {
-    window.location.pathname = '/login'
-}
-
-function goToDishes() {
-    window.location.pathname = '/dishes'
-}
-
-function goToCart() {
-    window.location.pathname = '/cart'
-}
-
-function goToOrders() {
-    window.location.pathname = '/orders'
-}
-
-function goToReservations() {
-    window.location.pathname = '/reservations'
-}
-
-function goToReservationsToCreate() {
-    window.location.pathname =  '/reservation'
-}
-
-function goToAddresses() {
-    window.location.pathname = `/addresses`;
-}
-
-function goToRestaurants() {
-    window.location.pathname = `/restaurants`;
-}
 
 
 function Logout() {
     fetch("/logout", {
-        method: "POST",
-        redirect: 'follow',
+        method: "POST"
 
     }).then((res) => {
-        if (res.status === 200) {
-            goToLogin()
+        if (res.ok) {
+            window.location.pathname = "/login"
         }
     })
 }

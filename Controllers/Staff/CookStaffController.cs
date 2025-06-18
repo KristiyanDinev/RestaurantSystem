@@ -4,7 +4,7 @@ using RestaurantSystem.Enums;
 using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
-using RestaurantSystem.Models.View.Staff;
+using RestaurantSystem.Models.View.Staff.Cook;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
@@ -20,21 +20,18 @@ namespace RestaurantSystem.Controllers.Staff
         private OrderedDishesService _orderedDishesService;
         private WebSocketService _webSocketService;
         private WebSocketUtility _webSocketUtility;
-        private Utility _utility;
 
         public CookStaffController(UserUtility userUtils,
             OrderService orderService,
             OrderedDishesService orderedDishesService,
             UserService userService, WebSocketService webSocketService,
-            WebSocketUtility webSocketUtility,
-            Utility utility)
+            WebSocketUtility webSocketUtility)
         {
             _userUtils = userUtils;
             _orderService = orderService;
             _orderedDishesService = orderedDishesService;
             _webSocketService = webSocketService;
             _webSocketUtility = webSocketUtility;
-            _utility = utility;
         }
 
         [HttpGet]
@@ -88,7 +85,8 @@ namespace RestaurantSystem.Controllers.Staff
             if (orderUpdateFormModel.DishCurrentStatus != null &&
                 Utility.IsValidDishStatus(orderUpdateFormModel.DishCurrentStatus))
             {
-
+                orderUpdateFormModel.DishCurrentStatus =
+                    Utility.MakeCapital(orderUpdateFormModel.DishCurrentStatus);
                 if (!await _orderedDishesService
                     .UpdateOrderedDishStatusByIdAsync(orderUpdateFormModel.DishId,
                     orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus))
@@ -122,6 +120,7 @@ namespace RestaurantSystem.Controllers.Staff
                 orderStatus = Status.Pending.ToString();
             }
 
+            orderStatus = Utility.MakeCapital(orderStatus);
             updated = updated && await _orderService
                 .UpdateOrderCurrentStatusByIdAsync(orderUpdateFormModel.OrderId, orderStatus);
 

@@ -1,7 +1,8 @@
-﻿@using RestaurantSystem.Models;
+﻿@using RestaurantSystem.Enums;
+@using RestaurantSystem.Models;
 @using RestaurantSystem.Models.DatabaseModels;
-@using RestaurantSystem.Enums;
-@model RestaurantSystem.Models.View.Staff.DishesViewModel;
+@using RestaurantSystem.Models.View.Staff.Cook
+@model DishesViewModel;
 
 @{
     ViewData["Title"] = "Cook";
@@ -9,6 +10,7 @@
 
 <head>
     @await Html.PartialAsync("_Header")
+    <script src="~/assets/index.js"></script>
     <script src='~/assets/staff/cook/cook.js'></script>
 </head>
 
@@ -36,50 +38,46 @@
                 registeredOrders.push(Number(@order.Id))
             </script>
 
-            <div class="order_view">
-
-                <p class="status" id="orderstatus,@order.Id">
-                    CurrentStatus: @order.CurrentStatus
-                </p>
-
-                <div class="notes_view">
-                    <p class="notes_title">Notes: </p>
-                    <p class="notes">@order.Notes</p>
-                </div>
-
-                <p class="part">@order.OrderedAt</p>
-
-                <p class="part">TotalPrice: @order.TotalPrice</p>
-
+            <div class="card m-3">
+                 <div class="card-body">
+                     <p class="card-text" id="orderstatus,@order.Id">
+                        CurrentStatus: @order.CurrentStatus
+                     </p>
+                     <p class="card-text">
+                        Notes: @order.Notes
+                     </p>
+                     <p class="card-text">
+                        Ordered At: @order.OrderedAt
+                     </p>
+                     <p class="card-text">
+                        Total Price: @order.TotalPrice
+                     </p>
                 @foreach (DishWithStatusModel dishWithStatus in orderWithDishesCount.DishesCount.Keys)
                 {
-                    <div class="menu">
-
-                        <p class="part">Amount: @orderWithDishesCount.DishesCount[dishWithStatus]</p>
-
-                        <p class="part" id="dishstatus,@order.Id,@dishWithStatus.Dish.Id">
-                            Dish Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
-
-                        <p class="name">@dishWithStatus.Dish.Name</p>
-
-                        <p class="grams">grams /@dishWithStatus.Dish.Grams/</p>
-
-                        <p class="ingr">Ingredients: @dishWithStatus.Dish.Ingredients</p>
-
-                        @if (dishWithStatus.Dish.Image != null)
+                    <div class="card m-3">
+                     <div class="card-body">
+                         @if (dishWithStatus.Dish.Image != null)
                         {
-                            <img src="@dishWithStatus.Dish.Image" class="image" alt="No image for now">
+                            <img src="@dishWithStatus.Dish.Image" class="img-thumbnail rounded" alt="No image for now">
                         }
 
-                        <p class="avg_time_to_took">Avrage time to cook: @dishWithStatus.Dish.AvrageTimeToCook minute/s</p>
+                        <h4 class="card-title">@dishWithStatus.Dish.Name</h4>
+                        <p class="card-text">Amount: @orderWithDishesCount.DishesCount[dishWithStatus]</p>
 
-                        <p class="price">@dishWithStatus.Dish.Price lv.</p>
+                        <p class="card-text" id="dishstatus,@order.Id,@dishWithStatus.Dish.Id">
+                            Dish Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
+
+                        <p class="card-text">Grams: /@dishWithStatus.Dish.Grams/</p>
+                        <p class="card-text">Ingredients: @dishWithStatus.Dish.Ingredients</p>
+
+                        <p class="card-text">Avrage Time To Cook: @dishWithStatus.Dish.AvrageTimeToCook minute/s</p>
+
+                        <p class="card-text">@dishWithStatus.Dish.Price lv.</p>
 
                         <p id="error,@order.Id,@dishWithStatus.Dish.Id"></p>
                         <p id="success,@order.Id,@dishWithStatus.Dish.Id"></p>
 
-                        <div class="row noselect" 
-                            id="dish_buttons,@dishWithStatus.OrderedDish.OrderId,@dishWithStatus.OrderedDish.DishId">
+                        <div id="dish_buttons,@dishWithStatus.OrderedDish.OrderId,@dishWithStatus.OrderedDish.DishId">
 
                         @{
                             string pending = Status.Pending.ToString();
@@ -88,29 +86,27 @@
 
                             @if (dishWithStatus.OrderedDish.CurrentStatus.Equals(pending, StringComparison.OrdinalIgnoreCase))
                             {
-                                <button class="order noselect"
+                                <button type="button" class="btn btn-success m-2"
                                         onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">
                                     Start cooking
                                 </button>
                             }
                             else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(preparing, StringComparison.OrdinalIgnoreCase))
                             {
-                                <div class="row noselect">
-                                    <button type="button" class="order"
+                                    <button type="button" class="btn btn-primary m-2"
                                     onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@pending')">
                                         Pending
                                     </button>
 
-                                    <button type="button" class="order"
+                                    <button type="button" class="btn btn-success m-2"
                                             onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@ready')">
                                         Dish Ready
                                     </button>
-                                </div>
 
                             }
                             else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(ready, StringComparison.OrdinalIgnoreCase))
                             {
-                                <button type="button" class="order noselect"
+                                <button type="button" class="btn btn-success m-2"
                                         onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">
                                     Preparing
                                 </button>
@@ -118,7 +114,9 @@
                         }
                         </div>
                     </div>
+                    </div>
                 }
+                      </div>
             </div>
         }
     </div>

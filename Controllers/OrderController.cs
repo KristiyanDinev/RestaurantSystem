@@ -122,7 +122,7 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("/order/cancel/{orderId}")]
-        public async Task<IActionResult> OrderStop(int orderId)
+        public async Task<IActionResult> OrderCancele(int orderId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
@@ -132,6 +132,7 @@ namespace RestaurantSystem.Controllers {
 
             if (await _orderService.DeleteOrderAsync(orderId))
             {
+                TempData["Canceled"] = true;
                 return Ok();
             }
 

@@ -5,7 +5,7 @@ async function changeStatus(id, status) {
     formData.append('Status', status)
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") + "/staff/reservations", {
+        const res = await fetch("/staff/reservations", {
             method: 'POST',
             body: formData,
             redirect: 'follow'
@@ -31,20 +31,16 @@ async function deleteReservation(id) {
     }
 
     try {
-        const res = await fetch(getDataFromLocalStorage("Host") +
-            "/staff/reservations/delete/" + Number(id), {
-            method: 'POST',
-            redirect: 'follow'
+        const res = await fetch(`/staff/reservations/delete/${id}`, {
+            method: 'POST'
         })
 
-        if (res.status === 200) {
+        if (res.ok) {
             window.location.reload()
             return
         }
 
-        document.getElementById('error,' + id).innerHTML = "Couldn't Delete the Reservation."
+    } catch {}
 
-    } catch {
-        document.getElementById('error,' + id).innerHTML = "Couldn't Delete the Reservation."
-    }
+    document.getElementById('error,' + id).innerHTML = "Couldn't Delete the Reservation."
 }

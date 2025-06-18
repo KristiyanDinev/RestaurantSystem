@@ -20,6 +20,15 @@ namespace RestaurantSystem.Utilities
                    status.Equals(Status.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
+        public static string MakeCapital(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
+            return char.ToUpper(str[0]) + str.Substring(1).ToLower();
+        }
+
         public static async Task<string?> UploadImageAsync(IFormFile? Image)
         {
             if (Image == null)

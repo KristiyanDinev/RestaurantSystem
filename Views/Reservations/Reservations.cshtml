@@ -15,32 +15,33 @@
 <body>
     @await Html.PartialAsync("_NavBar", Model.User)
 
-    <div class="reservation_navigation">
-        <button type="button" onclick="goToReservationsToCreate()">Create</button>
-    </div>
+    <a class="btn btn-success m-2" href="/reservation">Create</a>
 
     <h1>Reservations</h1>
 
     @if (TempData.Peek("ReservationSuccessfull") != null)
     {
         <p>Reservation created successfully.</p>
+        TempData.Remove("ReservationSuccessfull");
 
     } else if (TempData.Peek("CanceledSuccessfull") != null)
     {
         <p>Reservation canceled successfully.</p>
+        TempData.Remove("CanceledSuccessfull");
     }
 
     <div id="reservations">
 
             @foreach (ReservationModel reservation in Model.Reservations)
             {
-                <div class="reservation-card">
+                <div class="card card-body m-2">
                     <p>Reservation At: @reservation.At_Date.ToLocalTime()</p>
                     <p>Reserved At: @reservation.Created_At.ToLocalTime()</p>
-                    <p>Current Status: @reservation.CurrentStatus</p>
+                    <p class="card-title">Current Status: @reservation.CurrentStatus</p>
 
-                    <p>Adults: @reservation.Amount_Of_Adults</p>
+                    <p class="card-text">Adults: @reservation.Amount_Of_Adults</p>
                     <p>Children: @reservation.Amount_Of_Children</p>
+                    <p>Total Price: @reservation.TotalPrice lv.</p>
 
                     <div class="notes_view">
                         <p class="notes_title">Notes:</p>
@@ -54,15 +55,16 @@
 
                         DateTime.UtcNow <= reservation.At_Date.ToUniversalTime().AddHours(-1))
                     {
-                        <button type="button" class="cancel noselect" onclick="cancelReservation('@reservation.Id')">Cancel</button>
+                        <button type="button" class="btn btn-danger m-2" onclick="cancelReservation('@reservation.Id')">Cancel</button>
 
                     } else
                     {
-                        <button type="button" class="cancel noselect" style="opacity: 50%;">Can't Cancel</button>
+                        <button type="button" class="btn btn-secondary m-2" style="opacity: 50%;">Can't Cancel</button>
                     }
             </div>
             }
     </div>
 
     @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
 </body>

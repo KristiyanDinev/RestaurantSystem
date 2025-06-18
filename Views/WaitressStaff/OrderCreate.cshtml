@@ -1,21 +1,22 @@
-﻿@model RestaurantSystem.Models.DatabaseModels.UserModel
-
+﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
 @{
-    ViewData["Title"] = "Staff";
+    ViewData["Title"] = "Create Order";
 }
 
-
 <head>
-    @await Html.PartialAsync("_Header")
+@await Html.PartialAsync("_Header")
+
 </head>
 
 <body>
-
     @await Html.PartialAsync("_StaffNavBar", Model)
 
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
-    <h1>Home Staff Page</h1>
+    <a class="btn btn-success m-2" href="/staff/order/create">Make Order</a>
+
+
+
 
     @await Html.PartialAsync("_Footer")
     <script src="~/assets/index.js"></script>

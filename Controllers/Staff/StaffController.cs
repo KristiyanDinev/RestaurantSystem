@@ -11,8 +11,6 @@ namespace RestaurantSystem.Controllers.Staff
     [IgnoreAntiforgeryToken]
     public class StaffController : Controller
     {
-        public static readonly string RestaurantNotFountError = "Can't determin in which restaurant you work in. Please contact your manager.";
-
         private UserUtility _userUtils;
 
         public StaffController(UserUtility userUtils)

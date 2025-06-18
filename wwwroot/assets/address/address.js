@@ -1,11 +1,4 @@
-﻿function goToEditAddress(addressId) {
-    window.location.pathname = `/address/update/${addressId}`;
-}
-
-function goToAddAddress() {
-    window.location.pathname = `/address/add`;
-}
-
+﻿
 async function deleteAddress(addressId) {
     if (!confirm('Are you sure you want to delete this address?')) {
         return;

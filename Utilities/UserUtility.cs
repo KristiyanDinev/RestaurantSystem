@@ -82,7 +82,7 @@ namespace RestaurantSystem.Utilities
                 Dictionary<string, object>? claims = await GetAuthClaimFromJWT(context);
 
                 if (claims == null || !claims.ContainsKey(userIdClaimKey) ||
-                    !int.TryParse(claims[userIdClaimKey].ToString(), out int Id))
+                    !long.TryParse(claims[userIdClaimKey].ToString(), out long Id))
                 {
                     return null;
                 }
@@ -103,7 +103,7 @@ namespace RestaurantSystem.Utilities
                 Dictionary<string, object>? claims = await GetAuthClaimFromJWT(context);
 
                 if (claims == null || !claims.ContainsKey(userIdClaimKey) ||
-                    !int.TryParse(claims[userIdClaimKey].ToString(), out int Id))
+                    !long.TryParse(claims[userIdClaimKey].ToString(), out long Id))
                 {
                     return null;
                 }

@@ -17,9 +17,10 @@
     @if (TempData.Peek("Success") != null)
     {
         <p>@TempData["Success"]</p>
+        TempData.Remove("Success");
     }
 
-    <button onclick="goToAddAddress()" type="button" class="btn btn-primary m-2">Add Address</button>
+    <a href="/address/add" class="btn btn-primary m-2">Add Address</a>
 
     <div class="m-3 row container">
 
@@ -39,7 +40,7 @@
                             <strong>Notes:</strong> @address.Notes<br />
                         </p>
                         <p class="card-text">
-                            <button onclick="goToEditAddress('@address.Id')" type="button" class="btn btn-warn m-2">Edit</button>
+                            <a href="/address/update/@address.Id" class="btn btn-warn m-2">Edit</a>
                             <button onclick="deleteAddress('@address.Id')" type="button" class="btn btn-danager m-2">Delete</button>
                         </p>
                     </div>
@@ -49,5 +50,6 @@
     </div>
 
     @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
     <script src="~/assets/address/address.js"></script>
 </body>

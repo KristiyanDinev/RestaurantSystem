@@ -18,15 +18,15 @@
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
     <div class="m-2 container">
-        <img src="@Model.Dish.Image" class="img-thumbnail rounded" alt="No image for now"></img>
+        <img src="@Model.Dish.Image" class="img-thumbnail rounded" alt="No image for now">
 
         <h4>@Model.Dish.Name</h4>
 
-        <p>Grams /@Model.Dish.Grams/</p>
+        <p>Grams: /@Model.Dish.Grams/</p>
 
         <p>Ingredients: @Model.Dish.Ingredients</p>
 
-        <p>Avrage time to cook: @Model.Dish.AvrageTimeToCook minute/s</p>
+        <p>Avrage Time To Cook: @Model.Dish.AvrageTimeToCook</p>
 
         <p>@Model.Dish.Price lv.</p>
 
@@ -35,4 +35,5 @@
     </div>
 
     @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
 </body>

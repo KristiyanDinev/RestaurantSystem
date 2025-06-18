@@ -9,7 +9,7 @@ namespace RestaurantSystem.Models
 
         public override int GetHashCode()
         {
-            return $"{OrderedDish.DishId},{OrderedDish.OrderId},{OrderedDish.CurrentStatus},{OrderedDish.Notes}"
+            return $"{OrderedDish.DishId},{OrderedDish.OrderId},{OrderedDish.CurrentStatus}"
                 .GetHashCode();
         }
 
@@ -22,8 +22,7 @@ namespace RestaurantSystem.Models
 
             return this.OrderedDish.DishId == otherModel.OrderedDish.DishId &&
                    this.OrderedDish.OrderId == otherModel.OrderedDish.OrderId &&
-                   this.OrderedDish.CurrentStatus == otherModel.OrderedDish.CurrentStatus &&
-                   this.OrderedDish.Notes == otherModel.OrderedDish.Notes;
+                   this.OrderedDish.CurrentStatus == otherModel.OrderedDish.CurrentStatus;
         }
     }
 }

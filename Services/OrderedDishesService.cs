@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using RestaurantSystem.Database;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
+using System.Linq;
 
 namespace RestaurantSystem.Services
 {
@@ -15,14 +18,13 @@ namespace RestaurantSystem.Services
         }
 
         public async Task<OrderedDishesModel> CreateOrderedDishAsync(int dishModelId, 
-            long orderModelId, string? notes)
+            long orderModelId)
         {
             OrderedDishesModel orderedDishes = new OrderedDishesModel()
             {
                 OrderId = orderModelId,
                 DishId = dishModelId,
-                Notes = notes,
-                CurrentStatus = _databaseContext.DefaultOrderedDish_CurrentStatus
+                CurrentStatus = Status.Pending.ToString()
             };
 
             await _databaseContext.OrderedDishes.AddAsync(orderedDishes);
@@ -31,18 +33,22 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> UpdateOrderedDishStatusByIdAsync(int dishId, long orderId, string status)
+        public async Task<bool> UpdateOrderedDishStatusByIdAsync(int dishId, 
+            long orderId, string status)
         {
-            OrderedDishesModel? orderedDishes = await _databaseContext.OrderedDishes
-                .FirstOrDefaultAsync(
-                order => order.DishId == dishId && order.OrderId == orderId);
+            List<OrderedDishesModel> orderedDishes = await _databaseContext.OrderedDishes
+                .Where(order => order.DishId == dishId && order.OrderId == orderId)
+                .ToListAsync();
 
             if (orderedDishes == null)
             {
                 return false;
             }
 
-            orderedDishes.CurrentStatus = status;
+            foreach (OrderedDishesModel orderedDish in orderedDishes)
+            {
+                orderedDish.CurrentStatus = status;
+            }
 
             return await _databaseContext.SaveChangesAsync() > 0;
         }

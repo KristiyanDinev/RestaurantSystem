@@ -15,12 +15,12 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<UserModel?> GetUserAsync(int id)
+        public async Task<UserModel?> GetUserAsync(long id)
         {
             return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         }
 
-        public async Task<UserModel?> GetStaffUserAsync(int id)
+        public async Task<UserModel?> GetStaffUserAsync(long id)
         {
             return await _databaseContext.Users
                 .Include(user => user.Restaurant)
@@ -77,7 +77,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> DeleteUserAsync(int userId)
+        public async Task<bool> DeleteUserAsync(long userId)
         {
             UserModel? user = await _databaseContext.Users.FirstOrDefaultAsync(
                 user => user.Id == userId);

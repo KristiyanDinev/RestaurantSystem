@@ -1,6 +1,6 @@
 ﻿using RestaurantSystem.Models.DatabaseModels;
 
-namespace RestaurantSystem.Models.View.Staff
+namespace RestaurantSystem.Models.View.Staff.Waitress
 {
     public class ReservationViewModel
     {

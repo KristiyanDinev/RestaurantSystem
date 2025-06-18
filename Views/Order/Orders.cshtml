@@ -1,5 +1,6 @@
-﻿@using RestaurantSystem.Models.DatabaseModels;
-@using RestaurantSystem.Models;
+﻿@using RestaurantSystem.Models
+@using RestaurantSystem.Models.DatabaseModels;
+@using RestaurantSystem.Enums;
 @model RestaurantSystem.Models.View.Order.OrdersViewModel;
 
 @{
@@ -8,7 +9,7 @@
 
 <head>
     @await Html.PartialAsync("_Header")
-
+    <script src="~/assets/index.js"></script>
     <script src='~/assets/orders/orders.js'></script>
     <script src='~/assets/dishes/dish.js'></script>
 </head>
@@ -21,56 +22,68 @@
     @if (TempData.Peek("OrderedSuccess") != null)
     {
         <h3>Ordered successful</h3>
+        TempData.Remove("OrderedSuccess");
+
+    } else if (TempData.Peek("Canceled") != null)
+    {
+        <h3>Canceled Order successful</h3>
+        TempData.Remove("Canceled");
     }
 
-    <div id="orders">
         @foreach (OrderWithDishesCountModel orderWithDish in Model.Orders)
         {
 
-            <div class="order_view">
-                <p class="status" id="orderstatus,@orderWithDish.Order.Id">CurrentStatus: @orderWithDish.Order.CurrentStatus</p>
+            <div class="card m-3">
+                <div class="card-body">
+                <h4 class="card-title" id="orderstatus,@orderWithDish.Order.Id">CurrentStatus: @orderWithDish.Order.CurrentStatus</h4>
 
-                <div class="notes_view">
-                    <p class="notes_title">Notes: </p>
-                    <p class="notes">@orderWithDish.Order.Notes</p>
-                </div>
+                <p class="card-text">Notes: @orderWithDish.Order.Notes</p>
 
-                <div class="dish_list">
+                
                     @foreach (DishWithStatusModel dishWithStatus in orderWithDish.DishesCount.Keys)
                     {
-                        <p id="dishstatus,@orderWithDish.Order.Id,@dishWithStatus.Dish.Id">
-                            Current Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
+                        <div class="card m-2">
+                            <div class="card-body">
+                                @if (dishWithStatus.Dish.Image != null)
+                                {
+                                    <img src="@dishWithStatus.Dish.Image" class="img-thumbnail rounded"/>
+                                }
+                                <p class="card-title" id="dishstatus,@orderWithDish.Order.Id,@dishWithStatus.Dish.Id">
+                                    Current Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
 
-                        @if (dishWithStatus.Dish.Image != null)
-                        {
-                            <img src="@dishWithStatus.Dish.Image" class="food_image"/>
-                        }
-
-                        <p class="list_dish"> x @orderWithDish.DishesCount[dishWithStatus] 
-                            @dishWithStatus.Dish.Name : @dishWithStatus.Dish.AvrageTimeToCook</p>
+                            <p class="card-text"> x @orderWithDish.DishesCount[dishWithStatus] 
+                                @dishWithStatus.Dish.Name : @dishWithStatus.Dish.AvrageTimeToCook</p>
+                            </div>
+                        </div>
                     }
-                </div>
 
-                <p class="part">TotalPrice: @orderWithDish.Order.TotalPrice lv.</p>
+                <p class="card-text">Total Price: @orderWithDish.Order.TotalPrice lv.</p>
 
-                <p class="part">Restorant Address: @string.Join(", ", 
+                <p class="card-text">Restorant Address: @string.Join(", ", 
                 orderWithDish.Order.Restaurant.Address, orderWithDish.Order.Restaurant.City,
                 orderWithDish.Order.Restaurant.State, orderWithDish.Order.Restaurant.Country)
                 </p>
 
-                <p class="part">Ordered At: @orderWithDish.Order.OrderedAt.ToString()</p>
+                <p class="card-text">Ordered At: @orderWithDish.Order.OrderedAt.ToString()</p>
                 <p id="error,@orderWithDish.Order.Id"></p>
 
-                <button type="button" id="cancel,@orderWithDish.Order.Id"></button>
+                @if (orderWithDish.Order.CurrentStatus.Equals(Status.Pending.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    <button onclick="cancelOrder('@orderWithDish.Order.Id')" type="button" class="btn btn-danger m-2" id="cancel,@orderWithDish.Order.Id">Cancel</button>
+
+                } else
+                {
+                    <button type="button" class="btn btn-secondary m-2" id="cancel,@orderWithDish.Order.Id">Can't Cancel Order</button>
+                }
 
             </div>
+         </div>
 
             <script>
                 registeredOrders.push(Number(@orderWithDish.Order.Id))
                 setCancelButton('@orderWithDish.Order.Id', '@orderWithDish.Order.CurrentStatus')
             </script>
         }
-    </div>
 
     @if (Model.Orders.Count > 0)
     {

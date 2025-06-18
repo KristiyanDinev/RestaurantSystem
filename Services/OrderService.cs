@@ -2,6 +2,7 @@
 using RestaurantSystem.Database;
 using RestaurantSystem.Utilities;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Enums;
 
 namespace RestaurantSystem.Services
 {
@@ -27,7 +28,7 @@ namespace RestaurantSystem.Services
             OrderModel order = new OrderModel {
                 Notes = notes != null && notes.Replace(" ", "").Length == 0 ? null : notes,
                 RestaurantId = restaurantId,
-                CurrentStatus = _databaseContext.DefaultOrder_CurrentStatus,
+                CurrentStatus = Status.Pending.ToString(),
                 TotalPrice = decimal.Parse($"{totalPrice:F2}"),
                 UserId = userId,
                 TableNumber = tableNumber,
@@ -42,7 +43,7 @@ namespace RestaurantSystem.Services
 
             foreach (int id in dishesId)
             {
-                await _orderedDishesDatabaseHandler.CreateOrderedDishAsync(id, order.Id, null);
+                await _orderedDishesDatabaseHandler.CreateOrderedDishAsync(id, order.Id);
             }
 
             if (await _databaseContext.SaveChangesAsync() <= 0)
@@ -58,8 +59,9 @@ namespace RestaurantSystem.Services
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
 
-            if (order == null || !order.CurrentStatus.Equals(
-                _databaseContext.DefaultOrder_CurrentStatus))
+            if (order == null || 
+                !order.CurrentStatus.Equals(Status.Pending.ToString(), 
+                StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -78,7 +80,7 @@ namespace RestaurantSystem.Services
 
             order.CurrentStatus = status;
 
-            return await _databaseContext.SaveChangesAsync() > 0;
+            return await _databaseContext.SaveChangesAsync() >= 0;
         }
 
         public async Task<List<OrderModel>> GetOrdersByUserAsync(long userId)

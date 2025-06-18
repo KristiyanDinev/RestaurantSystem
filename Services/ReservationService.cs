@@ -2,6 +2,7 @@
 using RestaurantSystem.Database;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Services
 {
@@ -29,7 +30,7 @@ namespace RestaurantSystem.Services
                 Amount_Of_Children = amount_Of_Children,
                 At_Date = dateTime.ToUniversalTime(),
                 Notes = notes,
-                CurrentStatus = _databaseContext.DefaultReservation_CurrentStatus
+                CurrentStatus = Status.Pending.ToString()
             };
 
             if (!await _restaurantDatabaseHandler.CheckForReservationAsync(reservation))
@@ -77,14 +78,12 @@ namespace RestaurantSystem.Services
         {
             ReservationModel? existingReservation = await _databaseContext
                 .Reservations.FirstOrDefaultAsync(res => res.Id == id);
-
             if (existingReservation == null)
             {
                 return false;
             }
 
-            existingReservation.CurrentStatus = new_status;
-
+            existingReservation.CurrentStatus = Utility.MakeCapital(new_status);
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 

@@ -102,16 +102,6 @@ namespace RestaurantSystem
                 command.CommandText = File.ReadAllText(sqlFile);
                 command.CommandTimeout = 300000;
                 command.ExecuteNonQuery();
-
-                /*foreach (string line in File.ReadLines(sqlFile)) {
-                    if (line.Trim().StartsWith("--") || string.IsNullOrWhiteSpace(line)) {
-                        continue;
-                    }
-
-                    //DbTransaction transaction = dbContext.Database.BeginTransaction().GetDbTransaction();
-                    //command.Transaction = transaction;
-                    //transaction.Commit();
-                }*/
             }
 
             Console.WriteLine("SQL executed");

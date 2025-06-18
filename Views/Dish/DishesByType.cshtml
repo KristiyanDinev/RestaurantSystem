@@ -37,14 +37,14 @@
             <div>
                 @if (dishModel.IsAvailable)
                 {
-                    <button type="button" id="order" style="opacity: 100%;"
+                    <button type="button" class="btn btn-success m-2" style="opacity: 100%;"
                             onclick="addDishToCart('@dishModel.Id', '@dishModel.Name', false)">
                         Add to order
                     </button>
                 }
                 else
                 {
-                    <button type="button" id="order" style="opacity: 50%;">Not available</button>
+                    <button type="button" class="btn btn-secondary m-2" style="opacity: 50%;">Not available</button>
                 }
             </div>
         </div>
@@ -52,4 +52,5 @@
 
 
     @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
 </body>

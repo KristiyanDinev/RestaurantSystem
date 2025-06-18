@@ -3,19 +3,19 @@
 <body>
     <div>
 
-        <button class="btn btn-primary m-2" type="button" onclick="goToCart()">🛒</button>
+        <a class="btn btn-primary m-2" href="/cart">🛒</a>
 
-        <button class="btn btn-primary m-2" type="button" onclick="goToOrders()">Orders</button>
+        <a class="btn btn-primary m-2" href="/orders">Orders</a>
 
-        <button class="btn btn-primary m-2" type="button" onclick="goToDishes()">Dishes</button>
+        <a class="btn btn-primary m-2" href="/dishes">Dishes</a>
 
-        <button class="btn btn-primary m-2" type="button" onclick="goToReservations()">Reservations</button>
+        <a class="btn btn-primary m-2" href="/reservations">Reservations</a>
 
-        <button class="btn btn-primary m-2" type="button" onclick="goToRestaurants()">Restaurants</button>
+        <a class="btn btn-primary m-2" href="/restaurants">Restaurants</a>
 
-        <button class="btn btn-primary m-2" type="button" onclick="goToAddresses()">Your Addresses</button>
+        <a class="btn btn-primary m-2" href="/addresses">Your Addresses</a>
 
-        <button class="btn btn-primary m-2" type="button" onclick="goToProfile()">
+        <a class="btn btn-primary m-2" href="/profile">
             @{
                 if (Model.Image != null && Model.Image.Length > 0)
                 {
@@ -23,9 +23,9 @@
                 }
             }
             <p>@Model.Name</p>
-        </button>
+        </a>
 
-        <button class="btn btn-danger m-2" type="button" onclick="Logout()" id="logout">Log Out</button>
+        <button class="btn btn-danger m-2" type="button" onclick="Logout()">Log Out</button>
         <i class="bi bi-box-arrow-right"></i>
     </div>
 

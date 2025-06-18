@@ -34,10 +34,11 @@
         <p id="Stats"></p>
         <br>
 
-        <button type="button" onclick="submit()">Login</button>
+        <button type="button" class="btn btn-success m-2" onclick="submit()">Login</button>
     </div>
 
-    <button type="button" onclick="goToRegister()">Go to Register</button>
+    <a class="btn btn-primary m-2" href="/register">Go to Register</a>
     @await Html.PartialAsync("_Footer")
+    <script src="~/assets/index.js"></script>
     <script src='~/assets/login/login.js'></script>
 </body>

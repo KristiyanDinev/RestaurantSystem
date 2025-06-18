@@ -29,7 +29,7 @@ namespace RestaurantSystem.Controllers {
         public async Task<IActionResult> Login()
         {
             return await _userUtility.GetUserByJWT(HttpContext) != null ?
-                RedirectToAction("Index", "Restaurant") : View();
+                RedirectToAction("Addresses", "Address") : View();
         }
 
 
@@ -38,7 +38,7 @@ namespace RestaurantSystem.Controllers {
         public async Task<IActionResult> Register()
         {
             return await _userUtility.GetUserByJWT(HttpContext) != null ?
-                RedirectToAction("Index", "Restaurant") : View();
+                RedirectToAction("Addresses", "Address") : View();
         }
 
 

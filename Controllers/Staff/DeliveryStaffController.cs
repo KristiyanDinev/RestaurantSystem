@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
-using RestaurantSystem.Models.View.Staff;
+using RestaurantSystem.Models.View.Staff.Delivery;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
