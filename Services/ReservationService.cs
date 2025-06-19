@@ -30,7 +30,7 @@ namespace RestaurantSystem.Services
                 Amount_Of_Children = amount_Of_Children,
                 At_Date = dateTime.ToUniversalTime(),
                 Notes = notes,
-                CurrentStatus = Status.Pending.ToString()
+                CurrentStatus = ReservationStatusEnum.Pending
             };
 
             if (!await _restaurantDatabaseHandler.CheckForReservationAsync(reservation))
@@ -74,7 +74,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<bool> UpdateReservationAsync(int id, string new_status)
+        public async Task<bool> UpdateReservationAsync(int id, ReservationStatusEnum new_status)
         {
             ReservationModel? existingReservation = await _databaseContext
                 .Reservations.FirstOrDefaultAsync(res => res.Id == id);
@@ -83,7 +83,7 @@ namespace RestaurantSystem.Services
                 return false;
             }
 
-            existingReservation.CurrentStatus = Utility.MakeCapital(new_status);
+            existingReservation.CurrentStatus = new_status;
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 

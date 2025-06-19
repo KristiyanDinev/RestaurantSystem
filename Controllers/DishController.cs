@@ -1,8 +1,9 @@
-﻿using RestaurantSystem.Models.DatabaseModels;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using RestaurantSystem.Services;
+using RestaurantSystem.Enums;
+using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.View.Dish;
+using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Controllers {
@@ -11,6 +12,7 @@ namespace RestaurantSystem.Controllers {
 
     [ApiController]
     [EnableRateLimiting("fixed")]
+    [IgnoreAntiforgeryToken]
     public class DishController : Controller {
 
         private DishService _dishService;
@@ -54,6 +56,11 @@ namespace RestaurantSystem.Controllers {
         [Route("/dishes/{dishType}")]
         public async Task<IActionResult> DishesByType(string dishType)
         {
+            if (!DishTypeEnum.TryParse(dishType, false, out DishTypeEnum type))
+            {
+                return RedirectToAction("Dishes");
+            }
+
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
@@ -71,7 +78,7 @@ namespace RestaurantSystem.Controllers {
             return View(new DishesTypeViewModel()
             {
                 Dishes = await _dishService.GetDishesByTypeAndRestaurantIdAsync(
-                    dishType, restaurant.Id),
+                    type, restaurant.Id),
                 Restaurant = restaurant,
                 User = user,
                 DishType = dishType
@@ -83,8 +90,6 @@ namespace RestaurantSystem.Controllers {
         [Route("/dish/{dishId}")]
         public async Task<IActionResult> DishById(int dishId)
         {
-            Console.WriteLine("Dish Id: " + dishId);
-
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {

@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using RestaurantSystem.Database;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
-using System.Linq;
 
 namespace RestaurantSystem.Services
 {
@@ -24,7 +22,7 @@ namespace RestaurantSystem.Services
             {
                 OrderId = orderModelId,
                 DishId = dishModelId,
-                CurrentStatus = Status.Pending.ToString()
+                CurrentStatus = DishStatusEnum.Pending
             };
 
             await _databaseContext.OrderedDishes.AddAsync(orderedDishes);
@@ -34,7 +32,7 @@ namespace RestaurantSystem.Services
 
 
         public async Task<bool> UpdateOrderedDishStatusByIdAsync(int dishId, 
-            long orderId, string status)
+            long orderId, DishStatusEnum status)
         {
             List<OrderedDishesModel> orderedDishes = await _databaseContext.OrderedDishes
                 .Where(order => order.DishId == dishId && order.OrderId == orderId)
@@ -66,7 +64,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<string>> GetDishCurrectStatusAsync(long orderId)
+        public async Task<List<DishStatusEnum>> GetDishCurrectStatusAsync(long orderId)
         {
             return await _databaseContext.OrderedDishes
                 .Where(order => order.OrderId == orderId)

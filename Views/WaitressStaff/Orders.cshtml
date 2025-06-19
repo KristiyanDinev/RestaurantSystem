@@ -18,7 +18,7 @@
 
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
-    <a class="btn btn-success m-2" href="/staff/order/create">Make an Order</a>
+    <a class="btn btn-success m-2" href="/staff/orders/create">Make an Order</a>
 
     @if (Model.Orders.Count > 0)
     {

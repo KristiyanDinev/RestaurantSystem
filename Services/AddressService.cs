@@ -55,8 +55,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateAddressAsync(
-            AddressUpdateFormModel addressUpdateForm)
+        public async Task<bool> UpdateAddressAsync(AddressUpdateFormModel addressUpdateForm)
         {
             AddressModel? address = await GetAddressByIdAsync(addressUpdateForm.Id);
             if (address == null)

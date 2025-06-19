@@ -1,4 +1,6 @@
-﻿namespace RestaurantSystem.Models.DatabaseModels {
+﻿using RestaurantSystem.Enums;
+
+namespace RestaurantSystem.Models.DatabaseModels {
     public class DishModel {
 
         public int Id { get; set; }
@@ -7,7 +9,7 @@
         public required int Grams { get; set; }
         public string? Image { get; set; }
         public required string Ingredients { get; set; }
-        public required string Type_Of_Dish { get; set; }
+        public required DishTypeEnum Type_Of_Dish { get; set; }
         public required bool IsAvailable { get; set; }
         public required string AvrageTimeToCook { get; set; }
 

@@ -67,7 +67,7 @@
                 <p class="card-text">Ordered At: @orderWithDish.Order.OrderedAt.ToString()</p>
                 <p id="error,@orderWithDish.Order.Id"></p>
 
-                @if (orderWithDish.Order.CurrentStatus.Equals(Status.Pending.ToString(), StringComparison.OrdinalIgnoreCase))
+                @if (orderWithDish.Order.CurrentStatus.Equals(OrderStatusEnum.Pending))
                 {
                     <button onclick="cancelOrder('@orderWithDish.Order.Id')" type="button" class="btn btn-danger m-2" id="cancel,@orderWithDish.Order.Id">Cancel</button>
 

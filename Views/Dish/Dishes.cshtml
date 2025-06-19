@@ -1,4 +1,5 @@
-﻿@model RestaurantSystem.Models.View.Dish.DishesViewModel;
+﻿@using RestaurantSystem.Enums
+@model RestaurantSystem.Models.View.Dish.DishesViewModel;
 
 @{
     ViewData["Title"] = "Dishes";
@@ -15,12 +16,12 @@
     @await Html.PartialAsync("_NavBar", Model.User)
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
-    <a class="btn btn-success m-2" href="/dishes/salad">Salads</a>
-    <a class="btn btn-success m-2" href="/dishes/soup">Soups</a>
-    <a class="btn btn-success m-2" href="/dishes/appetizers">Appetizers</a>
-    <a class="btn btn-success m-2" href="/dishes/dishes">Dishes</a>
-    <a class="btn btn-success m-2" href="/dishes/drink">Drinks</a>
-    <a class="btn btn-success m-2" href="/dishes/desserts">Desserts</a>
+    <a class="btn btn-success m-2" href="/dishes/@DishTypeEnum.salads.ToString()">Salads</a>
+    <a class="btn btn-success m-2" href="/dishes/@DishTypeEnum.soups.ToString()">Soups</a>
+    <a class="btn btn-success m-2" href="/dishes/@DishTypeEnum.appetizers.ToString()">Appetizers</a>
+    <a class="btn btn-success m-2" href="/dishes/@DishTypeEnum.dishes.ToString()">Dishes</a>
+    <a class="btn btn-success m-2" href="/dishes/@DishTypeEnum.desserts.ToString()">Desserts</a>
+    <a class="btn btn-success m-2" href="/dishes/@DishTypeEnum.drinks.ToString()">Drinks</a>
 
     @await Html.PartialAsync("_Footer")
     <script src="~/assets/index.js"></script>

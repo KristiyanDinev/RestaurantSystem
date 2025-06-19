@@ -42,12 +42,12 @@
             </div>
 
             @{
-                string pending = Status.Pending.ToString().ToLower();
-                string accepted = Status.Accepted.ToString().ToLower();
-                string cancelled = Status.Cancelled.ToString().ToLower();
+                string pending = ReservationStatusEnum.Pending.ToString();
+                string accepted = ReservationStatusEnum.Accepted.ToString();
+                string cancelled = ReservationStatusEnum.Cancelled.ToString();
+                string currentStatus = reservation.CurrentStatus.ToString();
 
-                @if (reservation.CurrentStatus.Equals(pending, 
-                    StringComparison.OrdinalIgnoreCase))
+                @if (currentStatus.Equals(pending, StringComparison.OrdinalIgnoreCase))
                 {
                     <button type="button" class="btn btn-success m-2"
                             onclick="changeStatus('@reservation.Id', '@accepted')">
@@ -59,8 +59,7 @@
                             Cancel
                     </button>
 
-                } else if (reservation.CurrentStatus.Equals(accepted, 
-                    StringComparison.OrdinalIgnoreCase))
+                } else if (currentStatus.Equals(accepted, StringComparison.OrdinalIgnoreCase))
                 {
                     <button type="button" class="btn btn-primary m-2"
                             onclick="changeStatus('@reservation.Id', '@pending')">
@@ -72,8 +71,7 @@
                             Cancel
                     </button>
 
-                } else if (reservation.CurrentStatus.Equals(cancelled, 
-                    StringComparison.OrdinalIgnoreCase))
+                } else if (currentStatus.Equals(cancelled, StringComparison.OrdinalIgnoreCase))
                 {
                     <button type="button" class="btn btn-danger m-2"
                             onclick="deleteReservation('@reservation.Id')">

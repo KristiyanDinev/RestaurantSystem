@@ -1,0 +1,43 @@
+﻿@using RestaurantSystem.Models.DatabaseModels
+@model RestaurantSystem.Models.View.Staff.Waitress.OrderDishViewModel;
+
+
+@if (Model.Dishes.Count == 0)
+{
+    <div class="alert alert-info m-2">
+       @Model.InfoMessage
+    </div>
+    return;
+}
+
+<div class="card card-body m-2" id="@Model.Dishes.First().Type_Of_Dish" style="display: none;">
+    @foreach (DishModel dish in Model.Dishes)
+    {
+        <div class="card m-5">
+            <div class="card-body">
+                @if (dish.Image != null)
+                {
+                    <img class="img-thumbnail rounded" src="@dish.Image">
+                }
+                <h4 class="card-title">@dish.Name</h4>
+                <p class="card-text">Grams: /@dish.Grams/</p>
+                <p class="card-text">@dish.Price lv.</p>
+
+            </div>
+
+            <div>
+                @if (dish.IsAvailable)
+                {
+                    <button type="button" class="btn btn-success m-2" style="opacity: 100%;"
+                            onclick="addDishToCart('@dish.Id', '@dish.Name', false)">
+                        Add to order
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-secondary m-2" style="opacity: 50%;">Not available</button>
+                }
+            </div>
+        </div>
+    }
+</div>

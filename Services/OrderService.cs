@@ -28,7 +28,7 @@ namespace RestaurantSystem.Services
             OrderModel order = new OrderModel {
                 Notes = notes != null && notes.Replace(" ", "").Length == 0 ? null : notes,
                 RestaurantId = restaurantId,
-                CurrentStatus = Status.Pending.ToString(),
+                CurrentStatus = OrderStatusEnum.Pending,
                 TotalPrice = decimal.Parse($"{totalPrice:F2}"),
                 UserId = userId,
                 TableNumber = tableNumber,
@@ -59,9 +59,7 @@ namespace RestaurantSystem.Services
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
 
-            if (order == null || 
-                !order.CurrentStatus.Equals(Status.Pending.ToString(), 
-                StringComparison.OrdinalIgnoreCase))
+            if (order == null ||  !order.CurrentStatus.Equals(OrderStatusEnum.Pending))
             {
                 return false;
             }
@@ -73,7 +71,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateOrderCurrentStatusByIdAsync(long orderId, string status)
+        public async Task<bool> UpdateOrderCurrentStatusByIdAsync(long orderId, OrderStatusEnum status)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId) ?? throw new Exception();
@@ -88,8 +86,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.Orders
                 .Include(order => order.Restaurant)
                 .Include(order => order.OrderedDishes)
-                .Where(
-                order => order.UserId == userId)
+                .Where(order => order.UserId == userId)
                 .ToListAsync();
         }
 
@@ -100,8 +97,7 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<List<OrderModel>> Get_HomeDelivery_OrdersBy_RestaurantIdAsync(
-            int restaurantId)
+        public async Task<List<OrderModel>> Get_HomeDelivery_OrdersBy_RestaurantIdAsync(int restaurantId)
         {
             return await _databaseContext.Orders.Where(
                 order => 

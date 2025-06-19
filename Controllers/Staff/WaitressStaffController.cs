@@ -60,13 +60,14 @@ namespace RestaurantSystem.Controllers.Staff
             [FromForm] ReservationUpdateFormModel reservationUpdateForm)
         {
             if (!ModelState.IsValid || 
-                !Utility.IsValidReservationStatus(reservationUpdateForm.Status))
+                !ReservationStatusEnum.TryParse(reservationUpdateForm.Status, false, out
+                    ReservationStatusEnum status))
             {
                 return BadRequest();
             }
 
-            return await _reservationService.UpdateReservationAsync(reservationUpdateForm.Id,
-                reservationUpdateForm.Status) ? Ok() : BadRequest();
+            return await _reservationService.UpdateReservationAsync(
+                reservationUpdateForm.Id, status) ? Ok() : BadRequest();
         }
 
 
@@ -77,8 +78,7 @@ namespace RestaurantSystem.Controllers.Staff
             ReservationModel? reservation = await _reservationService
                 .GetReservationByIdAsync(id);
 
-            if (reservation == null || !reservation.CurrentStatus.Equals(Status.Cancelled.ToString(),
-                StringComparison.OrdinalIgnoreCase)) { 
+            if (reservation == null || !reservation.CurrentStatus.Equals(ReservationStatusEnum.Cancelled)) { 
                 return BadRequest();
             }
             
@@ -117,7 +117,7 @@ namespace RestaurantSystem.Controllers.Staff
 
 
         [HttpGet]
-        [Route("/staff/order/create")]
+        [Route("/staff/orders/create")]
         public async Task<IActionResult> OrderCreate()
         {
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
@@ -127,15 +127,14 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             int restaurantId = user.Restaurant.Id;
-            List<DishModel> salads = await _dishService.GetDishesByTypeAndRestaurantIdAsync("salad", restaurantId);
-            List<DishModel> soups = await _dishService.GetDishesByTypeAndRestaurantIdAsync("soup", restaurantId);
-            List<DishModel> appetizers = await _dishService.GetDishesByTypeAndRestaurantIdAsync("appetizers", restaurantId);
-            List<DishModel> dishes = await _dishService.GetDishesByTypeAndRestaurantIdAsync("dishes", restaurantId);
-            List<DishModel> drinks = await _dishService.GetDishesByTypeAndRestaurantIdAsync("drink", restaurantId);
-            List<DishModel> desserts = await _dishService.GetDishesByTypeAndRestaurantIdAsync("desserts", restaurantId);
-
             return View(new OrderCreateViewModel { 
-                User = user
+                Staff = user,
+                Salads = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.salads, restaurantId),
+                Soups = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.soups, restaurantId),
+                Appetizers = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.appetizers, restaurantId),
+                Dishes = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.dishes, restaurantId),
+                Desserts = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.desserts, restaurantId),
+                Drinks = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.drinks, restaurantId)
             });
         }
 

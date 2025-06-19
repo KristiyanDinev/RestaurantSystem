@@ -1,17 +1,21 @@
-﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+﻿@using RestaurantSystem.Enums
+@using RestaurantSystem.Models.DatabaseModels
+@using RestaurantSystem.Models.View.Staff.Waitress
+@model OrderCreateViewModel;
 @{
     ViewData["Title"] = "Create Order";
 }
 
 <head>
     @await Html.PartialAsync("_Header")
+    <script src="~/assets/cart/cart.js"></script>
     <script src="~/assets/staff/waitress/order_create_staff.js"></script>
 </head>
 
 <body>
-    @await Html.PartialAsync("_StaffNavBar", Model)
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
 
-    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
     
     <div class="card card-body m-3">
@@ -22,7 +26,49 @@
             <input type="text" id="table" class="form-control" placeholder="Table Number">
         </div>
 
-        <!-- Dishes -->
+        <button onclick="toggleDish('@DishTypeEnum.salads.ToString()')" type="button" class="btn btn-success m-2">Salads</button>
+        <button onclick="toggleDish('@DishTypeEnum.soups.ToString()')" type="button" class="btn btn-success m-2">Soups</button>
+        <button onclick="toggleDish('@DishTypeEnum.appetizers.ToString()')" type="button" class="btn btn-success m-2">Appetizers</button>
+        <button onclick="toggleDish('@DishTypeEnum.dishes.ToString()')" type="button" class="btn btn-success m-2">Dishes</button>
+        <button onclick="toggleDish('@DishTypeEnum.desserts.ToString()')" type="button" class="btn btn-success m-2">Desserts</button>
+        <button onclick="toggleDish('@DishTypeEnum.drinks.ToString()')" type="button" class="btn btn-success m-2">Drinks</button>
+
+
+        @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
+            Dishes = Model.Salads,
+            InfoMessage = "No salads in your restaurant",
+        })
+
+        @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
+                Dishes = Model.Soups,
+                InfoMessage = "No soups in your restaurant",
+        })
+
+
+        @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
+                Dishes = Model.Appetizers,
+                InfoMessage = "No appetizers in your restaurant",
+        })
+
+
+        @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
+                Dishes = Model.Dishes,
+                InfoMessage = "No dishes in your restaurant",
+        })
+
+        @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
+                Dishes = Model.Desserts,
+                InfoMessage = "No desserts in your restaurant",
+        })
+
+        @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
+                Dishes = Model.Drinks,
+                InfoMessage = "No drinks in your restaurant",
+        })
+
+        <div class="card card-body m-2" id="cart">
+        </div>
+
 
         <div class="card-text m-2">
             <label for="cupon" class="form-label">Cupon Code</label>
@@ -31,7 +77,7 @@
 
         <div class="card-text m-2">
             <label for="notes" class="form-label">Notes</label>
-            <textarea id="notes" class="form-control"></textarea>>
+            <textarea id="notes" class="form-control"></textarea>
         </div>
 
         <button onclick="submit()" type="button" class="btn btn-success m-2">Order</button>

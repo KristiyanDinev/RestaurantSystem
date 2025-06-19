@@ -79,18 +79,19 @@
                         <div id="dish_buttons,@dishWithStatus.OrderedDish.OrderId,@dishWithStatus.OrderedDish.DishId">
 
                         @{
-                            string pending = Status.Pending.ToString();
-                            string preparing = Status.Preparing.ToString();
-                            string ready = Status.Ready.ToString();
+                            string pending = OrderStatusEnum.Pending.ToString();
+                            string preparing = OrderStatusEnum.Preparing.ToString();
+                            string ready = OrderStatusEnum.Ready.ToString();
+                            string currentStatus = dishWithStatus.OrderedDish.CurrentStatus.ToString();
 
-                            @if (dishWithStatus.OrderedDish.CurrentStatus.Equals(pending, StringComparison.OrdinalIgnoreCase))
+                            @if (currentStatus.Equals(pending, StringComparison.OrdinalIgnoreCase))
                             {
                                 <button type="button" class="btn btn-success m-2"
                                         onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">
                                     Start cooking
                                 </button>
                             }
-                            else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(preparing, StringComparison.OrdinalIgnoreCase))
+                            else if (currentStatus.Equals(preparing, StringComparison.OrdinalIgnoreCase))
                             {
                                     <button type="button" class="btn btn-primary m-2"
                                     onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@pending')">
@@ -103,7 +104,7 @@
                                     </button>
 
                             }
-                            else if (dishWithStatus.OrderedDish.CurrentStatus.Equals(ready, StringComparison.OrdinalIgnoreCase))
+                            else if (currentStatus.Equals(ready, StringComparison.OrdinalIgnoreCase))
                             {
                                 <button type="button" class="btn btn-success m-2"
                                         onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">

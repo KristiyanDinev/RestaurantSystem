@@ -50,8 +50,7 @@
 
                     <p id="error,@reservation.Id"></p>
 
-                    @if (!reservation.CurrentStatus.Equals(Status.Cancelled.ToString(), 
-                        StringComparison.OrdinalIgnoreCase) &&
+                    @if (!reservation.CurrentStatus.Equals(ReservationStatusEnum.Cancelled) &&
 
                         DateTime.UtcNow <= reservation.At_Date.ToUniversalTime().AddHours(-1))
                     {

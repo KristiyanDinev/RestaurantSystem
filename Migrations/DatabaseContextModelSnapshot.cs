@@ -20,6 +20,10 @@ namespace RestaurantSystem.Migrations
                 .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dish_status_enum", new[] { "pending", "preparing", "ready" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dish_type_enum", new[] { "salads", "soups", "appetizers", "dishes", "desserts", "drinks" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_status_enum", new[] { "pending", "preparing", "ready", "delivered" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "reservation_status_enum", new[] { "pending", "accepted", "cancelled" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.AddressModel", b =>

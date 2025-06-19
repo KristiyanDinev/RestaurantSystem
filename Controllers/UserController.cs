@@ -58,7 +58,6 @@ namespace RestaurantSystem.Controllers {
             if (loggedIn == null)
             {
                 TempData["Error"] = "Invalid login attempt.";
-                TempData["Login"] = loginFormModel;
                 return BadRequest();
             }
 

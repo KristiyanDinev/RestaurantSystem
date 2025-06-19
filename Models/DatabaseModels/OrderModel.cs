@@ -1,8 +1,10 @@
-﻿namespace RestaurantSystem.Models.DatabaseModels {
+﻿using RestaurantSystem.Enums;
+
+namespace RestaurantSystem.Models.DatabaseModels {
     public class OrderModel {
 
         public long Id { get; set; }
-        public required string CurrentStatus { get; set; }
+        public required OrderStatusEnum CurrentStatus { get; set; }
         public string? Notes { get; set; }
         public DateTime OrderedAt { get; set; }
         public decimal TotalPrice { get; set; }

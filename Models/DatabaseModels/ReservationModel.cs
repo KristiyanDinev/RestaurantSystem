@@ -1,10 +1,12 @@
-﻿namespace RestaurantSystem.Models.DatabaseModels
+﻿using RestaurantSystem.Enums;
+
+namespace RestaurantSystem.Models.DatabaseModels
 {
     public class ReservationModel
     {
         public int Id { get; set; }
         public string? Notes { get; set; }
-        public required string CurrentStatus { get; set; }
+        public required ReservationStatusEnum CurrentStatus { get; set; }
         public decimal TotalPrice { get; set; } // default 0.00
 
 

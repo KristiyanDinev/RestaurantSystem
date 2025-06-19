@@ -17,7 +17,7 @@ namespace RestaurantSystem
         public static void Main(string[] args)
         {
             Console.WriteLine("Current Working Directory: "+ Directory.GetCurrentDirectory());
-            Console.WriteLine("Configuring...");
+            Console.WriteLine("Configuring");
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddSession(options => {

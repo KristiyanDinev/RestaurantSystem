@@ -73,7 +73,6 @@ namespace RestaurantSystem.Controllers
 
             if (restaurant == null || !restaurant.ServeCustomersInPlace)
             {
-                TempData["Message"] = _forbit;
                 return RedirectToAction("Index", "Restaurant");
             }
 
@@ -143,7 +142,7 @@ namespace RestaurantSystem.Controllers
             }
 
             if (await _reservationService.UpdateReservationAsync(reservationId, 
-                Status.Cancelled.ToString()))
+                ReservationStatusEnum.Cancelled))
             {
                 TempData["CanceledSuccessfull"] = true;
                 return Ok();

@@ -1,24 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RestaurantSystem.Enums;
 namespace RestaurantSystem.Utilities
 {
     public class Utility
     {
         public readonly static int pageSize = 10;
-        private readonly static string deliveryRoleName = "delivery";
-
-        public static bool IsValidDishStatus(string status) { 
-            return status.Equals(Status.Pending.ToString(), StringComparison.OrdinalIgnoreCase) ||
-                   status.Equals(Status.Preparing.ToString(), StringComparison.OrdinalIgnoreCase) ||
-                   status.Equals(Status.Ready.ToString(), StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static bool IsValidReservationStatus(string status)
-        {
-            return status.Equals(Status.Pending.ToString(), StringComparison.OrdinalIgnoreCase) ||
-                   status.Equals(Status.Accepted.ToString(), StringComparison.OrdinalIgnoreCase) ||
-                   status.Equals(Status.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase);
-        }
 
         public static string MakeCapital(string str)
         {

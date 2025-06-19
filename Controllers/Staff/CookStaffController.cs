@@ -82,14 +82,13 @@ namespace RestaurantSystem.Controllers.Staff
 
             bool updated = false;
 
-            if (orderUpdateFormModel.DishCurrentStatus != null &&
-                Utility.IsValidDishStatus(orderUpdateFormModel.DishCurrentStatus))
+            if (DishStatusEnum.TryParse(orderUpdateFormModel.DishCurrentStatus,
+                false, out DishStatusEnum dishCurrentStatus))
             {
-                orderUpdateFormModel.DishCurrentStatus =
-                    Utility.MakeCapital(orderUpdateFormModel.DishCurrentStatus);
+                orderUpdateFormModel.DishCurrentStatus = dishCurrentStatus.ToString();
                 if (!await _orderedDishesService
                     .UpdateOrderedDishStatusByIdAsync(orderUpdateFormModel.DishId,
-                    orderUpdateFormModel.OrderId, orderUpdateFormModel.DishCurrentStatus))
+                    orderUpdateFormModel.OrderId, dishCurrentStatus))
                 {
                     return BadRequest();
                 }
@@ -97,30 +96,25 @@ namespace RestaurantSystem.Controllers.Staff
                 updated = true;
             }
 
-            List<string> status = await _orderedDishesService
+            List<DishStatusEnum> status = await _orderedDishesService
                 .GetDishCurrectStatusAsync(orderUpdateFormModel.OrderId);
 
-            string orderStatus;
-
-            string ready = Status.Ready.ToString();
-            string preparing = Status.Preparing.ToString();
-
-            if (status.All(s => s.Equals(ready, StringComparison.OrdinalIgnoreCase)))
+            OrderStatusEnum orderStatus;
+            if (status.All(s => s.Equals(DishStatusEnum.Ready)))
             {
-                orderStatus = ready;
+                orderStatus = OrderStatusEnum.Ready;
 
             }
-            else if (status.Any(s => s.Equals(preparing, StringComparison.OrdinalIgnoreCase)))
+            else if (status.Any(s => s.Equals(DishStatusEnum.Preparing)))
             {
-                orderStatus = preparing;
+                orderStatus = OrderStatusEnum.Preparing;
 
             }
             else
             {
-                orderStatus = Status.Pending.ToString();
+                orderStatus = OrderStatusEnum.Pending;
             }
 
-            orderStatus = Utility.MakeCapital(orderStatus);
             updated = updated && await _orderService
                 .UpdateOrderCurrentStatusByIdAsync(orderUpdateFormModel.OrderId, orderStatus);
 
@@ -129,7 +123,7 @@ namespace RestaurantSystem.Controllers.Staff
                 return BadRequest();
             }
 
-            orderUpdateFormModel.OrderCurrentStatus = orderStatus;
+            orderUpdateFormModel.OrderCurrentStatus = orderStatus.ToString();
 
             await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
                      _webSocketUtility.GetListenersForOrderId(orderUpdateFormModel.OrderId));

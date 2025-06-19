@@ -26,8 +26,7 @@ namespace RestaurantSystem.Services
                 restaurant.DoDelivery &&
                 restaurant.Country.Equals(country, StringComparison.OrdinalIgnoreCase) &&
                 restaurant.State == state &&
-                restaurant.City == city
-                )
+                restaurant.City == city)
                 .ToListAsync();
         }
 

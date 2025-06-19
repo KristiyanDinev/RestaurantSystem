@@ -1,4 +1,6 @@
-﻿namespace RestaurantSystem.Models.DatabaseModels
+﻿using RestaurantSystem.Enums;
+
+namespace RestaurantSystem.Models.DatabaseModels
 {
     public class OrderedDishesModel
     {
@@ -10,6 +12,6 @@
         public required int DishId { get; set; }
         public DishModel Dish { get; set; } = null!;
 
-        public required string CurrentStatus { get; set; }
+        public required DishStatusEnum CurrentStatus { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
 
 namespace RestaurantSystem.Services
@@ -12,10 +13,10 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<List<DishModel>> GetDishesByTypeAndRestaurantIdAsync(string type, int restaurantId)
+        public async Task<List<DishModel>> GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum type, int restaurantId)
         {
             return await _databaseContext.Dishies.Where(
-                dish => dish.Type_Of_Dish.ToLower().Equals(type.ToLower()) && 
+                dish => dish.Type_Of_Dish.Equals(type) && 
                 dish.RestaurantId == restaurantId)
                 .ToListAsync();
         }
@@ -31,7 +32,7 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<DishModel?> CreateDishAsync(string name, string type,
+        public async Task<DishModel?> CreateDishAsync(string name, DishTypeEnum type,
             decimal price, int restaurantModelId, string ingredients, string avrageTimeToCook, 
             int grams, string? image, bool isAvailable)
         {

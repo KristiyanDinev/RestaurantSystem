@@ -26,6 +26,11 @@ namespace RestaurantSystem.Database {
         {
             base.OnModelCreating(builder);
 
+            builder.HasPostgresEnum<OrderStatusEnum>();
+            builder.HasPostgresEnum<DishStatusEnum>();
+            builder.HasPostgresEnum<ReservationStatusEnum>();
+            builder.HasPostgresEnum<DishTypeEnum>();
+
             // UserModel
             BuildUserModel(ref builder);
 
@@ -64,6 +69,8 @@ namespace RestaurantSystem.Database {
 
             // AddressModel
             BuildAddressModel(ref builder);
+
+
         }
 
 
@@ -262,6 +269,7 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<DishModel>()
                 .Property(dish => dish.Type_Of_Dish)
+                .HasConversion<string>()
                 .IsRequired();
 
             builder.Entity<DishModel>()
@@ -289,7 +297,8 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<OrderModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue(Status.Pending.ToString())
+                .HasConversion<string>()
+                .HasDefaultValue(OrderStatusEnum.Pending)
                 .IsRequired();
 
             builder.Entity<OrderModel>()
@@ -345,7 +354,8 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<OrderedDishesModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue(Status.Pending.ToString())
+                .HasConversion<string>()
+                .HasDefaultValue(DishStatusEnum.Pending)
                 .IsRequired();
 
             builder.Entity<OrderedDishesModel>()
@@ -380,7 +390,8 @@ namespace RestaurantSystem.Database {
 
             builder.Entity<ReservationModel>()
                 .Property(order => order.CurrentStatus)
-                .HasDefaultValue(Status.Pending.ToString())
+                .HasConversion<string>()
+                .HasDefaultValue(ReservationStatusEnum.Pending)
                 .IsRequired();
 
             builder.Entity<ReservationModel>()

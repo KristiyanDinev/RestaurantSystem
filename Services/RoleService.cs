@@ -186,11 +186,11 @@ namespace RestaurantSystem.Services
         {
             return await _databaseContext.Users
                 .Include(user => user.Roles)
-                .Where(user => user.Roles.Any(userRole =>
-            userRole.Role.RolePermissions.Any(rolePermission =>
-                services.Contains(rolePermission.ServicePath)))
-                )
-            .ToListAsync();
+                .Where(user => 
+                user.Roles.Any(userRole =>
+                userRole.Role.RolePermissions.Any(rolePermission =>
+                services.Contains(rolePermission.ServicePath))))
+                .ToListAsync();
         }
 
     }
