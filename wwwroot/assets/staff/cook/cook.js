@@ -19,11 +19,10 @@ function createButton(className, text, onclickHandler) {
 
 
 function setDishButtons(obj) {
-    const container = document.getElementById(`dish_buttons,${obj.OrderId},${obj.DishId}`);
+    let container = document.getElementById(`dish_buttons,${obj.OrderId},${obj.DishId}`);
     container.innerHTML = "";
 
     const status = obj.DishCurrentStatus.toLowerCase();
-
     if (status == Status.Pending.toLowerCase()) {
         const startCookingBtn = createButton(
             "btn btn-success m-2",

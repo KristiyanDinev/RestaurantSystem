@@ -56,7 +56,7 @@ namespace RestaurantSystem.Controllers {
         [Route("/dishes/{dishType}")]
         public async Task<IActionResult> DishesByType(string dishType)
         {
-            if (!DishTypeEnum.TryParse(dishType, false, out DishTypeEnum type))
+            if (!DishTypeEnum.TryParse(dishType, true, out DishTypeEnum type))
             {
                 return RedirectToAction("Dishes");
             }

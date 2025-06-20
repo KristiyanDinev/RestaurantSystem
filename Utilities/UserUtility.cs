@@ -51,6 +51,11 @@ namespace RestaurantSystem.Utilities
             context.Response.Cookies.Append(authHeader, jwt);
         }
 
+        public void RemoveCartCookie(HttpContext context)
+        {
+            context.Response.Cookies.Delete("cart");
+        }
+
         public async Task<Dictionary<string, object>?> GetAuthClaimFromJWT(HttpContext context)
         {
             try

@@ -12,8 +12,7 @@ async function deleteAddress(addressId) {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-
-        goToAddresses();
+        window.location.pathname = '/addresses'
 
     } catch (error) {
         document.getElementById('status').innerHTML = 'Error while deleting address.';
@@ -56,8 +55,7 @@ async function updateAddress(addressId) {
         if (!response.ok) {
             throw new Error();
         }
-
-        goToAddresses()
+        window.location.pathname = '/addresses'
 
     } catch {
         status.innerHTML = 'Error while updating address.';
@@ -93,8 +91,8 @@ async function addAddress() {
         if (!response.ok) {
             throw new Error();
         }
-
-        goToAddresses()
+        window.location.pathname = '/addresses'
+        
     } catch {
         document.getElementById('status').innerHTML = 'Error while adding address.';
     }

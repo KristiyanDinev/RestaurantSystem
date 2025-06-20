@@ -46,7 +46,6 @@ namespace RestaurantSystem.Controllers
 
             if (restaurant == null || !restaurant.ServeCustomersInPlace)
             {
-                TempData["Message"] = _forbit;
                 return RedirectToAction("Index", "Restaurant");
             }
 

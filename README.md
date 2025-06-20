@@ -127,10 +127,6 @@ Staff endpoints:
 - user: ResturantUser
 - password: password123
 
-### TODO
-
-- Add profile access even on the restaurant part.
-
 ### Add test data
 *Note: Make sure that this will be the first data inserted in the tables in the database.*
 
@@ -296,3 +292,9 @@ Country: Bulgaria
 Postal Code: 12345
 PhoneNumber: +3592523511
 Roles: manager
+
+
+### TODO
+- Design the waitress order page.
+- Design the say the waitress will see the dishes to order. *(In cart cookie)*
+- Finish the waitress order submit.

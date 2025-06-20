@@ -91,7 +91,6 @@ namespace RestaurantSystem.Controllers {
 
             decimal totalPrice = 0;
             List<int> CoutingDishId = new List<int>(DishIds);
-
             foreach (DishModel dishModel in await _dishService.GetDishesByIdsAsync(DishIds.ToHashSet()))
             {
                 int beforeRemovalCount = CoutingDishId.Count;
@@ -114,6 +113,7 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
+            _userUtility.RemoveCartCookie(HttpContext);
             HttpContext.Response.Cookies.Delete("cart_items");
             TempData["OrderedSuccess"] = true;
             return Ok();

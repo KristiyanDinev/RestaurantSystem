@@ -25,14 +25,12 @@ namespace RestaurantSystem
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-            builder.Services.AddControllersWithViews()
-                .AddSessionStateTempDataProvider();
+            builder.Services.AddControllersWithViews();
 
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
 
             builder.WebHost.UseUrls([uri]);
-            // postgresql 17 5432
             builder.Services.AddDbContext<DatabaseContext>(options =>
             {
                 options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString"));

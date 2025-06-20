@@ -83,7 +83,7 @@ namespace RestaurantSystem.Controllers.Staff
             bool updated = false;
 
             if (DishStatusEnum.TryParse(orderUpdateFormModel.DishCurrentStatus,
-                false, out DishStatusEnum dishCurrentStatus))
+                true, out DishStatusEnum dishCurrentStatus))
             {
                 orderUpdateFormModel.DishCurrentStatus = dishCurrentStatus.ToString();
                 if (!await _orderedDishesService

@@ -7,9 +7,6 @@
 
 }
 
-
-
-
 function toggleDish(type) {
     const dish = document.getElementById(type);
     if (dish.style.display === "none") {

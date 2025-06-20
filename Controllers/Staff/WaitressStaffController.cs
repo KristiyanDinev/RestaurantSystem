@@ -16,20 +16,20 @@ namespace RestaurantSystem.Controllers.Staff
     [IgnoreAntiforgeryToken]
     public class WaitressStaffController : Controller
     {
-        private UserUtility _userUtils;
+        private UserUtility _userUtility;
         private ReservationService _reservationService;
         private OrderService _orderService;
         private OrderedDishesService _orderedDishesService;
         private DishService _dishService;
 
-        public WaitressStaffController(UserUtility userUtils,
+        public WaitressStaffController(UserUtility userUtility,
             OrderedDishesService orderedDishesService,
             ReservationService reservationService,
             OrderService orderService,
             OrderedDishesService orderedDishes,
             DishService dishService)
         {
-            _userUtils = userUtils;
+            _userUtility = userUtility;
             _reservationService = reservationService;
             _orderService = orderService;
             _orderedDishesService = orderedDishesService;
@@ -40,7 +40,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/reservations")]
         public async Task<IActionResult> Reservations()
         {
-            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
@@ -54,13 +54,14 @@ namespace RestaurantSystem.Controllers.Staff
             });
         }
 
+
         [HttpPost]
         [Route("/staff/reservations")]
         public async Task<IActionResult> ReservationUpdate(
             [FromForm] ReservationUpdateFormModel reservationUpdateForm)
         {
             if (!ModelState.IsValid || 
-                !ReservationStatusEnum.TryParse(reservationUpdateForm.Status, false, out
+                !ReservationStatusEnum.TryParse(reservationUpdateForm.Status, true, out
                     ReservationStatusEnum status))
             {
                 return BadRequest();
@@ -77,7 +78,6 @@ namespace RestaurantSystem.Controllers.Staff
         {
             ReservationModel? reservation = await _reservationService
                 .GetReservationByIdAsync(id);
-
             if (reservation == null || !reservation.CurrentStatus.Equals(ReservationStatusEnum.Cancelled)) { 
                 return BadRequest();
             }
@@ -92,7 +92,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/orders")]
         public async Task<IActionResult> Orders()
         {
-            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
@@ -120,7 +120,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/orders/create")]
         public async Task<IActionResult> OrderCreate()
         {
-            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
@@ -138,11 +138,12 @@ namespace RestaurantSystem.Controllers.Staff
             });
         }
 
+
         [HttpPost]
         [Route("/staff/orders/create")]
         public async Task<IActionResult> OrderCreatePost()
         {
-            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
