@@ -21,19 +21,22 @@ namespace RestaurantSystem.Controllers.Staff
         private OrderService _orderService;
         private OrderedDishesService _orderedDishesService;
         private DishService _dishService;
+        private CuponService _cuponService;
 
         public WaitressStaffController(UserUtility userUtility,
             OrderedDishesService orderedDishesService,
             ReservationService reservationService,
             OrderService orderService,
             OrderedDishesService orderedDishes,
-            DishService dishService)
+            DishService dishService,
+            CuponService cuponService)
         {
             _userUtility = userUtility;
             _reservationService = reservationService;
             _orderService = orderService;
             _orderedDishesService = orderedDishesService;
             _dishService = dishService;
+            _cuponService = cuponService;
         }
 
         [HttpGet]
@@ -108,7 +111,7 @@ namespace RestaurantSystem.Controllers.Staff
                 });
             }
 
-            return View(new OrdersViewModel
+            return View(new OrdersViewModel()
             {
                 Staff = user,
                 Orders = dishes
@@ -126,8 +129,43 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
+            List<int> DishIds = _dishService.GetDishIDsFromCartAsync(HttpContext);
+            HashSet<int> hash_ids = new(DishIds);
+            Dictionary<DishModel, int> dishes = new();
+            List<DishModel> dishModels = await _dishService.GetDishesByIdsAsync(hash_ids);
+
+            foreach (int eachDishId in hash_ids)
+            {
+                int countOfItems = DishIds.Count;
+                DishIds.RemoveAll(id => id == eachDishId);
+
+                DishModel? dish = dishModels.FirstOrDefault(dish => dish.Id == eachDishId);
+
+                if (dish != null)
+                {
+                    dishes.Add(dish, countOfItems - DishIds.Count);
+                }
+            }
+            return View(new OrderDetailsViewModel { 
+                Staff = user,
+                Dishs = dishes,
+            });
+        }
+
+
+        [HttpGet]
+        [Route("/staff/orders/dishes")]
+        public async Task<IActionResult> OrderDishes()
+        {
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
             int restaurantId = user.Restaurant.Id;
-            return View(new OrderCreateViewModel { 
+            return View(new OrderChoseDishViewModel
+            { 
                 Staff = user,
                 Salads = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.salads, restaurantId),
                 Soups = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.soups, restaurantId),
@@ -141,7 +179,8 @@ namespace RestaurantSystem.Controllers.Staff
 
         [HttpPost]
         [Route("/staff/orders/create")]
-        public async Task<IActionResult> OrderCreatePost()
+        public async Task<IActionResult> OrderCreatePost(
+            [FromForm] WaitressOrderFormModel waitressOrderForm)
         {
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
             if (user == null || user.Restaurant == null)
@@ -149,17 +188,37 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
-            /*
-            if (await _orderService.AddOrderAsync())
-            {
-                TempData["OrderedSuccess"] = true;
-                return Ok();
+            List<int> DishIds = _dishService.GetDishIDsFromCartAsync(HttpContext);
 
-            } else
+            decimal totalPrice = 0;
+            List<int> CoutingDishId = new List<int>(DishIds);
+            foreach (DishModel dishModel in await _dishService.GetDishesByIdsAsync(DishIds.ToHashSet()))
+            {
+                int beforeRemovalCount = CoutingDishId.Count;
+                CoutingDishId.RemoveAll(id => id == dishModel.Id);
+
+                totalPrice += dishModel.Price * (beforeRemovalCount - CoutingDishId.Count);
+            }
+
+            if (!string.IsNullOrWhiteSpace(waitressOrderForm.CuponCode))
+            {
+                CuponModel? cupon = await _cuponService.GetCuponByCodeAsync(waitressOrderForm.CuponCode);
+                if (cupon != null)
+                {
+                    totalPrice = _cuponService.HandleCuponDiscount(cupon.DiscountPercent, totalPrice);
+                }
+            }
+
+            if ((await _orderService.AddOrderAsync(user.Id, user.Restaurant.Id,
+                DishIds, waitressOrderForm.Notes, totalPrice, waitressOrderForm.TableNumber,
+                waitressOrderForm.CuponCode, null)) == null)
             {
                 return BadRequest();
-            }*/
-            return BadRequest();
+            }
+
+            _userUtility.RemoveCartCookie(HttpContext);
+            TempData["OrderedSuccess"] = true;
+            return Ok();
         }
     }
 }

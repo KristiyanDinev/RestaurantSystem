@@ -2,7 +2,7 @@
 
 namespace RestaurantSystem.Models.View.Staff.Waitress
 {
-    public class OrderCreateViewModel
+    public class OrderChoseDishViewModel
     {
         public required UserModel Staff { get; set; }
         public required List<DishModel> Salads { get; set; } = new List<DishModel>();

@@ -59,6 +59,10 @@
 
                 <p class="card-text">Total Price: @orderWithDish.Order.TotalPrice lv.</p>
 
+                @if (orderWithDish.Order.TableNumber != null) {
+                    <p class="card-text">Table Number: @orderWithDish.Order.TableNumber</p>
+                }
+
                 <p class="card-text">Restorant Address: @string.Join(", ", 
                 orderWithDish.Order.Restaurant.Address, orderWithDish.Order.Restaurant.City,
                 orderWithDish.Order.Restaurant.State, orderWithDish.Order.Restaurant.Country)

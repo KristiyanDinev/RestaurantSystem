@@ -47,7 +47,6 @@ namespace RestaurantSystem.Controllers {
             }
 
             List<OrderWithDishesCountModel> orders = new ();
-
             foreach (OrderModel order in await _orderService.GetOrdersByUserAsync(user.Id))
             {
                 orders.Add(new OrderWithDishesCountModel() {
@@ -99,7 +98,7 @@ namespace RestaurantSystem.Controllers {
                 totalPrice += dishModel.Price * (beforeRemovalCount - CoutingDishId.Count);
             }
 
-            if (order.CuponCode != null && order.CuponCode.Replace(" ", "").Length > 0) {
+            if (!string.IsNullOrWhiteSpace(order.CuponCode)) {
                 CuponModel? cupon = await _cuponService.GetCuponByCodeAsync(order.CuponCode);
                 if (cupon != null)
                 {
@@ -114,7 +113,6 @@ namespace RestaurantSystem.Controllers {
             }
 
             _userUtility.RemoveCartCookie(HttpContext);
-            HttpContext.Response.Cookies.Delete("cart_items");
             TempData["OrderedSuccess"] = true;
             return Ok();
         }

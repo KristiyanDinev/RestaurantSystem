@@ -35,3 +35,19 @@ function goToDish(id) {
 }
 
 
+function toggleDish(type) {
+    document.getElementById('salads').style.display = "none"
+    document.getElementById('soups').style.display = "none"
+    document.getElementById('appetizers').style.display = "none"
+    document.getElementById('dishes').style.display = "none"
+    document.getElementById('desserts').style.display = "none"
+    document.getElementById('drinks').style.display = "none"
+
+    const dish = document.getElementById(type);
+    if (dish.style.display === "none") {
+        dish.style.display = "block";
+
+    } else {
+        dish.style.display = "none";
+    }
+}

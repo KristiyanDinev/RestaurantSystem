@@ -48,11 +48,10 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Index", "Restaurant");
             }
 
-            Dictionary<DishModel, int> dishes = new();
 
             List<int> ids = _dishService.GetDishIDsFromCartAsync(HttpContext);
             HashSet<int> hash_ids = new(ids);
-
+            Dictionary<DishModel, int> dishes = new();
             List<DishModel> dishModels = await _dishService.GetDishesByIdsAsync(hash_ids);
 
             foreach (int eachDishId in hash_ids)

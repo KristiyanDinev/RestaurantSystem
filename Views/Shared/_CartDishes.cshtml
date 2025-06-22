@@ -1,0 +1,34 @@
+﻿@using RestaurantSystem.Models.DatabaseModels;
+@model Dictionary<DishModel, int>;
+
+@{
+    decimal sum = 0;
+
+    foreach (DishModel dish in Model.Keys)
+    {
+        int count = Model[dish];
+        sum += dish.Price * count;
+
+        <div class="card">
+            <div class="card-body">
+                @if (dish.Image != null)
+                {
+                    <img class="img-thumbnail rounded" src="@dish.Image">
+                }
+                <h4 class="card-title">@dish.Name</h4>
+                <p class="card-text">Grams: /@dish.Grams/</p>
+                <p class="card-text">Ingredients: @dish.Ingredients</p>
+                <p class="card-text">Avrage Time To Cook: @dish.AvrageTimeToCook</p>
+                <p class="card-text">@dish.Price lv.</p>
+                <div class="quantity">
+                    <p class="card-text">Quantity: @count</p>
+
+                    <button type="button" class="btn btn-danger m-2" onclick="removeDishFromCart('@dish.Id', '@dish.Name', true)">Remove</button>
+                    <button type="button" class="btn btn-success m-2" onclick="addDishToCart('@dish.Id', '@dish.Name', true)">Add</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <p>Total Price (not counting discounted price): @sum</p>
+}

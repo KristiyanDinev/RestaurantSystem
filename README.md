@@ -295,6 +295,5 @@ Roles: manager
 
 
 ### TODO
-- Design the waitress order page.
-- Design the say the waitress will see the dishes to order. *(In cart cookie)*
-- Finish the waitress order submit.
+- Waitress staff to mark the order as served and delete the orders onces the customers leave the restaurant.
+ (if customers will have an temporary account to track the order)

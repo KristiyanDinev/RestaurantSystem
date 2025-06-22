@@ -86,14 +86,18 @@ namespace RestaurantSystem.Services
             return await _databaseContext.Orders
                 .Include(order => order.Restaurant)
                 .Include(order => order.OrderedDishes)
-                .Where(order => order.UserId == userId)
+                .Where(order => 
+                order.UserId == userId && 
+                order.TableNumber == null)
                 .ToListAsync();
         }
 
         public async Task<List<OrderModel>> GetOrdersByRestaurantIdAsync(int restaurantId)
         {
-            return await _databaseContext.Orders.Where(
-                order => order.RestaurantId == restaurantId)
+            return await _databaseContext.Orders
+                .Where(order => 
+                order.RestaurantId == restaurantId && 
+                order.TableNumber != null)
                 .ToListAsync();
         }
 

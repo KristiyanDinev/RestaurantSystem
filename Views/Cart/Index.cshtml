@@ -20,35 +20,7 @@
     <h1>Your Cart</h1>
 
     <div class="m-3 container">
-        @{
-            decimal sum = 0;
-
-            foreach (DishModel dish in Model.Dishes.Keys)
-            {
-                int count = Model.Dishes[dish];
-                sum += dish.Price * count;
-
-                <div class="card">
-                    <div class="card-body">
-                        @if (dish.Image != null)
-                        {
-                            <img class="img-thumbnail rounded" src="@dish.Image">
-                        }
-                        <h4 class="card-title">@dish.Name</h4>
-                        <p class="card-text">Grams: /@dish.Grams/</p>
-                        <p class="card-text">Ingredients: @dish.Ingredients</p>
-                        <p class="card-text">Avrage Time To Cook: @dish.AvrageTimeToCook</p>
-                        <p class="card-text">@dish.Price lv.</p>
-                        <div class="quantity">
-                            <p class="card-text">Quantity: @count</p>
-
-                            <button type="button" class="btn btn-danger m-2" onclick="removeDishFromCart('@dish.Id', '@dish.Name', true)">Remove</button>
-                            <button type="button" class="btn btn-success m-2" onclick="addDishToCart('@dish.Id', '@dish.Name', true)">Add</button>
-                        </div>
-                    </div>
-                </div>
-            }
-        }
+        @await Html.PartialAsync("_CartDishes", Model.Dishes)
     </div>
 
     <p id="dish_stats"></p>
@@ -62,8 +34,6 @@
         <p>Cupon Code</p>
         <input id="cupon_input" maxlength="25" placeholder="Cupon Code">
     </div>
-
-    <p>Total Price (not counting discounted price): @sum</p>
 
     <div class="input-group">
         <p>Chose delivery address:</p>
