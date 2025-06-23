@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
 using RestaurantSystem.Models.View.Address;
@@ -26,7 +27,7 @@ namespace RestaurantSystem.Controllers
         [HttpGet]
         [Route("/addresses")]
         public async Task<IActionResult> Addresses() {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
@@ -44,7 +45,7 @@ namespace RestaurantSystem.Controllers
         [Route("/address/update/{address_id}")]
         public async Task<IActionResult> AddressUpdate(long address_id)
         {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
@@ -67,7 +68,7 @@ namespace RestaurantSystem.Controllers
         [HttpGet]
         [Route("/address/add")]
         public async Task<IActionResult> AddressAdd() {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
@@ -75,6 +76,7 @@ namespace RestaurantSystem.Controllers
 
             return View(user);
         }
+
 
         [HttpPost]
         [Route("/address/{address_id}")]

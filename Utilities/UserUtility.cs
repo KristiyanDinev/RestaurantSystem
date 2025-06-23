@@ -9,16 +9,18 @@ namespace RestaurantSystem.Utilities
         private EncryptionUtility _encryptionUtility;
         private JWTUtility _jwtUtility;
         private UserService _userService;
+        private RoleService _roleService;
 
         private readonly string authHeader = "Authentication";
         private readonly string userIdClaimKey = "Id";
 
         public UserUtility(EncryptionUtility encryptionUtility, JWTUtility jwtUtility,
-            UserService userService)
+            UserService userService, RoleService roleService)
         {
             _encryptionUtility = encryptionUtility;
             _jwtUtility = jwtUtility;
             _userService = userService;
+            _roleService = roleService;
         }
 
 
@@ -53,7 +55,7 @@ namespace RestaurantSystem.Utilities
 
         public void RemoveCartCookie(HttpContext context)
         {
-            context.Response.Cookies.Delete("cart");
+            context.Response.Cookies.Delete("cart_items");
         }
 
         public async Task<Dictionary<string, object>?> GetAuthClaimFromJWT(HttpContext context)
@@ -101,7 +103,33 @@ namespace RestaurantSystem.Utilities
         }
 
 
-        public async Task<UserModel?> GetStaffUserByJWT(HttpContext context)
+        public async Task<UserModel?> GetStaffUserByJWT(HttpContext context, bool getRoles = false)
+        {
+            try
+            {
+                Dictionary<string, object>? claims = await GetAuthClaimFromJWT(context);
+                if (claims == null || !claims.ContainsKey(userIdClaimKey) ||
+                    !long.TryParse(claims[userIdClaimKey].ToString(), out long Id))
+                {
+                    return null;
+                }
+
+                if (getRoles) {
+                    return await _userService.GetStaffUserWithRolesAsync(Id);
+
+                } else
+                {
+                    return await _userService.GetStaffUserAsync(Id);
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+
+        public async Task<UserModel?> GetUserWithRolesByJWT(HttpContext context)
         {
             try
             {
@@ -113,7 +141,7 @@ namespace RestaurantSystem.Utilities
                     return null;
                 }
 
-                return await _userService.GetStaffUserAsync(Id);
+                return await _userService.GetUserWithRolesAsync(Id);
 
             }
             catch (Exception)

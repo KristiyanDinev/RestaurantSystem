@@ -57,7 +57,8 @@ namespace RestaurantSystem.Services
                 .Where(order => order.OrderId == orderId)
                 .ToListAsync();
 
-            foreach (OrderedDishesModel orderedDishes in dishes) {
+            foreach (OrderedDishesModel orderedDishes in dishes)
+            {
                 _databaseContext.OrderedDishes.Remove(orderedDishes);
             }
 

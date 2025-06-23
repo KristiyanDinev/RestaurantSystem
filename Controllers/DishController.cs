@@ -32,7 +32,7 @@ namespace RestaurantSystem.Controllers {
         [Route("/dishes")]
         public async Task<IActionResult> Dishes()
         {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
@@ -61,7 +61,7 @@ namespace RestaurantSystem.Controllers {
                 return RedirectToAction("Dishes");
             }
 
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
@@ -90,7 +90,7 @@ namespace RestaurantSystem.Controllers {
         [Route("/dish/{dishId}")]
         public async Task<IActionResult> DishById(int dishId)
         {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");

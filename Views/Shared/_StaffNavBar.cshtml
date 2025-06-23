@@ -1,19 +1,46 @@
-﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+﻿@using RestaurantSystem.Enums
+@model RestaurantSystem.Models.DatabaseModels.UserModel;
 
 <body>
     <div>
-        <a class="btn btn-primary m-2" href="/staff/dishes">Dishes</a>
-        <a class="btn btn-primary m-2" href="/staff/reservations">Reservations</a>
-        <a class="btn btn-primary m-2" href="/staff/orders">Orders</a>
-        <a class="btn btn-primary m-2" href="/staff/delivery">Delivery</a>
-        <a class="btn btn-primary m-2" href="/staff/manager">Manager</a>
+
+        @if (Model.Roles.Any(r => RoleEnum.manager.ToString()
+                .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            <a href="/staff/manager" class="btn btn-primary m-2">Manager</a>
+            <a href="/staff/dishes" class="btn btn-primary m-2">Cook</a>
+            <a href="/staff/orders" class="btn btn-primary m-2">Orders</a>
+            <a href="/staff/reservations" class="btn btn-primary m-2">Reservations</a>
+            <a href="/staff/delivery" class="btn btn-primary m-2">Delivery</a>
+        }
+        
+        @if (Model.Roles.Any(r => RoleEnum.cook.ToString()
+                .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            <a href="/staff/cook" class="btn btn-primary m-2">Cook</a>
+        }
+        
+        @if (Model.Roles.Any(r => RoleEnum.waitress.ToString()
+                .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            <a href="/staff/orders" class="btn btn-primary m-2">Orders</a>
+            <a href="/staff/reservations" class="btn btn-primary m-2">Reservations</a>
+        }
+        
+        @if (Model.Roles.Any(r => RoleEnum.delivery.ToString()
+                .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            <a href="/staff/delivery" class="btn btn-primary m-2">Delivery</a>
+        }
 
         <p>Logged in as: @Model.Name</p>
 
         @if (Model.Image != null)
         {
-            <img hight="500" width="500" src="~@Model.Image">
+            <img class="img-thumbnail rounded m-2" src="@Model.Image">
         }
+
+        <a href="/dishes" class="btn btn-secondary m-2">Go back to Restaurant Menu</a>
 
     </div>
 

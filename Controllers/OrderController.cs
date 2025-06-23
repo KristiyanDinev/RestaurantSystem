@@ -40,7 +40,7 @@ namespace RestaurantSystem.Controllers {
         [Route("/orders/index")]
         public async Task<IActionResult> Orders()
         {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");

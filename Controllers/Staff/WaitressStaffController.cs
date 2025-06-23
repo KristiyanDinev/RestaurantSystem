@@ -43,7 +43,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/reservations")]
         public async Task<IActionResult> Reservations()
         {
-            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
@@ -90,12 +90,11 @@ namespace RestaurantSystem.Controllers.Staff
         }
 
 
-
         [HttpGet]
         [Route("/staff/orders")]
         public async Task<IActionResult> Orders()
         {
-            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
@@ -123,7 +122,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/orders/create")]
         public async Task<IActionResult> OrderCreate()
         {
-            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
@@ -157,7 +156,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/orders/dishes")]
         public async Task<IActionResult> OrderDishes()
         {
-            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
@@ -219,6 +218,25 @@ namespace RestaurantSystem.Controllers.Staff
             _userUtility.RemoveCartCookie(HttpContext);
             TempData["OrderedSuccess"] = true;
             return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("/staff/orders/delete/{orderId}")]
+        public async Task<IActionResult> OrderDeletePost(long orderId)
+        {
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            if (await _orderService.DeleteOrderAsync(orderId))
+            {
+                TempData["DeletedOrderSuccess"] = true;
+                return Ok();
+            }
+            return BadRequest();
         }
     }
 }

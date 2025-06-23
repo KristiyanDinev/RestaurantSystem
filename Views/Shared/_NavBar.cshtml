@@ -1,27 +1,42 @@
-﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+﻿@using RestaurantSystem.Enums
+@model RestaurantSystem.Models.DatabaseModels.UserModel;
 
 <body>
     <div>
 
         <a class="btn btn-primary m-2" href="/cart">🛒</a>
-
         <a class="btn btn-primary m-2" href="/orders">Orders</a>
-
         <a class="btn btn-primary m-2" href="/dishes">Dishes</a>
-
         <a class="btn btn-primary m-2" href="/reservations">Reservations</a>
-
         <a class="btn btn-primary m-2" href="/restaurants">Restaurants</a>
-
         <a class="btn btn-primary m-2" href="/addresses">Your Addresses</a>
+        
+        @if (Model.Roles.Any(r => RoleEnum.manager.ToString()
+            .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            <a href="/staff/manager" class="btn btn-success m-2">Staff Panel</a>
+
+        } else if (Model.Roles.Any(r => RoleEnum.cook.ToString()
+            .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            <a href="/staff/cook" class="btn btn-success m-2">Staff Panel</a>
+
+        } else if (Model.Roles.Any(r => RoleEnum.waitress.ToString()
+            .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            <a href="/staff/orders" class="btn btn-success m-2">Staff Panel</a>
+
+        } else if (Model.Roles.Any(r => RoleEnum.delivery.ToString()
+            .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            <a href="/staff/delivery" class="btn btn-success m-2">Staff Panel</a>
+        }
 
         <a class="btn btn-primary m-2" href="/profile">
-            @{
-                if (Model.Image != null && Model.Image.Length > 0)
+                @if (Model.Image != null)
                 {
                     <img src="@Model.Image" class="mt-2 rounded img-thumbnail">
                 }
-            }
             <p>@Model.Name</p>
         </a>
 

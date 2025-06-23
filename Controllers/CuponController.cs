@@ -19,7 +19,7 @@ namespace RestaurantSystem.Controllers {
         }
 
         [HttpPost]
-        [Route("/cupon")]
+        [Route("/cupon/{code}")]
         public async Task<IResult> Cupon(string code)
         {
             return Results.Json<CuponModel?>(await _cuponDatabaseHandler.GetCuponByCodeAsync(code));

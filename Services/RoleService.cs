@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
 
 namespace RestaurantSystem.Services
@@ -142,12 +143,19 @@ namespace RestaurantSystem.Services
         }
 
         // list of role names for user
-        public async Task<List<string>> GetUserRolesAsync(int userId)
+        public async Task<List<RoleEnum>> GetUserRolesAsync(int userId)
         {
-            return await _databaseContext.UserRoles
+            List<string> roleNames = await _databaseContext.UserRoles
                 .Where(ur => ur.UserId == userId)
                 .Select(ur => ur.RoleName)
                 .ToListAsync();
+
+            return roleNames
+                .Select(roleName => Enum.TryParse<RoleEnum>(roleName, true, out RoleEnum roleEnum) ? 
+                    roleEnum : (RoleEnum?)null)
+                .Where(e => e.HasValue)
+                .Select(e => e.Value)
+                .ToList();
         }
 
         // List of names of the services

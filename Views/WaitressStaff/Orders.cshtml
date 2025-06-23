@@ -1,4 +1,5 @@
-﻿@using RestaurantSystem.Models
+﻿@using RestaurantSystem.Enums
+@using RestaurantSystem.Models
 @using RestaurantSystem.Models.DatabaseModels
 @using RestaurantSystem.Models.View.Staff.Waitress
 @model OrdersViewModel;
@@ -35,6 +36,14 @@
             Successfully Placed an Order
         </div>
         TempData.Remove("OrderedSuccess");
+    }
+
+    @if (TempData["DeletedOrderSuccess"] != null)
+    {
+        <div class="alert alert-success m-3">
+            Successfully Deleted an Order
+        </div>
+        TempData.Remove("DeletedOrderSuccess");
     }
 
     @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.Orders)
@@ -89,6 +98,15 @@
                      <p class="card-text">
                         Total Price: @order.TotalPrice
                      </p>
+
+                    @if (order.CurrentStatus.Equals(OrderStatusEnum.Ready))
+                    {
+                        <p id="stats,@order.Id"></p>
+                        <button onclick="deleteOrder('@order.Id')"
+                                class="card-text btn btn-danger m-2">
+                            Delete Order
+                         </button>
+                    }
                 
                 </div>
             </div>

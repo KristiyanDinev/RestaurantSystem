@@ -59,7 +59,7 @@ namespace RestaurantSystem.Services
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
 
-            if (order == null ||  !order.CurrentStatus.Equals(OrderStatusEnum.Pending))
+            if (order == null || order.CurrentStatus.Equals(OrderStatusEnum.Pending))
             {
                 return false;
             }

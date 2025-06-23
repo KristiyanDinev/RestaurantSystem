@@ -20,10 +20,25 @@ namespace RestaurantSystem.Services
             return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         }
 
+        public async Task<UserModel?> GetUserWithRolesAsync(long id)
+        {
+            return await _databaseContext.Users
+                .Include(user => user.Roles)
+                .FirstOrDefaultAsync(user => user.Id == id);
+        }
+
         public async Task<UserModel?> GetStaffUserAsync(long id)
         {
             return await _databaseContext.Users
                 .Include(user => user.Restaurant)
+                .FirstOrDefaultAsync(user => user.Id == id);
+        }
+
+        public async Task<UserModel?> GetStaffUserWithRolesAsync(long id)
+        {
+            return await _databaseContext.Users
+                .Include(user => user.Restaurant)
+                .Include(user => user.Roles)
                 .FirstOrDefaultAsync(user => user.Id == id);
         }
 

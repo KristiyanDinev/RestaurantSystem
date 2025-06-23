@@ -200,7 +200,6 @@ INSERT INTO "Dishes" ("Name", "Price", "Grams", "Image", "Ingredients", "Type_Of
 INSERT INTO "Roles"
 ("Name", "Description")
 VALUES
-('staff', 'Access to staff.'),
 ('delivery', 'Access to online delivery.'),
 ('waitress', 'Access to serving the people in place and handling reservations.'),
 ('manager', 'Access to handle all staff for a specific restaurant.'),
@@ -297,3 +296,12 @@ Roles: manager
 ### TODO
 - Waitress staff to mark the order as served and delete the orders onces the customers leave the restaurant.
  (if customers will have an temporary account to track the order)
+
+- Delivery staff on their main page will see all their addresses. When they chose an address they go to Restaurant page.
+- Restaurant page: List restaurants in the same city as their address. When they chose restaurant, they go to Order page.
+- Order page: List all orders, which are not yet delivered and have not TableNumber. 
+  They can start the delivery if the order is ready. Otherwise 
+
+- After the delivery guy choses an order, then he can't chose another order, 
+  until he delivers the current one. But he can see all restaurants and orders.
+  

@@ -34,7 +34,7 @@ namespace RestaurantSystem.Controllers
         public async Task<IActionResult> Index()
         {
 
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");

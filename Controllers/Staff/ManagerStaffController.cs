@@ -29,7 +29,7 @@ namespace RestaurantSystem.Controllers.Staff
         public async Task<IActionResult> Manager()
         {
             // One Manager per restaurant
-            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");

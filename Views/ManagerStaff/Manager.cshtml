@@ -1,0 +1,18 @@
+﻿@model RestaurantSystem.Models.View.Staff.Manager.ManagerViewModel;
+@{
+    ViewData["Title"] = "Manager Panel";
+}
+
+
+<head>
+    @await Html.PartialAsync("_Header")
+</head>
+
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+
+
+    @await Html.PartialAsync("_Footer")
+</body>

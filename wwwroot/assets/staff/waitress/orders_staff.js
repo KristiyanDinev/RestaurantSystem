@@ -38,3 +38,24 @@ function onerror(event) { }
 function startWebSocket() {
     socket = startOrderWebSocket(onopen, onclose, onerror, onmessage);
 }
+
+
+async function deleteOrder(orderId) {
+    if (!confirm("Are you sure you want to delete this order?")) return;
+
+    const statusElement = document.getElementById(`stats,${orderId}`);
+    try {
+        const response = await fetch(`/staff/orders/delete/${orderId}`, {
+            method: 'POST'
+        })
+
+        if (response.ok) {
+            window.location.reload();
+            return;
+        }
+
+    } catch {
+    }
+
+    statusElement.innerHTML = "Counldn't delete the order";
+}

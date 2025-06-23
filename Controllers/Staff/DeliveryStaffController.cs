@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.View.Address;
 using RestaurantSystem.Models.View.Staff.Delivery;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
@@ -17,21 +18,21 @@ namespace RestaurantSystem.Controllers.Staff
         private OrderService _orderService;
         private UserUtility _userUtils;
         private RestaurantService _restaurantService;
+        private AddressService _addressService;
 
         public DeliveryStaffController(UserUtility userUtils,
             OrderService orderService,
-            RestaurantService restaurantService)
+            RestaurantService restaurantService, 
+            AddressService addressService)
         {
             _userUtils = userUtils;
             _orderService = orderService;
             _restaurantService = restaurantService;
-            // Delivery people can take orders from different restaurants in their own city.
-            // They just have to update their profile in order to change which restaurants they can take 
-            // orders and deliver them
+            _addressService = addressService;
         }
 
         [HttpGet]
-        [Route("/staff/delivery")]
+        [Route("/staff/delivery/address")]
         public async Task<IActionResult> Delivery()
         {
             UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
@@ -40,14 +41,11 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
-
-            return View();
-            /*
-            return View(new DeliveryOrderViewModel()
+            return View(new AddressesViewModel()
             {
-                Staff = user,
-                Order = 
-            });*/
+                User = user,
+                Addresses = await _addressService.GetUserAddressesAsync(user.Id)
+            });
         }
 
 

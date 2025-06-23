@@ -38,9 +38,7 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/dishes")]
         public async Task<IActionResult> Dishes()
         {
-            // Chief in the kitchen
-
-            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
