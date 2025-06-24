@@ -46,6 +46,7 @@ namespace RestaurantSystem
             builder.Services.AddScoped<ReservationService>();
             builder.Services.AddScoped<LocationService>();
             builder.Services.AddScoped<AddressService>();
+            builder.Services.AddScoped<DeliveryService>();
 
             builder.Services.AddScoped<EncryptionUtility>(_ =>
                 new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??

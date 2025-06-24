@@ -45,7 +45,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             List<OrderWithDishesCountModel> dishes = new();
-            foreach (OrderModel order in await _orderService.GetOrdersByRestaurantIdAsync(user.Restaurant.Id))
+            foreach (OrderModel order in await _orderService.GetAllOrdersByRestaurantIdAsync(user.Restaurant.Id))
             {
                 dishes.Add(new OrderWithDishesCountModel()
                 {

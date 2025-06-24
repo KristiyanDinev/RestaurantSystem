@@ -35,9 +35,7 @@
 
             <div class="card m-3">
                 <div class="card-body">
-                <h4 class="card-title" id="orderstatus,@orderWithDish.Order.Id">CurrentStatus: @orderWithDish.Order.CurrentStatus</h4>
-
-                <p class="card-text">Notes: @orderWithDish.Order.Notes</p>
+                <h4 class="card-title" id="orderstatus,@orderWithDish.Order.Id">Current Status: @orderWithDish.Order.CurrentStatus</h4>
 
                 
                     @foreach (DishWithStatusModel dishWithStatus in orderWithDish.DishesCount.Keys)
@@ -58,17 +56,21 @@
                     }
 
                 <p class="card-text">Total Price: @orderWithDish.Order.TotalPrice lv.</p>
-
-                @if (orderWithDish.Order.TableNumber != null) {
-                    <p class="card-text">Table Number: @orderWithDish.Order.TableNumber</p>
-                }
-
                 <p class="card-text">Restorant Address: @string.Join(", ", 
                 orderWithDish.Order.Restaurant.Address, orderWithDish.Order.Restaurant.City,
                 orderWithDish.Order.Restaurant.State, orderWithDish.Order.Restaurant.Country)
                 </p>
 
+                <p class="card-text">Ordered At Address</p>
+                <p class="card-text">Country: @orderWithDish.Order.Address.Country</p>
+                <p class="card-text">State / Province / Region: @orderWithDish.Order.Address.State</p>
+                <p class="card-text">City: @orderWithDish.Order.Address.City</p>
+                <p class="card-text">Address: @orderWithDish.Order.Address.Address</p>
+                <p class="card-text">Postal Code: @orderWithDish.Order.Address.PostalCode</p>
+                <p class="card-text">Phone Number: @orderWithDish.Order.Address.PhoneNumber</p>
+
                 <p class="card-text">Ordered At: @orderWithDish.Order.OrderedAt.ToString()</p>
+                <p class="card-text">Notes: @orderWithDish.Order.Notes</p>
                 <p id="error,@orderWithDish.Order.Id"></p>
 
                 @if (orderWithDish.Order.CurrentStatus.Equals(OrderStatusEnum.Pending))

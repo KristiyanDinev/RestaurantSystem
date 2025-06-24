@@ -1,5 +1,4 @@
 ﻿@model RestaurantSystem.Models.View.Dish.DishViewModel;
-
 @{
     ViewData["Title"] = "Dish";
     Model.Dish.Image ??= "";
@@ -18,17 +17,7 @@
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
     <div class="m-2 container">
-        <img src="@Model.Dish.Image" class="img-thumbnail rounded" alt="No image for now">
-
-        <h4>@Model.Dish.Name</h4>
-
-        <p>Grams: /@Model.Dish.Grams/</p>
-
-        <p>Ingredients: @Model.Dish.Ingredients</p>
-
-        <p>Avrage Time To Cook: @Model.Dish.AvrageTimeToCook</p>
-
-        <p>@Model.Dish.Price lv.</p>
+        @await Html.PartialAsync("_DisplayDish", Model.Dish)
 
         <button type="button" class="btn btn-success m-2" onclick="addDishToCart('@Model.Dish.Id', '@Model.Dish.Name', false)">Add to order</button>
 

@@ -55,23 +55,13 @@
                 {
                     <div class="card m-3">
                      <div class="card-body">
-                         @if (dishWithStatus.Dish.Image != null)
-                        {
-                            <img src="@dishWithStatus.Dish.Image" class="img-thumbnail rounded" alt="No image for now">
-                        }
 
-                        <h4 class="card-title">@dishWithStatus.Dish.Name</h4>
+                        @await Html.PartialAsync("_DisplayDish", dishWithStatus.Dish)
+
                         <p class="card-text">Amount: @orderWithDishesCount.DishesCount[dishWithStatus]</p>
 
                         <p class="card-text" id="dishstatus,@order.Id,@dishWithStatus.Dish.Id">
                             Dish Status: @dishWithStatus.OrderedDish.CurrentStatus</p>
-
-                        <p class="card-text">Grams: /@dishWithStatus.Dish.Grams/</p>
-                        <p class="card-text">Ingredients: @dishWithStatus.Dish.Ingredients</p>
-
-                        <p class="card-text">Avrage Time To Cook: @dishWithStatus.Dish.AvrageTimeToCook minute/s</p>
-
-                        <p class="card-text">@dishWithStatus.Dish.Price lv.</p>
 
                         <p id="error,@order.Id,@dishWithStatus.Dish.Id"></p>
                         <p id="success,@order.Id,@dishWithStatus.Dish.Id"></p>

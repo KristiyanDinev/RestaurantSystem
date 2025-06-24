@@ -12,7 +12,7 @@ using RestaurantSystem.Database;
 namespace RestaurantSystem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250619161728_Init")]
+    [Migration("20250624064402_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace RestaurantSystem.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dish_status_enum", new[] { "pending", "preparing", "ready" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dish_type_enum", new[] { "salads", "soups", "appetizers", "dishes", "desserts", "drinks" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_status_enum", new[] { "pending", "preparing", "ready", "delivered" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_status_enum", new[] { "pending", "preparing", "ready", "delivering", "delivered" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "reservation_status_enum", new[] { "pending", "accepted", "cancelled" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 

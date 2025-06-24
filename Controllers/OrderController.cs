@@ -75,7 +75,7 @@ namespace RestaurantSystem.Controllers {
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
                 _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
 
-            if (restaurant == null)
+            if (restaurant == null || !restaurant.DoDelivery)
             {
                 return BadRequest();
             }

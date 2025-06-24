@@ -33,7 +33,6 @@ namespace RestaurantSystem.Controllers
         [Route("/cart/index")]
         public async Task<IActionResult> Index()
         {
-
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
@@ -42,8 +41,7 @@ namespace RestaurantSystem.Controllers
 
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
                 _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
-
-            if (restaurant == null)
+            if (restaurant == null || !restaurant.DoDelivery)
             {
                 return RedirectToAction("Index", "Restaurant");
             }

@@ -15,7 +15,7 @@ namespace RestaurantSystem.Migrations
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:Enum:dish_status_enum", "pending,preparing,ready")
                 .Annotation("Npgsql:Enum:dish_type_enum", "salads,soups,appetizers,dishes,desserts,drinks")
-                .Annotation("Npgsql:Enum:order_status_enum", "pending,preparing,ready,delivered")
+                .Annotation("Npgsql:Enum:order_status_enum", "pending,preparing,ready,delivering,delivered")
                 .Annotation("Npgsql:Enum:reservation_status_enum", "pending,accepted,cancelled");
 
             migrationBuilder.CreateTable(

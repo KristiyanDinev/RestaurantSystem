@@ -9,18 +9,16 @@ namespace RestaurantSystem.Utilities
         private EncryptionUtility _encryptionUtility;
         private JWTUtility _jwtUtility;
         private UserService _userService;
-        private RoleService _roleService;
 
         private readonly string authHeader = "Authentication";
         private readonly string userIdClaimKey = "Id";
 
         public UserUtility(EncryptionUtility encryptionUtility, JWTUtility jwtUtility,
-            UserService userService, RoleService roleService)
+            UserService userService)
         {
             _encryptionUtility = encryptionUtility;
             _jwtUtility = jwtUtility;
             _userService = userService;
-            _roleService = roleService;
         }
 
 
@@ -56,6 +54,16 @@ namespace RestaurantSystem.Utilities
         public void RemoveCartCookie(HttpContext context)
         {
             context.Response.Cookies.Delete("cart_items");
+        }
+
+        public void RemoveDeliveryAddressCookie(HttpContext context)
+        {
+            context.Response.Cookies.Delete("delivery_address_id");
+        }
+
+        public void RemoveDeliveryRestaurantCookie(HttpContext context)
+        {
+            context.Response.Cookies.Delete("delivery_restaurant_id");
         }
 
         public async Task<Dictionary<string, object>?> GetAuthClaimFromJWT(HttpContext context)

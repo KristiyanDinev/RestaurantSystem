@@ -39,6 +39,8 @@ are the user's or not.
 - `preparing` - the order is accepted and the staff is preparing it.
 
 - `ready` - the order is ready to be picked up by the delivery guy or the user.
+- 
+- `delivering` - the order is being delivered by the delivery guy.
 
 - `delivered` - the order is delivered to the user.
 

@@ -5,7 +5,9 @@ const registeredOrders = [];
 const Status = {
     Pending: "Pending",
     Preparing: "Preparing",
-    Ready: "Ready"
+    Ready: "Ready",
+    Delivering: "Delivering",
+    Delivered: "Delivered",
 };
 
 // helper function
@@ -13,10 +15,12 @@ function setCancelButton(orderId, status) {
     const btn = document.getElementById(`cancel,${orderId}`);
 
     if (status.toLowerCase() !== Status.Pending.toLowerCase()) {
+        btn.className = btn.className.replace("btn-danger", "btn-secondary")
         btn.innerHTML = "Can't Cancel Order";
         return
     }
     btn.innerHTML = "Cancel";
+    btn.className = btn.className.replace("btn-secondary", "btn-danger")
     btn.onclick = () => cancelOrder(orderId);
 }
 

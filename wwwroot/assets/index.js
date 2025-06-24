@@ -1,5 +1,7 @@
 var restaurantId_header = "restaurant_id";
 var cart_header = "cart_items";
+var delivery_address_header = "delivery_address_id";
+var delivery_restaurant_header = "delivery_restaurant_id";
 var _cart_seperator = '-';
 
 function getCookie(cname) {

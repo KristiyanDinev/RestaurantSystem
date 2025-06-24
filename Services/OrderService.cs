@@ -54,20 +54,22 @@ namespace RestaurantSystem.Services
             return order;
         }
 
-        public async Task<bool> DeleteOrderAsync(long orderId)
+        public async Task<bool> DeleteOrderAsync(long orderId, bool checkOrderStatus = true)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
+            if (order == null)
+            {
+                return false;
+            }
 
-            if (order == null || order.CurrentStatus.Equals(OrderStatusEnum.Pending))
+            if (checkOrderStatus && !order.CurrentStatus.Equals(OrderStatusEnum.Pending))
             {
                 return false;
             }
 
             await _orderedDishesDatabaseHandler.DeleteOrderedDishesAsync(orderId);
-
             _databaseContext.Orders.Remove(order);
-
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
@@ -85,6 +87,7 @@ namespace RestaurantSystem.Services
         {
             return await _databaseContext.Orders
                 .Include(order => order.Restaurant)
+                .Include(order => order.Address)
                 .Include(order => order.OrderedDishes)
                 .Where(order => 
                 order.UserId == userId && 
@@ -92,12 +95,26 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<List<OrderModel>> GetOrdersByRestaurantIdAsync(int restaurantId)
+        public async Task<List<OrderModel>> GetAllOrdersByRestaurantIdAsync(int restaurantId)
         {
             return await _databaseContext.Orders
                 .Where(order => 
-                order.RestaurantId == restaurantId && 
-                order.TableNumber != null)
+                order.RestaurantId == restaurantId)
+                .ToListAsync();
+        }
+
+        public async Task<List<OrderModel>> GetDeliveryOrdersByRestaurantIdAsync(int restaurantId)
+        {
+            return await _databaseContext.Orders
+                .Include(order => order.Address)
+                .Include(order => order.User)
+                .Where(order =>
+                order.RestaurantId == restaurantId &&
+                order.TableNumber == null && 
+
+                !(order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivering.ToString()) ||
+
+                 order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivered.ToString())))
                 .ToListAsync();
         }
 

@@ -101,7 +101,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             List<OrderWithDishesCountModel> dishes = new();
-            foreach (OrderModel order in await _orderService.GetOrdersByRestaurantIdAsync(user.Restaurant.Id))
+            foreach (OrderModel order in await _orderService.GetAllOrdersByRestaurantIdAsync(user.Restaurant.Id))
             {
                 dishes.Add(new OrderWithDishesCountModel()
                 {
@@ -231,7 +231,7 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
-            if (await _orderService.DeleteOrderAsync(orderId))
+            if (await _orderService.DeleteOrderAsync(orderId, false))
             {
                 TempData["DeletedOrderSuccess"] = true;
                 return Ok();

@@ -19,23 +19,29 @@ namespace RestaurantSystem.Controllers.Staff
         private UserUtility _userUtils;
         private RestaurantService _restaurantService;
         private AddressService _addressService;
+        private DeliveryService _deliveryService;
+        private OrderedDishesService _orderedDishesService;
 
         public DeliveryStaffController(UserUtility userUtils,
             OrderService orderService,
             RestaurantService restaurantService, 
-            AddressService addressService)
+            AddressService addressService,
+            DeliveryService deliveryService,
+            OrderedDishesService orderedDishesService)
         {
             _userUtils = userUtils;
             _orderService = orderService;
             _restaurantService = restaurantService;
             _addressService = addressService;
+            _deliveryService = deliveryService;
+            _orderedDishesService = orderedDishesService;
         }
 
         [HttpGet]
         [Route("/staff/delivery/address")]
-        public async Task<IActionResult> Delivery()
+        public async Task<IActionResult> DeliveryAddress()
         {
-            UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
@@ -50,26 +56,59 @@ namespace RestaurantSystem.Controllers.Staff
 
 
         [HttpGet]
-        [Route("/staff/delivery/orders")]
-        public async Task<IActionResult> DeliveryOrders()
+        [Route("/staff/delivery/restaurant")]
+        public async Task<IActionResult> DeliveryRestaurant()
         {
-            UserModel? user = await _userUtils.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
                 return RedirectToAction("Login", "User");
             }
 
-            List<RestaurantWithOrdersModel> orders = new();
-
-            foreach (RestaurantModel restaurant in await _restaurantService
-                .GetDeliveryGuy_RestaurantsAsync("Bulgaria", null, null, user))
+            AddressModel? address = await _deliveryService.GetDeliveryAddressCookie(HttpContext);
+            if (address == null)
             {
+                return RedirectToAction("DeliveryAddress");
+            }
 
-                orders.Add(new RestaurantWithOrdersModel()
+            return View(new DeliveryRestaurantViewModel()
+            {
+                User = user,
+                Restaurants = await _restaurantService.GetDeliveryGuy_RestaurantsAsync(address)
+            });
+        }
+
+
+        [HttpGet]
+        [Route("/staff/delivery/orders")]
+        public async Task<IActionResult> DeliveryOrders()
+        {
+            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            AddressModel? address = await _deliveryService.GetDeliveryAddressCookie(HttpContext);
+            if (address == null)
+            {
+                return RedirectToAction("DeliveryAddress");
+            }
+
+            RestaurantModel? restaurant = await _deliveryService.GetDeliveryRestaurantCookie(HttpContext);
+            if (restaurant == null)
+            {
+                return RedirectToAction("DeliveryRestaurant");
+            }
+
+            List<OrderWithDishesCountModel> orders = new ();
+            foreach (OrderModel order in 
+                await _orderService.GetDeliveryOrdersByRestaurantIdAsync(restaurant.Id))
+            {
+                orders.Add(new OrderWithDishesCountModel()
                 {
-                    Restaurant = restaurant,
-                    Orders = await _orderService
-                        .Get_HomeDelivery_OrdersBy_RestaurantIdAsync(restaurant.Id)
+                    Order = order,
+                    DishesCount = await _orderedDishesService.CountDishesByOrderAsync(order.Id)
                 });
             }
 

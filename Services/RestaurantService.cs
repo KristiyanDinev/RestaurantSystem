@@ -1,39 +1,33 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Services
 {
     public class RestaurantService
     {
-        private AddressService _addressService;
         private DatabaseContext _databaseContext;
-        private readonly string restaurantId = "restaurant_id";
 
-        public RestaurantService(DatabaseContext databaseContext, 
-            AddressService addressService)
+        public RestaurantService(DatabaseContext databaseContext)
         {
             _databaseContext = databaseContext;
-            _addressService = addressService;
         }
 
-        public async Task<List<RestaurantModel>> GetDeliveryGuy_RestaurantsAsync(string country, 
-            string? state, string? city, UserModel user)
+        public async Task<List<RestaurantModel>> GetDeliveryGuy_RestaurantsAsync(AddressModel address)
         {
             return await _databaseContext.Restaurants
                 .Where(
                 restaurant =>
                 restaurant.DoDelivery &&
-                restaurant.Country.Equals(country, StringComparison.OrdinalIgnoreCase) &&
-                restaurant.State == state &&
-                restaurant.City == city)
+                restaurant.Country.ToLower().Equals(address.Country.ToLower()) &&
+                restaurant.State == address.State &&
+                restaurant.City == address.City)
                 .ToListAsync();
         }
 
         public async Task<List<RestaurantModel>> GetAllRestaurantsForUserAsync(UserModel user)
         {
-            //List<AddressModel> addresses = await _addressService.GetUserAddressesAsync(user.Id);
-
             return await _databaseContext.Restaurants
                 .Join(_databaseContext.Addresses,
                       restaurant => new { restaurant.Country, restaurant.State, restaurant.City },
@@ -64,7 +58,7 @@ namespace RestaurantSystem.Services
 
         public int? GetRestaurantIdFromCookieHeaderAsync(HttpContext context)
         {
-            context.Request.Cookies.TryGetValue(restaurantId, out string? restaurant_id_str);
+            context.Request.Cookies.TryGetValue(Utility.restaurantId, out string? restaurant_id_str);
             if (!int.TryParse(restaurant_id_str, out int restaurant_id))
             {
                 return null;

@@ -4,6 +4,9 @@ namespace RestaurantSystem.Utilities
     public class Utility
     {
         public readonly static int pageSize = 10;
+        public readonly static string restaurantId = "restaurant_id";
+        public readonly static string delivery_address_header = "delivery_address_id";
+        public readonly static string delivery_restaurant_header = "delivery_restaurant_id";
 
         public static string MakeCapital(string str)
         {

@@ -1,1 +1,76 @@
-﻿
+﻿@using RestaurantSystem.Enums
+@using RestaurantSystem.Models.DatabaseModels
+@using RestaurantSystem.Models
+@model RestaurantSystem.Models.View.Staff.Delivery.DeliveryOrdersViewModel;
+@{
+    ViewData["Title"] = "Delivery Orders";
+}
+
+<head>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/index.js"></script>
+    <script src="~/assets/staff/delivery/delivery.js"></script>
+</head>
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+
+    <a class="btn btn-primary m-2" href="/staff/delivery/restaurant">Go to Restaurants</a>
+
+    <div class="m-2 container">
+        @foreach (OrderWithDishesCountModel orderWithDishes in Model.Orders)
+        {
+            OrderModel order = orderWithDishes.Order;
+            <div class="card m-3">
+                <div class="card-body">
+
+                    @foreach (DishWithStatusModel dish in orderWithDishes.DishesCount.Keys)
+                    {
+                        <div class="card card-body m-3">
+                            @await Html.PartialAsync("_DisplayDish", dish.Dish)
+                            <p class="card-text">Current Status: @dish.OrderedDish.CurrentStatus</p>
+                            <p class="card-text">Amount: @orderWithDishes.DishesCount[dish]</p>
+                        </div>
+                    }
+
+                    <h4 class="card-title">Current Status: @order.CurrentStatus</h4>
+
+                    <p class="card-text">Total Price: @order.TotalPrice.ToString("C") lv.</p>
+                    <p class="card-text">Ordered At: @order.OrderedAt</p>
+
+                    <p class="card-text">User Contact</p>
+                    <p class="card-text">Name: @order.User.Name</p>
+                    @if (order.User.Image != null)
+                    {
+                        <img class="im-thumbnail rounded m-2" src="order.User.Image" />
+                    }
+                    <p class="card-text">Email: @order.User.Email</p>
+                    <p class="card-text">Phone Number: @order.Address.PhoneNumber</p>
+
+                    <p class="card-text">Address Information</p>
+                    <p class="card-text">Country: @order.Address.Country</p>
+                    <p class="card-text">State / Region / Province: @order.Address.State</p>
+                    <p class="card-text">City: @order.Address.City</p>
+                    <p class="card-text">Address: @order.Address.Address</p>
+                    <p class="card-text">Postal Code: @order.Address.PostalCode</p>
+
+                    <p class="card-text">Notes: @order.Notes</p>
+
+                    <div>
+                        @if (order.CurrentStatus.Equals(OrderStatusEnum.Ready))
+                        {
+                            <button class="btn btn-success m-2" 
+                                onclick="startDelivery('@order.Id')">Deliver</button>
+
+                        } else
+                        {
+                            <button class="btn btn-secondary m-2" disabled>Wait for the order</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+</body>

@@ -1,0 +1,39 @@
+﻿@using RestaurantSystem.Models.DatabaseModels
+@model RestaurantSystem.Models.View.Address.AddressesViewModel;
+@{
+    ViewData["Title"] = "Delivery Addresses";
+}
+
+<head>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/index.js"></script>
+    <script src="~/assets/staff/delivery/delivery.js"></script>
+</head>
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.User)
+
+    <div class="m-2 container">
+        @foreach (AddressModel address in Model.Addresses)
+        {
+            <div class="col-md-4 mb-3" style="cursor: pointer;" onclick="selectAddress('@address.Id')">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Address Information</h5>
+                        <p class="card-text">
+                            <strong>Country:</strong> @address.Country<br />
+                            <strong>State / Province / Region:</strong> @address.State<br />
+                            <strong>City:</strong> @address.City<br />
+                            <strong>Address:</strong> @address.Address<br />
+                            <strong>Postal/Zip Code:</strong> @address.PostalCode<br />
+                            <strong>Phone Number:</strong> @address.PhoneNumber<br />
+                            <strong>Notes:</strong> @address.Notes<br />
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+</body>
