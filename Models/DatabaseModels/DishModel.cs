@@ -11,7 +11,7 @@ namespace RestaurantSystem.Models.DatabaseModels {
         public required string Ingredients { get; set; }
         public required DishTypeEnum Type_Of_Dish { get; set; }
         public required bool IsAvailable { get; set; }
-        public required string AvrageTimeToCook { get; set; }
+        public required string AverageTimeToCook { get; set; }
 
 
 

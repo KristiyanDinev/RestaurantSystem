@@ -115,8 +115,57 @@ namespace RestaurantSystem.Controllers.Staff
             return View(new DeliveryOrdersViewModel()
             {
                 Staff = user,
-                Orders = orders
+                Orders = orders,
+                Restaurant = restaurant
             });
+        }
+
+
+        [HttpGet]
+        [Route("/staff/delivery/myorder")]
+        public async Task<IActionResult> DeliveryMyOwner()
+        {
+            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            if (delivery == null)
+            {
+                return RedirectToAction("DeliveryOrders");
+            }
+
+            return View(new UserWithOrderAndDishesModel()
+            {
+                Order = new OrderWithDishesCountModel()
+                {
+                    Order = delivery.Order,
+                    DishesCount = await _orderedDishesService
+                        .CountDishesByOrderAsync(delivery.Order.Id)
+                },
+                User = user
+            });
+        }
+
+
+        [HttpPost]
+        [Route("/staff/delivery/start/{orderId}")]
+        public async Task<IActionResult> StartDelivery(long orderId)
+        {
+            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            if (await _deliveryService.AddDeliveryAsync(user.Id, orderId)) {
+                TempData["success"] = true;
+                return Ok();
+            }
+
+            return BadRequest();
         }
 
 
@@ -124,6 +173,11 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/delivery")]
         public async Task<IActionResult> UpdateDelivery()
         {
+            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            if (user == null)
+            {
+                return BadRequest();
+            }
             return Ok();
         }
     }

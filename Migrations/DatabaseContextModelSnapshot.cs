@@ -127,7 +127,7 @@ namespace RestaurantSystem.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AvrageTimeToCook")
+                    b.Property<string>("AverageTimeToCook")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -323,6 +323,13 @@ namespace RestaurantSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsUnicode(true)
+                        .HasColumnType("text");
 
                     b.Property<string>("PostalCode")
                         .IsRequired()

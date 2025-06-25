@@ -1,10 +1,19 @@
 ﻿@model RestaurantSystem.Models.DatabaseModels.RestaurantModel;
 
 <body>
-    <div>
-           <p>Restaurant: @string.Join(", ", Model.Address,
+    <div class="card card-body m-3">
+           <p class="card-text">Restaurant: @string.Join(", ", Model.Address,
                      Model.City, Model.State, Model.Country)</p>
-        
+
+        <p class="card-text">Postal Code: @Model.PostalCode</p>
+        @if (Model.PhoneNumber != null)
+        {
+            <p class="card-text">Phone Number: @Model.PhoneNumber</p>
+        }
+        @if (Model.Email != null)
+        {
+            <p class="card-text">Email: @Model.Email</p>
+        }
     </div>
 
 </body>

@@ -35,7 +35,26 @@
 
                     <h4 class="card-title">Current Status: @order.CurrentStatus</h4>
 
-                    <p class="card-text">Total Price: @order.TotalPrice.ToString("C") lv.</p>
+                    <p class="card-text">Restaurant Address</p>
+                    <p class="card-text">Country: @Model.Restaurant.Country</p>
+                    <p class="card-text">State / Province / Region: @Model.Restaurant.State</p>
+                    <p class="card-text">City: @Model.Restaurant.City</p>
+                    <p class="card-text">Address: @Model.Restaurant.Address</p>
+                    <p class="card-text">Postal Code: @Model.Restaurant.PostalCode</p>
+                    @if (Model.Restaurant.PhoneNumber != null)
+                    {
+                        <p class="card-text">Phone Number: @Model.Restaurant.PhoneNumber</p>
+                    }
+                    @if (Model.Restaurant.Email != null)
+                    {
+                        <p class="card-text">Email: @Model.Restaurant.Email</p>
+                    }
+                    @if (Model.Restaurant.ServeCustomersInPlace)
+                    {
+                        <p class="card-text">Restaurant serves customers in place</p>
+                    }
+
+                    <p class="card-text">Total Price: @order.TotalPrice lv.</p>
                     <p class="card-text">Ordered At: @order.OrderedAt</p>
 
                     <p class="card-text">User Contact</p>
@@ -59,6 +78,7 @@
                     <div>
                         @if (order.CurrentStatus.Equals(OrderStatusEnum.Ready))
                         {
+                            <p id="error,@order.Id"></p>
                             <button class="btn btn-success m-2" 
                                 onclick="startDelivery('@order.Id')">Deliver</button>
 

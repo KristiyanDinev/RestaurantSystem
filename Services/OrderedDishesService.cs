@@ -81,7 +81,6 @@ namespace RestaurantSystem.Services
             List<OrderedDishesModel> orderedDishes = await _databaseContext.OrderedDishes.Where(
                 order => order.OrderId == orderId)
                 .ToListAsync();
-
             List<int> IDs = new List<int>();
             foreach (OrderedDishesModel orderedDish in orderedDishes) {
                 IDs.Add(orderedDish.DishId);
@@ -90,7 +89,6 @@ namespace RestaurantSystem.Services
             List<DishModel> dishes = await _databaseContext.Dishies.Where(
                 dish => IDs.Contains(dish.Id))
                 .ToListAsync();
-
             Dictionary<DishWithStatusModel, int> result = new ();
             foreach (int id in IDs)
             {
@@ -107,7 +105,6 @@ namespace RestaurantSystem.Services
                     Dish = dish,
                     OrderedDish = orderedDish
                 };
-
                 if (result.ContainsKey(dishWithStatus))
                 {
                     result[dishWithStatus] = ++result[dishWithStatus];

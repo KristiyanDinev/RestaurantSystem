@@ -84,5 +84,12 @@ namespace RestaurantSystem.Services
             return restaurantId == null ? null : await _databaseContext.Restaurants
                 .FirstOrDefaultAsync(restaurant => restaurant.Id == restaurantId);
         }
+
+        public async Task<RestaurantModel?> GetDeliveryRestaurantByIdAsync(int? restaurantId)
+        {
+            return restaurantId == null ? null : await _databaseContext.Restaurants
+                .Include(restaurant => restaurant.Address)
+                .FirstOrDefaultAsync(restaurant => restaurant.Id == restaurantId);
+        }
     }
 }

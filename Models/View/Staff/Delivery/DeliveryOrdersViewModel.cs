@@ -6,5 +6,6 @@ namespace RestaurantSystem.Models.View.Staff.Delivery
     {
         public required UserModel Staff { get; set; }
         public required List<OrderWithDishesCountModel> Orders { get; set; }
+        public required RestaurantModel Restaurant { get; set; }
     }
 }

@@ -74,7 +74,7 @@
                             <p class="card-text">Grams: /@dishWithStatus.Dish.Grams/</p>
                             <p class="card-text">Ingredients: @dishWithStatus.Dish.Ingredients</p>
 
-                            <p class="card-text">Avrage Time To Cook: @dishWithStatus.Dish.AvrageTimeToCook minute/s</p>
+                            <p class="card-text">Avrage Time To Cook: @dishWithStatus.Dish.AverageTimeToCook minute/s</p>
 
                             <p class="card-text">Price: @dishWithStatus.Dish.Price lv.</p>
                         </div>
@@ -96,7 +96,7 @@
                         Ordered At: @order.OrderedAt
                      </p>
                      <p class="card-text">
-                        Total Price: @order.TotalPrice
+                        Total Price: @order.TotalPrice lv.
                      </p>
 
                     @if (order.CurrentStatus.Equals(OrderStatusEnum.Ready))

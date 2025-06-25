@@ -10,7 +10,23 @@ function selectRestaurant(restaurantId) {
 
 
 async function startDelivery(orderId) {
+    if (!confirm("Are you sure you want to start this delivery?")) {
+        return;
+    }
 
+    try {
+        const response = await fetch(`/staff/delivery/start/${orderId}`, {
+            method: 'POST',
+        });
 
+        if (response.ok) {
+            window.location.pathname = "/staff/delivery/myorder";
+            return
+        }
+        document.getElementById(`error,${orderId}`).innerText = "Counldn't start an order.";
+
+    } catch {
+        document.getElementById(`error,${orderId}`).innerText = "An error occurred while starting the delivery. Please try again.";
+    }
 }
 

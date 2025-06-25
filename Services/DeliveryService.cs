@@ -19,15 +19,24 @@ namespace RestaurantSystem.Services
             _addressService = addressService;
             _restaurantService = restaurantService;
         }
-        public async Task<DeliveryModel?> GetDeliveryAsync(int user_id)
+        public async Task<DeliveryModel?> GetDeliveryAsync(long user_id)
         {
             return await _databaseContext.Delivery
+                .Include(d => d.Order)
+                .Include(d => d.Order.Address)
+                .Include(d => d.Order.Restaurant)
+                .Include(d => d.Order.Restaurant.Address)
                 .FirstOrDefaultAsync(d => d.UserId == user_id);
         }
 
 
-        public async Task<bool> AddDeliveryAsync(int user_id, int order_id)
+        public async Task<bool> AddDeliveryAsync(long user_id, long order_id)
         {
+            if (await _databaseContext.Orders
+                .FirstOrDefaultAsync(o => o.Id == order_id) == null)
+            {
+                return false;
+            }
             DeliveryModel delivery = new ()
             {
                 UserId = user_id,
@@ -35,12 +44,11 @@ namespace RestaurantSystem.Services
             };
 
             await _databaseContext.Delivery.AddAsync(delivery);
-
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
 
-        public async Task<bool> RemoveDeliveryAsync(int user_id)
+        public async Task<bool> RemoveDeliveryAsync(long user_id)
         {
             DeliveryModel? delivery = await GetDeliveryAsync(user_id);
             if (delivery == null)
@@ -74,7 +82,7 @@ namespace RestaurantSystem.Services
                 return null;
             }
 
-            return await _restaurantService.GetRestaurantByIdAsync(restaurant_id);
+            return await _restaurantService.GetDeliveryRestaurantByIdAsync(restaurant_id);
         }
     }
 }

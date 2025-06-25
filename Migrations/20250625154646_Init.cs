@@ -45,6 +45,8 @@ namespace RestaurantSystem.Migrations
                     PostalCode = table.Column<string>(type: "text", nullable: false),
                     DoDelivery = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     ServeCustomersInPlace = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: true),
                     ReservationMaxChildren = table.Column<int>(type: "integer", nullable: false),
                     ReservationMinChildren = table.Column<int>(type: "integer", nullable: false),
                     ReservationMaxAdults = table.Column<int>(type: "integer", nullable: false),
@@ -92,7 +94,7 @@ namespace RestaurantSystem.Migrations
                     Ingredients = table.Column<string>(type: "text", nullable: false),
                     Type_Of_Dish = table.Column<string>(type: "text", nullable: false),
                     IsAvailable = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    AvrageTimeToCook = table.Column<string>(type: "text", nullable: false),
+                    AverageTimeToCook = table.Column<string>(type: "text", nullable: false),
                     RestaurantId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>

@@ -12,7 +12,7 @@ using RestaurantSystem.Database;
 namespace RestaurantSystem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250624064402_Init")]
+    [Migration("20250625154646_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -130,7 +130,7 @@ namespace RestaurantSystem.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AvrageTimeToCook")
+                    b.Property<string>("AverageTimeToCook")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -326,6 +326,13 @@ namespace RestaurantSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsUnicode(true)
+                        .HasColumnType("text");
 
                     b.Property<string>("PostalCode")
                         .IsRequired()

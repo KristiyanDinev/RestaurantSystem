@@ -219,6 +219,15 @@ namespace RestaurantSystem.Database {
                .HasDefaultValue(null)
                .IsUnicode();
 
+            builder.Entity<RestaurantModel>()
+               .Property(restaurant => restaurant.PhoneNumber)
+               .HasDefaultValue(null)
+               .IsUnicode();
+
+            builder.Entity<RestaurantModel>()
+               .Property(restaurant => restaurant.Email)
+               .HasDefaultValue(null);
+
 
             builder.Entity<RestaurantModel>()
                 .Property(restaurant => restaurant.ReservationMaxAdults)
@@ -277,7 +286,7 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<DishModel>()
-                .Property(dish => dish.AvrageTimeToCook)
+                .Property(dish => dish.AverageTimeToCook)
                 .IsRequired();
 
             builder.Entity<DishModel>()

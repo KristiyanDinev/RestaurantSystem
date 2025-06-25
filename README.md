@@ -137,14 +137,15 @@ INSERT INTO "Restaurants"
 ("Address", "City", "State", "Country", 
 "PostalCode", "DoDelivery", "ServeCustomersInPlace", 
 "ReservationMaxChildren", "ReservationMinChildren", 
-"ReservationMaxAdults", "ReservationMinAdults") 
+"ReservationMaxAdults", "ReservationMinAdults", "PhoneNumber", "Email") 
 VALUES 
-('ul. Test', 'Sofia', 'Sofia City', 'Bulgaria', '1234', TRUE, TRUE, 10, 0, 4, 1),
-('ul. Test2', 'Sofia', 'Sofia City', 'Bulgaria', '1235', TRUE, FALSE, 10, 0, 4, 1),
-('ul. Test3', 'Sofia', 'Sofia City', 'Bulgaria', '1236', FALSE, TRUE, 10, 0, 4, 1);
+('ul. Test', 'Sofia', 'Sofia City', 'Bulgaria', '1234', TRUE, TRUE, 10, 0, 4, 1, '+124125', 'email@example.com'),
+('ul. Test2', 'Sofia', 'Sofia City', 'Bulgaria', '1235', TRUE, FALSE, 10, 0, 4, 1, null, 'email2@example.com'),
+('ul. Test3', 'Sofia', 'Sofia City', 'Bulgaria', '1236', FALSE, TRUE, 10, 0, 4, 1, '+12351', null),
+('ul. Test4', 'Sofia', 'Sofia City', 'Bulgaria', '1237', FALSE, TRUE, 10, 0, 4, 1, null, null);
 
 -- SALADS
-INSERT INTO "Dishes" ("Name", "Price", "Grams", "Image", "Ingredients", "Type_Of_Dish", "IsAvailable", "AvrageTimeToCook", "RestaurantId") VALUES
+INSERT INTO "Dishes" ("Name", "Price", "Grams", "Image", "Ingredients", "Type_Of_Dish", "IsAvailable", "AverageTimeToCook", "RestaurantId") VALUES
 ('Caesar Salad', 8.50, 250, '/assets/images/salad/1.png', 'Romaine lettuce, croutons, parmesan, Caesar dressing', 'salads', TRUE, '5 - 7 minutes', 1),
 ('Greek Salad', 7.20, 200, NULL, 'Tomatoes, cucumbers, onions, olives, feta cheese', 'salads', TRUE, '4 - 6 minutes', 1),
 ('Caprese Salad', 6.80, 180, NULL, 'Tomatoes, mozzarella, basil, olive oil', 'salads', TRUE, '3 - 5 minutes', 1),
