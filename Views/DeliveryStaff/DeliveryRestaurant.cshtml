@@ -11,7 +11,14 @@
 </head>
 
 <body>
-    @await Html.PartialAsync("_StaffNavBar", Model.User)
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+
+    @if (Model.Restaurants.Count == 0)
+    {
+        <p class="alert aler-warning m-2">No Restaurants. Please contact your Manager.</p>
+        <a class="btn btn-success m-2" href="/addresses">Make Address</a>
+    }
 
     <a class="btn btn-primary m-2" href="/staff/delivery/address">Go to Addresses</a>
 

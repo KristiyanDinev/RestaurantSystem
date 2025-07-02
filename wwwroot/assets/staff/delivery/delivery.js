@@ -23,7 +23,7 @@ async function startDelivery(orderId) {
             window.location.pathname = "/staff/delivery/myorder";
             return
         }
-        document.getElementById(`error,${orderId}`).innerText = "Counldn't start an order.";
+        document.getElementById(`error,${orderId}`).innerText = "Counldn't start your order.";
 
     } catch {
         document.getElementById(`error,${orderId}`).innerText = "An error occurred while starting the delivery. Please try again.";

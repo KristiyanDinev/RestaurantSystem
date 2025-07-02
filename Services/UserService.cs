@@ -20,6 +20,11 @@ namespace RestaurantSystem.Services
             return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         }
 
+        public async Task<UserModel?> GetUserByEmailAsync(string Email)
+        {
+            return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Email.Equals(Email));
+        }
+
         public async Task<UserModel?> GetUserWithRolesAsync(long id)
         {
             return await _databaseContext.Users
@@ -65,7 +70,6 @@ namespace RestaurantSystem.Services
                 user.Password.Equals(hash_password));
         }
 
-
         public async Task<bool> UpdateUserAsync(UserModel user, 
             ProfileUpdateFormModel profileUpdateForm)
         {
@@ -91,7 +95,6 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-
         public async Task<bool> DeleteUserAsync(long userId)
         {
             UserModel? user = await _databaseContext.Users.FirstOrDefaultAsync(
@@ -113,12 +116,36 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-
         public async Task<RestaurantModel?> GetRestaurantWhereUserWorksInAsync(UserModel user)
         {
             return await _databaseContext.Restaurants
                 .Where(restaurant => restaurant.Id == user.RestaurantId)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> AddEmployeeToRestaurantAsync(UserModel user, int restaurantId)
+        {
+            user.RestaurantId = restaurantId;
+            return await _databaseContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> RemoveEmployeeFromRestaurantAsync(UserModel user)
+        {
+            user.RestaurantId = null;
+            return await _databaseContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<UserModel>> GetRestaurantEmployeesAsync(
+            int restaurantId, int page)
+        {
+            List<UserModel>? employees = await Utility
+                .GetPageAsync<UserModel>(_databaseContext.Users
+                .Include(user => user.Roles)
+                .ThenInclude(role => role.Role)
+                .Where(user => user.RestaurantId == restaurantId)
+                .AsQueryable(), page)
+                .ToListAsync();
+            return employees ?? new List<UserModel>();
         }
     }
 }

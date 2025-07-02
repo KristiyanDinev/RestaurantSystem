@@ -1,4 +1,6 @@
-﻿namespace RestaurantSystem.Models.Form
+﻿using RestaurantSystem.Enums;
+
+namespace RestaurantSystem.Models.Form
 {
     public class OrderUpdateFormModel
     {

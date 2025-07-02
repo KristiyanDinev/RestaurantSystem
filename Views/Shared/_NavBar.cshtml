@@ -19,7 +19,7 @@
         } else if (Model.Roles.Any(r => RoleEnum.cook.ToString()
             .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
         {
-            <a href="/staff/cook" class="btn btn-success m-2">Staff Panel</a>
+            <a href="/staff/dishes" class="btn btn-success m-2">Staff Panel</a>
 
         } else if (Model.Roles.Any(r => RoleEnum.waitress.ToString()
             .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))

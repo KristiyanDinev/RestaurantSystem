@@ -289,22 +289,7 @@ Email: john@example.com
 Password: 1234
 Address: ul. Home1
 City: Sofia
-State: *(empty)*
 Country: Bulgaria
 Postal Code: 12345
 PhoneNumber: +3592523511
 Roles: manager
-
-
-### TODO
-- Waitress staff to mark the order as served and delete the orders onces the customers leave the restaurant.
- (if customers will have an temporary account to track the order)
-
-- Delivery staff on their main page will see all their addresses. When they chose an address they go to Restaurant page.
-- Restaurant page: List restaurants in the same city as their address. When they chose restaurant, they go to Order page.
-- Order page: List all orders, which are not yet delivered and have not TableNumber. 
-  They can start the delivery if the order is ready. Otherwise 
-
-- After the delivery guy choses an order, then he can't chose another order, 
-  until he delivers the current one. But he can see all restaurants and orders.
-  

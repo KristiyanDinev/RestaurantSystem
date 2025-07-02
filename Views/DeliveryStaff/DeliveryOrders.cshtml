@@ -14,8 +14,21 @@
 
 <body>
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
     <a class="btn btn-primary m-2" href="/staff/delivery/restaurant">Go to Restaurants</a>
+
+    @if (TempData.Peek("Success") != null)
+    {
+        <p class="alert alert-success">Delivered Successfully</p>
+        TempData.Remove("Success");
+    }
+
+    @if (TempData.Peek("Canceled") != null)
+    {
+        <p class="alert alert-success">Canceled Delivery Successfully</p>
+        TempData.Remove("Canceled");
+    }
 
     <div class="m-2 container">
         @foreach (OrderWithDishesCountModel orderWithDishes in Model.Orders)
@@ -73,7 +86,7 @@
                     <p class="card-text">Address: @order.Address.Address</p>
                     <p class="card-text">Postal Code: @order.Address.PostalCode</p>
 
-                    <p class="card-text">Notes: @order.Notes</p>
+                    <p class="card-text">Order Notes: @order.Notes</p>
 
                     <div>
                         @if (order.CurrentStatus.Equals(OrderStatusEnum.Ready))

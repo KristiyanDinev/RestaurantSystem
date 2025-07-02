@@ -12,6 +12,13 @@
 
 <body>
     @await Html.PartialAsync("_StaffNavBar", Model.User)
+    @await Html.PartialAsync("_RestaurantBar", Model.User.Restaurant)
+
+    @if (Model.Addresses.Count == 0)
+    {
+        <p class="alert aler-warning m-2">No Addresses. Please create one.</p>
+        <a class="btn btn-success m-2" href="/addresses">Make Address</a>
+    }
 
     <div class="m-2 container">
         @foreach (AddressModel address in Model.Addresses)

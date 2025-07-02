@@ -60,12 +60,11 @@ namespace RestaurantSystem.Utilities
             return await UploadImageAsync(Image);
         }
 
-        public static async Task<List<T>> GetPageAsync<T>(IQueryable<T> query, int pageNumber)
+        public static IQueryable<T> GetPageAsync<T>(IQueryable<T> query, int pageNumber)
         {
-            return await query
+            return query
                 .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Take(pageSize);
         }
     }
 }

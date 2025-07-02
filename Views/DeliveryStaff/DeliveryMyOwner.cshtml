@@ -1,1 +1,104 @@
-﻿
+﻿@using RestaurantSystem.Enums
+@using RestaurantSystem.Models.DatabaseModels
+@using RestaurantSystem.Models
+@model RestaurantSystem.Models.View.Staff.Delivery.DeliveryMyOrderViewModel;
+@{
+    ViewData["Title"] = "Delivery My Order";
+}
+
+<head>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/index.js"></script>
+    <script src="~/assets/staff/delivery/delivery_myorder.js"></script>
+</head>
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+    <h4>My Order to Deliver</h4>
+
+    @if (TempData.Peek("Success") != null)
+    {
+        <p class="alert alert-success">Delivery Started Successfully</p>
+        TempData.Remove("Success");
+    }
+
+    <div class="card m-3">
+                <div class="card-body">
+                    @{
+                        OrderModel order = Model.Order.Order;
+                        RestaurantModel restaurant = order.Restaurant;
+                    }
+                    @foreach (DishWithStatusModel dish in Model.Order.DishesCount.Keys)
+                    {
+                        <div class="card card-body m-3">
+                            @await Html.PartialAsync("_DisplayDish", dish.Dish)
+                            <p class="card-text">Current Status: @dish.OrderedDish.CurrentStatus</p>
+                            <p class="card-text">Amount: @Model.Order.DishesCount[dish]</p>
+                        </div>
+                    }
+
+                    <h4 class="card-title">Current Status: @order.CurrentStatus</h4>
+
+                    <p class="card-text">Restaurant Address</p>
+                    <p class="card-text">Country: @restaurant.Country</p>
+                    <p class="card-text">State / Province / Region: @restaurant.State</p>
+                    <p class="card-text">City: @restaurant.City</p>
+                    <p class="card-text">Address: @restaurant.Address</p>
+                    <p class="card-text">Postal Code: @restaurant.PostalCode</p>
+                    @if (restaurant.PhoneNumber != null)
+                    {
+                        <p class="card-text">Phone Number: @restaurant.PhoneNumber</p>
+                    }
+                    @if (restaurant.Email != null)
+                    {
+                        <p class="card-text">Email: @restaurant.Email</p>
+                    }
+                    @if (restaurant.ServeCustomersInPlace)
+                    {
+                        <p class="card-text">Restaurant serves customers in place</p>
+                    }
+
+                    <p class="card-text">Total Price: @order.TotalPrice lv.</p>
+                    <p class="card-text">Ordered At: @order.OrderedAt</p>
+
+                    <p class="card-text">User Contact</p>
+                    <p class="card-text">Name: @order.User.Name</p>
+                    @if (order.User.Image != null)
+                    {
+                        <img class="im-thumbnail rounded m-2" src="order.User.Image" />
+                    }
+                    <p class="card-text">Email: @order.User.Email</p>
+                    <p class="card-text">Phone Number: @order.Address.PhoneNumber</p>
+
+                    <p class="card-text">Address Information</p>
+                    <p class="card-text">Country: @order.Address.Country</p>
+                    <p class="card-text">State / Region / Province: @order.Address.State</p>
+                    <p class="card-text">City: @order.Address.City</p>
+                    <p class="card-text">Address: @order.Address.Address</p>
+                    <p class="card-text">Postal Code: @order.Address.PostalCode</p>
+
+                    <p class="card-text">Order Notes: @order.Notes</p>
+
+                    <div>
+                        @if (order.CurrentStatus.Equals(OrderStatusEnum.Delivering))
+                        {
+                                <p id="error,@order.Id"></p>
+                                  <button class="btn btn-success m-2"
+                                    onclick="delivered()">
+                                    Delivered
+                                </button>
+
+                                <button class="btn btn-danger m-2"
+                                    onclick="canceled()">
+                                    Cancel Delivery
+                                </button>
+                        }
+
+                        
+                    </div>
+                </div>
+            </div>
+
+    @await Html.PartialAsync("_Footer")
+</body>

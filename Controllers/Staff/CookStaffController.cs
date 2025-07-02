@@ -41,7 +41,7 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             List<OrderWithDishesCountModel> dishes = new();
@@ -79,9 +79,8 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             bool updated = false;
-
-            if (DishStatusEnum.TryParse(orderUpdateFormModel.DishCurrentStatus,
-                true, out DishStatusEnum dishCurrentStatus))
+            if (DishStatusEnum.TryParse(orderUpdateFormModel.DishCurrentStatus, 
+                    out DishStatusEnum dishCurrentStatus))
             {
                 orderUpdateFormModel.DishCurrentStatus = dishCurrentStatus.ToString();
                 if (!await _orderedDishesService

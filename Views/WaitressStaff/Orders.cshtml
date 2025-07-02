@@ -30,7 +30,7 @@
         <h1>No orders</h1>
     }
 
-    @if (TempData["OrderedSuccess"] != null)
+    @if (TempData.Peek("OrderedSuccess") != null)
     {
         <div class="alert alert-success m-3">
             Successfully Placed an Order
@@ -38,12 +38,20 @@
         TempData.Remove("OrderedSuccess");
     }
 
-    @if (TempData["DeletedOrderSuccess"] != null)
+    @if (TempData.Peek("DeletedOrderSuccess") != null)
     {
         <div class="alert alert-success m-3">
             Successfully Deleted an Order
         </div>
         TempData.Remove("DeletedOrderSuccess");
+    }
+
+    @if (TempData.Peek("ServedOrderSuccess") != null)
+    {
+        <div class="alert alert-success m-3">
+            Successfully Updated Order Status
+        </div>
+        TempData.Remove("ServedOrderSuccess");
     }
 
     @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.Orders)
@@ -82,11 +90,18 @@
                 }
 
                      <p class="card-text" id="orderstatus,@order.Id">
-                        CurrentStatus: @order.CurrentStatus
+                        Current Status: @order.CurrentStatus
                      </p>
 
                      @if (order.TableNumber != null) {
-                        <p class="card-text">Table Number: @order.TableNumber</p>
+                    <p class="card-text">Table Number: @order.TableNumber</p>
+                    } else
+                    {
+                     <p class="card-text">Delivery Order</p>
+
+                     <p class="card-text">User Details</p>
+                     <p class="card-text">Name: @order.User.Name</p>
+                     <p class="card-text">Email: @order.User.Email</p>
                     }
 
                      <p class="card-text">
@@ -99,16 +114,35 @@
                         Total Price: @order.TotalPrice lv.
                      </p>
 
-                    @if (order.CurrentStatus.Equals(OrderStatusEnum.Ready))
+                     <p id="stats,@order.Id"></p>
+                    @if (order.TableNumber == null &&
+                          order.CurrentStatus.Equals(OrderStatusEnum.Delivered))
                     {
-                        <p id="stats,@order.Id"></p>
                         <button onclick="deleteOrder('@order.Id')"
                                 class="card-text btn btn-danger m-2">
                             Delete Order
-                         </button>
+                        </button>
+
+                    } else if (order.TableNumber != null && order.CurrentStatus.Equals(OrderStatusEnum.Ready))
+                    {
+                        <button onclick="servedOrder('@order.Id')"
+                                class="card-text btn btn-success m-2">
+                            Served
+                        </button>
+
+                    } else if (order.TableNumber != null && order.CurrentStatus.Equals(OrderStatusEnum.Served))
+                    {
+                        <button onclick="unserveOrder('@order.Id')"
+                                class="card-text btn btn-danger m-2">
+                            Unserve
+                        </button>
+
+                        <button onclick="deleteOrder('@order.Id')"
+                                class="card-text btn btn-danger m-2">
+                            Delete Order
+                        </button>
                     }
-                
-                </div>
+            </div>
             </div>
         }
     @if (Model.Orders.Count > 0)

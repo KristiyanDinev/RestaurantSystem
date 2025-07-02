@@ -15,73 +15,34 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<bool> CreateRoleAsync(string roleName, string? description = null)
+        public async Task<bool> AssignRoleToUserAsync(long userId, RoleEnum roleName)
         {
-            if (await _databaseContext.Roles.AnyAsync(r => r.Name.Equals(roleName)))
-            {
-                return false;
-            }
-
-            _databaseContext.Roles.Add(new RoleModel
-            {
-                Name = roleName,
-                Description = description
-            });
-
-            return await _databaseContext.SaveChangesAsync() > 0;
-        }
-
-        public async Task<bool> CreateServiceAsync(string path, string? description = null)
-        {
-            if (await _databaseContext.Services.AnyAsync(s => s.Path.Equals(path)))
-            {
-                return false;
-            }
-
-            _databaseContext.Services.Add(new ServiceModel
-            {
-                Path = path,
-                Description = description
-            });
-
-            return await _databaseContext.SaveChangesAsync() > 0;
-        }
-
-        public async Task<bool> AssignRoleToUserAsync(int userId, string roleName)
-        {
-            // Check if user and role exist
-            bool userExists = await _databaseContext.Users.AnyAsync(u => u.Id == userId);
-            bool roleExists = await _databaseContext.Roles.AnyAsync(r => r.Name.Equals(roleName));
-
-            if (!userExists || !roleExists) {
-                return false;
-            }
-
             // Check if assignment already exists
             if (await _databaseContext.UserRoles.AnyAsync(
-                ur => ur.UserId == userId && ur.RoleName.Equals(roleName)))
+                ur => ur.UserId == userId && ur.RoleName.Equals(roleName.ToString())))
             {
                 return true;
             };
 
             // Create new assignment
-            _databaseContext.UserRoles.Add(new UserRoleModel
+            await _databaseContext.UserRoles.AddAsync(new UserRoleModel
             {
                 UserId = userId,
-                RoleName = roleName
+                RoleName = roleName.ToString()
             });
 
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> RemoveRoleFromUserAsync(int userId, string roleName)
+        public async Task<bool> RemoveRoleFromUserAsync(long userId, RoleEnum roleName)
         {
-            UserRoleModel? userRole = await _databaseContext.UserRoles.FindAsync(userId, roleName);
-
+            UserRoleModel? userRole = await _databaseContext.UserRoles
+                .FirstOrDefaultAsync(u => 
+                    u.UserId == userId && 
+                    u.RoleName.Equals(roleName.ToString()));
             if (userRole == null) {
                 return false;
             }
-
             _databaseContext.UserRoles.Remove(userRole);
             return await _databaseContext.SaveChangesAsync() > 0;
         }
@@ -189,7 +150,6 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-
         public async Task<List<UserModel>> GetUsersWithAccessToServicesAsync(List<string> services)
         {
             return await _databaseContext.Users
@@ -200,6 +160,5 @@ namespace RestaurantSystem.Services
                 services.Contains(rolePermission.ServicePath))))
                 .ToListAsync();
         }
-
     }
 }

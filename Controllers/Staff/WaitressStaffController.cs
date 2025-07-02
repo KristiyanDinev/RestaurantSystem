@@ -22,6 +22,8 @@ namespace RestaurantSystem.Controllers.Staff
         private OrderedDishesService _orderedDishesService;
         private DishService _dishService;
         private CuponService _cuponService;
+        private WebSocketService _webSocketService;
+        private WebSocketUtility _webSocketUtility;
 
         public WaitressStaffController(UserUtility userUtility,
             OrderedDishesService orderedDishesService,
@@ -29,7 +31,9 @@ namespace RestaurantSystem.Controllers.Staff
             OrderService orderService,
             OrderedDishesService orderedDishes,
             DishService dishService,
-            CuponService cuponService)
+            CuponService cuponService,
+            WebSocketService webSocketService,
+            WebSocketUtility webSocketUtility)
         {
             _userUtility = userUtility;
             _reservationService = reservationService;
@@ -37,6 +41,8 @@ namespace RestaurantSystem.Controllers.Staff
             _orderedDishesService = orderedDishesService;
             _dishService = dishService;
             _cuponService = cuponService;
+            _webSocketService = webSocketService;
+            _webSocketUtility = webSocketUtility;
         }
 
         [HttpGet]
@@ -46,7 +52,7 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             return View(new ReservationViewModel()
@@ -90,6 +96,35 @@ namespace RestaurantSystem.Controllers.Staff
         }
 
 
+        [HttpPost]
+        [Route("/staff/orders/serve/{orderId}")]
+        public async Task<IActionResult> OrderServePost(long orderId, [FromForm] bool IsServed)
+        {
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "Staff");
+            }
+
+            OrderStatusEnum statusEnum = IsServed ? OrderStatusEnum.Served : OrderStatusEnum.Ready;
+            if (await _orderService.UpdateOrderCurrentStatusByIdAsync(orderId, statusEnum))
+            {
+
+                await _webSocketService.SendJsonToClients("/ws/orders", new OrderUpdateFormModel()
+                {
+                    DishId = 0,
+                    OrderId = orderId,
+                    OrderCurrentStatus = statusEnum.ToString()
+                },
+                     _webSocketUtility.GetListenersForOrderId(orderId));
+
+                TempData["ServedOrderSuccess"] = true;
+                return Ok();
+            }
+            return BadRequest();
+        }
+
+
         [HttpGet]
         [Route("/staff/orders")]
         public async Task<IActionResult> Orders()
@@ -97,7 +132,7 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             List<OrderWithDishesCountModel> dishes = new();
@@ -125,7 +160,7 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             List<int> DishIds = _dishService.GetDishIDsFromCartAsync(HttpContext);
@@ -159,7 +194,7 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             int restaurantId = user.Restaurant.Id;
@@ -184,7 +219,7 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
             if (user == null || user.Restaurant == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             List<int> DishIds = _dishService.GetDishIDsFromCartAsync(HttpContext);
@@ -228,7 +263,7 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext);
             if (user == null || user.Restaurant == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             if (await _orderService.DeleteOrderAsync(orderId, false))

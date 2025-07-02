@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Utilities;
 
@@ -25,25 +26,25 @@ namespace RestaurantSystem.Services
                 .Include(d => d.Order)
                 .Include(d => d.Order.Address)
                 .Include(d => d.Order.Restaurant)
-                .Include(d => d.Order.Restaurant.Address)
                 .FirstOrDefaultAsync(d => d.UserId == user_id);
         }
 
 
         public async Task<bool> AddDeliveryAsync(long user_id, long order_id)
         {
-            if (await _databaseContext.Orders
-                .FirstOrDefaultAsync(o => o.Id == order_id) == null)
+            OrderModel? order = await _databaseContext.Orders
+                .FirstOrDefaultAsync(o => o.Id == order_id);
+            if (order == null || 
+                !order.CurrentStatus.Equals(OrderStatusEnum.Ready) ||
+                order.TableNumber != null)
             {
                 return false;
             }
-            DeliveryModel delivery = new ()
+            await _databaseContext.Delivery.AddAsync(new DeliveryModel()
             {
                 UserId = user_id,
                 OrderId = order_id
-            };
-
-            await _databaseContext.Delivery.AddAsync(delivery);
+            });
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
@@ -82,7 +83,7 @@ namespace RestaurantSystem.Services
                 return null;
             }
 
-            return await _restaurantService.GetDeliveryRestaurantByIdAsync(restaurant_id);
+            return await _restaurantService.GetRestaurantByIdAsync(restaurant_id);
         }
     }
 }

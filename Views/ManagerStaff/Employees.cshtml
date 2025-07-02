@@ -1,0 +1,136 @@
+﻿@using RestaurantSystem.Enums
+@using RestaurantSystem.Models.DatabaseModels
+@model RestaurantSystem.Models.View.Staff.Manager.ManagerEmployeesViewModel;
+@{
+    ViewData["Title"] = "Manage Employees";
+}
+
+
+<head>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/staff/manager/manager.js"></script>
+</head>
+
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+    @await Html.PartialAsync("_ManagerNavBar")
+
+    @await Html.PartialAsync("_Paging", Model.Page)
+
+    @if (TempData.Peek("AddStaff") != null)
+    {
+        <p class="alert alert-success m-2">Successfully Added New Employee</p>
+        TempData.Remove("AddStaff");
+    }
+
+    @if (TempData.Peek("RemoveStaff") != null)
+    {
+        <p class="alert alert-success m-2">Successfully Removed Employee</p>
+        TempData.Remove("RemoveStaff");
+    }
+
+    @if (TempData.Peek("GiveRole") != null)
+    {
+        <p class="alert alert-success m-2">Successfully Give Role to Employee</p>
+        TempData.Remove("GiveRole");
+    }
+
+    @if (TempData.Peek("RemoveRole") != null)
+    {
+        <p class="alert alert-success m-2">Successfully Removed Role from Employee</p>
+        TempData.Remove("RemoveRole");
+    }
+
+    <p id="status"></p>
+
+    <div class="container form-group m-2">
+        <input id="staff_email" type="email" 
+            class="input-group form-controled" 
+            placeholder="Enter the email of the user you want to add as staff">
+        <button type="button" class="btn btn-success m-2" onclick="addStaff()">Submit</button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Created At</th>
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (UserModel user in Model.Employees)
+                {
+                    <tr class="page-row">
+                        <td>@user.Id</td>
+                        <td>
+                            <img src="@user.Image" class="img-thumbnail rounded" style="width: 100px;" />
+                        </td>
+                        <td>@user.Name</td>
+                        <td>@user.Email</td>
+                        <td>@user.CreatedAt</td>
+                        <td>
+                            @foreach (UserRoleModel role in user.Roles)
+                            {
+                                <p class="card card-body card-title">@role.Role.Name</p>
+                            }
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary m-2" onclick="toggleGiveRole()">Give Role</button>
+                            <button type="button" class="btn btn-danger m-2" onclick="toggleRemoveRole()">Remove Role</button>
+                            <button type="button" class="btn btn-danger m-2" onclick="removeStaff('@user.Id', '@user.Name')">Remove Staff</button>
+                            <div id="give_role" style="display:none;">
+                                <h4>Give Role</h4>
+                                <select id="gi_role" name="gi_role">
+                                    @if (!user.Roles.Any(r => r.RoleName == RoleEnum.delivery.ToString()))
+                                    {
+                                        <option value="@RoleEnum.delivery.ToString()">Delivery</option>
+                                    }
+                                    @if (!user.Roles.Any(r => r.RoleName == RoleEnum.waitress.ToString()))
+                                    {
+                                        <option value="@RoleEnum.waitress.ToString()">Waitress</option>
+                                    }
+                                    @if (!user.Roles.Any(r => r.RoleName == RoleEnum.cook.ToString()))
+                                    {
+                                        <option value="@RoleEnum.cook.ToString()">Cook</option>
+                                    }
+                                    @if (!user.Roles.Any(r => r.RoleName == RoleEnum.manager.ToString()))
+                                    {
+                                        <option value="@RoleEnum.manager.ToString()">Manager</option>
+                                    }
+                                </select>
+
+                                <button type="button" 
+                                    class="btn btn-success m-2" 
+                                    onclick="giveRole('@user.Id', '@user.Name')">Submit</button>
+                            </div>
+                            <div id="remove_role" style="display:none;">
+                                <h4>Remove Role</h4>
+                                <select id="rm_role">
+                                    @foreach (UserRoleModel role in user.Roles)
+                                    {
+                                        <option value="@role.Role.Name">@role.Role.Name</option>
+                                    }
+                                </select>
+                                <button type="button"
+                                        class="btn btn-success m-2"
+                                        onclick="removeRole('@user.Id', '@user.Name')">
+                                    Submit
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+</body>

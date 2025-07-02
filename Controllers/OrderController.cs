@@ -43,7 +43,7 @@ namespace RestaurantSystem.Controllers {
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             List<OrderWithDishesCountModel> orders = new ();

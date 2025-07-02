@@ -8,30 +8,33 @@
                 .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
         {
             <a href="/staff/manager" class="btn btn-primary m-2">Manager</a>
-            <a href="/staff/dishes" class="btn btn-primary m-2">Cook</a>
+            <a href="/staff/dishes" class="btn btn-primary m-2">Dishes</a>
             <a href="/staff/orders" class="btn btn-primary m-2">Orders</a>
             <a href="/staff/reservations" class="btn btn-primary m-2">Reservations</a>
             <a href="/staff/delivery/address" class="btn btn-primary m-2">Delivery</a>
-        }
-        
-        @if (Model.Roles.Any(r => RoleEnum.cook.ToString()
-                .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+        } else
         {
-            <a href="/staff/cook" class="btn btn-primary m-2">Cook</a>
-        }
-        
-        @if (Model.Roles.Any(r => RoleEnum.waitress.ToString()
+            @if (Model.Roles.Any(r => RoleEnum.cook.ToString()
                 .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
-        {
-            <a href="/staff/orders" class="btn btn-primary m-2">Orders</a>
-            <a href="/staff/reservations" class="btn btn-primary m-2">Reservations</a>
-        }
+            {
+                <a href="/staff/dishes" class="btn btn-primary m-2">Dishes</a>
+            }
         
-        @if (Model.Roles.Any(r => RoleEnum.delivery.ToString()
-                .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
-        {
-            <a href="/staff/delivery" class="btn btn-primary m-2">Delivery</a>
+            @if (Model.Roles.Any(r => RoleEnum.waitress.ToString()
+                    .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            {
+                <a href="/staff/orders" class="btn btn-primary m-2">Orders</a>
+                <a href="/staff/reservations" class="btn btn-primary m-2">Reservations</a>
+            }
+        
+            @if (Model.Roles.Any(r => RoleEnum.delivery.ToString()
+                    .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            {
+                <a href="/staff/delivery" class="btn btn-primary m-2">Delivery</a>
+            }
         }
+
+        
 
         <p>Logged in as: @Model.Name</p>
 

@@ -5,6 +5,7 @@
         Pending,
         Preparing,
         Ready,
+        Served,
         Delivering,
         Delivered
     }

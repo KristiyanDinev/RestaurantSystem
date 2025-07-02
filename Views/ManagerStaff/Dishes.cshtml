@@ -1,6 +1,6 @@
 ﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
 @{
-    ViewData["Title"] = "Manager Panel";
+    ViewData["Title"] = "Manage Dishes";
 }
 
 
@@ -13,7 +13,6 @@
 <body>
     @await Html.PartialAsync("_StaffNavBar", Model)
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
-
     @await Html.PartialAsync("_ManagerNavBar")
 
 

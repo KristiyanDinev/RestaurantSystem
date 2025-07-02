@@ -2,9 +2,9 @@
 
 namespace RestaurantSystem.Models.View.Staff.Delivery
 {
-    public class DeliveryRestaurantViewModel
+    public class DeliveryMyOrderViewModel
     {
         public required UserModel Staff { get; set; }
-        public required List<RestaurantModel> Restaurants { get; set; }
+        public required OrderWithDishesCountModel Order { get; set; }
     }
 }

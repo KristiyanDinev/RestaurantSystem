@@ -98,6 +98,7 @@ namespace RestaurantSystem.Services
         public async Task<List<OrderModel>> GetAllOrdersByRestaurantIdAsync(int restaurantId)
         {
             return await _databaseContext.Orders
+                .Include(order => order.User)
                 .Where(order => 
                 order.RestaurantId == restaurantId)
                 .ToListAsync();

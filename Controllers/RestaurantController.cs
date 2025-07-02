@@ -31,7 +31,7 @@ namespace RestaurantSystem.Controllers
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             return View(await _restaurantService.GetAllRestaurantsForUserAsync(user));

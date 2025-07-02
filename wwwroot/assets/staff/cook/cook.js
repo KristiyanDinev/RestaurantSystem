@@ -22,35 +22,38 @@ function setDishButtons(obj) {
     let container = document.getElementById(`dish_buttons,${obj.OrderId},${obj.DishId}`);
     container.innerHTML = "";
 
-    const status = obj.DishCurrentStatus.toLowerCase();
-    if (status == Status.Pending.toLowerCase()) {
+    const status = obj.DishCurrentStatus;
+    if (status == Status.Pending) {
+        // Status.Pending
         const startCookingBtn = createButton(
             "btn btn-success m-2",
             "Start cooking",
-            () => setStatus(obj.OrderId, obj.DishId, Status.Preparing.toLowerCase())
+            () => setStatus(obj.OrderId, obj.DishId, Status.Preparing)
         );
         container.appendChild(startCookingBtn);
 
-    } else if (status == Status.Preparing.toLowerCase()) {
+    } else if (status == Status.Preparing) {
+        // Status.Preparin
         const readyBtn = createButton(
             "btn btn-success m-2",
             "Dish Ready",
-            () => setStatus(obj.OrderId, obj.DishId, Status.Ready.toLowerCase())
+            () => setStatus(obj.OrderId, obj.DishId, Status.Ready)
         );
         container.appendChild(readyBtn);
 
         const undoBtn = createButton(
             "btn btn-primary m-2",
             "Pending",
-            () => setStatus(obj.OrderId, obj.DishId, Status.Pending.toLowerCase())
+            () => setStatus(obj.OrderId, obj.DishId, Status.Pending)
         );
         container.appendChild(undoBtn);
 
-    } else if (status == Status.Ready.toLowerCase()) {
+    } else if (status == Status.Ready) {
+        // Status.Ready
         const undoBtn = createButton(
             "btn btn-primary m-2",
             "Preparing",
-            () => setStatus(obj.OrderId, obj.DishId, Status.Preparing.toLowerCase())
+            () => setStatus(obj.OrderId, obj.DishId, Status.Preparing)
         );
         container.appendChild(undoBtn);
     }

@@ -39,18 +39,7 @@
 
             <div class="card m-3">
                  <div class="card-body">
-                     <p class="card-text" id="orderstatus,@order.Id">
-                        CurrentStatus: @order.CurrentStatus
-                     </p>
-                     <p class="card-text">
-                        Notes: @order.Notes
-                     </p>
-                     <p class="card-text">
-                        Ordered At: @order.OrderedAt
-                     </p>
-                     <p class="card-text">
-                        Total Price: @order.TotalPrice lv.
-                     </p>
+                     
                 @foreach (DishWithStatusModel dishWithStatus in orderWithDishesCount.DishesCount.Keys)
                 {
                     <div class="card m-3">
@@ -96,7 +85,7 @@
                             }
                             else if (currentStatus.Equals(ready, StringComparison.OrdinalIgnoreCase))
                             {
-                                <button type="button" class="btn btn-success m-2"
+                                <button type="button" class="btn btn-primary m-2"
                                         onclick="setStatus('@order.Id', '@dishWithStatus.Dish.Id', '@preparing')">
                                     Preparing
                                 </button>
@@ -106,6 +95,32 @@
                     </div>
                     </div>
                 }
+
+                <p class="card-text" id="orderstatus,@order.Id">
+                        CurrentStatus: @order.CurrentStatus
+                     </p>
+                     <p class="card-text">
+                        Notes: @order.Notes
+                     </p>
+
+                @if (order.TableNumber != null)
+                {
+                    <p class="card-text">
+                        Table Number: @order.TableNumber
+                     </p>
+                }
+                else
+                {
+                    <p class="card-text">
+                        Delivery Order
+                     </p>
+                }
+                <p class="card-text">
+                        Ordered At: @order.OrderedAt
+                     </p>
+                     <p class="card-text">
+                        Total Price: @order.TotalPrice lv.
+                     </p>
                       </div>
             </div>
         }

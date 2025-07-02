@@ -59,3 +59,51 @@ async function deleteOrder(orderId) {
 
     statusElement.innerHTML = "Counldn't delete the order";
 }
+
+
+async function servedOrder(orderId) {
+    if (!confirm("Are you sure you want to mark this order as served?")) return;
+
+    const statusElement = document.getElementById(`stats,${orderId}`);
+    let formData = new FormData();
+    formData.append("IsServed", true);
+
+    try {
+        const response = await fetch(`/staff/orders/serve/${orderId}`, {
+            method: 'POST',
+            body: formData
+        })
+
+        if (response.ok) {
+            window.location.reload();
+            return;
+        }
+
+    } catch {
+    }
+
+    statusElement.innerHTML = "Counldn't mark the order as surved";
+}
+
+
+async function unserveOrder(orderId) {
+    if (!confirm("Are you sure you want to mark this order as unserved?")) return;
+
+    const statusElement = document.getElementById(`stats,${orderId}`);
+    let formData = new FormData();
+    formData.append("IsServed", false);
+
+    try {
+        const response = await fetch(`/staff/orders/serve/${orderId}`, {
+            method: 'POST',
+            body: formData
+        })
+
+        if (response.ok) {
+            window.location.reload();
+            return;
+        }
+    } catch {
+    }
+    statusElement.innerHTML = "Counldn't mark the order as unserved";
+}

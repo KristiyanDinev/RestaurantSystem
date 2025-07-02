@@ -68,27 +68,9 @@ namespace RestaurantSystem.Services
         }
 
 
-        public async Task<List<UserModel>> GetRestaurantEmployeesByRestaurantIdAsync(int restaurantId)
-        {
-            ICollection<UserModel>? employees = await _databaseContext.Restaurants
-                .Include(restaurant => restaurant.Employees)
-                .Where(restaurant => restaurant.Id == restaurantId)
-                .Select(restaurant => restaurant.Employees)
-                .FirstOrDefaultAsync();
-
-            return employees == null ? new List<UserModel>() : employees.ToList();
-        }
-
         public async Task<RestaurantModel?> GetRestaurantByIdAsync(int? restaurantId)
         {
             return restaurantId == null ? null : await _databaseContext.Restaurants
-                .FirstOrDefaultAsync(restaurant => restaurant.Id == restaurantId);
-        }
-
-        public async Task<RestaurantModel?> GetDeliveryRestaurantByIdAsync(int? restaurantId)
-        {
-            return restaurantId == null ? null : await _databaseContext.Restaurants
-                .Include(restaurant => restaurant.Address)
                 .FirstOrDefaultAsync(restaurant => restaurant.Id == restaurantId);
         }
     }

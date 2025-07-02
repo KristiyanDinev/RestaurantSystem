@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using RestaurantSystem.Enums;
 using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.View.Address;
@@ -41,10 +42,10 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/delivery/address")]
         public async Task<IActionResult> DeliveryAddress()
         {
-            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             return View(new AddressesViewModel()
@@ -59,10 +60,10 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/delivery/restaurant")]
         public async Task<IActionResult> DeliveryRestaurant()
         {
-            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             AddressModel? address = await _deliveryService.GetDeliveryAddressCookie(HttpContext);
@@ -73,7 +74,7 @@ namespace RestaurantSystem.Controllers.Staff
 
             return View(new DeliveryRestaurantViewModel()
             {
-                User = user,
+                Staff = user,
                 Restaurants = await _restaurantService.GetDeliveryGuy_RestaurantsAsync(address)
             });
         }
@@ -83,10 +84,10 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/delivery/orders")]
         public async Task<IActionResult> DeliveryOrders()
         {
-            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             AddressModel? address = await _deliveryService.GetDeliveryAddressCookie(HttpContext);
@@ -99,6 +100,12 @@ namespace RestaurantSystem.Controllers.Staff
             if (restaurant == null)
             {
                 return RedirectToAction("DeliveryRestaurant");
+            }
+
+            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            if (delivery != null)
+            {
+                return RedirectToAction("DeliveryMyOwner");
             }
 
             List<OrderWithDishesCountModel> orders = new ();
@@ -125,10 +132,10 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/delivery/myorder")]
         public async Task<IActionResult> DeliveryMyOwner()
         {
-            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
             {
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Staff");
             }
 
             DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
@@ -137,7 +144,7 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("DeliveryOrders");
             }
 
-            return View(new UserWithOrderAndDishesModel()
+            return View(new DeliveryMyOrderViewModel()
             {
                 Order = new OrderWithDishesCountModel()
                 {
@@ -145,7 +152,7 @@ namespace RestaurantSystem.Controllers.Staff
                     DishesCount = await _orderedDishesService
                         .CountDishesByOrderAsync(delivery.Order.Id)
                 },
-                User = user
+                Staff = user
             });
         }
 
@@ -154,14 +161,22 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/delivery/start/{orderId}")]
         public async Task<IActionResult> StartDelivery(long orderId)
         {
-            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
             if (user == null)
             {
                 return BadRequest();
             }
 
-            if (await _deliveryService.AddDeliveryAsync(user.Id, orderId)) {
-                TempData["success"] = true;
+            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            if (delivery != null)
+            {
+                return BadRequest();
+            }
+
+            if (await _deliveryService.AddDeliveryAsync(user.Id, orderId) &&
+                await _orderService.UpdateOrderCurrentStatusByIdAsync(orderId, 
+                                            OrderStatusEnum.Delivering)) {
+                TempData["Success"] = true;
                 return Ok();
             }
 
@@ -170,13 +185,49 @@ namespace RestaurantSystem.Controllers.Staff
 
 
         [HttpPost]
-        [Route("/staff/delivery")]
-        public async Task<IActionResult> UpdateDelivery()
+        [Route("/staff/delivery/delivered")]
+        public async Task<IActionResult> MarkAsDelivered()
         {
-            UserModel? user = await _userUtils.GetUserWithRolesByJWT(HttpContext);
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
             if (user == null)
             {
                 return BadRequest();
+            }
+            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            if (delivery == null)
+            {
+                return BadRequest();
+            }
+            if (await _orderService.UpdateOrderCurrentStatusByIdAsync(delivery.OrderId,
+                                            OrderStatusEnum.Delivered))
+            {
+                TempData["Success"] = true;
+                return Ok();
+            }
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("/staff/delivery/cancel")]
+        public async Task<IActionResult> CancelDelivery()
+        {
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            if (delivery == null)
+            {
+                return BadRequest();
+            }
+            if (await _deliveryService.RemoveDeliveryAsync(user.Id) &&
+                await _orderService.UpdateOrderCurrentStatusByIdAsync(delivery.OrderId, 
+                                            OrderStatusEnum.Ready)) {
+                TempData["Canceled"] = true;
+                return Ok();
             }
             return Ok();
         }
