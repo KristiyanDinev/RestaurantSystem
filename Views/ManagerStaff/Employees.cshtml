@@ -9,6 +9,7 @@
 <head>
     @await Html.PartialAsync("_Header")
     <script src="~/assets/staff/manager/manager.js"></script>
+    <script src="~/assets/staff/manager/manager_employees.js"></script>
 </head>
 
 
@@ -16,7 +17,7 @@
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
     @await Html.PartialAsync("_ManagerNavBar")
-
+    <h3>Manage Employees</h3>
     @await Html.PartialAsync("_Paging", Model.Page)
 
     @if (TempData.Peek("AddStaff") != null)
@@ -46,9 +47,9 @@
     <p id="status"></p>
 
     <div class="container form-group m-2">
-        <input id="staff_email" type="email" 
-            class="input-group form-controled" 
-            placeholder="Enter the email of the user you want to add as staff">
+        <input id="staff_email" type="email"
+               class="input-group form-controled"
+               placeholder="Enter the email of the user you want to add as staff">
         <button type="button" class="btn btn-success m-2" onclick="addStaff()">Submit</button>
     </div>
 
@@ -71,7 +72,7 @@
                     <tr class="page-row">
                         <td>@user.Id</td>
                         <td>
-                            <img src="@user.Image" class="img-thumbnail rounded" style="width: 100px;" />
+                            <img src="@user.Image" class="img-thumbnail rounded" />
                         </td>
                         <td>@user.Name</td>
                         <td>@user.Email</td>
@@ -89,27 +90,29 @@
                             <div id="give_role" style="display:none;">
                                 <h4>Give Role</h4>
                                 <select id="gi_role" name="gi_role">
-                                    @if (!user.Roles.Any(r => r.RoleName == RoleEnum.delivery.ToString()))
+                                    @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.delivery.ToString())))
                                     {
-                                        <option value="@RoleEnum.delivery.ToString()">Delivery</option>
+                                        <option value="@RoleEnum.delivery.ToString()">@RoleEnum.delivery.ToString()</option>
                                     }
-                                    @if (!user.Roles.Any(r => r.RoleName == RoleEnum.waitress.ToString()))
+                                    @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.waitress.ToString())))
                                     {
-                                        <option value="@RoleEnum.waitress.ToString()">Waitress</option>
+                                        <option value="@RoleEnum.waitress.ToString()">RoleEnum.waitress.ToString()</option>
                                     }
-                                    @if (!user.Roles.Any(r => r.RoleName == RoleEnum.cook.ToString()))
+                                    @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.cook.ToString())))
                                     {
-                                        <option value="@RoleEnum.cook.ToString()">Cook</option>
+                                        <option value="@RoleEnum.cook.ToString()">@RoleEnum.cook.ToString()</option>
                                     }
-                                    @if (!user.Roles.Any(r => r.RoleName == RoleEnum.manager.ToString()))
+                                    @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.manager.ToString())))
                                     {
-                                        <option value="@RoleEnum.manager.ToString()">Manager</option>
+                                        <option value="@RoleEnum.manager.ToString()">@RoleEnum.manager.ToString()</option>
                                     }
                                 </select>
 
-                                <button type="button" 
-                                    class="btn btn-success m-2" 
-                                    onclick="giveRole('@user.Id', '@user.Name')">Submit</button>
+                                <button type="button"
+                                        class="btn btn-success m-2"
+                                        onclick="giveRole('@user.Id', '@user.Name')">
+                                    Submit
+                                </button>
                             </div>
                             <div id="remove_role" style="display:none;">
                                 <h4>Remove Role</h4>

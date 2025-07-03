@@ -2,6 +2,8 @@
 using RestaurantSystem.Database;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.Form;
+using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Services
 {
@@ -21,7 +23,6 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-
         public async Task<DishModel?> GetDishByIdAsync(int id) {
             return await _databaseContext.Dishies.FirstOrDefaultAsync(dish => dish.Id == id);
         }
@@ -32,35 +33,34 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<DishModel?> CreateDishAsync(string name, DishTypeEnum type,
-            decimal price, int restaurantModelId, string ingredients, string averageTimeToCook, 
-            int grams, string? image, bool isAvailable)
+        public async Task<bool> CreateDishAsync(CreateDishFormModel dishFormModel,
+            int restaurantModelId)
         {
-            DishModel dish = new DishModel()
+            if (!DishTypeEnum.TryParse(dishFormModel.Type, out DishTypeEnum type))
             {
-                Name = name,
+                return false;
+            }
+            await _databaseContext.Dishies.AddAsync(new DishModel()
+            {
+                Name = dishFormModel.Name,
                 Type_Of_Dish = type,
-                Price = price,
+                Price = dishFormModel.Price,
                 RestaurantId = restaurantModelId,
-                Ingredients = ingredients,
-                AverageTimeToCook = averageTimeToCook,
-                Grams = grams,
-                IsAvailable = isAvailable,
-                Image = image
-            };
-
-            await _databaseContext.Dishies.AddAsync(dish);
-
-            return await _databaseContext.SaveChangesAsync() > 0 ? dish : null;
+                Ingredients = dishFormModel.Ingredients,
+                AverageTimeToCook = dishFormModel.AverageTimeToCook,
+                Grams = dishFormModel.Grams,
+                IsAvailable = dishFormModel.IsAvailable,
+                Image = await Utility.UploadDishImageAsync(dishFormModel.Image)
+            });
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> DeleteDishAsync(int id)
         {
-            DishModel? dish = await _databaseContext.Dishies.FirstOrDefaultAsync(
-                d => d.Id == id) ?? throw new Exception("Dish doesn't exist.");
-
+            DishModel? dish = await _databaseContext.Dishies
+                .FirstOrDefaultAsync(d => d.Id == id);
+            if (dish == null) { return false; }
             _databaseContext.Dishies.Remove(dish);
-
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
@@ -82,6 +82,49 @@ namespace RestaurantSystem.Services
                 }
             }
             return dishesIds;
+        }
+
+        public async Task<List<DishModel>> GetDishesByRestaurantIdAsync(int restaurantId, int page)
+        {
+            List<DishModel>? dishes = await Utility.GetPageAsync<DishModel>(
+                _databaseContext.Dishies
+                .Where(dish => dish.RestaurantId == restaurantId).AsQueryable(),
+                page)
+                .ToListAsync();
+            return dishes ?? new List<DishModel>();
+        }
+
+        public async Task<bool> UpdateDishAsync(EditDishFormModel editDishFormModel)
+        {
+            if (!DishTypeEnum.TryParse(editDishFormModel.Type, out DishTypeEnum type))
+            {
+                return false;
+            }
+            DishModel? dish = await GetDishByIdAsync(editDishFormModel.Id);
+            if (dish == null) { return false; }
+            if (editDishFormModel.DeleteImage)
+            {
+                Utility.DeleteImage(dish.Image);
+                dish.Image = null;
+
+            }
+            else
+            {
+                string? img = await Utility.UpdateImageAsync(dish.Image,
+                    editDishFormModel.Image, true);
+                if (img != null)
+                {
+                    dish.Image = img;
+                }
+            }
+            dish.Name = editDishFormModel.Name;
+            dish.Price = editDishFormModel.Price;
+            dish.Grams = editDishFormModel.Grams;
+            dish.Ingredients = editDishFormModel.Ingredients;
+            dish.AverageTimeToCook = editDishFormModel.AverageTimeToCook;
+            dish.Type_Of_Dish = type;
+            dish.IsAvailable = editDishFormModel.IsAvailable;
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
     }
 }

@@ -14,6 +14,8 @@
     @await Html.PartialAsync("_StaffNavBar", Model.User)
     @await Html.PartialAsync("_RestaurantBar", Model.User.Restaurant)
 
+    <h3>Delivery Address</h3>
+
     @if (Model.Addresses.Count == 0)
     {
         <p class="alert aler-warning m-2">No Addresses. Please create one.</p>

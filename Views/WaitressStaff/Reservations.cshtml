@@ -20,25 +20,28 @@
 
     @foreach (ReservationModel reservation in Model.Reservations)
     {
-        <div>
-            <h3>User</h3>
-            <p>Name: @reservation.User.Name</p>
+        <div class="card card-body m-4">
+            <h4 class="card-title">Contact Information</h4>
+            <p class="card-text">Name: @reservation.User.Name</p>
+            <p class="card-text">Email: @reservation.User.Email</p>
+            <p class="card-text">Phone: @reservation.PhoneNumber</p>
+            @if (reservation.User.Image != null)
+            {
+                <img class="img img-thumbnail rounded m-2" src="@reservation.User.Image" />
+            }
 
-            <h4>Contact</h4>
-            <p>Email: @reservation.User.Email</p>
+            <h4 class="card-title">Reservation</h4>
+            <p class="card-text">Current Status: @reservation.CurrentStatus</p>
+            <p class="card-text">Reservation At: @reservation.At_Date.ToLocalTime()</p>
+            <p class="card-text">Reserved At: @reservation.Created_At.ToLocalTime()</p>
+            <p class="card-text">Adults: @reservation.Amount_Of_Adults</p>
+            <p class="card-text">Children: @reservation.Amount_Of_Children</p>
 
-            <h4>Reservation</h4>
-            <p>Current Status: @reservation.CurrentStatus</p>
-            <p>Reservation At: @reservation.At_Date.ToLocalTime()</p>
-            <p>Reserved At: @reservation.Created_At.ToLocalTime()</p>
-            <p>Adults: @reservation.Amount_Of_Adults</p>
-            <p>Children: @reservation.Amount_Of_Children</p>
+            <p class="card-text">Total Price: @reservation.TotalPrice lv.</p>
 
-            <p>Total Price: @reservation.TotalPrice lv.</p>
-
-            <div class="notes_view">
-                <p class="notes_title">Notes: </p>
-                <p class="notes">@reservation.Notes</p>
+            <div class="card-text">
+                <p class="card-text">Notes: </p>
+                <p class="card-text">@reservation.Notes</p>
             </div>
 
             @{

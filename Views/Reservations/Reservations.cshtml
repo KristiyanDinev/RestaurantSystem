@@ -43,6 +43,15 @@
                     <p>Children: @reservation.Amount_Of_Children</p>
                     <p>Total Price: @reservation.TotalPrice lv.</p>
 
+                    <h4>Contact Information</h4>
+                    <p>Name: @Model.User.Name</p>
+                    <p>Email: @Model.User.Email</p>
+                    <p>Phone: @reservation.PhoneNumber</p>
+                    @if (Model.User.Image != null)
+                    {
+                        <img class="img img-thumbnail rounded m-2" src="@Model.User.Image" />
+                    }
+
                     <div class="notes_view">
                         <p class="notes_title">Notes:</p>
                         <p class="notes">@reservation.Notes</p>

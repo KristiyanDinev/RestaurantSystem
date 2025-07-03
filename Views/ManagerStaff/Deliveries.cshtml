@@ -1,4 +1,6 @@
-﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+﻿@using RestaurantSystem.Models
+@using RestaurantSystem.Models.DatabaseModels
+@model RestaurantSystem.Models.View.Staff.Manager.ManagerDeliveryViewModel;
 @{
     ViewData["Title"] = "Manage Deliveries";
 }
@@ -7,13 +9,90 @@
 <head>
     @await Html.PartialAsync("_Header")
     <script src="~/assets/staff/manager/manager.js"></script>
+    <script src="~/assets/staff/manager/manager_delivery.js"></script>
 </head>
 
 
 <body>
-    @await Html.PartialAsync("_StaffNavBar", Model)
-    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
     @await Html.PartialAsync("_ManagerNavBar")
+    @await Html.PartialAsync("_Paging", Model.Page)
+    <h3>Deliveries Completed</h3>
+    @if (TempData.Peek("Canceled") != null)
+    {
+        <p class="alert alert-success">Canceled Delivery Successfully</p>
+        TempData.Remove("Canceled");
+    }
+    @if (TempData.Peek("Deleted") != null)
+    {
+        <p class="alert alert-success">Deleted Order And Delivery Successfully</p>
+        TempData.Remove("Deleted");
+    }
+    <div class="conatiner m-2">
+        @foreach (OrderWithDishesCountModel orderWithDish in Model.Orders)
+        {
+            OrderModel order = orderWithDish.Order;
+            <div class="card m-3 page-row">
+                <div class="card-body">
+
+                    @foreach (DishWithStatusModel dish in orderWithDish.DishesCount.Keys)
+                    {
+                        <div class="card card-body m-3">
+                            @await Html.PartialAsync("_DisplayDish", dish.Dish)
+                            <p class="card-text">Current Status: @dish.OrderedDish.CurrentStatus</p>
+                            <p class="card-text">Amount: @orderWithDish.DishesCount[dish]</p>
+                        </div>
+                    }
+
+                    <h4 class="card-title">Order Current Status: @order.CurrentStatus</h4>
+
+                    <h3 class="card-text">Delivery Guy</h3>
+                    <p class="card-text">Name: @order.Delivery.User.Name</p>
+                    <p class="card-text">Email: @order.Delivery.User.Email</p>
+                    @if (order.Delivery.User.Image != null)
+                    {
+                        <img class="img-thumbnail rounded m-2" src="@order.Delivery.User.Image" />
+                    }
+
+                    <p class="card-text">Total Price: @order.TotalPrice lv.</p>
+                    <p class="card-text">Ordered At: @order.OrderedAt</p>
+
+                    <h4 class="card-text">User Contact</h4>
+                    <p class="card-text">Name: @order.User.Name</p>
+                    <p class="card-text">Email: @order.User.Email</p>
+                    <p class="card-text">Phone Number: @order.Address.PhoneNumber</p>
+                    @if (order.User.Image != null)
+                    {
+                        <img class="img img-thumbnail rounded m-2" src="@order.User.Image" />
+                    }
+
+                    <h4 class="card-text">Address Information</h4>
+                    <p class="card-text">Country: @order.Address.Country</p>
+                    <p class="card-text">State / Region / Province: @order.Address.State</p>
+                    <p class="card-text">City: @order.Address.City</p>
+                    <p class="card-text">Address: @order.Address.Address</p>
+                    <p class="card-text">Postal Code: @order.Address.PostalCode</p>
+
+                    <p class="card-text">Order Notes: @order.Notes</p>
+
+                    <p id="status,@order.Id" class="card-text"></p>
+                    <div>
+                        <button type="button" class="btn btn-danger m-2"
+                                onclick="cancelDelivery('@order.Id')">
+                            Cancel Delivery
+                        </button>
+
+                        <button type="button" class="btn btn-danger m-2"
+                                onclick="deleteDelivery('@order.Id')">
+                            Delete Order And Delivery
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
 
 
     @await Html.PartialAsync("_Footer")

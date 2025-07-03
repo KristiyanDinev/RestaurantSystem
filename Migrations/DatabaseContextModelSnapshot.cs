@@ -22,7 +22,7 @@ namespace RestaurantSystem.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dish_status_enum", new[] { "pending", "preparing", "ready" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dish_type_enum", new[] { "salads", "soups", "appetizers", "dishes", "desserts", "drinks" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_status_enum", new[] { "pending", "preparing", "ready", "delivering", "delivered" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_status_enum", new[] { "pending", "preparing", "ready", "served", "delivering", "delivered" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "reservation_status_enum", new[] { "pending", "accepted", "cancelled" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -277,6 +277,10 @@ namespace RestaurantSystem.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("RestaurantId")
                         .HasColumnType("integer");
 
@@ -481,13 +485,13 @@ namespace RestaurantSystem.Migrations
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.AddressModel", b =>
                 {
-                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "Staff")
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
                         .WithMany("Addresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Staff");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DeliveryModel", b =>
@@ -498,7 +502,7 @@ namespace RestaurantSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "Staff")
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
                         .WithOne("Delivery")
                         .HasForeignKey("RestaurantSystem.Models.DatabaseModels.DeliveryModel", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -506,7 +510,7 @@ namespace RestaurantSystem.Migrations
 
                     b.Navigation("Order");
 
-                    b.Navigation("Staff");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DishModel", b =>
@@ -532,7 +536,7 @@ namespace RestaurantSystem.Migrations
                         .WithMany("Orders")
                         .HasForeignKey("UserAddressId");
 
-                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "Staff")
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -542,7 +546,7 @@ namespace RestaurantSystem.Migrations
 
                     b.Navigation("Restaurant");
 
-                    b.Navigation("Staff");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.OrderedDishesModel", b =>
@@ -572,7 +576,7 @@ namespace RestaurantSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "Staff")
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
                         .WithMany("Reservations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -580,7 +584,7 @@ namespace RestaurantSystem.Migrations
 
                     b.Navigation("Restaurant");
 
-                    b.Navigation("Staff");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.RolePermissionModel", b =>
@@ -619,7 +623,7 @@ namespace RestaurantSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "Staff")
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -627,7 +631,7 @@ namespace RestaurantSystem.Migrations
 
                     b.Navigation("Role");
 
-                    b.Navigation("Staff");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.AddressModel", b =>

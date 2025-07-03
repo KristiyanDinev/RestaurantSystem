@@ -41,11 +41,11 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
 
             List<OrderWithDishesCountModel> dishes = new();
-            foreach (OrderModel order in await _orderService.GetAllOrdersByRestaurantIdAsync(user.Restaurant.Id))
+            foreach (OrderModel order in await _orderService.GetCookOrdersByRestaurantIdAsync(user.Restaurant.Id))
             {
                 dishes.Add(new OrderWithDishesCountModel()
                 {

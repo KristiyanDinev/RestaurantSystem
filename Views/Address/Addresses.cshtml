@@ -13,7 +13,7 @@
 
 <body>
     @await Html.PartialAsync("_NavBar", Model.User)
-
+    <h3>Addresss</h3>
     @if (TempData.Peek("Success") != null)
     {
         <p>@TempData["Success"]</p>

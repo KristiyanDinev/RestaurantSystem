@@ -54,7 +54,8 @@ namespace RestaurantSystem.Services
             return order;
         }
 
-        public async Task<bool> DeleteOrderAsync(long orderId, bool checkOrderStatus = true)
+        public async Task<bool> DeleteOrderAsync(long orderId, 
+            bool checkOrderStatus = true)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId);
@@ -95,12 +96,26 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<List<OrderModel>> GetAllOrdersByRestaurantIdAsync(int restaurantId)
+        public async Task<List<OrderModel>> GetCookOrdersByRestaurantIdAsync(int restaurantId)
         {
             return await _databaseContext.Orders
                 .Include(order => order.User)
                 .Where(order => 
-                order.RestaurantId == restaurantId)
+                order.RestaurantId == restaurantId &&
+                !(order.CurrentStatus.ToString().Equals(OrderStatusEnum.Served.ToString()) ||
+                  order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivering.ToString()) ||
+                  order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivered.ToString())))
+                .ToListAsync();
+        }
+
+        public async Task<List<OrderModel>> GetWaitressOrdersByRestaurantIdAsync(int restaurantId)
+        {
+            return await _databaseContext.Orders
+                .Include(order => order.User)
+                .Where(order =>
+                order.RestaurantId == restaurantId &&
+                !(order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivering.ToString()) ||
+                  order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivered.ToString())))
                 .ToListAsync();
         }
 
@@ -134,6 +149,20 @@ namespace RestaurantSystem.Services
                 .Include(order => order.OrderedDishes)
                 .Include(order => order.Restaurant)
                 .FirstOrDefaultAsync(order => order.Id == orderId);
+        }
+
+        public async Task<List<OrderModel>> GetDeliveredOrdersAsync(int restaurantId, int page)
+        {
+            return await Utility.GetPageAsync<OrderModel>(_databaseContext.Orders
+                .Include(order => order.Address)
+                .Include(order => order.User)
+                .Include(order => order.Delivery)
+                .Where(order =>
+                order.RestaurantId == restaurantId &&
+                order.TableNumber == null &&
+                order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivered.ToString()))
+                .AsQueryable(), page)
+                .ToListAsync();
         }
 
     }

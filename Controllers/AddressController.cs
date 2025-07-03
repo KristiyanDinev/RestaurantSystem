@@ -30,7 +30,7 @@ namespace RestaurantSystem.Controllers
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
 
             return View(new AddressesViewModel
@@ -48,7 +48,7 @@ namespace RestaurantSystem.Controllers
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
 
             AddressModel? address = await _addressService.GetAddressByIdAsync(address_id);
@@ -71,7 +71,7 @@ namespace RestaurantSystem.Controllers
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
 
             return View(user);

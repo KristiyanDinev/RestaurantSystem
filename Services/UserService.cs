@@ -53,7 +53,7 @@ namespace RestaurantSystem.Services
             {
                 Name = registerFormModel.Name,
                 Email = registerFormModel.Email,
-                Image = await Utility.UploadImageAsync(registerFormModel.Image),
+                Image = await Utility.UploadUserImageAsync(registerFormModel.Image),
                 Password = Convert.ToBase64String(EncryptionUtility.HashIt(registerFormModel.Password)),
             };
 
@@ -80,9 +80,8 @@ namespace RestaurantSystem.Services
 
             } else
             {
-                string? img = await Utility.UpdateImage(user.Image,
+                string? img = await Utility.UpdateImageAsync(user.Image,
                     profileUpdateForm.Image);
-
                 if (img != null)
                 {
                     user.Image = img;

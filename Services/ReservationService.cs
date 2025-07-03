@@ -2,6 +2,7 @@
 using RestaurantSystem.Database;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.Form;
 using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Services
@@ -20,16 +21,17 @@ namespace RestaurantSystem.Services
         }
 
         public async Task<ReservationModel?> CreateReservationAsync(long userId, int restaurantId,
-            int amount_Of_Adults, int amount_Of_Children, DateTime dateTime, string? notes)
+            ReservationFormModel reservationFormModel)
         {
             ReservationModel reservation = new ReservationModel()
             {
                 UserId = userId,
                 RestaurantId = restaurantId,
-                Amount_Of_Adults = amount_Of_Adults,
-                Amount_Of_Children = amount_Of_Children,
-                At_Date = dateTime.ToUniversalTime(),
-                Notes = notes,
+                Amount_Of_Adults = reservationFormModel.Amount_Of_Adults,
+                Amount_Of_Children = reservationFormModel.Amount_Of_Children,
+                At_Date = reservationFormModel.At_Date.ToUniversalTime(),
+                Notes = reservationFormModel.Notes,
+                PhoneNumber = reservationFormModel.PhoneNumber,
                 CurrentStatus = ReservationStatusEnum.Pending
             };
 
@@ -37,9 +39,7 @@ namespace RestaurantSystem.Services
             {
                 return null;
             }
-
             await _databaseContext.Reservations.AddAsync(reservation);
-
             return await _databaseContext.SaveChangesAsync() > 0 ? reservation : null;
         }
 

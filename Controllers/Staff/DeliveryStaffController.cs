@@ -45,9 +45,13 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
-
+            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            if (delivery != null)
+            {
+                return RedirectToAction("DeliveryMyOwner");
+            }
             return View(new AddressesViewModel()
             {
                 User = user,
@@ -63,9 +67,13 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
-
+            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            if (delivery != null)
+            {
+                return RedirectToAction("DeliveryMyOwner");
+            }
             AddressModel? address = await _deliveryService.GetDeliveryAddressCookie(HttpContext);
             if (address == null)
             {
@@ -87,27 +95,18 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
-
-            AddressModel? address = await _deliveryService.GetDeliveryAddressCookie(HttpContext);
-            if (address == null)
-            {
-                return RedirectToAction("DeliveryAddress");
-            }
-
-            RestaurantModel? restaurant = await _deliveryService.GetDeliveryRestaurantCookie(HttpContext);
-            if (restaurant == null)
-            {
-                return RedirectToAction("DeliveryRestaurant");
-            }
-
             DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
             if (delivery != null)
             {
                 return RedirectToAction("DeliveryMyOwner");
             }
-
+            RestaurantModel? restaurant = await _deliveryService.GetDeliveryRestaurantCookie(HttpContext);
+            if (restaurant == null)
+            {
+                return RedirectToAction("DeliveryRestaurant");
+            }
             List<OrderWithDishesCountModel> orders = new ();
             foreach (OrderModel order in 
                 await _orderService.GetDeliveryOrdersByRestaurantIdAsync(restaurant.Id))
@@ -135,7 +134,7 @@ namespace RestaurantSystem.Controllers.Staff
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
 
             DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
@@ -201,7 +200,7 @@ namespace RestaurantSystem.Controllers.Staff
             if (await _orderService.UpdateOrderCurrentStatusByIdAsync(delivery.OrderId,
                                             OrderStatusEnum.Delivered))
             {
-                TempData["Success"] = true;
+                TempData["DeliveredSuccessfully"] = true;
                 return Ok();
             }
             return Ok();
@@ -229,7 +228,7 @@ namespace RestaurantSystem.Controllers.Staff
                 TempData["Canceled"] = true;
                 return Ok();
             }
-            return Ok();
+            return BadRequest();
         }
     }
 }

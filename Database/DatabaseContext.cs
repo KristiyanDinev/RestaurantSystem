@@ -408,6 +408,10 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<ReservationModel>()
+                .Property(order => order.PhoneNumber)
+                .IsRequired();
+
+            builder.Entity<ReservationModel>()
                 .Property(order => order.TotalPrice)
                 .HasDefaultValue(0);
 

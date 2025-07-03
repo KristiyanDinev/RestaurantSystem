@@ -8,6 +8,7 @@ namespace RestaurantSystem.Models.DatabaseModels
         public string? Notes { get; set; }
         public required ReservationStatusEnum CurrentStatus { get; set; }
         public decimal TotalPrice { get; set; } // default 0.00
+        public required string PhoneNumber { get; set; }
 
 
         public required long UserId { get; set; }

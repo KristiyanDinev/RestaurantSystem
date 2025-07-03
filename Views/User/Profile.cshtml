@@ -5,7 +5,7 @@
 
 
 <head>
-   
+
     @await Html.PartialAsync("_Header")
 </head>
 
@@ -22,26 +22,23 @@
             <img id="image" src="@Model.Image" alt="user image" class="mt-2 rounded img-thumbnail">
         }
 
-            <input type="file" accept="image/*" id="Image">
-
+        <input type="file" accept="image/*" id="Image">
         <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
+        <img id="preview" alt="Profile Image Preview" class="mt-2 rounded img-thumbnail" />
 
-            <img id="preview" alt="Profile Image Preview" class="mt-2 rounded img-thumbnail" />
-   
-            <label id="delete_image_status">Delete Image: No</label>
-      
-            <button onclick="toggleDeleteImage()">Toggle Delete Image</button>
-     
-            <div class="input_center">
-                <p>Username: @Model.Name</p>
-                <input type="text" id="username"
-                maxlength="255" value="@Model.Name" placeholder="Username" required>
-            </div>
+        <label for="deleteimage">Delete Image?</label>
+        <input type="checkbox" id="deleteimage">
 
-            <div class="input_center">
-                <p>Email: @Model.Email</p>
-                <input type="email" id="email" maxlength="50" value="@Model.Email" placeholder="Email" required>
-            </div>
+        <div class="input_center">
+            <p>Username: @Model.Name</p>
+            <input type="text" id="username"
+                   maxlength="255" value="@Model.Name" placeholder="Username" required>
+        </div>
+
+        <div class="input_center">
+            <p>Email: @Model.Email</p>
+            <input type="email" id="email" maxlength="50" value="@Model.Email" placeholder="Email" required>
+        </div>
     </div>
 
     <p id="Stats"></p>

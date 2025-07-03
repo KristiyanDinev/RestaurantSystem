@@ -12,6 +12,7 @@
 <body>
     @await Html.PartialAsync("_NavBar", Model.User)
     @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
+    <h3>@ViewData["Title"]</h3>
 
     <p id="dish_stats"></p>
 
@@ -20,8 +21,6 @@
         
        string clickAction = dishModel.IsAvailable ? "goToDish('" + dishModel.Id + "')" : "";
         
-    
-
         <div class="card m-5" style="cursor: pointer;">
             <div class="card-body" onclick="@clickAction">
                 @if (dishModel.Image != null)

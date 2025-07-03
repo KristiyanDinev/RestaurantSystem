@@ -17,16 +17,15 @@
 
 <body>
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
-
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
     @if (Model.Orders.Count > 0)
     {
-        <h1>All Dishes to cook per order</h1>
+        <h3>All Dishes to cook per order</h3>
 
     } else
     {
-        <h1>No Dishes to cook</h1>
+        <h3>No Dishes to cook</h3>
     }
 
         @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.Orders)

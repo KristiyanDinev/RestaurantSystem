@@ -13,7 +13,7 @@
 <body>
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
-
+    <h3>Delivery Restaurants</h3>
     @if (Model.Restaurants.Count == 0)
     {
         <p class="alert aler-warning m-2">No Restaurants. Please contact your Manager.</p>

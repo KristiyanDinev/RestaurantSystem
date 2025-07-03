@@ -119,9 +119,8 @@ function onmessage(event) {
 
     if (obj.DishId && obj.DishCurrentStatus) {
         document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`).innerHTML = `Dish Status: ${obj.DishCurrentStatus}`;
-
-        setDishButtons(obj)
     }
+    setDishButtons(obj)
 }
 
 // WebSocket error event handler (currently empty)

@@ -57,7 +57,7 @@ async function deleteOrder(orderId) {
     } catch {
     }
 
-    statusElement.innerHTML = "Counldn't delete the order";
+    statusElement.innerHTML = "Couldn't delete the order";
 }
 
 
@@ -82,7 +82,7 @@ async function servedOrder(orderId) {
     } catch {
     }
 
-    statusElement.innerHTML = "Counldn't mark the order as surved";
+    statusElement.innerHTML = "Couldn't mark the order as served";
 }
 
 
@@ -105,5 +105,5 @@ async function unserveOrder(orderId) {
         }
     } catch {
     }
-    statusElement.innerHTML = "Counldn't mark the order as unserved";
+    statusElement.innerHTML = "Couldn't mark the order as unserved";
 }

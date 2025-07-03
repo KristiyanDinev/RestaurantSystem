@@ -38,7 +38,7 @@ namespace RestaurantSystem.Controllers
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
 
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
@@ -64,7 +64,7 @@ namespace RestaurantSystem.Controllers
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Login", "Staff");
+                return RedirectToAction("Login", "User");
             }
 
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
@@ -101,17 +101,14 @@ namespace RestaurantSystem.Controllers
 
             RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
                 _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
-
             if (restaurant == null || !restaurant.ServeCustomersInPlace)
             {
                 TempData["Message"] = _forbit;
                 return RedirectToAction("Index", "Restaurant");
             }
 
-            if (await _reservationService.CreateReservationAsync(user.Id, restaurant.Id,
-                reservationFormModel.Amount_Of_Adults, reservationFormModel.Amount_Of_Children,
-                reservationFormModel.At_Date, reservationFormModel.Notes)
-                != null)
+            if (await _reservationService.CreateReservationAsync(user.Id, restaurant.Id, 
+                    reservationFormModel) != null)
             {
                 TempData["ReservationSuccessfull"] = true;
                 return Ok();

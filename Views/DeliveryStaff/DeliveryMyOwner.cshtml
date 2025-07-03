@@ -23,6 +23,12 @@
         TempData.Remove("Success");
     }
 
+    @if (TempData.Peek("DeliveredSuccessfully") != null)
+    {
+        <p class="alert alert-success">Delivered Order Successfully</p>
+        TempData.Remove("DeliveredSuccessfully");
+    }
+
     <div class="card m-3">
                 <div class="card-body">
                     @{
@@ -38,9 +44,9 @@
                         </div>
                     }
 
-                    <h4 class="card-title">Current Status: @order.CurrentStatus</h4>
+                    <h4 class="card-title">Order Current Status: @order.CurrentStatus</h4>
 
-                    <p class="card-text">Restaurant Address</p>
+                    <h4 class="card-text">Restaurant Address</h4>
                     <p class="card-text">Country: @restaurant.Country</p>
                     <p class="card-text">State / Province / Region: @restaurant.State</p>
                     <p class="card-text">City: @restaurant.City</p>
@@ -62,16 +68,16 @@
                     <p class="card-text">Total Price: @order.TotalPrice lv.</p>
                     <p class="card-text">Ordered At: @order.OrderedAt</p>
 
-                    <p class="card-text">User Contact</p>
+                    <h4 class="card-text">User Contact</h4>
                     <p class="card-text">Name: @order.User.Name</p>
-                    @if (order.User.Image != null)
-                    {
-                        <img class="im-thumbnail rounded m-2" src="order.User.Image" />
-                    }
                     <p class="card-text">Email: @order.User.Email</p>
                     <p class="card-text">Phone Number: @order.Address.PhoneNumber</p>
+                    @if (order.User.Image != null)
+                    {
+                        <img class="img-thumbnail rounded m-2" src="@order.User.Image" />
+                    }
 
-                    <p class="card-text">Address Information</p>
+                    <h4 class="card-text">Address Information</h4>
                     <p class="card-text">Country: @order.Address.Country</p>
                     <p class="card-text">State / Region / Province: @order.Address.State</p>
                     <p class="card-text">City: @order.Address.City</p>
@@ -85,12 +91,14 @@
                         {
                                 <p id="error,@order.Id"></p>
                                   <button class="btn btn-success m-2"
-                                    onclick="delivered()">
+                                    onclick="delivered()"
+                                    type="button">
                                     Delivered
                                 </button>
 
                                 <button class="btn btn-danger m-2"
-                                    onclick="canceled()">
+                                    onclick="canceled()"
+                                    type="button">
                                     Cancel Delivery
                                 </button>
                         }

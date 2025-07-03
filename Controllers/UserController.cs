@@ -54,10 +54,8 @@ namespace RestaurantSystem.Controllers {
 
             UserModel? loggedIn = await _userService.LoginUserAsync(
                 loginFormModel.Email, loginFormModel.Password);
-
             if (loggedIn == null)
             {
-                TempData["Error"] = "Invalid login attempt.";
                 return BadRequest();
             }
 
@@ -83,7 +81,6 @@ namespace RestaurantSystem.Controllers {
             UserModel? registered = await _userService.RegisterUserAsync(registerFormModel);
             if (registered == null)
             {
-                TempData["Error"] = "Invalid registration attempt.";
                 return BadRequest();
             }
 
@@ -101,7 +98,7 @@ namespace RestaurantSystem.Controllers {
         [Route("/profile")]
         public async Task<IActionResult> Profile()
         {
-            UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
+            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             return user == null ? RedirectToAction("Login") : View(user);
         }
 

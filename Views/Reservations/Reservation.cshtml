@@ -20,30 +20,35 @@
     <div>
         <div class="input_center">
             <p>Amount of Adults</p>
-            <input type="number" min="1" name="adults" id="adults" value="0" />
+            <input type="number" min="1" name="adults" 
+                id="adults" value="0" placeholder="How many children? Above 18 years old." required/>
         </div>
 
         <div class="input_center">
             <p>Amount of Children</p>
-            <input type="number" min="0" id="children" value="0" />
+            <input type="number" min="0" id="children" 
+                value="0" placeholder="How many children? Under 18 years old." required />
+        </div>
+
+        <div class="input_center">
+            <p>Phone Number</p>
+            <input type="text" id="phone" placeholder="You phone number for contact" required/>
         </div>
 
         <div class="input_center">
             <p>Notes</p>
-            <textarea id="notes" cols="40" rows="6" maxlength="255" placeholder="Notes"></textarea>
+            <textarea id="notes" cols="40" rows="6" maxlength="255" placeholder="Notes..."></textarea>
         </div>
 
         <div class="input_center">
             <p>Reservation At</p>
-            <input type="date" id="at_date" />
-            <input type="time" id="at_time" />
+            <input type="date" id="at_date" required/>
+            <input type="time" id="at_time" required/>
         </div>
 
         <p id="reservation_status"></p>
 
-        <div class="noselect reserve">
-            <button type="button" onclick="submit()">Reserve</button>
-        </div>
+        <button type="button" class="btn btn-success m-2" onclick="submit()">Reserve</button>
     </div>
 
     @await Html.PartialAsync("_Footer")

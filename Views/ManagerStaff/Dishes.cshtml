@@ -1,4 +1,6 @@
-﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+﻿@using RestaurantSystem.Enums
+@using RestaurantSystem.Models.DatabaseModels
+@model RestaurantSystem.Models.View.Staff.Manager.ManagerDishViewModel;
 @{
     ViewData["Title"] = "Manage Dishes";
 }
@@ -7,14 +9,284 @@
 <head>
     @await Html.PartialAsync("_Header")
     <script src="~/assets/staff/manager/manager.js"></script>
+    <script src="~/assets/staff/manager/manager_dishes.js"></script>
 </head>
 
 
 <body>
-    @await Html.PartialAsync("_StaffNavBar", Model)
-    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
     @await Html.PartialAsync("_ManagerNavBar")
+    <h3>Manage Dishes</h3>
+    @await Html.PartialAsync("_Paging", Model.Page)
 
+    @if (TempData.Peek("CreatedSuccessfully") != null)
+    {
+        <p class="alert alert-success m-2">Successfully Created Dish</p>
+        TempData.Remove("CreatedSuccessfully");
+    }
+
+    @if (TempData.Peek("UpdatedSuccessfully") != null)
+    {
+        <p class="alert alert-success m-2">Successfully Updated Dish</p>
+        TempData.Remove("UpdatedSuccessfully");
+    }
+
+    @if (TempData.Peek("DeletedSuccessfully") != null)
+    {
+        <p class="alert alert-success m-2">Successfully Deleted Dish</p>
+        TempData.Remove("DeletedSuccessfully");
+    }
+
+    <p id="status"></p>
+
+    <button class="btn btn-success m-2" onclick="toggleCreateDish()" type="button">Create Dish</button>
+
+    <div id="create_dish" class="container form-group m-2" style="display:none;">
+        <input id="dish_name" type="text"
+               class="input-group form-controled"
+               placeholder="Dish Name" required>
+
+        <select id="dish_type"
+                class="input-group form-controled" required>
+            <option value="@DishTypeEnum.salads.ToString()">@DishTypeEnum.salads.ToString()</option>
+            <option value="@DishTypeEnum.soups.ToString()">@DishTypeEnum.soups.ToString()</option>
+            <option value="@DishTypeEnum.appetizers.ToString()">@DishTypeEnum.drinks.ToString()</option>
+            <option value="@DishTypeEnum.dishes.ToString()">@DishTypeEnum.dishes.ToString()</option>
+            <option value="@DishTypeEnum.desserts.ToString()">@DishTypeEnum.desserts.ToString()</option>
+            <option value="@DishTypeEnum.drinks.ToString()">@DishTypeEnum.drinks.ToString()</option>
+        </select>
+
+        <input id="dish_price" type="number"
+               class="input-group form-controled"
+               min="0.1" max="9999999999"
+               placeholder="Dish Price lv." required>
+
+        <input id="dish_ingredients" type="text"
+               class="input-group form-controled"
+               placeholder="Dish Ingredients" required>
+
+        <input id="dish_attc" type="text"
+               class="input-group form-controled"
+               placeholder="Dish Average Time To Cook: 1 - 2 minutes." required>
+
+        <input id="dish_grams" type="number"
+               class="input-group form-controled"
+               min="1" max="999999"
+               placeholder="Dish Grams" required>
+
+        <label for="dish_isavailable">Is Dish Currently Available</label>
+        <input id="dish_isavailable" type="checkbox"
+               class="input-group form-controled" required>
+
+        <div class="mb-3">
+            <label for="Image" class="form-label">Dish Image</label>
+            <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage(null)">Remove Image</button>
+            <input type="file" class="form-control" id="dish_image" accept="image/*">
+            <img id="preview" src="#" alt="Dish Image Preview" class="mt-2 rounded img-thumbnail" />
+        </div>
+
+        <button type="button" class="btn btn-success m-2" onclick="createDish()">Submit</button>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Ingredients</th>
+                    <th>Grams</th>
+                    <th>Type</th>
+                    <th>Average Time To Cook</th>
+                    <th>Is Available</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (DishModel dish in Model.Dishes)
+                {
+                    <tr class="page-row">
+                        <td>@dish.Id</td>
+                        <td>
+                            <img src="@dish.Image" class="img img-thumbnail rounded m-2">
+
+                            <div id="image,@dish.Id" style="display:none;">
+                                <input type="file" accept="image/*" id="inputimage,@dish.Id">
+                                <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage('@dish.Id')">Remove Image</button>
+                                <img id="preview,@dish.Id" alt="Dish Image Preview" class="mt-2 rounded img-thumbnail" />
+                                <label for="deleteimage,@dish.Id">Delete Image?</label>
+                                <input type="checkbox" id="deleteimage,@dish.Id">
+                                <script>
+                                    registerPreview('@dish.Id')
+                                </script>
+                            </div>
+                        </td>
+                        <td>
+                            <p>@dish.Name</p>
+                            <input id="name,@dish.Id"
+                                   type="text"
+                                   style="display:none;"
+                                   class="input-group form-control"
+                                   placeholder="Dish Name" value="@dish.Name"
+                                   required>
+                        </td>
+                        <td>
+                            <p>@dish.Price lv.</p>
+                            <input id="price,@dish.Id"
+                                   type="number"
+                                   style="display:none;"
+                                   min="0.1" max="9999999999"
+                                   class="input-group form-control"
+                                   placeholder="Dish Price lv." value="@dish.Price"
+                                   required>
+                        </td>
+                        <td>
+                            <p>@dish.Ingredients</p>
+                            <input id="ingredients,@dish.Id"
+                                   type="text"
+                                   style="display:none;"
+                                   class="input-group form-control"
+                                   placeholder="Dish Ingredients" value="@dish.Ingredients"
+                                   required>
+                        </td>
+                        <td>
+                            <p>@dish.Grams</p>
+                            <input id="grams,@dish.Id" type="number"
+                                   class="input-group form-controled"
+                                   min="1" max="999999"
+                                   style="display:none;"
+                                   placeholder="Dish Grams" value="@dish.Grams" required>
+                        </td>
+                        <td>
+                            <p>@dish.Type_Of_Dish.ToString()</p>
+                            <select id="type,@dish.Id"
+                                    style="display:none;"
+                                    class="input-group form-controled" required>
+                                @if (dish.Type_Of_Dish.Equals(DishTypeEnum.salads))
+                                {
+                                    <option value="@DishTypeEnum.salads.ToString()" 
+                                        selected>@DishTypeEnum.salads.ToString()</option>
+                                } else
+                                {
+                                    <option value="@DishTypeEnum.salads.ToString()"
+                                            >@DishTypeEnum.salads.ToString()</option>
+                                }
+
+                                @if (dish.Type_Of_Dish.Equals(DishTypeEnum.soups))
+                                {
+                                    <option value="@DishTypeEnum.soups.ToString()"
+                                            selected>@DishTypeEnum.soups.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@DishTypeEnum.soups.ToString()"
+                                        >@DishTypeEnum.soups.ToString()</option>
+                                }
+
+                                @if (dish.Type_Of_Dish.Equals(DishTypeEnum.appetizers))
+                                {
+                                    <option value="@DishTypeEnum.appetizers.ToString()"
+                                            selected>@DishTypeEnum.appetizers.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@DishTypeEnum.appetizers.ToString()"
+                                        >@DishTypeEnum.appetizers.ToString()</option>
+                                }
+
+                                @if (dish.Type_Of_Dish.Equals(DishTypeEnum.dishes))
+                                {
+                                    <option value="@DishTypeEnum.dishes.ToString()"
+                                            selected>@DishTypeEnum.dishes.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@DishTypeEnum.dishes.ToString()"
+                                        >@DishTypeEnum.dishes.ToString()</option>
+                                }
+
+                                @if (dish.Type_Of_Dish.Equals(DishTypeEnum.desserts))
+                                {
+                                    <option value="@DishTypeEnum.desserts.ToString()"
+                                            selected>@DishTypeEnum.desserts.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@DishTypeEnum.desserts.ToString()">@DishTypeEnum.desserts.ToString()</option>
+                                }
+
+                                @if (dish.Type_Of_Dish.Equals(DishTypeEnum.drinks))
+                                {
+                                    <option value="@DishTypeEnum.drinks.ToString()"
+                                    selected>@DishTypeEnum.drinks.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@DishTypeEnum.drinks.ToString()">@DishTypeEnum.drinks.ToString()</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <p>@dish.AverageTimeToCook</p>
+                            <input id="attc,@dish.Id" type="text"
+                                   class="input-group form-controled"
+                                   style="display:none;"
+                                   placeholder="Dish Average Time To Cook: 1 - 2 minutes."
+                                   value="@dish.AverageTimeToCook"
+                                   required>
+                        </td>
+                        <td>
+                            @if (dish.IsAvailable)
+                            {
+                                <i class="bi bi-check-lg"></i>
+                                <input id="isavailable,@dish.Id" type="checkbox"
+                                       style="display:none;"
+                                       class="input-group form-controled"
+                                       checked required>
+                            }
+                            else
+                            {
+                                <i class="bi bi-ban"></i>
+                                <input id="isavailable,@dish.Id" type="checkbox"
+                                       class="input-group form-controled"
+                                       style="display:none;"
+                                       required>
+                            }
+                        </td>
+                        <td>
+                            <div>
+                                <button id="submit,@dish.Id" type="button"
+                                        class="btn btn-primary m-2"
+                                        onclick="editDish('@dish.Id')"
+                                        style="display:none;">
+                                    Submit Edited Dish
+                                </button>
+                                <button type="button"
+                                        class="btn btn-primary m-2"
+                                        onclick="toggleEditDish('@dish.Id')">
+                                    Edit
+                                </button>
+                                <button type="button"
+                                        class="btn btn-danger m-2"
+                                        onclick="deleteDish('@dish.Id')">
+                                    Delete Dish
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById("dish_image").onchange = (e) => {
+            readURL(e.target, 'preview');
+        };
+    </script>
 
     @await Html.PartialAsync("_Footer")
 </body>

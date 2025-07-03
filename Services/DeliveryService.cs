@@ -26,9 +26,9 @@ namespace RestaurantSystem.Services
                 .Include(d => d.Order)
                 .Include(d => d.Order.Address)
                 .Include(d => d.Order.Restaurant)
+                .Include(d => d.Order.User)
                 .FirstOrDefaultAsync(d => d.UserId == user_id);
         }
-
 
         public async Task<bool> AddDeliveryAsync(long user_id, long order_id)
         {
@@ -47,7 +47,6 @@ namespace RestaurantSystem.Services
             });
             return await _databaseContext.SaveChangesAsync() > 0;
         }
-
 
         public async Task<bool> RemoveDeliveryAsync(long user_id)
         {

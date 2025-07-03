@@ -14,7 +14,7 @@
         @if (Model.Roles.Any(r => RoleEnum.manager.ToString()
             .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
         {
-            <a href="/staff/manager" class="btn btn-success m-2">Staff Panel</a>
+            <a href="/staff/manager/employees" class="btn btn-success m-2">Staff Panel</a>
 
         } else if (Model.Roles.Any(r => RoleEnum.cook.ToString()
             .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))

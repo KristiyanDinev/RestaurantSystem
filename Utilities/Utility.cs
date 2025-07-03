@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 namespace RestaurantSystem.Utilities
 {
     public class Utility
@@ -17,24 +17,33 @@ namespace RestaurantSystem.Utilities
             return char.ToUpper(str[0]) + str.Substring(1).ToLower();
         }
 
-        public static async Task<string?> UploadImageAsync(IFormFile? Image)
+        private static async Task<string?> UploadImageAsync(IFormFile? Image, string assetPath)
         {
             if (Image == null)
             {
                 return null;
             }
-            
             string imageName = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
             try
             {
-                using FileStream fileStream = new FileStream("wwwroot/assets/images/user/" + imageName, FileMode.Create);
+                using FileStream fileStream = new FileStream("wwwroot/"+assetPath + imageName, FileMode.Create);
                 await Image.CopyToAsync(fileStream);
-                return "/assets/images/user/" + imageName;
+                return assetPath + imageName;
             }
             catch (Exception)
             {
                 return null;
             }
+        }
+
+        public static async Task<string?> UploadUserImageAsync(IFormFile? Image)
+        {
+            return await UploadImageAsync(Image, "/assets/images/user/");
+        }
+
+        public static async Task<string?> UploadDishImageAsync(IFormFile? Image)
+        {
+            return await UploadImageAsync(Image, "/assets/images/dishes/");
         }
 
         public static void DeleteImage(string? img)
@@ -50,14 +59,16 @@ namespace RestaurantSystem.Utilities
             }
         }
 
-        public static async Task<string?> UpdateImage(string? OldImage, IFormFile? Image) {
+        public static async Task<string?> UpdateImageAsync(string? OldImage, 
+            IFormFile? Image, bool isDish = false) {
 
             if (OldImage != null)
             {
                 DeleteImage(OldImage);
             }
 
-            return await UploadImageAsync(Image);
+            return isDish ? await UploadDishImageAsync(Image) :
+                await UploadUserImageAsync(Image);
         }
 
         public static IQueryable<T> GetPageAsync<T>(IQueryable<T> query, int pageNumber)

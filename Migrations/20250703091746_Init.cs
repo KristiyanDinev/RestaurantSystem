@@ -15,7 +15,7 @@ namespace RestaurantSystem.Migrations
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:Enum:dish_status_enum", "pending,preparing,ready")
                 .Annotation("Npgsql:Enum:dish_type_enum", "salads,soups,appetizers,dishes,desserts,drinks")
-                .Annotation("Npgsql:Enum:order_status_enum", "pending,preparing,ready,delivering,delivered")
+                .Annotation("Npgsql:Enum:order_status_enum", "pending,preparing,ready,served,delivering,delivered")
                 .Annotation("Npgsql:Enum:reservation_status_enum", "pending,accepted,cancelled");
 
             migrationBuilder.CreateTable(
@@ -192,6 +192,7 @@ namespace RestaurantSystem.Migrations
                     Notes = table.Column<string>(type: "text", nullable: true),
                     CurrentStatus = table.Column<string>(type: "text", nullable: false, defaultValue: "Pending"),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false, defaultValue: 0m),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     RestaurantId = table.Column<int>(type: "integer", nullable: false),
                     Amount_Of_Adults = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),

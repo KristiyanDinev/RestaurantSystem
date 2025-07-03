@@ -20,21 +20,6 @@ function removeImage() {
     document.getElementById('preview').src = ''
 }
 
-var delete_image_data = false
-document.getElementById('delete_image_status').innerHTML = "Delete Image: No"
-
-function toggleDeleteImage() {
-    let doc = document.getElementById('delete_image_status')
-    if (delete_image_data) {
-        delete_image_data = false
-        doc.innerHTML = "Delete Image: No"
-
-    } else {
-        delete_image_data = true
-        doc.innerHTML = "Delete Image: Yes"
-        document.getElementById('preview').src = ""
-    }
-}
 
 async function updateUser() {
     if (!confirm('Are you sure you want to update your profile?')) {
@@ -56,7 +41,7 @@ async function updateUser() {
     formData.append('Name', username)
     formData.append('Email', email)
     formData.append('Image', document.getElementById("Image").files[0])
-    formData.append('DeleteImage', delete_image_data)
+    formData.append('DeleteImage', document.getElementById("deleteimage").checked)
 
     try {
         const res = await fetch('/profile/update', {
