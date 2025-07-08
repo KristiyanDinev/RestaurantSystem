@@ -3,62 +3,135 @@
 }
 
 <head>
-    
     @await Html.PartialAsync("_Header")
+    <style>
+        html, body {
+            height: 100%;
+        }
 
+        .form-signin {
+            max-width: 500px;
+            padding: 1rem;
+        }
+
+            .form-signin .form-floating:focus-within {
+                z-index: 2;
+            }
+
+            .form-signin h1 {
+                color: #d63384 !important;
+                font-family: 'Georgia', serif;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            }
+
+        .preview-img {
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #ff6b35);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+            .btn-warning:hover {
+                background: linear-gradient(45deg, #ff6b35, #ffc107);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                color: white !important;
+            }
+
+        .btn-outline-warning {
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+
+            .btn-outline-warning:hover {
+                background-color: #ffc107;
+                border-color: #ffc107;
+                color: white;
+            }
+
+        [data-bs-theme="dark"] .btn-warning {
+            background: linear-gradient(45deg, #e6ac00, #cc5a2b);
+        }
+
+            [data-bs-theme="dark"] .btn-warning:hover {
+                background: linear-gradient(45deg, #cc5a2b, #e6ac00);
+            }
+    </style>
 </head>
 
-<body>
 
-    <div class="container-fluid">
-        <div class="register-container">
-            <h1 class="form-title">Create Your Account</h1>
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <main class="form-signin w-100 m-auto">
+        @await Html.PartialAsync("_ChangeTheme")
+        <div class="container">
+            <div class="text-center mb-4">
+                @await Html.PartialAsync("_RestaurantLogo")
+                <h1 class="h2 mb-2 fw-bold text-primary">Savanas</h1>
+                <p class="text-muted mb-3">Sign Up and join our food-loving community!</p>
+            </div>
 
             <div novalidate>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="Username" class="form-label">Username <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="Username" maxlength="100" placeholder="Enter username" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="Email" class="form-label">Email <span class="required">*</span></label>
-                        <input type="email" class="form-control" id="Email" maxlength="100" placeholder="Enter email" required>
-                    </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="Username" placeholder="Enter username" maxlength="100" required>
+                    <label for="Username"><i class="bi bi-person-fill me-2"></i>Username</label>
                 </div>
 
-                <div class="mb-3">
-                    <label for="Password" class="form-label">Password <span class="required">*</span></label>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="Email" placeholder="Enter email" maxlength="100" required>
+                    <label for="Email"><i class="bi bi-envelope-fill me-2"></i>Email</label>
+                </div>
+
+                <div class="form-floating mb-3">
                     <input type="password" class="form-control" id="Password" placeholder="Enter password" required>
+                    <label for="Password"><i class="bi bi-lock-fill me-2"></i>Password</label>
                 </div>
 
                 <div class="mb-3">
-                    <label for="Image" class="form-label">Profile Image</label>
-                    <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
+                    <label class="form-label"><i class="bi bi-image-fill me-2"></i>Profile Image</label>
                     <input type="file" class="form-control" id="Image" accept="image/*">
-                    <img id="preview" src="#" alt="Profile Preview" class="mt-2 rounded img-thumbnail" />
+                    <button type="button" class="btn btn-outline-danger mt-2" onclick="removeImage()">
+                        <i class="bi bi-x-circle me-1"></i>Remove Image
+                    </button>
+                    <img id="preview" src="#" alt="Profile Preview" class="preview-img mt-2 rounded img-thumbnail d-none" />
                 </div>
 
-                <div class="form-check mb-4">
+                <div class="form-check text-start my-3">
                     <input class="form-check-input" type="checkbox" id="RememberMe">
                     <label class="form-check-label" for="RememberMe">
-                        Remember me
+                        <i class="bi bi-clock-fill me-2"></i>Remember me
                     </label>
                 </div>
 
-                <div id="Stats" class="mb-3"></div>
+                <div class="mb-3">
+                    <div id="Stats" class="alert d-none" role="alert"><i class="bi bi-exclamation-triangle-fill me-2"></i></div>
+                </div>
 
-                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <button type="button" class="btn btn-primary btn-lg me-md-2" onclick="submit()">
-                        Create Account
-                    </button>
-                    <a class="btn btn-secondary btn-lg" href="/login">
-                        Go to Login
+                <button type="button" class="btn btn-warning w-100 py-2 fw-semibold mb-3" onclick="submit()">
+                    <i class="bi bi-person-plus-fill me-2"></i>Create Account
+                </button>
+
+                <div class="text-center">
+                    <p class="text-muted">Already have an account?</p>
+                    <a class="btn btn-outline-warning" href="/login">
+                        <i class="bi bi-box-arrow-in-left me-2"></i>Go to Login
                     </a>
                 </div>
+
+                <p class="mt-4 mb-3 text-body-secondary text-center">
+                    <i class="bi bi-c-circle me-1"></i>2023–2030 Savanas Restaurant
+                </p>
             </div>
         </div>
-    </div>
+    </main>
+
     @await Html.PartialAsync("_Footer")
     <script src="~/assets/index.js"></script>
-    <script src='~/assets/register/register.js'></script>
+    <script src="~/assets/register/register.js"></script>
 </body>

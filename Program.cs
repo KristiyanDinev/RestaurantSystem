@@ -25,7 +25,11 @@ namespace RestaurantSystem
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews()
+                .AddCookieTempDataProvider(options =>
+                {
+                    options.Cookie.Name = "restaurant_temp_data";
+                });
 
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";

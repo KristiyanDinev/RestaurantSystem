@@ -8,15 +8,6 @@ namespace RestaurantSystem.Utilities
         public readonly static string delivery_address_header = "delivery_address_id";
         public readonly static string delivery_restaurant_header = "delivery_restaurant_id";
 
-        public static string MakeCapital(string str)
-        {
-            if (string.IsNullOrEmpty(str))
-            {
-                return string.Empty;
-            }
-            return char.ToUpper(str[0]) + str.Substring(1).ToLower();
-        }
-
         private static async Task<string?> UploadImageAsync(IFormFile? Image, string assetPath)
         {
             if (Image == null)
@@ -26,7 +17,11 @@ namespace RestaurantSystem.Utilities
             string imageName = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
             try
             {
-                using FileStream fileStream = new FileStream("wwwroot/"+assetPath + imageName, FileMode.Create);
+                string path = "wwwroot" + assetPath;
+                if (!Directory.Exists(path)) {
+                    Directory.CreateDirectory(path);
+                }
+                using FileStream fileStream = new FileStream(path + imageName, FileMode.Create);
                 await Image.CopyToAsync(fileStream);
                 return assetPath + imageName;
             }
