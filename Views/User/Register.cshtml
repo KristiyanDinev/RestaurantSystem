@@ -4,76 +4,16 @@
 
 <head>
     @await Html.PartialAsync("_Header")
-    <style>
-        html, body {
-            height: 100%;
-        }
-
-        .form-signin {
-            max-width: 500px;
-            padding: 1rem;
-        }
-
-            .form-signin .form-floating:focus-within {
-                z-index: 2;
-            }
-
-            .form-signin h1 {
-                color: #d63384 !important;
-                font-family: 'Georgia', serif;
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            }
-
-        .preview-img {
-            max-width: 150px;
-            max-height: 150px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .btn-warning {
-            background: linear-gradient(45deg, #ffc107, #ff6b35);
-            border: none;
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-            .btn-warning:hover {
-                background: linear-gradient(45deg, #ff6b35, #ffc107);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-                color: white !important;
-            }
-
-        .btn-outline-warning {
-            border-color: #ffc107;
-            color: #ffc107;
-        }
-
-            .btn-outline-warning:hover {
-                background-color: #ffc107;
-                border-color: #ffc107;
-                color: white;
-            }
-
-        [data-bs-theme="dark"] .btn-warning {
-            background: linear-gradient(45deg, #e6ac00, #cc5a2b);
-        }
-
-            [data-bs-theme="dark"] .btn-warning:hover {
-                background: linear-gradient(45deg, #cc5a2b, #e6ac00);
-            }
-    </style>
 </head>
 
 
-<body class="d-flex align-items-center py-4 bg-body-tertiary">
+@await Html.PartialAsync("_ChangeTheme")
+<div class="d-flex py-4">
     <div class="form-signin w-100 m-auto">
-        @await Html.PartialAsync("_ChangeTheme")
-        <div class="container">
+        <div class="container align-items-center">
             <div class="text-center mb-4">
                 @await Html.PartialAsync("_RestaurantLogo")
-                <h1 class="h2 mb-2 fw-bold text-primary">Savanas</h1>
+                <h1 class="h2 mb-2 fw-bold text-primary logo">Savanas</h1>
                 <p class="text-muted mb-3">Sign Up and join our food-loving community!</p>
             </div>
 
@@ -114,7 +54,7 @@
                 </div>
 
                 <button type="button" class="btn btn-warning w-100 py-2 fw-semibold mb-3" onclick="submit()">
-                    <i class="bi bi-person-plus-fill me-2"></i>Create Account
+                    <i class="bi bi-person-plus-fill me-2"></i>Sign Up
                 </button>
 
                 <div class="text-center">
@@ -134,4 +74,4 @@
     @await Html.PartialAsync("_Footer")
     <script src="~/assets/index.js"></script>
     <script src="~/assets/register/register.js"></script>
-</body>
+</div>

@@ -33,7 +33,7 @@ async function submit() {
     let email = emailElement.value;
     let stats = document.getElementById("Stats");
 
-    statsElement.className = "alert d-none"
+    stats.className = "alert d-none"
     emailElement.classList.remove(invalidClass)
     passwordElement.classList.remove(invalidClass)
     usernameElement.classList.remove(invalidClass)

@@ -1,49 +1,74 @@
 ﻿@using RestaurantSystem.Enums
 @model RestaurantSystem.Models.DatabaseModels.UserModel;
 
-<body>
-    <div>
+<nav class="navbar navbar-expand-lg bg-body-tertiary shadow rounded p-3 mb-4 d-flex justify-content-around" data-bs-theme="auto">
+    <div class="p-2">
+        @await Html.PartialAsync("_RestaurantLogoText")
+    </div>
+    
+    <div class="container flex-wrap">
+        <div class="d-flex flex-wrap gap-2 me-auto mb-2 mb-lg-0">
+            <a class="btn btn-primary btn-hover-outline-primary" href="/cart">
+                <i class="bi bi-cart-fill me-1"></i> Cart
+            </a>
+            <a class="btn btn-primary btn-hover-outline-primary" href="/orders">
+                <i class="bi bi-receipt-cutoff me-1"></i> Orders
+            </a>
+            <a class="btn btn-primary btn-hover-outline-primary" href="/dishes">
+                <i class="bi bi-egg-fried me-1"></i> Dishes
+            </a>
+            <a class="btn btn-primary btn-hover-outline-primary" href="/reservations">
+                <i class="bi bi-calendar-check me-1"></i> Reservations
+            </a>
+            <a class="btn btn-primary btn-hover-outline-primary" href="/restaurants">
+                <i class="bi bi-shop me-1"></i> Restaurants
+            </a>
+            <a class="btn btn-primary btn-hover-outline-primary" href="/addresses">
+                <i class="bi bi-geo-alt me-1"></i> Your Addresses
+            </a>
 
-        <a class="btn btn-primary m-2" href="/cart">🛒</a>
-        <a class="btn btn-primary m-2" href="/orders">Orders</a>
-        <a class="btn btn-primary m-2" href="/dishes">Dishes</a>
-        <a class="btn btn-primary m-2" href="/reservations">Reservations</a>
-        <a class="btn btn-primary m-2" href="/restaurants">Restaurants</a>
-        <a class="btn btn-primary m-2" href="/addresses">Your Addresses</a>
-        
-        @if (Model.Roles.Any(r => RoleEnum.manager.ToString()
-            .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
-        {
-            <a href="/staff/manager/employees" class="btn btn-success m-2">Staff Panel</a>
+            @if (Model.Roles.Any(r => RoleEnum.manager.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            {
+                <a class="btn btn-success btn-hover-outline-success" href="/staff/manager/employees">
+                    <i class="bi bi-people-fill me-1"></i> Staff Panel
+                </a>
+            }
+            else if (Model.Roles.Any(r => RoleEnum.cook.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            {
+                <a class="btn btn-success btn-hover-outline-success" href="/staff/dishes">
+                    <i class="bi bi-people-fill me-1"></i> Staff Panel
+                </a>
+            }
+            else if (Model.Roles.Any(r => RoleEnum.waitress.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            {
+                <a class="btn btn-success btn-hover-outline-success" href="/staff/orders">
+                    <i class="bi bi-people-fill me-1"></i> Staff Panel
+                </a>
+            }
+            else if (Model.Roles.Any(r => RoleEnum.delivery.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            {
+                <a class="btn btn-success btn-hover-outline-success" href="/staff/delivery/address">
+                    <i class="bi bi-people-fill me-1"></i> Staff Panel
+                </a>
+            }
+        </div>
 
-        } else if (Model.Roles.Any(r => RoleEnum.cook.ToString()
-            .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
-        {
-            <a href="/staff/dishes" class="btn btn-success m-2">Staff Panel</a>
-
-        } else if (Model.Roles.Any(r => RoleEnum.waitress.ToString()
-            .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
-        {
-            <a href="/staff/orders" class="btn btn-success m-2">Staff Panel</a>
-
-        } else if (Model.Roles.Any(r => RoleEnum.delivery.ToString()
-            .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
-        {
-            <a href="/staff/delivery/address" class="btn btn-success m-2">Staff Panel</a>
-        }
-
-        <a class="btn btn-primary m-2" href="/profile">
+        <div class="d-flex align-items-center gap-3">
+            <a class="text-decoration-none d-flex flex-column align-items-center" href="/profile">
                 @if (Model.Image != null)
                 {
-                    <img src="@Model.Image" class="mt-2 rounded img-thumbnail">
+                    <img src="@Model.Image" class="img-thumbnail rounded-circle" style="width: 100px;" />
                 }
-            <p>@Model.Name</p>
-        </a>
+                <p class="fw-bold">@Model.Name</p>
+            </a>
 
-        <button class="btn btn-danger m-2" type="button" onclick="Logout()">Log Out</button>
-        <i class="bi bi-box-arrow-right"></i>
+            <button class="btn btn-danger btn-hover-outline-danger" type="button" onclick="Logout()">
+                <i class="bi bi-box-arrow-right me-1"></i> Log Out
+            </button>
+        </div>
     </div>
 
-</body>
-
-                 
+    <div class="p-2">
+        @await Html.PartialAsync("_ChangeTheme")
+    </div>
+</nav>

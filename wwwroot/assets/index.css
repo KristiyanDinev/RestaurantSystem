@@ -1,0 +1,121 @@
+﻿html,
+body {
+    height: 100%;
+}
+
+.form-signin {
+    max-width: 330px;
+    padding: 1rem;
+}
+
+    .form-signin .form-floating:focus-within {
+        z-index: 2;
+    }
+
+    .form-signin input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+.btn-theme-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+}
+
+.theme-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+
+.logo {
+    color: #ee3434 !important;
+    font-family: 'Georgia', serif;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.btn-warning {
+    background: linear-gradient(45deg, #ffc107, #ff6b35);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+    .btn-warning:hover {
+        background: linear-gradient(45deg, #ff6b35, #ffc107);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white !important;
+    }
+
+
+.btn-outline-warning {
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+    .btn-outline-warning:hover {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: white;
+    }
+
+.btn-primary.btn-hover-outline-primary:hover {
+    background-color: transparent;
+    color: var(--bs-primary);
+    border: 1px solid var(--bs-primary);
+}
+
+.btn-warning.btn-hover-outline-warning:hover {
+    background-color: transparent;
+    color: var(--bs-warning);
+    border: 1px solid var(--bs-warning);
+}
+
+.btn-danger.btn-hover-outline-danger:hover {
+    background-color: transparent;
+    color: var(--bs-danger);
+    border: 1px solid var(--bs-danger);
+}
+
+.btn-success.btn-hover-outline-success:hover {
+    background-color: transparent;
+    color: var(--bs-success);
+    border: 1px solid var(--bs-success);
+}
+
+/* Dark mode styles */
+[data-bs-theme="dark"] .form-signin {
+    color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+
+[data-bs-theme="dark"] .btn-warning {
+    background: linear-gradient(45deg, #e6ac00, #cc5a2b);
+}
+
+    [data-bs-theme="dark"] .btn-warning:hover {
+        background: linear-gradient(45deg, #cc5a2b, #e6ac00);
+    }
