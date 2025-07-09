@@ -1,20 +1,25 @@
+var invalidClass = "is-invalid"
+
 async function submit() {
-    let password = document.getElementById("Password").value
-    let email = document.getElementById("Email").value
+    let passwordElement = document.getElementById("Password")
+    let emailElement = document.getElementById("Email")
+
+    let password = passwordElement.value
+    let email = emailElement.value
     let statsElement = document.getElementById("Stats")
 
     // Clear previous styling
     statsElement.className = "alert d-none"
-    document.getElementById("Email").classList.remove("is-invalid")
-    document.getElementById("Password").classList.remove("is-invalid")
+    emailElement.classList.remove(invalidClass)
+    passwordElement.classList.remove(invalidClass)
 
     if (!password || !email) {
-        statsElement.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Please fill in all fields correctly.'
+        statsElement.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Please fill in all fields correctly'
         statsElement.className = "alert alert-warning"
 
         // Add visual feedback to empty fields
-        if (!email) document.getElementById("Email").classList.add("is-invalid")
-        if (!password) document.getElementById("Password").classList.add("is-invalid")
+        if (!email) emailElement.classList.add(invalidClass)
+        if (!password) passwordElement.classList.add(invalidClass)
 
         return;
     }
@@ -22,7 +27,10 @@ async function submit() {
     // Show loading state
     const submitButton = document.querySelector('button[onclick="submit()"]')
     const originalText = submitButton.innerHTML
-    submitButton.innerHTML = '<i class="bi bi-arrow-clockwise me-2" style="animation: spin 1s linear infinite;"></i>Signing in...'
+    submitButton.innerHTML = `
+    <div class="spinner-border" role="status">
+    </div>
+    Signing in...`
     submitButton.disabled = true
 
     let formData = new FormData()
@@ -37,6 +45,9 @@ async function submit() {
         })
 
         if (res.ok) {
+            emailElement.classList.remove(invalidClass)
+            passwordElement.classList.remove(invalidClass)
+
             statsElement.innerHTML = ""
             statsElement.className = ""
             window.location.reload()
@@ -56,19 +67,9 @@ async function submit() {
     statsElement.className = "alert alert-danger"
 
     // Add visual feedback to input fields
-    document.getElementById("Email").classList.add("is-invalid")
-    document.getElementById("Password").classList.add("is-invalid")
+    emailElement.classList.add(invalidClass)
+    passwordElement.classList.add(invalidClass)
 
     // Clear password field for security
-    document.getElementById("Password").value = ""
+    passwordElement.value = ""
 }
-
-// Add CSS for spinning animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-`;
-document.head.appendChild(style);

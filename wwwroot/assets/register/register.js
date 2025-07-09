@@ -21,17 +21,37 @@ function removeImage() {
     preview.classList.add('d-none');
 }
 
+var invalidClass = "is-invalid"
+
 async function submit() {
-    let username = document.getElementById("Username").value;
-    let password = document.getElementById("Password").value;
-    let email = document.getElementById("Email").value;
-    const stats = document.getElementById("Stats");
+    let usernameElement = document.getElementById("Username")
+    let passwordElement = document.getElementById("Password")
+    let emailElement = document.getElementById("Email")
+
+    let username = usernameElement.value;
+    let password = passwordElement.value;
+    let email = emailElement.value;
+    let stats = document.getElementById("Stats");
+
+    statsElement.className = "alert d-none"
+    emailElement.classList.remove(invalidClass)
+    passwordElement.classList.remove(invalidClass)
+    usernameElement.classList.remove(invalidClass)
 
     if (!username || !password || !email) {
         stats.className = "alert alert-warning";
-        stats.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>Please fill all fields with valid data`;
+        stats.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>Please fill all fields correctly`;
+
+        if (!email) emailElement.classList.add(invalidClass)
+        if (!password) passwordElement.classList.add(invalidClass)
+        if (!username) usernameElement.classList.add(invalidClass)
         return;
     }
+
+    const submitButton = document.querySelector('button[onclick="submit()"]')
+    const originalText = submitButton.innerHTML
+    submitButton.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Signing up...'
+    submitButton.disabled = true
 
     let formData = new FormData();
     formData.append("Name", username);
@@ -47,15 +67,31 @@ async function submit() {
         });
 
         if (res.ok) {
+            usernameElement.classList.remove(invalidClass)
+            emailElement.classList.remove(invalidClass)
+            passwordElement.classList.remove(invalidClass)
+            stats.innerHTML = ""
+            stats.className = ""
             window.location.reload();
             return;
         }
 
-        stats.className = "alert alert-danger";
-        stats.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>Invalid register`;
-
     } catch (err) {
-        stats.className = "alert alert-danger";
-        stats.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>An error occurred during registration`;
+        console.error('Register error:', err)
     }
+    // Reset button state
+    submitButton.innerHTML = originalText
+    submitButton.disabled = false
+
+    // Show error message
+    stats.className = "alert alert-danger";
+    stats.innerHTML = `<i class="bi bi-x-circle-fill me-2"></i>Invalid register`;
+
+    // Add visual feedback to input fields
+    usernameElement.classList.add(invalidClass)
+    emailElement.classList.add(invalidClass)
+    passwordElement.classList.add(invalidClass)
+
+    // Clear password field for security
+    passwordElement.value = ""
 }
