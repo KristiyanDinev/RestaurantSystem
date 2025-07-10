@@ -27,7 +27,7 @@ async function submit() {
     // Show loading state
     const submitButton = document.querySelector('button[onclick="submit()"]')
     const originalText = submitButton.innerHTML
-    submitButton.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Signing in..'
+    submitButton.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Signing in...'
     submitButton.disabled = true
 
     let formData = new FormData()
