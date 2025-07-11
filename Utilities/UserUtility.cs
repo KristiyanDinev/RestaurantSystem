@@ -36,7 +36,7 @@ namespace RestaurantSystem.Utilities
             return _encryptionUtility.Encrypt(
                 _jwtUtility.GenerateJWT(claims,
 
-                remeberMe ? DateTime.Now.AddDays(1.0) : null)
+                remeberMe ? null : DateTime.Now.AddDays(1.0))
                 );
         }
 
