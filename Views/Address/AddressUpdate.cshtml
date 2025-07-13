@@ -4,89 +4,221 @@
     ViewData["Title"] = "Update Address";
     AddressModel address = Model.Addresses.First();
 }
-
 <head>
     @await Html.PartialAsync("_Header")
     <script src="~/assets/address/address.js"></script>
 </head>
-
 <body>
     @await Html.PartialAsync("_NavBar", Model.User)
-    <h3>Update Address</h3>
-    <button onclick="goToAddresses()" type="button" class="btn btn-primary m-2">Go to Addresses</button>
 
-    <div class="card">
-        <div class="card-body form-group">
-            <h5 class="card-title">Address Information</h5>
-            <div class="card-text">
-                <label for="country" class="form-lable">Country:</label>
-                <p>@address.Country</p>
-                <div class="input-group">
-                    <select id="country" class="form-control" required>
-                    </select>
+    <!-- Hero Section -->
+    <div class="bg-warning bg-gradient py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8 text-dark">
+                    <h1 class="display-6 mb-3 fw-bold">
+                        <i class="bi bi-geo-alt-fill me-4"></i> Update Delivery Address
+                    </h1>
+                    <p class="mb-0 fw-medium">Keep your delivery information up to date for seamless service from Savans</p>
+                </div>
+                <div class="col-lg-4 text-lg-end text-dark">
+                    <i class="bi bi-house-door display-1" style="font-size: 3rem; opacity: 0.4;"></i>
                 </div>
             </div>
-            <div class="card-text">
-                <label for="state" class="form-lable">State / Province / Region:</label>
-                <p>@address.State</p>
-                <div class="input-group">
-                    <select id="state" class="form-control">
-                    </select>
-                </div>
-            </div>
-            <div class="card-text">
-                <label for="city" class="form-lable">City:</label>
-                <p>@address.City</p>
-                <div class="input-group">
-                    <select id="city" class="form-control" required>
-                    </select>
-                </div>
-            </div>
+        </div>
+    </div>
 
-            <div class="card-text">
-                <label for="address" class="form-lable">Address/Streat:</label>
-                <p>@address.Address</p>
-                <div class="input-group">
-                    <input type="text" id="address" class="form-control" value="@address.Address" placeholder="Your Streat address" required>
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Navigation Button -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a href="/addresses" class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Addresses
+                    </a>
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        All fields marked with <span class="text-danger">*</span> are required
+                    </small>
                 </div>
-            </div>
 
-            <div class="card-text">
-                <label for="phoneNumber" class="form-lable">Phone Number:</label>
-                <p>@address.PhoneNumber</p>
-                <div class="input-group">
-                    <input type="text" id="phoneNumber" class="form-control" placeholder="Your Phone Number: +1 1234567" value="@address.PhoneNumber" required />
+                <!-- Main Form Card -->
+                <div class="card shadow-lg border-warning mb-4">
+                    <div class="card-header bg-warning py-3">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title mb-0 text-body-emphasis fw-bold" 
+                                    style="color: var(--bs-dark) !important;">
+                                    <i class="bi bi-pencil-square me-2"></i>
+                                    Address Information
+                                </h4>
+                                <small style="color: var(--bs-gray-700) !important;">Update your delivery details below</small>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge bg-dark bg-body-dark">
+                                    <i class="bi bi-truck me-1"></i>
+                                    Delivery Address
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Country Section -->
+                        <div class="mb-4">
+                            <div class="row align-items-center mb-2">
+                                <div class="col">
+                                    <label for="country" class="form-label fw-semibold">
+                                        <i class="bi bi-globe me-2 text-warning"></i>
+                                        Country <span class="text-danger">*</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-2">
+                                <small class="text-muted">Current:</small>
+                                <strong class="ms-2">@address.Country</strong>
+                            </div>
+                            <select id="country" class="form-select form-select-lg">
+                                <option value="">Select Country</option>
+                            </select>
+                        </div>
+
+                        <!-- State/Province Section -->
+                        <div class="mb-4">
+                            <label for="state" class="form-label fw-semibold">
+                                <i class="bi bi-map me-2 text-warning"></i>
+                                State / Province / Region <span class="text-danger">*</span> <span class="text-muted fs-10">(if there is any)</span>
+                            </label>
+                            <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-2">
+                                <small class="text-muted">Current:</small>
+                                <strong class="ms-2">@address.State</strong>
+                            </div>
+                            <select id="state" class="form-select form-select-lg">
+                                <option value="">Select State/Province</option>
+                            </select>
+                        </div>
+
+                        <!-- City Section -->
+                        <div class="mb-4">
+                            <div class="row align-items-center mb-2">
+                                <div class="col">
+                                    <label for="city" class="form-label fw-semibold">
+                                        <i class="bi bi-building me-2 text-warning"></i>
+                                        City <span class="text-danger">*</span> <span class="text-muted fs-10">(if there is any)</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-2">
+                                <small class="text-muted">Current:</small>
+                                <strong class="ms-2">@address.City</strong>
+                            </div>
+                            <select id="city" class="form-select form-select-lg">
+                                <option value="">Select City</option>
+                            </select>
+                        </div>
+
+                        <!-- Address/Street Section -->
+                        <div class="mb-4">
+                            <div class="row align-items-center mb-2">
+                                <div class="col">
+                                    <label for="address" class="form-label fw-semibold">
+                                        <i class="bi bi-house-door me-2 text-warning"></i>
+                                        Street Address <span class="text-danger">*</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-2">
+                                <small class="text-muted">Current:</small>
+                                <strong class="ms-2">@address.Address</strong>
+                            </div>
+                            <input type="text" id="address" class="form-control form-control-lg"
+                                   value="@address.Address"
+                                   placeholder="Enter your street address (e.g., 123 Main Street, Apt 4B)">
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Include apartment, suite, or unit number if applicable
+                            </div>
+                        </div>
+
+                        <!-- Phone Number Section -->
+                        <div class="mb-4">
+                            <div class="row align-items-center mb-2">
+                                <div class="col">
+                                    <label for="phoneNumber" class="form-label fw-semibold">
+                                        <i class="bi bi-telephone me-2 text-warning"></i>
+                                        Phone Number <span class="text-danger">*</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-2">
+                                <small class="text-muted">Current:</small>
+                                <strong class="ms-2">@address.PhoneNumber</strong>
+                            </div>
+                            <input type="tel" id="phoneNumber" class="form-control form-control-lg"
+                                   placeholder="Enter your phone number (e.g., +1 234-567-8900)"
+                                   value="@address.PhoneNumber">
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Used for delivery coordination and order updates
+                            </div>
+                        </div>
+
+                        <!-- Postal Code Section -->
+                        <div class="mb-4">
+                            <div class="row align-items-center mb-2">
+                                <div class="col">
+                                    <label for="postalCode" class="form-label fw-semibold">
+                                        <i class="bi bi-mailbox me-2 text-warning"></i>
+                                        Postal / Zip Code <span class="text-danger">*</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-2">
+                                <small class="text-muted">Current:</small>
+                                <strong class="ms-2">@address.PostalCode</strong>
+                            </div>
+                            <input type="text" id="postalCode" class="form-control form-control-lg"
+                                   value="@address.PostalCode"
+                                   placeholder="Enter postal/zip code (e.g., 12345)">
+                        </div>
+
+                        <!-- Notes Section -->
+                        <div class="mb-4">
+                            <label for="notes" class="form-label fw-semibold">
+                                <i class="bi bi-chat-dots me-2 text-warning"></i>
+                                Delivery Notes
+                                <small class="text-muted fw-normal">(Optional)</small>
+                            </label>
+                            <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-2">
+                                <small class="text-muted">Current:</small>
+                                <strong class="ms-2">@(string.IsNullOrEmpty(address.Notes) ? "No notes..." : address.Notes)</strong>
+                            </div>
+                            <textarea rows="4" id="notes" class="form-control"
+                                      placeholder="Add any special delivery instructions (e.g., 'Ring doorbell twice', 'Leave at front desk', 'Gate code: 1234')">@address.Notes</textarea>
+                            <div class="form-text">
+                                <i class="bi bi-lightbulb me-1"></i>
+                                Help our delivery team find you easily with specific instructions
+                            </div>
+                        </div>
+
+                        <!-- Status Message -->
+                        <div id="status" class="mb-4"></div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <button onclick="updateAddress('@address.Id')" type="button" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Update Address
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="card-text">
-                <label for="postalCode" class="form-lable">Postal/Zip Code:</label>
-                <p>@address.PostalCode</p>
-                <div class="input-group">
-                    <input type="text" id="postalCode" class="form-control" value="@address.PostalCode" placeholder="Your Postal/Zip Code: 12345" required />
-                </div>
-            </div>
-
-            <div class="card-text">
-                <label for="notes" class="form-lable">Notes:</label>
-                <p>@address.Notes</p>
-                <div class="input-group">
-                    <textarea rows="3" id="notes" class="form-control">@address.Notes</textarea>
-                </div>
-            </div>
-
-            <p id="status"></p>
-
-            <div class="card-text">
-                <button onclick="updateAddress('@address.Id')" type="button" class="btn btn-success m-2">Update</button>
             </div>
         </div>
     </div>
 
     @await Html.PartialAsync("_Footer")
-    <script src="~/assets/index.js"></script>
     <script src='~/assets/user_location.js'></script>
-
     <script>
         load('@address.Country', '@address.State', '@address.City')
     </script>

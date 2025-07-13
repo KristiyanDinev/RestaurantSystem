@@ -56,8 +56,18 @@ namespace RestaurantSystem.Controllers {
                 loginFormModel.Email, loginFormModel.Password);
             if (loggedIn == null)
             {
+                TempData["Email"] = loginFormModel.Email;
+                TempData["Error"] = true;
                 return BadRequest();
             }
+
+            if (!await _userService.UpdateLastLoginDate(loggedIn)) {
+                TempData["Email"] = loginFormModel.Email;
+                TempData["LastLoginUpdateError"] = true;
+                return BadRequest();
+            }
+
+            TempData["LoginSuccess"] = true;
 
             _userUtility.SetUserAuthBearerHeader(
                 HttpContext,
@@ -81,8 +91,13 @@ namespace RestaurantSystem.Controllers {
             UserModel? registered = await _userService.RegisterUserAsync(registerFormModel);
             if (registered == null)
             {
+                TempData["Email"] = registerFormModel.Email;
+                TempData["Name"] = registerFormModel.Name;
+                TempData["Error"] = true;
                 return BadRequest();
             }
+
+            TempData["RegisterSuccess"] = true;
 
             _userUtility.SetUserAuthBearerHeader(
                 HttpContext,

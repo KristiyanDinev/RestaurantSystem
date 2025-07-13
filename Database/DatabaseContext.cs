@@ -115,6 +115,11 @@ namespace RestaurantSystem.Database {
                 .HasDefaultValueSql("NOW()");
 
             builder.Entity<UserModel>()
+                .Property(user => user.LastTimeLogedIn)
+                .IsRequired()
+                .HasDefaultValue(DateOnly.FromDateTime(DateTime.Now));
+
+            builder.Entity<UserModel>()
                 .HasOne(user => user.Restaurant)
                 .WithMany(restaurat => restaurat.Employees)
                 .HasForeignKey(user => user.RestaurantId);

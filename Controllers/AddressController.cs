@@ -26,7 +26,7 @@ namespace RestaurantSystem.Controllers
 
         [HttpGet]
         [Route("/addresses")]
-        public async Task<IActionResult> Addresses() {
+        public async Task<IActionResult> Addresses([FromQuery] int page = 1) {
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
             {
@@ -35,8 +35,9 @@ namespace RestaurantSystem.Controllers
 
             return View(new AddressesViewModel
             {
-                Addresses = await _addressService.GetUserAddressesAsync(user.Id),
-                User = user
+                Addresses = await _addressService.GetUserAddressesAsync(user.Id, page),
+                User = user,
+                Page = page,
             });
         }
 
@@ -60,7 +61,8 @@ namespace RestaurantSystem.Controllers
             return View(new AddressesViewModel
             {
                 Addresses = new List<AddressModel> { address },
-                User = user
+                User = user,
+                Page = -1, // -1 indicates this is an update page
             });
         }
 
@@ -79,7 +81,7 @@ namespace RestaurantSystem.Controllers
 
 
         [HttpPost]
-        [Route("/address/{address_id}")]
+        [Route("/address/delete/{address_id}")]
         public async Task<IActionResult> DeleteAddress(long address_id)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
@@ -90,7 +92,7 @@ namespace RestaurantSystem.Controllers
 
             if (await _addressService.DeleteAddressAsync(address_id))
             {
-                TempData["Success"] = "Address deleted successfully.";
+                TempData["DeleteSuccess"] = true;
                 return Ok();
             }
             else
@@ -118,7 +120,7 @@ namespace RestaurantSystem.Controllers
 
             if (await _addressService.UpdateAddressAsync(addressUpdateForm))
             {
-                TempData["Success"] = "Address updated successfully.";
+                TempData["UpdateSuccess"] = true;
                 return Ok();
             }
             else 
@@ -146,7 +148,7 @@ namespace RestaurantSystem.Controllers
 
             if (await _addressService.AddAddressAsync(user.Id, addAddressForm))
             {
-                TempData["Success"] = "Address added successfully.";
+                TempData["AddSuccess"] = true;
                 return Ok();
 
             } else

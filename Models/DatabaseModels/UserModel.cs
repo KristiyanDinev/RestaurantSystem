@@ -6,6 +6,7 @@
         public required string Password { get; set; }
         public string? Image { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateOnly LastTimeLogedIn { get; set; }
 
 
         public int? RestaurantId { get; set; }

@@ -10,7 +10,7 @@
 @await Html.PartialAsync("_ChangeTheme")
 
 <div class="d-flex py-4">
-    <div class="form-signin w-100 m-auto">
+    <div class="form-signin m-auto">
         <div class="container align-items-center">
             <div>
                 @await Html.PartialAsync("_RestaurantLogoText")
@@ -18,13 +18,13 @@
             </div>
 
             <div class="form-floating">
-                <input type="email" class="form-control" id="Email" placeholder="name@example.com" maxlength="50" required>
+                <input type="email" class="form-control" id="Email" placeholder="name@example.com" maxlength="50" value="@TempData["Email"]">
                 <label for="Email">
                     <i class="bi bi-envelope-fill me-2"></i>Email <span class="text-danger">*</span>
                 </label>
             </div>
             <div class="form-floating">
-                <input type="password" class="form-control" id="Password" placeholder="Password" required>
+                <input type="password" class="form-control" id="Password" placeholder="Password">
                 <label for="Password">
                     <i class="bi bi-lock-fill me-2"></i>Password <span class="text-danger">*</span>
                 </label>
@@ -38,7 +38,17 @@
             </div>
 
             <div class="mb-3">
-                <div id="Stats" class="alert d-none" role="alert"></div>
+                @await Html.PartialAsync("_ErrorMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
+                {
+                    Key = "Error",
+                    Message = "Invalid email or password. Please try again."
+                })
+
+                @await Html.PartialAsync("_ErrorMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
+                                {
+                    Key = "LastLoginUpdateError",
+                    Message = "An error occurred while updating the last login time. Please try again later."
+                })
             </div>
 
             <button class="btn btn-warning w-100 py-2 fw-semibold" type="button" onclick="submit()">
@@ -59,6 +69,5 @@
     </div>
 
     @await Html.PartialAsync("_Footer")
-    <script src="~/assets/index.js"></script>
     <script src='~/assets/login/login.js'></script>
 </div>

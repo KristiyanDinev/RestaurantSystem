@@ -1,39 +1,56 @@
-﻿
+﻿var isInvalid = 'is-invalid'
 async function deleteAddress(addressId) {
     if (!confirm('Are you sure you want to delete this address?')) {
         return;
     }
 
     try {
-        const response = await fetch(`/address/${addressId}`, {
+        await fetch(`/address/delete/${addressId}`, {
             method: 'POST'
         });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        window.location.pathname = '/addresses'
+        window.location.reload()
 
-    } catch (error) {
-        document.getElementById('status').innerHTML = 'Error while deleting address.';
-    }
+    } catch {}
 }
 
 async function updateAddress(addressId) {
     if (!confirm('Are you sure you want to update this address?')) {
         return;
     }
+    let countryElement = document.getElementById('country');
+    let addressElement = document.getElementById('address');
+    let postalCodeElement = document.getElementById('postalCode');
+    let phoneNumberElement = document.getElementById('phoneNumber');
 
-    let country = document.getElementById('country').value;
-    let address = document.getElementById('address').value;
-    let postalCode = document.getElementById('postalCode').value;
-    let phoneNumber = document.getElementById('phoneNumber').value;
+    countryElement.classList.remove(isInvalid);
+    addressElement.classList.remove(isInvalid);
+    postalCodeElement.classList.remove(isInvalid);
+    phoneNumberElement.classList.remove(isInvalid);
 
-    let status = document.getElementById('status');
+    let country = countryElement.value;
+    let address = addressElement.value;
+    let postalCode = postalCodeElement.value;
+    let phoneNumber = phoneNumberElement.value;
 
-    if (!country || !address || !postalCode || !phoneNumber) {
-        status.innerHTML = 'Please fill in all required fields.';
-        return;
+    if (!country) {
+        countryElement.classList.add(isInvalid);
+        return
+    }
+
+    if (!address) {
+        addressElement.classList.add(isInvalid);
+        return
+    }
+
+    if (!postalCode) {
+        postalCodeElement.classList.add(isInvalid);
+        return
+    }
+
+    if (!phoneNumber) {
+        phoneNumberElement.classList.add(isInvalid);
+        return
     }
 
     let formData = new FormData()
@@ -47,30 +64,49 @@ async function updateAddress(addressId) {
     formData.append('Notes', document.getElementById('notes').value)
 
     try {
-        const response = await fetch(`/address/update`, {
+        await fetch(`/address/update`, {
             method: 'POST',
             body: formData
         });
-
-        if (!response.ok) {
-            throw new Error();
-        }
         window.location.pathname = '/addresses'
 
-    } catch {
-        status.innerHTML = 'Error while updating address.';
-    }
+    } catch {}
 }
 
 async function addAddress() {
-    let country = document.getElementById('country').value; 
-    let address = document.getElementById('address').value;
-    let postalCode = document.getElementById('postalCode').value;
-    let phoneNumber = document.getElementById('phoneNumber').value;
+    let countryElement = document.getElementById('country');
+    let addressElement = document.getElementById('address');
+    let postalCodeElement = document.getElementById('postalCode');
+    let phoneNumberElement = document.getElementById('phoneNumber');
 
-    if (!country || !address || !postalCode || !phoneNumber) {
-        document.getElementById('status').innerHTML = 'Please fill in all required fields.';
-        return;
+    countryElement.classList.remove(isInvalid);
+    addressElement.classList.remove(isInvalid);
+    postalCodeElement.classList.remove(isInvalid);
+    phoneNumberElement.classList.remove(isInvalid);
+
+    let country = countryElement.value;
+    let address = addressElement.value;
+    let postalCode = postalCodeElement.value;
+    let phoneNumber = phoneNumberElement.value;
+
+    if (!country) {
+        countryElement.classList.add(isInvalid);
+        return
+    }
+
+    if (!address) {
+        addressElement.classList.add(isInvalid);
+        return
+    }
+
+    if (!postalCode) {
+        postalCodeElement.classList.add(isInvalid);
+        return
+    }
+
+    if (!phoneNumber) {
+        phoneNumberElement.classList.add(isInvalid);
+        return
     }
 
     let formData = new FormData()
@@ -83,17 +119,12 @@ async function addAddress() {
     formData.append('Notes', document.getElementById('notes').value)
 
     try {
-        const response = await fetch(`/address/add`, {
+        await fetch(`/address/add`, {
             method: 'POST',
             body: formData
         });
 
-        if (!response.ok) {
-            throw new Error();
-        }
         window.location.pathname = '/addresses'
         
-    } catch {
-        document.getElementById('status').innerHTML = 'Error while adding address.';
-    }
+    } catch {}
 }

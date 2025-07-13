@@ -6,7 +6,6 @@
 
 <head>
     @await Html.PartialAsync("_Header")
-    <script src="~/assets/index.js"></script>
     <script src="~/assets/staff/delivery/delivery.js"></script>
 </head>
 
@@ -22,10 +21,12 @@
         <a class="btn btn-success m-2" href="/addresses">Make Address</a>
     }
 
+    @await Html.PartialAsync("_Paging", Model.Page)
+
     <div class="m-2 container">
         @foreach (AddressModel address in Model.Addresses)
         {
-            <div class="col-md-4 mb-3" style="cursor: pointer;" onclick="selectAddress('@address.Id')">
+            <div class="page-row col-md-4 mb-3" style="cursor: pointer;" onclick="selectAddress('@address.Id')">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Address Information</h5>

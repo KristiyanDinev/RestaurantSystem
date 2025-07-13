@@ -19,12 +19,12 @@
 
             <div novalidate>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="Username" placeholder="Enter username" maxlength="100" required>
+                    <input type="text" class="form-control" id="Username" placeholder="Enter username" maxlength="100" value="@TempData["Name"]">
                     <label for="Username"><i class="bi bi-person-fill me-2"></i>Username <span class="text-danger">*</span></label>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="Email" placeholder="Enter email" maxlength="100" required>
+                    <input type="email" class="form-control" id="Email" placeholder="Enter email" maxlength="100" value="@TempData["Email"]">
                     <label for="Email"><i class="bi bi-envelope-fill me-2"></i>Email <span class="text-danger">*</span></label>
                 </div>
 
@@ -50,7 +50,11 @@
                 </div>
 
                 <div class="mb-3">
-                    <div id="Stats" class="alert d-none" role="alert"><i class="bi bi-exclamation-triangle-fill me-2"></i></div>
+                    @await Html.PartialAsync("_ErrorMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
+                    {
+                        Key = "Error",
+                        Message = "Invalid account details. Please try again."
+                    })
                 </div>
 
                 <button type="button" class="btn btn-warning w-100 py-2 fw-semibold mb-3" onclick="submit()">

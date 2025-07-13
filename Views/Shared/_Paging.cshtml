@@ -1,16 +1,56 @@
 ﻿@model int; // current page
-
-<div class="container m-2 justify-content-center text-center">
-    @if (Model > 1)
-    {
-        // move forward and backword
-        <button onclick="page(@(Model - 1), @Model)" class="btn btn-info btn-sm">⏪ Page <b>@(Model - 1)</b></button>
-        <button class="btn btn-primary btn-sm" disabled>Current Page <b>@Model</b></button>
-        <button onclick="page(@(Model + 1), @Model)" class="btn btn-info btn-sm">Page <b>@(Model + 1)</b> ⏩</button>
-    }
-    else
-    {
-        // move only forward
-        <button onclick="page(@(Model + 1), @Model)" class="btn btn-info btn-sm">Page <b>@(Model + 1)</b> ⏩</button>
-    }
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <nav aria-label="Address pagination">
+                <ul class="pagination pagination-sm mb-0">
+                    @if (Model > 1)
+                    {
+                        <!-- Previous Page Button -->
+                        <li class="page-item">
+                            <button onclick="page(@(Model - 1), @Model)" class="page-link text-warning border-warning">
+                                <i class="bi bi-chevron-left me-1"></i>
+                                Previous
+                            </button>
+                        </li>
+                        <!-- Page Numbers -->
+                        @if (Model > 2)
+                        {
+                            <li class="page-item">
+                                <button onclick="page(1, @Model)" class="page-link text-warning border-warning">1</button>
+                            </li>
+                            @if (Model > 3)
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link text-warning border-warning">...</span>
+                                </li>
+                            }
+                        }
+                        <!-- Previous Page Number -->
+                        <li class="page-item">
+                            <button onclick="page(@(Model - 1), @Model)" class="page-link text-warning border-warning">@(Model - 1)</button>
+                        </li>
+                    }
+                    <!-- Current Page -->
+                    <li class="page-item active">
+                        <span class="page-link bg-warning border-warning" style="color: var(--bs-dark) !important;">
+                            @Model
+                            <span class="visually-hidden">(current)</span>
+                        </span>
+                    </li>
+                    <!-- Next Page Number -->
+                    <li class="page-item">
+                        <button onclick="page(@(Model + 1), @Model)" class="page-link text-warning border-warning">@(Model + 1)</button>
+                    </li>
+                    <!-- Next Page Button -->
+                    <li class="page-item">
+                        <button onclick="page(@(Model + 1), @Model)" class="page-link text-warning border-warning">
+                            Next
+                            <i class="bi bi-chevron-right ms-1"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>

@@ -40,7 +40,7 @@ namespace RestaurantSystem.Controllers.Staff
 
         [HttpGet]
         [Route("/staff/delivery/address")]
-        public async Task<IActionResult> DeliveryAddress()
+        public async Task<IActionResult> DeliveryAddress([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
@@ -55,7 +55,8 @@ namespace RestaurantSystem.Controllers.Staff
             return View(new AddressesViewModel()
             {
                 User = user,
-                Addresses = await _addressService.GetUserAddressesAsync(user.Id)
+                Addresses = await _addressService.GetUserAddressesAsync(user.Id, page),
+                Page = page,
             });
         }
 

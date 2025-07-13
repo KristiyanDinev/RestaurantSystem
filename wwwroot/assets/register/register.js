@@ -31,25 +31,26 @@ async function submit() {
     let username = usernameElement.value;
     let password = passwordElement.value;
     let email = emailElement.value;
-    let stats = document.getElementById("Stats");
 
-    stats.className = "alert d-none"
     emailElement.classList.remove(invalidClass)
     passwordElement.classList.remove(invalidClass)
     usernameElement.classList.remove(invalidClass)
 
-    if (!username || !password || !email) {
-        stats.className = "alert alert-warning";
-        stats.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>Please fill all fields correctly`;
-
-        if (!email) emailElement.classList.add(invalidClass)
-        if (!password) passwordElement.classList.add(invalidClass)
-        if (!username) usernameElement.classList.add(invalidClass)
-        return;
+    if (!email) {
+        emailElement.classList.add(invalidClass)
+        return
+    }
+    if (!password) {
+        passwordElement.classList.add(invalidClass)
+        return
+    } 
+    if (!username) {
+        usernameElement.classList.add(invalidClass)
+        return
     }
 
+
     const submitButton = document.querySelector('button[onclick="submit()"]')
-    const originalText = submitButton.innerHTML
     submitButton.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Signing up...'
     submitButton.disabled = true
 
@@ -61,37 +62,17 @@ async function submit() {
     formData.append("RememberMe", document.getElementById('RememberMe').checked);
 
     try {
-        const res = await fetch("/register", {
+        await fetch("/register", {
             method: "POST",
             body: formData,
         });
 
-        if (res.ok) {
-            usernameElement.classList.remove(invalidClass)
-            emailElement.classList.remove(invalidClass)
-            passwordElement.classList.remove(invalidClass)
-            stats.innerHTML = ""
-            stats.className = ""
-            window.location.reload();
-            return;
-        }
+        usernameElement.classList.remove(invalidClass)
+        emailElement.classList.remove(invalidClass)
+        passwordElement.classList.remove(invalidClass)
+        window.location.reload();
 
     } catch (err) {
         console.error('Register error:', err)
     }
-    // Reset button state
-    submitButton.innerHTML = originalText
-    submitButton.disabled = false
-
-    // Show error message
-    stats.className = "alert alert-danger";
-    stats.innerHTML = `<i class="bi bi-x-circle-fill me-2"></i>Invalid register`;
-
-    // Add visual feedback to input fields
-    usernameElement.classList.add(invalidClass)
-    emailElement.classList.add(invalidClass)
-    passwordElement.classList.add(invalidClass)
-
-    // Clear password field for security
-    passwordElement.value = ""
 }

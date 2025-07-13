@@ -70,6 +70,12 @@ namespace RestaurantSystem.Services
                 user.Password.Equals(hash_password));
         }
 
+        public async Task<bool> UpdateLastLoginDate(UserModel user)
+        {
+            user.LastTimeLogedIn = DateOnly.FromDateTime(DateTime.Now);
+            return await _databaseContext.SaveChangesAsync() >= 0;
+        }
+
         public async Task<bool> UpdateUserAsync(UserModel user, 
             ProfileUpdateFormModel profileUpdateForm)
         {

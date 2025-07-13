@@ -15,11 +15,17 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<List<AddressModel>> GetUserAddressesAsync(long user_id)
+        public async Task<List<AddressModel>> GetUserAddressesAsync(long user_id, int page = -1)
         {
-            return await _databaseContext.Addresses
-                .Where(a => a.UserId == user_id)
-                .ToListAsync();
+            if (page < 0)
+            {
+                return await _databaseContext.Addresses
+                    .Where(a => a.UserId == user_id)
+                    .ToListAsync();
+            }
+
+            return await Utility.GetPageAsync<AddressModel>(_databaseContext.Addresses
+                .Where(a => a.UserId == user_id).AsQueryable(), page).ToListAsync();
         }
 
         public async Task<bool> AddAddressAsync(long user_id, AddAddressFormModel addAddressForm)

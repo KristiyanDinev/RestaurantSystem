@@ -1,0 +1,11 @@
+﻿@model RestaurantSystem.Models.View.Messages.MessageViewModel;
+
+@if (TempData.Peek(Model.Key) != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-x-circle-fill me-2"></i>
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    TempData.Remove(Model.Key);
+}
