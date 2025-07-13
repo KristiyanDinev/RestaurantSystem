@@ -25,7 +25,9 @@ namespace RestaurantSystem.Services
             }
 
             return await Utility.GetPageAsync<AddressModel>(_databaseContext.Addresses
-                .Where(a => a.UserId == user_id).AsQueryable(), page).ToListAsync();
+                .Where(a => a.UserId == user_id)
+                .OrderBy(a => a.Country)
+                .AsQueryable(), page).ToListAsync();
         }
 
         public async Task<bool> AddAddressAsync(long user_id, AddAddressFormModel addAddressForm)

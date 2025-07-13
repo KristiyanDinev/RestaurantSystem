@@ -88,8 +88,9 @@ namespace RestaurantSystem.Services
         {
             List<DishModel>? dishes = await Utility.GetPageAsync<DishModel>(
                 _databaseContext.Dishies
-                .Where(dish => dish.RestaurantId == restaurantId).AsQueryable(),
-                page)
+                .Where(dish => dish.RestaurantId == restaurantId)
+                .OrderBy(dish => dish.Name)
+                .AsQueryable(), page)
                 .ToListAsync();
             return dishes ?? new List<DishModel>();
         }

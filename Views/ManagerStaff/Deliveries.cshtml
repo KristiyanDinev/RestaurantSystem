@@ -60,18 +60,18 @@
                     <h4 class="card-text">User Contact</h4>
                     <p class="card-text">Name: @order.User.Name</p>
                     <p class="card-text">Email: @order.User.Email</p>
-                    <p class="card-text">Phone Number: @order.Address.PhoneNumber</p>
+                    <p class="card-text">Phone Number: @order.UserAddress.PhoneNumber</p>
                     @if (order.User.Image != null)
                     {
                         <img class="img img-thumbnail rounded m-2" src="@order.User.Image" />
                     }
 
                     <h4 class="card-text">Address Information</h4>
-                    <p class="card-text">Country: @order.Address.Country</p>
-                    <p class="card-text">State / Region / Province: @order.Address.State</p>
-                    <p class="card-text">City: @order.Address.City</p>
-                    <p class="card-text">Address: @order.Address.Address</p>
-                    <p class="card-text">Postal Code: @order.Address.PostalCode</p>
+                    <p class="card-text">Country: @order.UserAddress.Country</p>
+                    <p class="card-text">State / Region / Province: @order.UserAddress.State</p>
+                    <p class="card-text">City: @order.UserAddress.City</p>
+                    <p class="card-text">Address: @order.UserAddress.Address</p>
+                    <p class="card-text">Postal Code: @order.UserAddress.PostalCode</p>
 
                     <p class="card-text">Order Notes: @order.Notes</p>
 

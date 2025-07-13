@@ -21,7 +21,7 @@ namespace RestaurantSystem.Models.DatabaseModels {
 
 
         public long? UserAddressId { get; set; }
-        public AddressModel Address { get; set; } = null!;
+        public AddressModel UserAddress { get; set; } = null!;
 
 
         // navigation

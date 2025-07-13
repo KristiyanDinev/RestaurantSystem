@@ -1,14 +1,8 @@
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Configuration;
-using RestaurantSystem.Database;
+using RestaurantSystem.Extentions;
 using RestaurantSystem.Middlewares;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
-using System.Data;
-using System.Data.Common;
-using System.Threading.RateLimiting;
+using Serilog;
 
 namespace RestaurantSystem
 {
@@ -16,29 +10,31 @@ namespace RestaurantSystem
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Current Working Directory: "+ Directory.GetCurrentDirectory());
-            Console.WriteLine("Configuring");
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddSession(options => {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
+            // Configure Serilog
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .CreateLogger();
+
+            // Replace default logging with Serilog
+            builder.Host.UseSerilog((context, loggerConfig) =>
+            {
+                loggerConfig.ReadFrom.Configuration(context.Configuration);
             });
-            builder.Services.AddControllersWithViews()
-                .AddCookieTempDataProvider(options =>
-                {
-                    options.Cookie.Name = "restaurant_temp_data";
-                });
+
+            Log.Information("Current Working Directory: " + Directory.GetCurrentDirectory());
+            Log.Information("Configuring");
+
+            builder.Host.UseSessions();
+            builder.Host.UseControllersWithViews();
 
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
 
             builder.WebHost.UseUrls([uri]);
-            builder.Services.AddDbContext<DatabaseContext>(options =>
-            {
-                options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString"));
-            });
+
+            builder.Host.UseDatabaseContext(builder.Configuration);
 
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<DishService>();
@@ -63,23 +59,29 @@ namespace RestaurantSystem
             builder.Services.AddScoped<UserUtility>();
             builder.Services.AddScoped<WebSocketService>();
             builder.Services.AddSingleton<WebSocketUtility>();
-
-            builder.Services.AddRateLimiter(_ => _
-                .AddFixedWindowLimiter(policyName: "fixed", options => {
-                    options.PermitLimit = 1;
-                    options.Window = TimeSpan.FromSeconds(1);
-                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                    options.QueueLimit = 2;
-                })
-            );
+            builder.Host.UseRateLimits();
 
             WebApplication app = builder.Build();
-            app.UseWebSockets(new WebSocketOptions
+
+            string ipPort = uri.Split("/").Last();
+            // Security headers middleware
+            app.Use(async (context, next) =>
             {
-                KeepAliveInterval = TimeSpan.FromMinutes(2),
-                AllowedOrigins = { uri }
+                // Content Security Policy
+                context.Response.Headers.Add("Content-Security-Policy",
+                    "default-src 'self';" +
+                    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com;" +
+                    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com;" +
+                    "font-src 'self' https://cdn.jsdelivr.net;" +
+                    "img-src 'self' data: https:;" +
+                    "connect-src 'self' ws://localhost:* wss://localhost:* ws://127.0.0.1:* wss://127.0.0.1:* wss://" +
+                    ipPort + " ws://"+ ipPort + " wss://"+ ipPort+";");
+
+                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+                await next();
             });
 
+            app.UseWebSockets(uri);
             app.UseSession();
             app.UseRateLimiter();
             app.UseRouting();
@@ -88,26 +90,7 @@ namespace RestaurantSystem
             app.UseWebSocketMiddleware();
             app.UseLoggingMiddleware();
             app.MapControllers();
-
-            Console.WriteLine("Start up SQL executing...");
-            string? sqlFile = builder.Configuration.GetValue<string>("StartUpSQLFile");
-            if (sqlFile != null && File.Exists(sqlFile)) {
-                using IServiceScope scope = app.Services.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                using var connection = dbContext.Database.GetDbConnection();
-                if (connection.State != ConnectionState.Open)
-                {
-                    connection.Open();
-                }
-
-
-                using var command = connection.CreateCommand();
-                command.CommandText = File.ReadAllText(sqlFile);
-                command.CommandTimeout = 300000;
-                command.ExecuteNonQuery();
-            }
-
-            Console.WriteLine("SQL executed");
+            app.UseStartupSQL(app);
 
             app.Run();
         }

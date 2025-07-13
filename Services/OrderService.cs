@@ -88,7 +88,7 @@ namespace RestaurantSystem.Services
         {
             return await _databaseContext.Orders
                 .Include(order => order.Restaurant)
-                .Include(order => order.Address)
+                .Include(order => order.UserAddress)
                 .Include(order => order.OrderedDishes)
                 .Where(order => 
                 order.UserId == userId && 
@@ -122,7 +122,7 @@ namespace RestaurantSystem.Services
         public async Task<List<OrderModel>> GetDeliveryOrdersByRestaurantIdAsync(int restaurantId)
         {
             return await _databaseContext.Orders
-                .Include(order => order.Address)
+                .Include(order => order.UserAddress)
                 .Include(order => order.User)
                 .Where(order =>
                 order.RestaurantId == restaurantId &&
@@ -154,13 +154,14 @@ namespace RestaurantSystem.Services
         public async Task<List<OrderModel>> GetDeliveredOrdersAsync(int restaurantId, int page)
         {
             return await Utility.GetPageAsync<OrderModel>(_databaseContext.Orders
-                .Include(order => order.Address)
+                .Include(order => order.UserAddress)
                 .Include(order => order.User)
                 .Include(order => order.Delivery)
                 .Where(order =>
                 order.RestaurantId == restaurantId &&
                 order.TableNumber == null &&
                 order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivered.ToString()))
+                .OrderBy(order => order.UserAddress.Country)
                 .AsQueryable(), page)
                 .ToListAsync();
         }

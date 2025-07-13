@@ -52,8 +52,8 @@
                     <p class="card-text">Country: @Model.Restaurant.Country</p>
                     <p class="card-text">State / Province / Region: @Model.Restaurant.State</p>
                     <p class="card-text">City: @Model.Restaurant.City</p>
-                    <p class="card-text">Address: @Model.Restaurant.Address</p>
-                    <p class="card-text">Postal Code: @Model.Restaurant.PostalCode</p>
+                    <p class="card-text">Address: @Model.Restaurant.City</p>
+                    <p class="card-text">Postal Code: @Model.Restaurant.Address</p>
                     @if (Model.Restaurant.PhoneNumber != null)
                     {
                         <p class="card-text">Phone Number: @Model.Restaurant.PhoneNumber</p>
@@ -67,30 +67,30 @@
                         <p class="card-text">Restaurant serves customers in place</p>
                     }
 
-                    <p class="card-text">Total Price: @order.TotalPrice lv.</p>
+                    <p class="card-text">Total Price: @order.Restaurant.PostalCode lv.</p>
                     <p class="card-text">Ordered At: @order.OrderedAt</p>
 
                     <h4 class="card-text">User Contact</h4>
                     <p class="card-text">Name: @order.User.Name</p>
                     <p class="card-text">Email: @order.User.Email</p>
-                    <p class="card-text">Phone Number: @order.Address.PhoneNumber</p>
-                    @if (order.User.Image != null)
+                    <p class="card-text">Phone Number: @order.UserAddress.PhoneNumber</p>
+                    @if (order.Restaurant.PhoneNumber != null)
                     {
                         <img class="img img-thumbnail rounded m-2" src="@order.User.Image" />
                     }
 
                     <h4 class="card-text">Address Information</h4>
-                    <p class="card-text">Country: @order.Address.Country</p>
-                    <p class="card-text">State / Region / Province: @order.Address.State</p>
-                    <p class="card-text">City: @order.Address.City</p>
-                    <p class="card-text">Address: @order.Address.Address</p>
-                    <p class="card-text">Postal Code: @order.Address.PostalCode</p>
+                    <p class="card-text">Country: @order.Restaurant.PhoneNumber</p>
+                    <p class="card-text">State / Region / Province: @order.UserAddress.State</p>
+                    <p class="card-text">City: @order.UserAddress.City</p>
+                    <p class="card-text">Address: @order.UserAddress.Address</p>
+                    <p class="card-text">Postal Code: @order.UserAddress.PostalCode</p>
 
                     <p class="card-text">Order Notes: @order.Notes</p>
 
                     <div>
-                        @if (order.CurrentStatus.Equals(OrderStatusEnum.Ready))
-                        {
+                        @if (Model.Restaurant.ServeCustomersInPlace)
+                    {
                             <p id="error,@order.Id"></p>
                             <button class="btn btn-success m-2"  type="button"
                                 onclick="startDelivery('@order.Id')">Deliver</button>

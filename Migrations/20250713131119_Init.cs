@@ -119,6 +119,7 @@ namespace RestaurantSystem.Migrations
                     Password = table.Column<string>(type: "text", nullable: false),
                     Image = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                    LastTimeLogedIn = table.Column<DateOnly>(type: "date", nullable: false, defaultValue: new DateOnly(2025, 7, 13)),
                     RestaurantId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>

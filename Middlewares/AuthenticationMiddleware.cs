@@ -17,24 +17,19 @@ namespace RestaurantSystem.Services
             UserUtility userUtility, RoleService roleService)
         {
             string path = context.Request.Path.Value ?? "/";
-
             if (path.StartsWith(staff_endpoint_prefix))
             {
                 if (path.Contains('?'))
                 {
                     path = path.Split('?')[0];
                 }
-
                 path = path.Last() == '/' ? path.Remove(path.LastIndexOf('/')) : path;
-
                 Dictionary<string, object>? claims = await userUtility.GetAuthClaimFromJWT(context);
-
                 if (claims == null || !claims.TryGetValue("Id", out object? value) ||
                     !int.TryParse((string?)value, out int Id))
                 {
                     return;
                 }
-
                 if (!await roleService.CanUserAccessServiceAsync(Id, path))
                 {
                     // user doesn't have the roles to do so.
@@ -48,7 +43,7 @@ namespace RestaurantSystem.Services
         }
     }
 
-    public static class AuthenticationMiddlewareExtensions
+    public static class AuthenticationMiddlewareExtension
     {
         public static IApplicationBuilder UseAuthenticationMiddleware(
             this IApplicationBuilder builder)

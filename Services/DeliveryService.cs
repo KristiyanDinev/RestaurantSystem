@@ -24,7 +24,7 @@ namespace RestaurantSystem.Services
         {
             return await _databaseContext.Delivery
                 .Include(d => d.Order)
-                .Include(d => d.Order.Address)
+                .Include(d => d.Order.UserAddress)
                 .Include(d => d.Order.Restaurant)
                 .Include(d => d.Order.User)
                 .FirstOrDefaultAsync(d => d.UserId == user_id);

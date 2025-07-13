@@ -148,6 +148,7 @@ namespace RestaurantSystem.Services
                 .Include(user => user.Roles)
                 .ThenInclude(role => role.Role)
                 .Where(user => user.RestaurantId == restaurantId)
+                .OrderBy(user => user.Name)
                 .AsQueryable(), page)
                 .ToListAsync();
             return employees ?? new List<UserModel>();

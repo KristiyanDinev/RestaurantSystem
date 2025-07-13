@@ -17,7 +17,7 @@ namespace RestaurantSystem.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dish_status_enum", new[] { "pending", "preparing", "ready" });
@@ -537,7 +537,7 @@ namespace RestaurantSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RestaurantSystem.Models.DatabaseModels.AddressModel", "Address")
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.AddressModel", "UserAddress")
                         .WithMany("Orders")
                         .HasForeignKey("UserAddressId");
 
@@ -547,11 +547,11 @@ namespace RestaurantSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Address");
-
                     b.Navigation("Restaurant");
 
                     b.Navigation("User");
+
+                    b.Navigation("UserAddress");
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.OrderedDishesModel", b =>

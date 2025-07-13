@@ -355,7 +355,7 @@ namespace RestaurantSystem.Database {
                 .HasForeignKey(order => order.RestaurantId);
 
             builder.Entity<OrderModel>()
-                .HasOne(order => order.Address)
+                .HasOne(order => order.UserAddress)
                 .WithMany(address => address.Orders)
                 .HasForeignKey(order => order.UserAddressId);
         }

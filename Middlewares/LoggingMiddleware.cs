@@ -10,7 +10,7 @@
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, ILogger<LoggingMiddleware> logger)
         {
             string? path = context.Request.Path.Value;
             if (path != null && path.StartsWith("/assets"))
@@ -18,20 +18,20 @@
                 await _next(context);
             }
 
-            Console.WriteLine("Custom Logging:\n");
-            Console.WriteLine(context.Request.Method + ": " + path);
-            Console.WriteLine("\n----\nCookies:");
+            logger.LogInformation("Custom Logging:\n");
+            logger.LogInformation(context.Request.Method + ": " + path);
+            logger.LogInformation("\n----\nCookies:");
             foreach (var cookie in context.Request.Cookies)
             {
-                Console.WriteLine(cookie);
+                logger.LogInformation(cookie.ToString());
             }
-            Console.WriteLine("----\n");
+            logger.LogInformation("----\n");
 
             await _next(context);
         }
     }
 
-    public static class LoggingMiddlewareExtensions
+    public static class LoggingMiddlewareExtension
     {
         public static IApplicationBuilder UseLoggingMiddleware(
             this IApplicationBuilder builder)
