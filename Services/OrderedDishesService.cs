@@ -38,7 +38,7 @@ namespace RestaurantSystem.Services
                 .Where(order => order.DishId == dishId && order.OrderId == orderId)
                 .ToListAsync();
 
-            if (orderedDishes == null)
+            if (!orderedDishes.Any())
             {
                 return false;
             }
@@ -48,7 +48,7 @@ namespace RestaurantSystem.Services
                 orderedDish.CurrentStatus = status;
             }
 
-            return await _databaseContext.SaveChangesAsync() > 0;
+            return await _databaseContext.SaveChangesAsync() >= 0;
         }
 
         public async Task<bool> DeleteOrderedDishesAsync(long orderId)

@@ -19,19 +19,16 @@ namespace RestaurantSystem.Controllers.Staff
         private UserUtility _userUtils;
         private OrderedDishesService _orderedDishesService;
         private WebSocketService _webSocketService;
-        private WebSocketUtility _webSocketUtility;
 
         public CookStaffController(UserUtility userUtils,
             OrderService orderService,
             OrderedDishesService orderedDishesService,
-            UserService userService, WebSocketService webSocketService,
-            WebSocketUtility webSocketUtility)
+            UserService userService, WebSocketService webSocketService)
         {
             _userUtils = userUtils;
             _orderService = orderService;
             _orderedDishesService = orderedDishesService;
             _webSocketService = webSocketService;
-            _webSocketUtility = webSocketUtility;
         }
 
         [HttpGet]
@@ -122,8 +119,8 @@ namespace RestaurantSystem.Controllers.Staff
 
             orderUpdateFormModel.OrderCurrentStatus = orderStatus.ToString();
 
-            await _webSocketService.SendJsonToClients("/ws/orders", orderUpdateFormModel,
-                     _webSocketUtility.GetListenersForOrderId(orderUpdateFormModel.OrderId));
+            await _webSocketService.SendJsonToOrder("/ws/orders", 
+                orderUpdateFormModel.OrderId, orderUpdateFormModel);
 
             return Ok();
         }

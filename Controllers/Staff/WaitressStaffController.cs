@@ -110,14 +110,12 @@ namespace RestaurantSystem.Controllers.Staff
             OrderStatusEnum statusEnum = IsServed ? OrderStatusEnum.Served : OrderStatusEnum.Ready;
             if (await _orderService.UpdateOrderCurrentStatusByIdAsync(orderId, statusEnum))
             {
-
-                await _webSocketService.SendJsonToClients("/ws/orders", new OrderUpdateFormModel()
+                await _webSocketService.SendJsonToOrder("/ws/orders", orderId, new OrderUpdateFormModel()
                 {
                     DishId = 0,
                     OrderId = orderId,
                     OrderCurrentStatus = statusEnum.ToString()
-                },
-                     _webSocketUtility.GetListenersForOrderId(orderId));
+                });
 
                 TempData["ServedOrderSuccess"] = true;
                 return Ok();

@@ -9,7 +9,7 @@ namespace RestaurantSystem.Extentions
         {
             app.UseWebSockets(new WebSocketOptions
             {
-                KeepAliveInterval = TimeSpan.FromMinutes(2),
+                KeepAliveInterval = TimeSpan.FromMinutes(1),
                 AllowedOrigins = { uri }
             });
         }

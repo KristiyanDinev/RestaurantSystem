@@ -12,8 +12,8 @@ using RestaurantSystem.Database;
 namespace RestaurantSystem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250713131119_Init")]
-    partial class Init
+    [Migration("20250714094812_Fixes")]
+    partial class Fixes
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -216,6 +216,26 @@ namespace RestaurantSystem.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders", (string)null);
+                });
+
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.OrderServerMappingModel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ServerId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Order_Server_Mappings", (string)null);
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.OrderedDishesModel", b =>
@@ -443,7 +463,7 @@ namespace RestaurantSystem.Migrations
                     b.Property<DateOnly>("LastTimeLogedIn")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("date")
-                        .HasDefaultValue(new DateOnly(2025, 7, 13));
+                        .HasDefaultValue(new DateOnly(2025, 7, 14));
 
                     b.Property<string>("Name")
                         .IsRequired()

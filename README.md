@@ -132,111 +132,6 @@ Staff endpoints:
 ### Add test data
 *Note: Make sure that this will be the first data inserted in the tables in the database.*
 
-```sql
-INSERT INTO "Restaurants" 
-("Address", "City", "State", "Country", 
-"PostalCode", "DoDelivery", "ServeCustomersInPlace", 
-"ReservationMaxChildren", "ReservationMinChildren", 
-"ReservationMaxAdults", "ReservationMinAdults", "PhoneNumber", "Email") 
-VALUES 
-('ul. Test', 'Sofia', 'Sofia City', 'Bulgaria', '1234', TRUE, TRUE, 10, 0, 4, 1, '+124125', 'email@example.com'),
-('ul. Test2', 'Sofia', 'Sofia City', 'Bulgaria', '1235', TRUE, FALSE, 10, 0, 4, 1, null, 'email2@example.com'),
-('ul. Test3', 'Sofia', 'Sofia City', 'Bulgaria', '1236', FALSE, TRUE, 10, 0, 4, 1, '+12351', null),
-('ul. Test4', 'Sofia', 'Sofia City', 'Bulgaria', '1237', FALSE, TRUE, 10, 0, 4, 1, null, null);
-
--- SALADS
-INSERT INTO "Dishes" ("Name", "Price", "Grams", "Image", "Ingredients", "Type_Of_Dish", "IsAvailable", "AverageTimeToCook", "RestaurantId") VALUES
-('Caesar Salad', 8.50, 250, '/assets/images/salad/1.png', 'Romaine lettuce, croutons, parmesan, Caesar dressing', 'salads', TRUE, '5 - 7 minutes', 1),
-('Greek Salad', 7.20, 200, NULL, 'Tomatoes, cucumbers, onions, olives, feta cheese', 'salads', TRUE, '4 - 6 minutes', 1),
-('Caprese Salad', 6.80, 180, NULL, 'Tomatoes, mozzarella, basil, olive oil', 'salads', TRUE, '3 - 5 minutes', 1),
-('Waldorf Salad', 7.90, 220, NULL, 'Apples, celery, walnuts, mayonnaise', 'salads', FALSE, '4 - 6 minutes', 1),
-('Quinoa Salad', 9.00, 260, NULL, 'Quinoa, cucumber, bell pepper, lemon juice', 'salads', FALSE, '6 - 8 minutes', 1),
-
--- SOUPS
-('Tomato Basil Soup', 5.50, 300, NULL, 'Tomatoes, basil, cream, garlic', 'soups', TRUE, '10 - 12 minutes', 1),
-('Chicken Noodle Soup', 6.20, 350, NULL, 'Chicken, noodles, carrots, celery', 'soups', TRUE, '12 - 15 minutes', 1),
-('Minestrone', 6.00, 320, NULL, 'Vegetables, beans, pasta, tomato broth', 'soups', TRUE, '11 - 13 minutes', 1),
-('French Onion Soup', 6.90, 330, NULL, 'Onions, beef broth, bread, cheese', 'soups', FALSE, '13 - 15 minutes', 1),
-('Lentil Soup', 5.80, 300, NULL, 'Lentils, carrots, onion, cumin', 'soups', FALSE, '10 - 12 minutes', 1),
-
--- APPETIZERS
-('Bruschetta', 4.50, 150, NULL, 'Grilled bread, tomatoes, garlic, basil', 'appetizers', TRUE, '5 - 7 minutes', 1),
-('Mozzarella Sticks', 5.00, 200, NULL, 'Mozzarella, breadcrumbs, marinara', 'appetizers', TRUE, '6 - 8 minutes', 1),
-('Stuffed Mushrooms', 6.30, 180, NULL, 'Mushrooms, cheese, herbs', 'appetizers', TRUE, '7 - 9 minutes', 1),
-('Deviled Eggs', 4.20, 160, NULL, 'Eggs, mayonnaise, mustard, paprika', 'appetizers', FALSE, '4 - 6 minutes', 1),
-('Spring Rolls', 5.50, 190, NULL, 'Vegetables, rice paper, dipping sauce', 'appetizers', FALSE, '6 - 8 minutes', 1),
-
--- MAIN DISHES
-('Grilled Salmon', 14.50, 400, NULL, 'Salmon, lemon, herbs, olive oil', 'dishes', TRUE, '15 - 20 minutes', 1),
-('Spaghetti Carbonara', 12.00, 350, NULL, 'Pasta, eggs, pancetta, cheese', 'dishes', TRUE, '10 - 12 minutes', 1),
-('Beef Stroganoff', 13.50, 360, NULL, 'Beef, mushrooms, sour cream, noodles', 'dishes', TRUE, '14 - 18 minutes', 1),
-('Chicken Alfredo', 11.80, 340, NULL, 'Chicken, pasta, Alfredo sauce', 'dishes', FALSE, '12 - 15 minutes', 1),
-('Vegetable Stir Fry', 10.20, 300, NULL, 'Mixed vegetables, soy sauce, rice', 'dishes', FALSE, '10 - 12 minutes', 1),
-
--- DESSERTS
-('Chocolate Lava Cake', 6.00, 180, NULL, 'Chocolate, flour, sugar, eggs', 'desserts', TRUE, '8 - 10 minutes', 1),
-('Tiramisu', 5.80, 150, NULL, 'Mascarpone, espresso, ladyfingers, cocoa', 'desserts', TRUE, '6 - 8 minutes', 1),
-('Apple Pie', 5.50, 200, NULL, 'Apples, cinnamon, crust', 'desserts', TRUE, '12 - 15 minutes', 1),
-('Panna Cotta', 5.20, 160, NULL, 'Cream, gelatin, vanilla, sugar', 'desserts', FALSE, '5 - 7 minutes', 1),
-('Baklava', 5.60, 170, NULL, 'Phyllo dough, nuts, honey syrup', 'desserts', FALSE, '10 - 12 minutes', 1),
-
--- DRINKS
-('Lemonade', 2.50, 250, NULL, 'Lemon, sugar, water', 'drinks', TRUE, '2 - 3 minutes', 1),
-('Iced Tea', 2.80, 250, NULL, 'Tea, lemon, sugar, ice', 'drinks', TRUE, '3 - 4 minutes', 1),
-('Espresso', 3.00, 80, NULL, 'Coffee beans, water', 'drinks', TRUE, '2 - 3 minutes', 1),
-('Hot Chocolate', 3.20, 200, NULL, 'Milk, cocoa powder, sugar', 'drinks', FALSE, '3 - 5 minutes', 1),
-('Milkshake', 4.00, 300, NULL, 'Milk, ice cream, flavor syrup', 'drinks', FALSE, '4 - 6 minutes', 1),
-
-
-('Cobb Salad', 9.00, 280, NULL, 'Chicken, bacon, avocado, blue cheese, eggs', 'salads', TRUE, '6 - 8 minutes', 2),
-('Borscht', 6.50, 300, NULL, 'Beets, cabbage, potatoes, sour cream', 'soups', TRUE, '15 - 18 minutes', 2),
-('Shrimp Cocktail', 7.80, 200, NULL, 'Shrimp, cocktail sauce, lemon', 'appetizers', TRUE, '4 - 6 minutes', 2),
-('Lamb Tagine', 16.00, 400, NULL, 'Lamb, apricots, spices, couscous', 'dishes', TRUE, '20 - 25 minutes', 2),
-('Mango Sticky Rice', 5.80, 220, NULL, 'Sticky rice, coconut milk, mango', 'desserts', TRUE, '8 - 10 minutes', 2),
-
-('Fattoush Salad', 8.00, 250, NULL, 'Mixed greens, pita chips, sumac, radish', 'salads', TRUE, '5 - 7 minutes', 3),
-('Pho', 9.50, 400, NULL, 'Beef broth, rice noodles, herbs, beef slices', 'soups', TRUE, '12 - 15 minutes', 3),
-('Gyoza', 6.50, 200, NULL, 'Dumplings, pork, cabbage, soy sauce', 'appetizers', TRUE, '6 - 8 minutes', 3),
-('Ratatouille', 11.00, 350, NULL, 'Zucchini, eggplant, bell peppers, tomato', 'dishes', TRUE, '14 - 18 minutes', 3),
-('Tapioca Pudding', 5.00, 180, NULL, 'Tapioca pearls, milk, vanilla', 'desserts', TRUE, '8 - 10 minutes', 3);
-
-INSERT INTO "Roles"
-("Name", "Description")
-VALUES
-('delivery', 'Access to online delivery.'),
-('waitress', 'Access to serving the people in place and handling reservations.'),
-('manager', 'Access to handle all staff for a specific restaurant.'),
-('cook', 'Access to see the orders and their dishes to cook them for that restaurant. Includes online orders.');
-
-INSERT INTO "Cupons" 
-("Name", "CuponCode", "DiscountPercent", "ExpirationDate")
-VALUES
-('Summer', 'Summer123', 15, '01-01-2027'),
-('Winter', 'Winter123', 20, '01-01-2027');
-
-INSERT INTO "Services" 
-("Path", "Description")
-VALUES
-('/staff/dishes', 'The cook service.'),
-('/staff/manager', 'The manager service.'),
-('/staff/reservations', 'Reservations for waitresses.'),
-('/staff/orders', 'Orders for waitresses.'),
-('/staff/delivery', 'Delivery page for the delivery staff.');
-
-INSERT INTO "Role_Permissions" 
-("RoleName", "ServicePath")
-VALUES
-('cook', '/staff/dishes'),
-('delivery', '/staff/delivery'),
-('waitress', '/staff/reservations'),
-('waitress', '/staff/orders'),
-('manager', '/staff/manager'),
-('manager', '/staff/dishes'),
-('manager', '/staff/reservations'),
-('manager', '/staff/orders'),
-('manager', '/staff/delivery');
-```
-
 Add Role
 ```sql
 INSERT INTO "User_Roles" 
@@ -270,26 +165,7 @@ Apply migration
 dotnet ef database update
 ```
 
-### Local testing notes:
-
-Username: Bob
-Email: bob@example.com
-Password: 123
-Address: ul. Home
-City: Sofia
-State: *(empty)*
-Country: Bulgaria
-Postal Code: 1234
-PhoneNumber: +3592523523
-
-
-Staff manager
-Username: John
-Email: john@example.com
-Password: 1234
-Address: ul. Home1
-City: Sofia
-Country: Bulgaria
-Postal Code: 12345
-PhoneNumber: +3592523511
-Roles: manager
+Build command for production
+```bash
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "./publish"
+```

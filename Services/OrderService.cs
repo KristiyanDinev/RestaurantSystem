@@ -74,14 +74,42 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateOrderCurrentStatusByIdAsync(long orderId, OrderStatusEnum status)
+        public async Task<bool> UpdateOrderCurrentStatusByIdAsync(long orderId, 
+            OrderStatusEnum status)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
                 o => o.Id == orderId) ?? throw new Exception();
+            if (order.CurrentStatus.Equals(status))
+            {
+                return true;
+            }
 
-            order.CurrentStatus = status;
+            if ((order.CurrentStatus.Equals(OrderStatusEnum.Ready) &&
+                ((order.TableNumber != null && status.Equals(OrderStatusEnum.Served)) ||
+                 status.Equals(OrderStatusEnum.Preparing) ||
+                (order.TableNumber == null && status.Equals(OrderStatusEnum.Delivering)))) ||
 
-            return await _databaseContext.SaveChangesAsync() >= 0;
+                 (order.CurrentStatus.Equals(OrderStatusEnum.Preparing) &&
+                 (status.Equals(OrderStatusEnum.Pending) || status.Equals(OrderStatusEnum.Ready))) ||
+
+                 (order.CurrentStatus.Equals(OrderStatusEnum.Pending) &&
+                 status.Equals(OrderStatusEnum.Preparing)) ||
+
+                 (order.CurrentStatus.Equals(OrderStatusEnum.Served) &&
+                 status.Equals(OrderStatusEnum.Ready)) ||
+
+                 (order.CurrentStatus.Equals(OrderStatusEnum.Delivering) &&
+                   (status.Equals(OrderStatusEnum.Ready) || 
+                   status.Equals(OrderStatusEnum.Delivered))) ||
+
+                   (order.CurrentStatus.Equals(OrderStatusEnum.Delivered) &&
+                   status.Equals(OrderStatusEnum.Ready)))
+            {
+
+                order.CurrentStatus = status;
+                return await _databaseContext.SaveChangesAsync() >= 0;
+            }
+            return false;
         }
 
         public async Task<List<OrderModel>> GetOrdersByUserAsync(long userId)

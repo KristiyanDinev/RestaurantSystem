@@ -6,6 +6,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "launchUrl": "",
+      "hotReloadEnabled": false,
       "externalUrlConfiguration": true,
       "environmentVariables": {
       }

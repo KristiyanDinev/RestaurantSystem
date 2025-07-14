@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace RestaurantSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class Fixes : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,20 @@ namespace RestaurantSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cupons", x => x.CuponCode);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Order_Server_Mappings",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OrderId = table.Column<long>(type: "bigint", nullable: false),
+                    ServerId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Order_Server_Mappings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -119,7 +133,7 @@ namespace RestaurantSystem.Migrations
                     Password = table.Column<string>(type: "text", nullable: false),
                     Image = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
-                    LastTimeLogedIn = table.Column<DateOnly>(type: "date", nullable: false, defaultValue: new DateOnly(2025, 7, 13)),
+                    LastTimeLogedIn = table.Column<DateOnly>(type: "date", nullable: false, defaultValue: new DateOnly(2025, 7, 14)),
                     RestaurantId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
@@ -431,6 +445,9 @@ namespace RestaurantSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "Delivery");
+
+            migrationBuilder.DropTable(
+                name: "Order_Server_Mappings");
 
             migrationBuilder.DropTable(
                 name: "Ordered_Dishes");

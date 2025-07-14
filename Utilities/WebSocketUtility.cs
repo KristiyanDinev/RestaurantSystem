@@ -7,8 +7,11 @@ namespace RestaurantSystem.Utilities
     {
         private List<OrderWebSocketModel> OrderWebSockets = new List<OrderWebSocketModel>();
 
-        public WebSocketUtility()
+        public WebSocketUtility() {}
+
+        public List<OrderWebSocketModel> GetOrderWebSocketModels()
         {
+            return OrderWebSockets;
         }
 
         public void AddOrdersToListenTo(List<long> orderIds, WebSocket socket)
@@ -27,6 +30,19 @@ namespace RestaurantSystem.Utilities
             return OrderWebSockets
                 .Where(order => order.OrderIds.Contains(order_id))
                 .Select(order => order.Socket).ToList();
+        }
+
+
+        public List<long> GetOrderIdsForSocket(WebSocket socket)
+        {
+            return OrderWebSockets
+                .Where(order => order.Socket.Equals(socket))
+                .SelectMany(order => order.OrderIds).ToList();
+        }
+
+        public void RemoveOrderIdsFromSocket(WebSocket socket)
+        {
+            OrderWebSockets.RemoveAll(order => order.Socket.Equals(socket));
         }
     }
 }

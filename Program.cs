@@ -1,8 +1,10 @@
 using RestaurantSystem.Extentions;
 using RestaurantSystem.Middlewares;
+using RestaurantSystem.Models.WebSockets;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 using Serilog;
+using System.Net.WebSockets;
 
 namespace RestaurantSystem
 {
@@ -26,6 +28,9 @@ namespace RestaurantSystem
             Log.Information("Current Working Directory: " + Directory.GetCurrentDirectory());
             Log.Information("Configuring");
 
+            builder.Services.Configure<RabbitMQOptionsModel>(
+                builder.Configuration.GetSection("RabbitMQ"));
+
             builder.Host.UseSessions();
             builder.Host.UseControllersWithViews();
 
@@ -36,29 +41,30 @@ namespace RestaurantSystem
 
             builder.Host.UseDatabaseContext(builder.Configuration);
 
-            builder.Services.AddScoped<UserService>();
-            builder.Services.AddScoped<DishService>();
-            builder.Services.AddScoped<OrderedDishesService>();
-            builder.Services.AddScoped<RestaurantService>();
-            builder.Services.AddScoped<CuponService>();
-            builder.Services.AddScoped<OrderService>();
-            builder.Services.AddScoped<RoleService>();
-            builder.Services.AddScoped<ReservationService>();
-            builder.Services.AddScoped<LocationService>();
-            builder.Services.AddScoped<AddressService>();
-            builder.Services.AddScoped<DeliveryService>();
+            builder.Services.AddSingleton<UserService>();
+            builder.Services.AddSingleton<DishService>();
+            builder.Services.AddSingleton<OrderedDishesService>();
+            builder.Services.AddSingleton<RestaurantService>();
+            builder.Services.AddSingleton<CuponService>();
+            builder.Services.AddSingleton<OrderService>();
+            builder.Services.AddSingleton<RoleService>();
+            builder.Services.AddSingleton<ReservationService>();
+            builder.Services.AddSingleton<LocationService>();
+            builder.Services.AddSingleton<AddressService>();
+            builder.Services.AddSingleton<DeliveryService>();
 
-            builder.Services.AddScoped<EncryptionUtility>(_ =>
+            builder.Services.AddSingleton<EncryptionUtility>(_ =>
                 new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??
                 "D471E0624EA5A7FFFABAA918E87"));
 
-            builder.Services.AddScoped<JWTUtility>(_ =>
+            builder.Services.AddSingleton<JWTUtility>(_ =>
                 new JWTUtility(builder.Configuration.GetValue<string>("JWT_Key") ?? 
                 "234w13543ewf53erdfa"));
 
-            builder.Services.AddScoped<UserUtility>();
-            builder.Services.AddScoped<WebSocketService>();
+            builder.Services.AddSingleton<UserUtility>();
+            builder.Services.AddSingleton<WebSocketDatabaseService>();
             builder.Services.AddSingleton<WebSocketUtility>();
+            builder.Services.AddSingleton<WebSocketService>();
             builder.Host.UseRateLimits();
 
             WebApplication app = builder.Build();
@@ -74,8 +80,7 @@ namespace RestaurantSystem
                     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com;" +
                     "font-src 'self' https://cdn.jsdelivr.net;" +
                     "img-src 'self' data: https:;" +
-                    "connect-src 'self' ws://localhost:* wss://localhost:* ws://127.0.0.1:* wss://127.0.0.1:* wss://" +
-                    ipPort + " ws://"+ ipPort + " wss://"+ ipPort+";");
+                    "connect-src 'self' wss://" +ipPort + " ws://"+ ipPort + ";");
 
                 context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
                 await next();
@@ -91,6 +96,34 @@ namespace RestaurantSystem
             app.UseLoggingMiddleware();
             app.MapControllers();
             app.UseStartupSQL(app);
+
+            app.Lifetime.ApplicationStopping.Register(() =>
+            {
+                Task.Run(async () =>
+                {
+                    using IServiceScope scope = app.Services.CreateScope();
+                    WebSocketService webSocketService = scope
+                            .ServiceProvider.GetRequiredService<WebSocketService>();
+
+                    WebSocketUtility webSocketUtility = scope
+                            .ServiceProvider.GetRequiredService<WebSocketUtility>();
+                    foreach (WebSocket webSocket in webSocketUtility.GetOrderWebSocketModels().Select(m => m.Socket))
+                    {
+                        try
+                        {
+                            await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                        }
+                        catch { }
+                    }
+                    if (webSocketService._serverId != null)
+                    {
+                        await scope.ServiceProvider.GetRequiredService<WebSocketDatabaseService>()
+                            .DeleteAllOrderServerMappingByServerIdAsync(webSocketService._serverId);
+                    }
+
+                }).GetAwaiter().GetResult();
+            });
+
 
             app.Run();
         }

@@ -9,7 +9,7 @@ namespace RestaurantSystem.Extentions
     public static class StartupSQLExtention
     {
 
-        public async static void UseStartupSQL(this IApplicationBuilder builder, WebApplication app)
+        public static void UseStartupSQL(this IApplicationBuilder builder, WebApplication app)
         {
             Log.Information("Start up SQL executing...");
             string? sqlFile = app.Configuration.GetValue<string>("StartUpSQLFile");
@@ -22,8 +22,6 @@ namespace RestaurantSystem.Extentions
                 {
                     connection.Open();
                 }
-
-
                 using var command = connection.CreateCommand();
                 command.CommandText = File.ReadAllText(sqlFile);
                 command.CommandTimeout = 300000;

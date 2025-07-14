@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
+using System.Reflection.Emit;
 
 namespace RestaurantSystem.Database {
     public class DatabaseContext : DbContext {
@@ -18,6 +19,7 @@ namespace RestaurantSystem.Database {
         public DbSet<RestaurantModel> Restaurants { get; set; }
         public DbSet<DeliveryModel> Delivery { get; set; }
         public DbSet<AddressModel> Addresses { get; set; }
+        public DbSet<OrderServerMappingModel> OrderServerMappings { get; set; }
 
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) {}
@@ -70,9 +72,25 @@ namespace RestaurantSystem.Database {
             // AddressModel
             BuildAddressModel(ref builder);
 
-
+            // OrderServerMappingModel
+            BuildOrderServerMappingModel(ref builder);
         }
 
+
+        private void BuildOrderServerMappingModel(ref ModelBuilder builder)
+        {
+            builder.Entity<OrderServerMappingModel>().ToTable("Order_Server_Mappings");
+            builder.Entity<OrderServerMappingModel>()
+                .HasKey(mapping => mapping.Id);
+
+            builder.Entity<OrderServerMappingModel>()
+                .Property(mapping => mapping.OrderId)
+                .IsRequired();
+
+            builder.Entity<OrderServerMappingModel>()
+                .Property(mapping => mapping.ServerId)
+                .IsRequired();
+        }
 
         private void BuildUserModel(ref ModelBuilder builder)
         {
