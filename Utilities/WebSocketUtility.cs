@@ -1,4 +1,5 @@
-﻿using RestaurantSystem.Models.WebSockets;
+﻿using RabbitMQ.Client;
+using RestaurantSystem.Models.WebSockets;
 using System.Net.WebSockets;
 
 namespace RestaurantSystem.Utilities
@@ -6,12 +7,54 @@ namespace RestaurantSystem.Utilities
     public class WebSocketUtility
     {
         private List<OrderWebSocketModel> OrderWebSockets = new List<OrderWebSocketModel>();
-
-        public WebSocketUtility() {}
+        private IConnection? _connection = null;
+        private IChannel? _channel = null;
+        public readonly string _serverId;
+        private readonly string _exchangeName = "websocket_distribution";
+        private readonly string _queueName;
+        public WebSocketUtility() {
+            _serverId = Environment.MachineName + "_" + Guid.NewGuid().ToString("N")[..8];
+            _queueName = $"websocket_queue_{_serverId}";
+        }
 
         public List<OrderWebSocketModel> GetOrderWebSocketModels()
         {
             return OrderWebSockets;
+        }
+
+        public void SetConnection(IConnection connection)
+        {
+            _connection = connection;
+        }
+
+        public void SetChannel(IChannel channel)
+        {
+            _channel = channel;
+        }
+
+        public string GetServerId()
+        {
+            return _serverId;
+        }
+
+        public IConnection? GetConnection()
+        {
+            return _connection;
+        }
+
+        public IChannel? GetChannel()
+        {
+            return _channel;
+        }
+
+        public string GetExchangeName()
+        {
+            return _exchangeName;
+        }
+
+        public string GetQueueName()
+        {
+            return _queueName;
         }
 
         public void AddOrdersToListenTo(List<long> orderIds, WebSocket socket)

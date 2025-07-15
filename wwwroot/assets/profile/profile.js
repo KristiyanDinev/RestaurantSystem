@@ -3,7 +3,9 @@ function readURL(input) {
         var reader = new FileReader();
 
         reader.onload = function (e) {
-            document.getElementById('preview').src = e.target.result;
+            let preview = document.getElementById('preview');
+            preview.src = e.target.result;
+            preview.classList.remove('d-none');
         }
 
         reader.readAsDataURL(input.files[0]);
@@ -17,25 +19,38 @@ document.getElementById("Image").onchange = (e) => {
 
 function removeImage() {
     document.getElementById('Image').value = ""
-    document.getElementById('preview').src = ''
+    let preview = document.getElementById('preview');
+    preview.src = ''
+    preview.classList.add('d-none');
 }
 
-
+var isInvalid = 'is-invalid'
 async function updateUser() {
     if (!confirm('Are you sure you want to update your profile?')) {
         return
     }
 
-    let status = document.getElementById('Stats')
-    status.innerHTML = "Updating..."
+    let usernameElement = document.getElementById('username')
+    let emailElement = document.getElementById('email')
+    let username = usernameElement.value
+    let email = emailElement.value
 
-    let username = document.getElementById('username').value
-    let email = document.getElementById('email').value
+    usernameElement.classList.remove(isInvalid)
+    emailElement.classList.remove(isInvalid)
 
-    if (!username || !email) {
-        status.innerHTML = "Please fill all fields with valid data"
+    if (!username) {
+        usernameElement.classList.add(isInvalid)
         return
     }
+
+    if (!email) {
+        emailElement.classList.add(isInvalid)
+        return
+    }
+
+    let updateButton = document.getElementById('update')
+    updateButton.disabled = true
+    updateButton.innerHTML = '<i class="bi bi - check - circle me - 2"></i> Updating Profile...'
 
     let formData = new FormData()
     formData.append('Name', username)
@@ -44,19 +59,12 @@ async function updateUser() {
     formData.append('DeleteImage', document.getElementById("deleteimage").checked)
 
     try {
-        const res = await fetch('/profile/update', {
+        await fetch('/profile/update', {
             method: 'POST',
             body: formData
         })
-
-        if (res.ok) {
-            window.location.reload()
-
-        } else {
-            status.innerHTML = "Failed to Update"
-        }
-
-    } catch {
-        status.innerHTML = "Error while updating profile"
-    }
+        usernameElement.classList.remove(isInvalid)
+        emailElement.classList.remove(isInvalid)
+        window.location.reload()
+    } catch { }
 }

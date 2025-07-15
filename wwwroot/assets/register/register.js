@@ -72,7 +72,5 @@ async function submit() {
         passwordElement.classList.remove(invalidClass)
         window.location.reload();
 
-    } catch (err) {
-        console.error('Register error:', err)
-    }
+    } catch {}
 }

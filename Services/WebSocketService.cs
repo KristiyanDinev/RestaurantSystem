@@ -16,14 +16,6 @@ namespace RestaurantSystem.Services
         // Dictionary of endpoint -> set of sockets
         private ConcurrentDictionary<string, ConcurrentBag<WebSocket>> _endpointSockets = new();
         private WebSocketUtility _webSocketUtility;
-
-        // RabbitMQ components
-        private IConnection? _connection = null;
-        private IChannel? _channel = null;
-        public readonly string? _serverId = null;
-        private readonly string _exchangeName = "websocket_distribution";
-        private readonly string? _queueName = null;
-
         private readonly bool distributionEnabled = false;
 
         private readonly ILogger<WebSocketService> _logger;
@@ -44,10 +36,7 @@ namespace RestaurantSystem.Services
                 model.Password == null) {
                 return; // If options are not provided, skip initialization
             }
-            distributionEnabled = true; // Enable distribution if options are provided
-            // Generate unique server ID for this instance
-            _serverId = Environment.MachineName + "_" + Guid.NewGuid().ToString("N")[..8];
-            _queueName = $"websocket_queue_{_serverId}";
+            distributionEnabled = true;
             
             // Initialize RabbitMQ connection
             InitializeRabbitMQ(model);
@@ -69,27 +58,34 @@ namespace RestaurantSystem.Services
                     Password = options.Password
                 };
 
-                // Create connection and channel
-                _connection = await factory.CreateConnectionAsync();
-                _channel = await _connection.CreateChannelAsync();
+                _webSocketUtility.SetConnection(await factory.CreateConnectionAsync());
+                IConnection connection = _webSocketUtility.GetConnection()!;
+                _webSocketUtility.SetChannel(await connection.CreateChannelAsync());
+                IChannel _channel = _webSocketUtility.GetChannel()!;
 
-                // Declare exchange for WebSocket message distribution
+                string _exchangeName = _webSocketUtility.GetExchangeName();
+                string _queueName = _webSocketUtility.GetQueueName();
+
                 await _channel.ExchangeDeclareAsync(exchange: _exchangeName, type: ExchangeType.Direct);
 
                 // Declare queue for this server instance
-                await _channel.QueueDeclareAsync(queue: _queueName!, durable: false, exclusive: false, autoDelete: true);
+                await _channel.QueueDeclareAsync(queue: _queueName!, 
+                    durable: false, 
+                    exclusive: false, 
+                    autoDelete: true);
 
                 // Bind queue to exchange with server ID as routing key
-                await _channel.QueueBindAsync(queue: _queueName!, exchange: _exchangeName, routingKey: _serverId!);
+                await _channel.QueueBindAsync(queue: _queueName!, 
+                    exchange: _exchangeName, 
+                    routingKey: _webSocketUtility.GetServerId());
 
                 // Set up message consumer
                 var consumer = new AsyncEventingBasicConsumer(_channel);
                 consumer.ReceivedAsync += OnMessageReceived;
 
                 // Start consuming messages
-                await _channel.BasicConsumeAsync(queue: _queueName!, autoAck: true, consumer: consumer);
-
-                _logger.LogInformation($"WebSocket Service initialized with Server ID: {_serverId}");
+                await _channel.BasicConsumeAsync(queue: _queueName, 
+                    autoAck: true, consumer: consumer);
             }
             catch (Exception ex)
             {
@@ -106,27 +102,19 @@ namespace RestaurantSystem.Services
             try
             {
 
-                // Deserialize the distribution message
                 WebSocketDistributionMessageModel? distributionMessage =
                     JsonSerializer.Deserialize<WebSocketDistributionMessageModel>(Encoding.UTF8.GetString(e.Body.ToArray()));
                 if (distributionMessage == null) return;
 
-                _logger.LogInformation($"Received distribution message for Order ID: {distributionMessage.OrderId}");
-
-                // Get local WebSocket connections listening to this order
                 List<WebSocket> sockets = _webSocketUtility.GetListenersForOrderId(distributionMessage.OrderId);
 
-                // Send message to local connections
-                if (sockets.Any())
+                if (sockets.Count != 0)
                 {
                     await SendJsonToClients(distributionMessage.Endpoint, distributionMessage.Data, sockets);
-                    _logger.LogInformation($"Delivered message to {sockets.Count} local connections for Order ID: {distributionMessage.OrderId}");
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error processing RabbitMQ message: {ex.Message}");
-            }
+            catch
+            {}
         }
 
 
@@ -151,12 +139,12 @@ namespace RestaurantSystem.Services
                     if (long.TryParse(id, out long orderId))
                     {
                         ids.Add(orderId);
-                        // Register this server as handling this order ID
                         if (!distributionEnabled)
                         {
                             continue; // Distribution is not enabled, skip database mapping
                         }
-                        await _webSocketDatabaseService.AddOrderServerMappingAsync(orderId, _serverId!);
+                        await _webSocketDatabaseService
+                            .AddOrderServerMappingAsync(orderId, _webSocketUtility.GetServerId());
                     }
                     else
                     {
@@ -165,7 +153,6 @@ namespace RestaurantSystem.Services
                 }
 
                 _webSocketUtility.AddOrdersToListenTo(ids, socket);
-                _logger.LogInformation($"Client registered to listen to {ids.Count} orders on server {_serverId}");
             }
         }
 
@@ -234,10 +221,8 @@ namespace RestaurantSystem.Services
         /// </summary>
         private async void CleanupOrderMappings(WebSocket disconnectedSocket)
         {
-            // Get all order IDs that this socket was listening to
             List<long> orderIds = _webSocketUtility.GetOrderIdsForSocket(disconnectedSocket);
             _webSocketUtility.RemoveOrderIdsFromSocket(disconnectedSocket);
-            _logger.LogInformation($"Cleaned up mappings for disconnected socket (local)");
             if (!distributionEnabled) { 
                 return; // If distribution is not enabled, skip database cleanup
             }
@@ -245,7 +230,6 @@ namespace RestaurantSystem.Services
             {
                 await _webSocketDatabaseService.DeleteAllOrderServerMappingByOrderIdAsync(orderId);
             }
-            _logger.LogInformation($"Cleaned up mappings for disconnected socket (distributed)");
         }
 
 
@@ -257,10 +241,9 @@ namespace RestaurantSystem.Services
         {
             // First, try to deliver locally
             List<WebSocket> localSockets = _webSocketUtility.GetListenersForOrderId(orderId);
-            if (localSockets.Any())
+            if (localSockets.Count != 0)
             {
                 await SendJsonToClients(endpoint, data, localSockets);
-                _logger.LogInformation($"Delivered message locally to {localSockets.Count} connections for Order ID: {orderId}");
             }
 
             if (!distributionEnabled) { 
@@ -271,9 +254,10 @@ namespace RestaurantSystem.Services
                 await _webSocketDatabaseService
                 .GetServerWhichHasListenersForOrderIdAsync(orderId);
 
-            if (orderServerMapping == null || orderServerMapping.ServerId.Equals(_serverId))
+            string serverId = _webSocketUtility.GetServerId();
+            if (orderServerMapping == null || orderServerMapping.ServerId.Equals(serverId))
             {
-                return; // No listeners found, nothing to do
+                return;
             }
 
             await PublishDistributionMessageAsync(new WebSocketDistributionMessageModel()
@@ -282,10 +266,9 @@ namespace RestaurantSystem.Services
                 Endpoint = endpoint,
                 Data = data,
                 TargetServerId = orderServerMapping.ServerId,
-                SourceServerId = _serverId!,
+                SourceServerId = serverId,
                 Timestamp = DateTime.UtcNow
             });
-            _logger.LogInformation($"Sent distribution message to server {orderServerMapping.ServerId} for Order ID: {orderId}");
         }
 
 
@@ -296,17 +279,18 @@ namespace RestaurantSystem.Services
         {
             try
             {
-                // Publish to exchange with target server ID as routing key
-                await _channel!.BasicPublishAsync(
-                    exchange: _exchangeName,
+                IChannel? channel = _webSocketUtility.GetChannel();
+                if (channel == null)
+                {
+                    return;
+                }
+                await channel.BasicPublishAsync(
+                    exchange: _webSocketUtility.GetExchangeName(),
                     routingKey: distributionMessage.TargetServerId,
                     body: new ReadOnlyMemory<byte>(
                         Encoding.UTF8.GetBytes(JsonSerializer.Serialize(distributionMessage))));
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Failed to publish distribution message: {ex.Message}");
-            }
+            catch {}
         }
 
         /// <summary>
@@ -327,7 +311,6 @@ namespace RestaurantSystem.Services
 
                 try
                 {
-                    _logger.LogInformation($"WebSocket: Sending to {endpoint}: {json}");
                     await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
                 }
                 catch

@@ -127,15 +127,18 @@ namespace RestaurantSystem.Controllers {
             {
                 return BadRequest();
             }
-
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
             {
                 return BadRequest();
             }
-
-            return await _userService.UpdateUserAsync(user, profileUpdateFormModel) ?
-                Ok() : BadRequest();
+            if (await _userService.UpdateUserAsync(user, profileUpdateFormModel))
+            {
+                TempData["ProfileUpdateSuccess"] = true;
+                return Ok();
+            }
+            TempData["ProfileUpdateError"] = true;
+            return BadRequest();
         }
 
 

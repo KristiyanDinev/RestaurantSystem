@@ -445,9 +445,9 @@ namespace RestaurantSystem.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateOnly>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("date")
                         .HasDefaultValueSql("NOW()");
 
                     b.Property<string>("Email")
@@ -460,7 +460,7 @@ namespace RestaurantSystem.Migrations
                     b.Property<DateOnly>("LastTimeLogedIn")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("date")
-                        .HasDefaultValue(new DateOnly(2025, 7, 14));
+                        .HasDefaultValue(new DateOnly(2025, 7, 15));
 
                     b.Property<string>("Name")
                         .IsRequired()

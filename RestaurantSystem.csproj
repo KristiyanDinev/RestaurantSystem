@@ -7,12 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="logs\**" />
     <Compile Remove="wwwroot\assets\dishes\drinks\**" />
     <Compile Remove="wwwroot\user\**" />
+    <Content Remove="logs\**" />
     <Content Remove="wwwroot\assets\dishes\drinks\**" />
     <Content Remove="wwwroot\user\**" />
+    <EmbeddedResource Remove="logs\**" />
     <EmbeddedResource Remove="wwwroot\assets\dishes\drinks\**" />
     <EmbeddedResource Remove="wwwroot\user\**" />
+    <None Remove="logs\**" />
     <None Remove="wwwroot\assets\dishes\drinks\**" />
     <None Remove="wwwroot\user\**" />
   </ItemGroup>
@@ -33,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="logs\" />
     <Folder Include="wwwroot\assets\images\user\" />
   </ItemGroup>
 

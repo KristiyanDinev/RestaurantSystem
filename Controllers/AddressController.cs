@@ -95,10 +95,9 @@ namespace RestaurantSystem.Controllers
                 TempData["DeleteSuccess"] = true;
                 return Ok();
             }
-            else
-            {
-                return BadRequest();
-            }
+
+            TempData["DeleteError"] = true;
+            return BadRequest();
         }
 
 
@@ -123,10 +122,8 @@ namespace RestaurantSystem.Controllers
                 TempData["UpdateSuccess"] = true;
                 return Ok();
             }
-            else 
-            {
-                return BadRequest();
-            }
+            TempData["UpdateError"] = true;
+            return BadRequest();
         }
 
 
@@ -151,10 +148,9 @@ namespace RestaurantSystem.Controllers
                 TempData["AddSuccess"] = true;
                 return Ok();
 
-            } else
-            {
-                return BadRequest();
-            }
+            } 
+            TempData["AddError"] = true;
+            return BadRequest();
         }
     }
 }

@@ -41,30 +41,31 @@ namespace RestaurantSystem
 
             builder.Host.UseDatabaseContext(builder.Configuration);
 
-            builder.Services.AddSingleton<UserService>();
-            builder.Services.AddSingleton<DishService>();
-            builder.Services.AddSingleton<OrderedDishesService>();
-            builder.Services.AddSingleton<RestaurantService>();
-            builder.Services.AddSingleton<CuponService>();
-            builder.Services.AddSingleton<OrderService>();
-            builder.Services.AddSingleton<RoleService>();
-            builder.Services.AddSingleton<ReservationService>();
-            builder.Services.AddSingleton<LocationService>();
-            builder.Services.AddSingleton<AddressService>();
-            builder.Services.AddSingleton<DeliveryService>();
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<DishService>();
+            builder.Services.AddScoped<OrderedDishesService>();
+            builder.Services.AddScoped<RestaurantService>();
+            builder.Services.AddScoped<CuponService>();
+            builder.Services.AddScoped<OrderService>();
+            builder.Services.AddScoped<RoleService>();
+            builder.Services.AddScoped<ReservationService>();
+            builder.Services.AddScoped<LocationService>();
+            builder.Services.AddScoped<AddressService>();
+            builder.Services.AddScoped<DeliveryService>();
 
-            builder.Services.AddSingleton<EncryptionUtility>(_ =>
+            builder.Services.AddScoped<EncryptionUtility>(_ =>
                 new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??
                 "D471E0624EA5A7FFFABAA918E87"));
 
-            builder.Services.AddSingleton<JWTUtility>(_ =>
+            builder.Services.AddScoped<JWTUtility>(_ =>
                 new JWTUtility(builder.Configuration.GetValue<string>("JWT_Key") ?? 
                 "234w13543ewf53erdfa"));
 
-            builder.Services.AddSingleton<UserUtility>();
-            builder.Services.AddSingleton<WebSocketDatabaseService>();
+            builder.Services.AddScoped<UserUtility>();
+            builder.Services.AddScoped<WebSocketDatabaseService>();
+
             builder.Services.AddSingleton<WebSocketUtility>();
-            builder.Services.AddSingleton<WebSocketService>();
+            builder.Services.AddScoped<WebSocketService>();
             builder.Host.UseRateLimits();
 
             WebApplication app = builder.Build();
@@ -115,10 +116,11 @@ namespace RestaurantSystem
                         }
                         catch { }
                     }
-                    if (webSocketService._serverId != null)
+                    string _serverId = webSocketUtility.GetServerId();
+                    if (_serverId != null)
                     {
                         await scope.ServiceProvider.GetRequiredService<WebSocketDatabaseService>()
-                            .DeleteAllOrderServerMappingByServerIdAsync(webSocketService._serverId);
+                            .DeleteAllOrderServerMappingByServerIdAsync(_serverId);
                     }
 
                 }).GetAwaiter().GetResult();

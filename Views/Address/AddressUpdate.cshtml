@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <div class="container mb-5">
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <!-- Navigation Button -->
@@ -215,8 +215,9 @@
                 </div>
             </div>
         </div>
-    </div>
 
+        @await Html.PartialAsync("_RestaurantFooter")
+    </div>
     @await Html.PartialAsync("_Footer")
     <script src='~/assets/user_location.js'></script>
     <script>

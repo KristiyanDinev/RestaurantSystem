@@ -1,4 +1,5 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels;
+@using RestaurantSystem.Models.View.Messages;
 @model RestaurantSystem.Models.View.Address.AddressesViewModel;
 @{
     ViewData["Title"] = "Addresses";
@@ -28,33 +29,51 @@
         </div>
     </div>
 
-    <div class="container mb-5">
+    <div class="container">
         <!-- Success Message -->
-        @await Html.PartialAsync("_SuccessMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
         {
             Key = "UpdateSuccess",
-            Message = "UserAddress updated successfully!"
+            Message = "Address updated successfully!"
         })
 
-        @await Html.PartialAsync("_SuccessMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
         {
-            Key = "DeleteSuccess",
-            Message = "UserAddress deleted successfully!"
-        })
-
-        @await Html.PartialAsync("_SuccessMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
-        {
-            Key = "AddSuccess",
-            Message = "UserAddress added successfully!"
+            Key = "UpdateError",
+            Message = "Couldn't update address. Please try again."
          })
 
-        @await Html.PartialAsync("_SuccessMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "DeleteSuccess",
+            Message = "Address deleted successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "DeleteError",
+            Message = "Couldn't delete address. Please try again."
+        })
+
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "AddSuccess",
+            Message = "Address added successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "AddError",
+            Message = "Couldn't add your address. Please try again."
+        })
+
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
         {
             Key = "LoginSuccess",
             Message = "Login successfully!"
         })
 
-        @await Html.PartialAsync("_SuccessMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
         {
             Key = "RegisterSuccess",
             Message = "Registered successfully!"

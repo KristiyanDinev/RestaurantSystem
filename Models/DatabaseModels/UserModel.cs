@@ -5,7 +5,7 @@
         public required string Email { get; set; }
         public required string Password { get; set; }
         public string? Image { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateOnly CreatedAt { get; set; }
         public DateOnly LastTimeLogedIn { get; set; }
 
 

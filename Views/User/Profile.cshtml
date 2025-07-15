@@ -1,51 +1,191 @@
-﻿@model RestaurantSystem.Models.DatabaseModels.UserModel;
+﻿@using RestaurantSystem.Models.View.Messages;
+@model RestaurantSystem.Models.DatabaseModels.UserModel;
 @{
     ViewData["Title"] = "Profile";
 }
-
-
 <head>
-
     @await Html.PartialAsync("_Header")
 </head>
-
 <body>
     @await Html.PartialAsync("_NavBar", Model)
 
-    <h1>Profile</h1>
-
-    <div>
-        <label id="profile_value">Image</label>
-
-        @if (Model.Image != null)
-        {
-            <img id="image" src="@Model.Image" alt="user image" class="mt-2 rounded img-thumbnail">
-        }
-
-        <input type="file" accept="image/*" id="Image">
-        <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage()">Remove Image</button>
-        <img id="preview" alt="Profile Image Preview" class="mt-2 rounded img-thumbnail" />
-
-        <label for="deleteimage">Delete Image?</label>
-        <input type="checkbox" id="deleteimage">
-
-        <div class="input_center">
-            <p>Username: @Model.Name</p>
-            <input type="text" id="username"
-                   maxlength="255" value="@Model.Name" placeholder="Username" required>
-        </div>
-
-        <div class="input_center">
-            <p>Email: @Model.Email</p>
-            <input type="email" id="email" maxlength="50" value="@Model.Email" placeholder="Email" required>
+    <!-- Hero Section -->
+    <div class="bg-warning text-dark py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 mb-3 fw-bold">
+                        <i class="bi bi-person-circle me-4"></i>My Profile
+                    </h1>
+                    <p class="mb-0 fw-medium">Manage your Savans restaurant account settings</p>
+                </div>
+                <div class="col-lg-4 text-lg-end text-dark">
+                    <i class="bi bi-person-circle display-5 opacity-25"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <p id="Stats"></p>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Profile Card -->
+                <div class="card shadow-lg border-0 mb-5">
+                    <div class="card-header border-0 py-4">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="card-title mb-0 text-warning">
+                                    <i class="bi bi-person-gear me-2"></i>Account Information
+                                </h3>
+                                <p class="text-muted mb-0">Update your profile details</p>
+                            </div>
+                        </div>
+                    </div>
 
-    <button type="button" class="btn btn-success m-2" onclick="updateUser()">Edit</button>
+                    <div class="card-body p-5">
+                        <!-- Profile Image Section -->
+                        <div class="text-center mb-5">
+                            <div class="position-relative d-inline-block">
+                                @if (Model.Image != null)
+                                {
+                                    <img id="image" src="@Model.Image" alt="user image"
+                                         class="rounded-circle shadow-lg border border-3 border-warning"
+                                         style="width: 150px; height: 150px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="rounded-circle shadow-lg border border-3 border-warning bg-secondary d-flex align-items-center justify-content-center"
+                                         style="width: 150px; height: 150px;">
+                                        <i class="bi bi-person text-white" style="font-size: 4rem;"></i>
+                                    </div>
+                                }
+
+                                <!-- Camera badge -->
+                                <span class="position-absolute bottom-0 end-0 bg-warning text-dark rounded-circle p-2 shadow">
+                                    <i class="bi bi-camera"></i>
+                                </span>
+                            </div>
+                            
+
+                            <!-- Image Controls -->
+                            <div class="mt-4">
+                                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                                    <label for="Image" class="btn btn-outline-warning btn-sm">
+                                        <i class="bi bi-cloud-upload me-2"></i>Upload Photo
+                                    </label>
+                                    <input type="file" accept="image/*" id="Image" class="d-none">
+
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeImage()">
+                                        <i class="bi bi-trash me-2"></i>Remove
+                                    </button>
+                                </div>
+
+                                <div class="form-check mt-3 d-flex justify-content-center">
+                                    <input class="form-check-input me-2" type="checkbox" id="deleteimage">
+                                    <label class="form-check-label text-muted" for="deleteimage">
+                                        <i class="bi bi-trash me-1"></i>Delete current image
+                                    </label>
+                                </div>
+                            </div>
+
+                            <img id="preview" alt="Profile Image Preview"
+                                 class="img-thumnail rounded-circle shadow-lg border border-3 border-warning d-none"
+                                 style="width: 150px; height: 150px; object-fit: cover;" />
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="row g-4">
+                            <!-- Username Section -->
+                            <div class="col-md-6">
+                                <div class="card border-0">
+                                    <div class="card-body bg-warning border border-warning bg-opacity-10">
+                                        <div class="d-flex align-items-center mb-3 text-warning">
+                                            <i class="bi bi-person-badge me-2"></i>
+                                            <h6 class="mb-0">Username</h6>
+                                        </div>
+                                        <p class="text-muted small mb-2">Current: <strong class="fw-bold">@Model.Name</strong></p>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-warning border-end-0">
+                                                <i class="bi bi-person-badge text-dark"></i>
+                                            </span>
+                                            <input type="text" id="username" class="form-control border-start-0 pl-2"
+                                                   maxlength="255" value="@Model.Name" placeholder="Enter username">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email Section -->
+                            <div class="col-md-6">
+                                <div class="card border-0">
+                                    <div class="card-body border border-warning bg-warning bg-opacity-10">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="bi bi-envelope text-warning me-2"></i>
+                                            <h6 class="mb-0 text-warning">Email Address</h6>
+                                        </div>
+                                        <p class="text-muted small mb-2">Current: <strnog class="fw-bold">@Model.Email</strnog></p>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-warning border-end-0">
+                                                <i class="bi bi-envelope text-dark"></i>
+                                            </span>
+                                            <input type="email" id="email" class="form-control border-start-0 pl-2"
+                                                   maxlength="50" value="@Model.Email" placeholder="Enter email">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Section -->
+                        <div class="mt-5">
+                            <div class="card border border-warning bg-warning bg-opacity-10">
+                                <div class="card-body text-center">
+                                    <h6 class="text-warning mb-3">
+                                        <i class="bi bi-graph-up me-2"></i>Account Statistics
+                                    </h6>
+                                    <div class="text-muted">
+                                        <div class="d-flex justify-content-center gap-4 flex-wrap">
+                                            <div class="text-center">
+                                                <i class="bi bi-calendar-check text-success d-block mb-1"></i>
+                                                <small>Member Since:</small>
+                                                <strong>@Model.CreatedAt</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+                            {
+                                Key = "ProfileUpdateSuccess",
+                                Message = "Profile updated successfully!"
+                            })
+
+                            @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+                            {
+                                Key = "ProfileUpdateError",
+                                Message = "Couldn't update your profile. Please try again."
+                            })
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center mt-3 mb-1">
+                            <button id="update" type="button" class="btn btn-warning btn-lg px-5 py-3 shadow" onclick="updateUser()">
+                                <i class="bi bi-check-circle me-2"></i> Update Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("_RestaurantFooter")
+    </div>
+
+
+
     @await Html.PartialAsync("_Footer")
-    <script src="~/assets/index.js"></script>
     <script src='~/assets/profile/profile.js'></script>
 </body>
-
