@@ -45,8 +45,8 @@ namespace RestaurantSystem.Services
 
         public async Task<List<ReservationModel>> GetReservationsByUserIdAsync(long userId, int page)
         {
-            return await _databaseContext.Reservations.Where(res =>
-                res.UserId == userId).ToListAsync();
+            return await Utility.GetPageAsync(_databaseContext.Reservations
+                .Where(res => res.UserId == userId).AsQueryable(), page).ToListAsync();
         }
 
         public async Task<bool> DeleteReservationAsync(int reservationId)

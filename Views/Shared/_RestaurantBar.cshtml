@@ -1,20 +1,42 @@
 ﻿@model RestaurantSystem.Models.DatabaseModels.RestaurantModel;
 
-<body>
-    <div class="card card-body m-3">
-           <p class="card-text">Restaurant: @string.Join(", ", Model.Address,
-                     Model.City, Model.State, Model.Country)</p>
+<!-- Restaurant Information Bar - Floating/Sticky -->
+<div class="position-sticky top-0 border-0 shadow-sm z-1 mb-2" style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+    <div class="container-fluid py-2">
+        <div class="row align-items-center justify-content-between">
+            <!-- Restaurant Name & Location -->
+            <div class="col-auto">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-shop text-warning me-2 fs-1"></i>
+                    <div>
+                        <h6 class="mb-0 fw-bold">Savans Restaurant</h6>
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt text-warning me-1"></i>
+                            @string.Join(", ", Model.Address, Model.City, Model.State)
+                        </small>
+                    </div>
+                </div>
+            </div>
 
-        <p class="card-text">Postal Code: @Model.PostalCode</p>
-        @if (Model.PhoneNumber != null)
-        {
-            <p class="card-text">Phone Number: @Model.PhoneNumber</p>
-        }
-        @if (Model.Email != null)
-        {
-            <p class="card-text">Email: @Model.Email</p>
-        }
+            <!-- Contact Information -->
+            <div class="col-auto d-none d-md-block">
+                <div class="d-flex align-items-center gap-3">
+                    @if (Model.PhoneNumber != null)
+                    {
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-telephone text-warning me-1"></i>
+                            <small class="text-muted">@Model.PhoneNumber</small>
+                        </div>
+                    }
+                    @if (Model.Email != null)
+                    {
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-envelope text-warning me-1"></i>
+                            <small class="text-muted">@Model.Email</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-
-</body>
-
+</div>
