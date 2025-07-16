@@ -52,7 +52,8 @@ namespace RestaurantSystem.Controllers.Staff
                 return RedirectToAction("Login", "User");
             }
 
-            return View(new ManagerEmployeesViewModel() { 
+            return View(new ManagerEmployeesViewModel()
+            {
                 Page = page,
                 Staff = user,
                 Employees = await _userService
@@ -65,7 +66,8 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/manager/employees/add")]
         public async Task<IActionResult> AddEmployee([FromForm] string Email)
         {
-            if (string.IsNullOrWhiteSpace(Email)) {
+            if (string.IsNullOrWhiteSpace(Email))
+            {
                 return BadRequest();
             }
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext);
@@ -78,7 +80,8 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return BadRequest();
             }
-            if (await _userService.AddEmployeeToRestaurantAsync(newEmployee, user.Restaurant.Id)) {
+            if (await _userService.AddEmployeeToRestaurantAsync(newEmployee, user.Restaurant.Id))
+            {
                 TempData["AddStaff"] = true;
                 return Ok();
             }
@@ -124,7 +127,8 @@ namespace RestaurantSystem.Controllers.Staff
                 return BadRequest();
             }
             UserModel? employee = await _userService.GetUserAsync(employeeRoleFormModel.Id);
-            if (employee == null) {
+            if (employee == null)
+            {
                 return BadRequest();
             }
             if (await _roleService.AssignRoleToUserAsync(
@@ -199,7 +203,8 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return BadRequest();
             }
-            if (await _dishService.CreateDishAsync(createDishFormModel, user.Restaurant.Id)) {
+            if (await _dishService.CreateDishAsync(createDishFormModel, user.Restaurant.Id))
+            {
                 TempData["CreatedSuccessfully"] = true;
                 return Ok();
             }
@@ -211,7 +216,8 @@ namespace RestaurantSystem.Controllers.Staff
         [Route("/staff/manager/dishes/edit")]
         public async Task<IActionResult> EditDishes([FromForm] EditDishFormModel editDishFormModel)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 return BadRequest();
             }
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
@@ -322,6 +328,26 @@ namespace RestaurantSystem.Controllers.Staff
                 return Ok();
             }
             return BadRequest();
+        }
+
+
+        [HttpGet]
+        [Route("/staff/manager/cupons")]
+        public async Task<IActionResult> Cupons([FromQuery] int page = 1)
+        {
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+            return null;
+            /*
+            return View(new ManagerCuponViewModel()
+            {
+                Staff = user,
+                Cupons = await ,
+                Page = page
+            });*/
         }
     }
 }

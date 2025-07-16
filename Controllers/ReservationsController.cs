@@ -16,7 +16,6 @@ namespace RestaurantSystem.Controllers
     [IgnoreAntiforgeryToken]
     public class ReservationsController : Controller
     {
-        private static readonly string _forbit = "Please select a restaurant, that serves customers on-site";
         private ReservationService _reservationService;
         private UserUtility _userUtility;
         private RestaurantService _restaurantService;
@@ -33,7 +32,7 @@ namespace RestaurantSystem.Controllers
         [HttpGet]
         [Route("/reservations")]
         [Route("/reservations/index")]
-        public async Task<IActionResult> Reservations()
+        public async Task<IActionResult> Reservations([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
@@ -46,13 +45,15 @@ namespace RestaurantSystem.Controllers
 
             if (restaurant == null || !restaurant.ServeCustomersInPlace)
             {
+                TempData["ReservationInvalidRestaurant"] = true;
                 return RedirectToAction("Index", "Restaurant");
             }
 
             return View(new ReservationsViewModel()
             {
                 User = user,
-                Reservations = await _reservationService.GetReservationsByUserIdAsync(user.Id)
+                Page = page,
+                Reservations = await _reservationService.GetReservationsByUserIdAsync(user.Id, page)
             });
         }
         
@@ -72,6 +73,7 @@ namespace RestaurantSystem.Controllers
 
             if (restaurant == null || !restaurant.ServeCustomersInPlace)
             {
+                TempData["ReservationInvalidRestaurant"] = true;
                 return RedirectToAction("Index", "Restaurant");
             }
 
@@ -103,14 +105,14 @@ namespace RestaurantSystem.Controllers
                 _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
             if (restaurant == null || !restaurant.ServeCustomersInPlace)
             {
-                TempData["Message"] = _forbit;
+                TempData["ReservationInvalidRestaurant"] = true;
                 return RedirectToAction("Index", "Restaurant");
             }
 
             if (await _reservationService.CreateReservationAsync(user.Id, restaurant.Id, 
                     reservationFormModel) != null)
             {
-                TempData["ReservationSuccessfull"] = true;
+                TempData["ReservationSuccessful"] = true;
                 return Ok();
             }
 
@@ -140,7 +142,7 @@ namespace RestaurantSystem.Controllers
             if (await _reservationService.UpdateReservationAsync(reservationId, 
                 ReservationStatusEnum.Cancelled))
             {
-                TempData["CanceledSuccessfull"] = true;
+                TempData["CanceledSuccessful"] = true;
                 return Ok();
             }
 

@@ -43,7 +43,7 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0 ? reservation : null;
         }
 
-        public async Task<List<ReservationModel>> GetReservationsByUserIdAsync(long userId)
+        public async Task<List<ReservationModel>> GetReservationsByUserIdAsync(long userId, int page)
         {
             return await _databaseContext.Reservations.Where(res =>
                 res.UserId == userId).ToListAsync();

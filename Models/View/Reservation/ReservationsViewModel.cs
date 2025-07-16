@@ -5,6 +5,7 @@ namespace RestaurantSystem.Models.View.Reservation
     public class ReservationsViewModel
     {
         public required UserModel User { get; set; }
+        public required int Page { get; set; } = 1;
         public required List<ReservationModel> Reservations { get; set; }
     }
 }

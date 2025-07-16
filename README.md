@@ -165,7 +165,16 @@ Apply migration
 dotnet ef database update
 ```
 
-Build command for production
+Build command for production (Windows 10/11)
 ```bash
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "./publish"
 ```
+
+## TODO
+
+- Add cupons for the manager to manage.
+
+- If there is time. Add cupon checks in the cart and waitress add order page.
+
+- Waitresses update total price of reservations if needed.
+

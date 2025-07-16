@@ -1,7 +1,7 @@
 ﻿@using RestaurantSystem.Models.View.User
 @model RestaurantSystem.Models.DatabaseModels.UserModel;
 @{
-    ViewData["Title"] = "Add UserAddress";
+    ViewData["Title"] = "Add Address";
 }
 <head>
     @await Html.PartialAsync("_Header")
@@ -72,7 +72,7 @@
                                 <div class="row g-3">
                                     <div class="col-md-4">
                                         <label for="country" class="form-label fw-semibold">
-                                            <i class="bi bi-flag me-1 text-warning"></i>Country <span class="text-danger">*</span>
+                                            <i class="bi bi-flag me-1"></i>Country <span class="text-danger">*</span>
                                         </label>
                                         <select id="country" class="form-select">
                                             <option value="" selected disabled>Select Country</option>
@@ -81,7 +81,7 @@
 
                                     <div class="col-md-4">
                                         <label for="state" class="form-label fw-semibold">
-                                            <i class="bi bi-map me-1 text-warning"></i>State / Province / Region <span class="text-danger">*</span> <span class="text-muted fs-10">(if there is any)</span>
+                                            <i class="bi bi-map me-1"></i>State / Province / Region <span class="text-danger">*</span> <span class="text-muted fs-10">(if there is any)</span>
                                         </label>
                                         <select id="state" class="form-select" disabled>
                                             <option value="" selected disabled>Select State / Province / Region</option>
@@ -90,7 +90,7 @@
 
                                     <div class="col-md-4">
                                         <label for="city" class="form-label fw-semibold">
-                                            <i class="bi bi-building me-1 text-warning"></i>City <span class="text-danger">*</span> <span class="text-muted fs-10">(if there is any)</span>
+                                            <i class="bi bi-building me-1"></i>City <span class="text-danger">*</span> <span class="text-muted fs-10">(if there is any)</span>
                                         </label>
                                         <select id="city" class="form-select" disabled>
                                             <option value="" selected disabled>Select City</option>
@@ -109,10 +109,10 @@
                                 <div class="row g-3">
                                     <div class="col-md-8">
                                         <label for="address" class="form-label fw-semibold">
-                                            <i class="bi bi-geo-alt me-1 text-warning"></i>Street Address <span class="text-danger">*</span>
+                                            <i class="bi bi-geo-alt me-1"></i>Street Address <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control" id="address" name="Address"
-                                               placeholder="Enter your full street address" required>
+                                               placeholder="Enter your full street address">
                                         <div class="form-text">
                                             <i class="bi bi-lightbulb me-1"></i>
                                             Include apartment, suite, or floor number if applicable
@@ -121,10 +121,10 @@
 
                                     <div class="col-md-4">
                                         <label for="postalCode" class="form-label fw-semibold">
-                                            <i class="bi bi-mailbox me-1 text-warning"></i>Postal / Zip Code <span class="text-danger">*</span>
+                                            <i class="bi bi-mailbox me-1"></i>Postal / Zip Code <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control" id="postalCode" name="PostalCode"
-                                               placeholder="Enter postal code" required>
+                                               placeholder="Enter postal code">
                                     </div>
                                 </div>
                             </div>
@@ -138,7 +138,7 @@
 
                                 <div class="col-md-6">
                                     <label for="phoneNumber" class="form-label fw-semibold">
-                                        <i class="bi bi-phone me-1 text-warning"></i>Phone Number <span class="text-danger">*</span>
+                                        <i class="bi bi-phone me-1"></i>Phone Number <span class="text-danger">*</span>
                                     </label>
                                     <input type="tel" class="form-control" id="phoneNumber" name="PhoneNumber"
                                            placeholder="Enter your phone number">
@@ -158,7 +158,7 @@
 
                                 <div class="col-12">
                                     <label for="notes" class="form-label fw-semibold">
-                                        <i class="bi bi-pencil me-1 text-warning"></i>Delivery Notes
+                                        <i class="bi bi-pencil me-1"></i>Delivery Notes
                                     </label>
                                     <textarea class="form-control" id="notes" name="Notes" rows="3"
                                               placeholder="Any special delivery instructions? (e.g., gate code, building entrance, landmarks)"></textarea>
@@ -168,9 +168,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Status Message -->
-                            <div id="status" class="mb-3"></div>
 
                             <!-- Action Buttons -->
                             <div class="d-flex justify-content-between align-items-center pt-3 border-top">

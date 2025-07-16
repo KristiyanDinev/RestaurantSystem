@@ -1,76 +1,221 @@
 ﻿@using RestaurantSystem.Enums;
 @using RestaurantSystem.Models.DatabaseModels;
+@using RestaurantSystem.Models.View.Messages
 @model RestaurantSystem.Models.View.Reservation.ReservationsViewModel;
 @{
     ViewData["Title"] = "Reservations";
 }
-
 <head>
     @await Html.PartialAsync("_Header")
-
     <script src='~/assets/reservations/reservations.js'></script>
 </head>
-
-
 <body>
     @await Html.PartialAsync("_NavBar", Model.User)
 
-    <a class="btn btn-success m-2" href="/reservation">Create</a>
+    <!-- Hero Section -->
+    <div class="bg-warning text-dark py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 fw-bold mb-2">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        Your Reservations at Savans
+                    </h1>
+                    <p class="lead mb-0">Manage your dining experiences with us</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a class="btn btn-dark btn-lg shadow" href="/reservation">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Make New Reservation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <h1>Reservations</h1>
+    <div class="container">
+        
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "ReservationSuccessful",
+            Message = "Your reservation has been created successfully"
+        })
 
-    @if (TempData.Peek("ReservationSuccessfull") != null)
-    {
-        <p>Reservation created successfully.</p>
-        TempData.Remove("ReservationSuccessfull");
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "CanceledSuccessful",
+            Message = "Your reservation has been canceled successfully."
+        })
 
-    } else if (TempData.Peek("CanceledSuccessfull") != null)
-    {
-        <p>Reservation canceled successfully.</p>
-        TempData.Remove("CanceledSuccessfull");
-    }
+        <!-- Paging Component -->
+        <div class="mb-4">
+            @await Html.PartialAsync("_Paging", Model.Page)
+        </div>
+        
+        <!-- Empty State -->
+        @if (!Model.Reservations.Any())
+        {
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-calendar-x display-1 text-muted"></i>
+                </div>
+                <h3 class="text-muted mb-3">No Reservations Yet</h3>
+                <p class="text-muted mb-4">You haven't made any reservations at Savans yet. Start by creating your first reservation!</p>
+                <a class="btn btn-warning btn-lg" href="/reservation">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Make Your First Reservation
+                </a>
+            </div>
+        }
 
-    <div id="reservations">
-
+        <!-- Reservations Grid -->
+        <div id="reservations" class="row">
             @foreach (ReservationModel reservation in Model.Reservations)
             {
-                <div class="card card-body m-2">
-                    <p>Reservation At: @reservation.At_Date.ToLocalTime()</p>
-                    <p>Reserved At: @reservation.Created_At.ToLocalTime()</p>
-                    <p class="card-title">Current Status: @reservation.CurrentStatus</p>
-
-                    <p class="card-text">Adults: @reservation.Amount_Of_Adults</p>
-                    <p>Children: @reservation.Amount_Of_Children</p>
-                    <p>Total Price: @reservation.TotalPrice lv.</p>
-
-                    <h4>Contact Information</h4>
-                    <p>Name: @Model.User.Name</p>
-                    <p>Email: @Model.User.Email</p>
-                    <p>Phone: @reservation.PhoneNumber</p>
-                    @if (Model.User.Image != null)
-                    {
-                        <img class="img img-thumbnail rounded m-2" src="@Model.User.Image" />
-                    }
-
-                    <div class="notes_view">
-                        <p class="notes_title">Notes:</p>
-                        <p class="notes">@reservation.Notes</p>
+                <div class="col-lg-6 col-xl-4 mb-4 page-row">
+                    <div class="card h-100 shadow-sm border border-warning position-relative"
+                         style="transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;"
+                         onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';"
+                         onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='';">
+                        <!-- Card Header with Status -->
+                        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                Reservation
+                            </h5>
+                            <span class="badge @(reservation.CurrentStatus == ReservationStatusEnum.Cancelled ? "bg-danger" :
+                                                 reservation.CurrentStatus == ReservationStatusEnum.Accepted ? "bg-success" : "bg-secondary")">
+                            @reservation.CurrentStatus
+                        </span>
                     </div>
 
-                    <p id="error,@reservation.Id"></p>
+                        <div class="card-body">
+                            <!-- Reservation Details -->
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-clock text-warning me-2"></i>
+                                        <div>
+                                            <small class="text-muted">Dining Time</small>
+                                            <div class="fw-bold">@reservation.At_Date.ToLocalTime().ToString("MMM dd, yyyy")</div>
+                                            <div class="text-warning">@reservation.At_Date.ToLocalTime().ToString("h:mm tt")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-bookmark text-warning me-2"></i>
+                                        <div>
+                                            <small class="text-muted">Reserved On</small>
+                                            <div class="fw-bold">@reservation.Created_At.ToLocalTime().ToString("MMM dd, yyyy")</div>
+                                            <div class="text-muted">@reservation.Created_At.ToLocalTime().ToString("h:mm tt")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                    @if (!reservation.CurrentStatus.Equals(ReservationStatusEnum.Cancelled) &&
+                            <!-- Guest Information -->
+                            <div class="border-top border-secondary pt-3 mb-3">
+                                <h6 class="text-warning mb-2">
+                                    <i class="bi bi-people me-2"></i>
+                                    Party Details
+                                </h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-person text-muted me-2"></i>
+                                            <span>@reservation.Amount_Of_Adults Adults</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-person-heart text-muted me-2"></i>
+                                            <span>@reservation.Amount_Of_Children Children</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        DateTime.UtcNow <= reservation.At_Date.ToUniversalTime().AddHours(-1))
-                    {
-                        <button type="button" class="btn btn-danger m-2" onclick="cancelReservation('@reservation.Id')">Cancel</button>
+                            <!-- Contact Information -->
+                            <div class="border-top border-secondary pt-3 mb-3">
+                                <h6 class="text-warning mb-2">
+                                    <i class="bi bi-person-circle me-2"></i>
+                                    Contact Information
+                                </h6>
+                                <div class="row">
+                                    <div class="col-12 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-person text-muted me-2"></i>
+                                            <span>Name: @Model.User.Name</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-envelope text-muted me-2"></i>
+                                            <span class="text-break">Email: @Model.User.Email</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-telephone text-muted me-2"></i>
+                                            <span>Phone: @reservation.PhoneNumber</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @if (Model.User.Image != null)
+                                {
+                                    <div class="text-center mt-2">
+                                        <img class="rounded-circle" src="@Model.User.Image" width="50" height="50" style="object-fit: cover;" />
+                                    </div>
+                                }
+                            </div>
 
-                    } else
-                    {
-                        <button type="button" class="btn btn-secondary m-2" style="opacity: 50%;">Can't Cancel</button>
-                    }
-            </div>
+                            <!-- Notes Section -->
+                            @if (!string.IsNullOrEmpty(reservation.Notes))
+                            {
+                                <div class="border-top border-secondary pt-3 mb-3">
+                                    <h6 class="text-warning mb-2">
+                                        <i class="bi bi-sticky me-2"></i>
+                                        Special Notes
+                                    </h6>
+                                    <p class="text-muted mb-0 fst-italic">@reservation.Notes</p>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="card-footer border-top border-secondary">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-warning fw-bold fs-5">@reservation.TotalPrice lv.</span>
+                                    <small>Total Amount</small>
+                                </div>
+                                <div>
+                                    <p id="error,@reservation.Id" class="text-danger mb-2"></p>
+                                    @if (!reservation.CurrentStatus.Equals(ReservationStatusEnum.Cancelled) &&
+                                                                    DateTime.UtcNow <= reservation.At_Date.ToUniversalTime().AddHours(-1))
+                                    {
+                                        <button type="button" class="btn btn-outline-danger" onclick="cancelReservation('@reservation.Id')">
+                                            <i class="bi bi-x-circle me-1"></i>
+                                            Cancel
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-outline-secondary" disabled>
+                                            <i class="bi bi-x-circle me-1"></i>
+                                            Can't Cancel
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
+        </div>
+
+        @await Html.PartialAsync("_RestaurantFooter")
     </div>
 
     @await Html.PartialAsync("_Footer")
