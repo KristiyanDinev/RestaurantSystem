@@ -3,6 +3,7 @@
 
 <body>
     <div>
+        @await Html.PartialAsync("_RestaurantLogoText")
 
         @if (Model.Roles.Any(r => RoleEnum.manager.ToString()
                 .Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))

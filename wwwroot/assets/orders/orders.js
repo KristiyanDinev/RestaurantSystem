@@ -1,30 +1,89 @@
 let socket = null
 const registeredOrders = [];
 
-
 const Status = {
     Pending: "Pending",
     Preparing: "Preparing",
     Ready: "Ready",
     Delivering: "Delivering",
     Delivered: "Delivered",
+    Served: "Served"
 };
+
+// Status color mapping for Bootstrap badges
+const StatusColors = {
+    Pending: "warning",
+    Preparing: "info",
+    Ready: "success",
+    Served: "success",
+    Delivering: "primary",
+    Delivered: "success"
+};
+
+// Status icon mapping for Bootstrap icons
+const StatusIcons = {
+    Pending: "hourglass-split",
+    Preparing: "fire",
+    Ready: "check-circle",
+    Served: "check-circle-fill",
+    Delivering: "truck",
+    Delivered: "check2-circle"
+};
+
+// Helper function to get Bootstrap badge color based on status
+function getStatusBadgeColor(status) {
+    return StatusColors[status] || "secondary";
+}
+
+// Helper function to get Bootstrap icon based on status
+function getStatusIcon(status) {
+    return StatusIcons[status] || "question-circle";
+}
+
+// Helper function to update last updated time
+function updateLastUpdatedTime() {
+    const lastUpdatedElement = document.getElementById('lastUpdated');
+    if (lastUpdatedElement) {
+        const now = new Date();
+        lastUpdatedElement.textContent = now.toLocaleTimeString();
+    }
+}
+
+// Helper function to update badge styling
+function updateBadgeStatus(element, status) {
+    // Remove all existing badge color classes
+    const badgeColorClasses = ['bg-warning', 'bg-info', 'bg-success', 'bg-primary', 'bg-secondary', 'bg-danger'];
+    badgeColorClasses.forEach(cls => element.classList.remove(cls));
+
+    // Add new badge color class
+    element.classList.add(`bg-${getStatusBadgeColor(status)}`);
+
+    // Update icon and text
+    const icon = getStatusIcon(status);
+    element.innerHTML = `<i class="bi bi-${icon} me-1"></i>${status}`;
+}
 
 // helper function
 function setCancelButton(orderId, status) {
     const btn = document.getElementById(`cancel,${orderId}`);
 
+    if (!btn) return;
+
     if (status.toLowerCase() !== Status.Pending.toLowerCase()) {
-        btn.className = btn.className.replace("btn-danger", "btn-secondary")
-        btn.innerHTML = "Can't Cancel Order";
-        return
+        // Update button to disabled state
+        btn.className = "btn btn-secondary";
+        btn.innerHTML = '<i class="bi bi-lock me-2"></i> Can\'t Cancel';
+        btn.disabled = true;
+        btn.onclick = null;
+        return;
     }
-    btn.innerHTML = "Cancel";
-    btn.className = btn.className.replace("btn-secondary", "btn-danger")
+
+    // Update button to active state
+    btn.className = "btn btn-outline-danger";
+    btn.innerHTML = '<i class="bi bi-x-circle me-2"></i> Cancel Order';
+    btn.disabled = false;
     btn.onclick = () => cancelOrder(orderId);
 }
-
-
 
 // WebSocket open event handler
 function onopen() {
@@ -52,23 +111,33 @@ function onmessage(event) {
         return
     }
 
+    // Update last updated time
+    updateLastUpdatedTime();
+
+    // Update order status
     if (obj.OrderCurrentStatus) {
-        document.getElementById(`orderstatus,${obj.OrderId}`)
-            .innerHTML = "Current Status: " + obj.OrderCurrentStatus
+        const orderStatusElement = document.getElementById(`orderstatus,${obj.OrderId}`);
+        if (orderStatusElement) {
+            updateBadgeStatus(orderStatusElement, obj.OrderCurrentStatus);
+        }
     }
 
+    // Update dish status
     if (obj.DishId && obj.DishCurrentStatus) {
-        document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`)
-            .innerHTML = "Current Status: " + obj.DishCurrentStatus
+        const dishStatusElement = document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`);
+        if (dishStatusElement) {
+            updateBadgeStatus(dishStatusElement, obj.DishCurrentStatus);
+        }
     }
 
-    setCancelButton(obj.OrderId, obj.OrderCurrentStatus)
+    // Update cancel button state
+    setCancelButton(obj.OrderId, obj.OrderCurrentStatus);
 }
 
 // WebSocket error event handler (currently empty)
 function onerror(event) {
+    console.error('WebSocket error:', event);
 }
-
 
 // Start the WebSocket connection
 function startWebSocket() {
@@ -77,9 +146,15 @@ function startWebSocket() {
 
 // Cancel an order by its ID
 async function cancelOrder(id) {
-    if (!confirm("Do you really want to cancel the order?")) {
+    if (!confirm("Are you sure you want to cancel this order?")) {
         return
     }
+
+    // Show loading state on button
+    const cancelBtn = document.getElementById(`cancel,${id}`);
+    const originalContent = cancelBtn.innerHTML;
+    cancelBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i> Cancelling...';
+    cancelBtn.disabled = true;
 
     try {
         const res = await fetch(`/order/cancel/${id}`, {
@@ -87,12 +162,50 @@ async function cancelOrder(id) {
         })
 
         if (res.ok) {
-            window.location.reload();
+            // Show success message briefly before reload
+            cancelBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Cancelled';
+            cancelBtn.className = "btn btn-success";
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
             return
         }
-
-    } catch {
+    } catch (error) {
+        console.error('Error cancelling order:', error);
     }
 
-    document.getElementById(`error,${id}`).innerHTML = "Can't cancel order";
+    // Restore button state on error
+    cancelBtn.innerHTML = originalContent;
+    cancelBtn.disabled = false;
+
+    // Show error message
+    const errorElement = document.getElementById(`error,${id}`);
+    if (errorElement) {
+        errorElement.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i> Unable to cancel order. Please try again.';
+
+        // Clear error message after 5 seconds
+        setTimeout(() => {
+            errorElement.innerHTML = '';
+        }, 5000);
+    }
 }
+
+// Initialize page when DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    // Set initial last updated time
+    updateLastUpdatedTime();
+
+    // Add smooth scrolling for any anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+});

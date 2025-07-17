@@ -9,13 +9,13 @@
     <div class="container flex-wrap">
         <div class="d-flex flex-wrap gap-2 me-auto mb-2 mb-lg-0">
             <a class="btn btn-primary btn-hover-outline-primary" href="/cart">
-                <i class="bi bi-cart-fill me-1"></i> Cart
+                <i class="bi bi-cart me-1"></i> Cart
             </a>
             <a class="btn btn-primary btn-hover-outline-primary" href="/orders">
                 <i class="bi bi-receipt-cutoff me-1"></i> Orders
             </a>
             <a class="btn btn-primary btn-hover-outline-primary" href="/dishes">
-                <i class="bi bi-egg-fried me-1"></i> Menu
+                <i class="bi bi-leaf me-1"></i> Menu
             </a>
             <a class="btn btn-primary btn-hover-outline-primary" href="/reservations">
                 <i class="bi bi-calendar-check me-1"></i> Reservations
@@ -30,25 +30,25 @@
             @if (Model.Roles.Any(r => RoleEnum.manager.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
             {
                 <a class="btn btn-success btn-hover-outline-success" href="/staff/manager/employees">
-                    <i class="bi bi-people-fill me-1"></i> Staff Panel
+                    <i class="bi bi-people me-1"></i> Staff Panel
                 </a>
             }
             else if (Model.Roles.Any(r => RoleEnum.cook.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
             {
                 <a class="btn btn-success btn-hover-outline-success" href="/staff/dishes">
-                    <i class="bi bi-people-fill me-1"></i> Staff Panel
+                    <i class="bi bi-people me-1"></i> Staff Panel
                 </a>
             }
             else if (Model.Roles.Any(r => RoleEnum.waitress.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
             {
                 <a class="btn btn-success btn-hover-outline-success" href="/staff/orders">
-                    <i class="bi bi-people-fill me-1"></i> Staff Panel
+                    <i class="bi bi-people me-1"></i> Staff Panel
                 </a>
             }
             else if (Model.Roles.Any(r => RoleEnum.delivery.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
             {
                 <a class="btn btn-success btn-hover-outline-success" href="/staff/delivery/address">
-                    <i class="bi bi-people-fill me-1"></i> Staff Panel
+                    <i class="bi bi-people me-1"></i> Staff Panel
                 </a>
             }
         </div>
@@ -57,7 +57,7 @@
             <a class="text-decoration-none d-flex flex-column align-items-center" href="/profile">
                 @if (Model.Image != null)
                 {
-                    <img src="@Model.Image" class="img-thumnail rounded-circle shadow-lg border border-3 border-warning" style="width: 100px; object-fit: cover;" />
+                    <img src="@Model.Image" class="img-thumnail rounded-circle shadow-lg border border-3 border-warning" width="100" height="100" style="object-fit: cover;" />
                 }
                 <p class="fw-bold">@Model.Name</p>
             </a>
