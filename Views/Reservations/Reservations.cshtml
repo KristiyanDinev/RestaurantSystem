@@ -143,6 +143,14 @@
                                     Contact Information
                                 </h6>
                                 <div class="row">
+                                    @if (Model.User.Image != null)
+                                    {
+                                        <div class="col-12 mb-2">
+                                            <div class="text-start mt-2">
+                                                <img class="rounded-circle img-thumbnail object-fit-cover" src="@Model.User.Image" width="100" height="100" />
+                                            </div>
+                                        </div>
+                                    }
                                     <div class="col-12 mb-2">
                                         <div class="d-flex align-items-center">
                                             <i class="bi bi-person text-muted me-2"></i>
@@ -162,12 +170,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            @if (Model.User.Image != null)
-                                {
-                                    <div class="text-center mt-2">
-                                        <img class="rounded-circle img-thumbnail border border-warning" src="@Model.User.Image" width="50" height="50" style="object-fit: cover;" />
-                                    </div>
-                                }
+                            
                             </div>
 
                             <!-- Notes Section -->

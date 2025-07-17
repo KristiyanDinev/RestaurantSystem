@@ -38,11 +38,11 @@ function UseWebSockets(url, onopen, onclose, onerror, onmessage) {
     return socket
 }
 
-function setDataToLocalStorage(key, value) {
+function setDataToSessionStorage(key, value) {
     window.sessionStorage.setItem(key, value);
 }
 
-function getDataFromLocalStorage(key) {
+function getDataFromSessionStorage(key) {
     return window.sessionStorage.getItem(key);
 }
 
@@ -56,7 +56,7 @@ function clearAllDataFromLocalStorage() {
 
 var __port = (document.location.port.length == 0 ? "" : ":"+ document.location.port)
 
-setDataToLocalStorage("WebSocketHost", (document.location.protocol === "https:" ? "wss" : "ws") +
+setDataToSessionStorage("WebSocketHost", (document.location.protocol === "https:" ? "wss" : "ws") +
      "://" + document.location.hostname + __port)
 
 

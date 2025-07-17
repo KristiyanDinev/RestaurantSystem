@@ -18,10 +18,9 @@
                 <div class="col-md-3 col-4 mb-3 mb-md-0">
                     @if (dish.Image != null)
                     {
-                        <img class="img-fluid rounded shadow-sm"
+                        <img class="img-fluid rounded shadow-sm object-fit-cover"
                              src="@dish.Image"
-                             alt="@dish.Name"
-                             style="max-height: 120px; object-fit: cover;">
+                             alt="@dish.Name">
                     }
                     else
                     {

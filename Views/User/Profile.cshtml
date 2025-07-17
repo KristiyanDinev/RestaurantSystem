@@ -49,8 +49,8 @@
                                 @if (Model.Image != null)
                                 {
                                     <img id="image" src="@Model.Image" alt="user image"
-                                         class="rounded-circle shadow-lg border border-3 border-warning"
-                                         style="width: 150px; height: 150px; object-fit: cover;">
+                                         class="rounded-circle shadow-lg border border-3 border-warning object-fit-cover"
+                                         width="150" height="150">
                                 }
                                 else
                                 {
@@ -89,8 +89,8 @@
                             </div>
 
                             <img id="preview" alt="Profile Image Preview"
-                                 class="img-thumnail rounded-circle shadow-lg border border-3 border-warning d-none"
-                                 style="width: 150px; object-fit: cover;" />
+                                 class="img-thumnail rounded-circle shadow-lg border border-3 border-warning d-none object-fit-cover"
+                                 width="150" height="150" />
                         </div>
 
                         <!-- Form Fields -->
