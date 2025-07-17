@@ -101,3 +101,7 @@ function toggleElement(id) {
         ele.style.display = 'none'
     }
 }
+
+
+
+// const theme = localStorage.getItem('theme');

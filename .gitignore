@@ -1,6 +1,8 @@
 .vs/
+.vscode/
 bin/
 obj/
 logs/
+wwwroot/assets/images/user/*
 startup.sql
 publish/
