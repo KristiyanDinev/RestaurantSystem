@@ -31,7 +31,7 @@ namespace RestaurantSystem.Services
         public async Task<CuponModel?> GetCuponByCodeAsync(string cuponCode)
         {
             return await _databaseContext.Cupons.FirstOrDefaultAsync(
-                c => c.CuponCode == cuponCode);
+                c => c.CuponCode.Equals(cuponCode));
         }
 
         public async Task<CuponModel?> CreateCuponAsync(string cuponCode, string name,
@@ -51,7 +51,7 @@ namespace RestaurantSystem.Services
 
         public decimal HandleCuponDiscount(int discountPercent, decimal totalPrice)
         {
-            return totalPrice - (totalPrice * (discountPercent / 100));
+            return totalPrice - (totalPrice * (discountPercent / 100m));
         }
     }
 }

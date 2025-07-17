@@ -2,7 +2,7 @@
 @using RestaurantSystem.Models.View.Messages
 @model List<RestaurantModel>
 @{
-    ViewData["Title"] = "Restaurants";
+    ViewData["Title"] = "Restaurants - Savans Restaurant";
 }
 <head>
     @await Html.PartialAsync("_Header")
@@ -20,7 +20,7 @@
                     <i class="bi bi-shop me-3"></i>Choose Your Savans Location
                 </h1>
                 <p class="lead text-muted">Select from our restaurant locations</p>
-                <div class="mx-auto" style="width: 100px; height: 2px; background: linear-gradient(90deg, #ffc107, #212529);"></div>
+                <div class="mx-auto" style="width: 300px; height: 2px; background: linear-gradient(90deg, #ffc107, #212529);"></div>
             </div>
             <div class="p-2">
                 @await Html.PartialAsync("_ChangeTheme")

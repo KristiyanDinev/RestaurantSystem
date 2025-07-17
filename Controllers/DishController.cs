@@ -84,39 +84,5 @@ namespace RestaurantSystem.Controllers {
                 DishType = dishType
             });
         }
-
-
-        [HttpGet]
-        [Route("/dish/{dishId}")]
-        public async Task<IActionResult> DishById(int dishId)
-        {
-            UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-
-            RestaurantModel? restaurant = await _restaurantService.GetRestaurantByIdAsync(
-                _restaurantService.GetRestaurantIdFromCookieHeaderAsync(HttpContext));
-
-            if (restaurant == null)
-            {
-                return RedirectToAction("Index", "Restaurant");
-            }
-
-            DishModel? dish = await _dishService.GetDishByIdAsync(dishId);
-            if (dish == null)
-            {
-                return RedirectToAction("Dishes");
-            }
-
-            return View(new DishViewModel()
-            {
-                Dish = dish,
-                Restaurant = restaurant,
-                User = user
-            });
-        }
-
     }
 }

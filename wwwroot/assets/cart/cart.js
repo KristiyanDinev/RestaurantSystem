@@ -1,5 +1,4 @@
-
-
+var isInvalid = 'is-invalid'
 async function startOrder() {
     if (getCookie(cart_header).length == 0) {
         alert("You don't have any dishes to order as of now.")
@@ -7,9 +6,12 @@ async function startOrder() {
         return;
     }
 
-    let address_id = document.getElementById("address").value
+    let addressElement = document.getElementById("address")
+    addressElement.classList.remove(isInvalid)
+
+    let address_id = addressElement.value
     if (!address_id) {
-        document.getElementById("error").innerHTML = "Please select an address to continue."
+        addressElement.classList.add(isInvalid)
         return;
     }
 
@@ -19,19 +21,51 @@ async function startOrder() {
     formData.append("AddressId", address_id)
 
     try {
-        const res = await fetch('/order/start', {
+        await fetch('/order/start', {
             method: 'POST',
             body: formData,
         })
 
-        if (res.ok) {
-            window.location.pathname = "/orders"
+        window.location.pathname = "/orders"
+    } catch {}
+}
 
-        } else {
-            document.getElementById("error").innerHTML = "Couldn't start your order"
-        }
 
-    } catch {
-        document.getElementById("error").innerHTML = "Error while starting your order"
+
+
+async function applyCuponCode() {
+    let cuponCodeElement = document.getElementById("cupon_input")
+    const code = cuponCodeElement.value
+    if (code.length == 0) {
+        cuponCodeElement.classList.add(isInvalid)
+        return;
     }
+
+    cuponCodeElement.classList.remove(isInvalid)
+
+    let applyButton = document.getElementById("apply")
+    const originText = applyButton.innerHTML
+    applyButton.disabled = true
+    applyButton.innerHTML = '<i class="bi bi-check2"></i> Applying...'
+
+    let formData = new FormData()
+    formData.append("CuponCode", code)
+    formData.append("Total", document.getElementById("total").value)
+
+    try {
+        const res = await fetch(`/cupon/validate`, {
+            method: "POST",
+            body: formData,
+        })
+
+        if (res.ok) {
+            window.location.reload()
+            return
+        }
+        
+    } catch {}
+
+    cuponCodeElement.classList.add(isInvalid)
+    applyButton.disabled = false
+    applyButton.innerHTML = originText
 }

@@ -3,32 +3,144 @@
 
 @{
     decimal sum = 0;
+    int totalItems = 0;
+    bool isFirst = true;
 
     foreach (DishModel dish in Model.Keys)
     {
         int count = Model[dish];
         sum += dish.Price * count;
+        totalItems += count;
 
-        <div class="card">
-            <div class="card-body">
-                @if (dish.Image != null)
-                {
-                    <img class="img-thumbnail rounded" src="@dish.Image">
-                }
-                <h4 class="card-title">@dish.Name</h4>
-                <p class="card-text">Grams: /@dish.Grams/</p>
-                <p class="card-text">Ingredients: @dish.Ingredients</p>
-                <p class="card-text">Avrage Time To Cook: @dish.AverageTimeToCook</p>
-                <p class="card-text">@dish.Price lv.</p>
-                <div class="quantity">
-                    <p class="card-text">Quantity: @count</p>
+        <div class="@(isFirst ? "" : "border-top") p-3">
+            <div class="row align-items-center">
+                <!-- Dish Image -->
+                <div class="col-md-3 col-4 mb-3 mb-md-0">
+                    @if (dish.Image != null)
+                    {
+                        <img class="img-fluid rounded shadow-sm"
+                             src="@dish.Image"
+                             alt="@dish.Name"
+                             style="max-height: 120px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="bg-warning bg-opacity-10 rounded d-flex align-items-center justify-content-center text-muted"
+                             style="height: 120px;">
+                            <i class="bi bi-image fs-1 text-warning opacity-50"></i>
+                        </div>
+                    }
+                </div>
 
-                    <button type="button" class="btn btn-danger m-2" onclick="removeDishFromCart('@dish.Id', '@dish.Name', true)">Remove</button>
-                    <button type="button" class="btn btn-success m-2" onclick="addDishToCart('@dish.Id', '@dish.Name', true)">Add</button>
+                <!-- Dish Details -->
+                <div class="col-md-5 col-8">
+                    <h5 class="mb-2 text-warning">@dish.Name</h5>
+                    <div class="text-muted small mb-2">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <i class="bi bi-clock"></i> @dish.AverageTimeToCook
+                            </div>
+                            <div class="col-sm-6">
+                                <i class="bi bi-speedometer2"></i> @dish.Grams g
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-list-ul"></i> @dish.Ingredients
+                    </p>
+                </div>
+
+                <!-- Quantity & Price -->
+                <div class="col-md-4 col-12">
+                    <div class="text-center">
+                        <div class="mb-2">
+                            <span class="badge bg-warning text-dark fs-6">@dish.Price lv.</span>
+                        </div>
+
+                        <!-- Quantity Controls -->
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <button type="button"
+                                    class="btn btn-outline-danger btn-sm me-2"
+                                    onclick="removeDishFromCart('@dish.Id', '@dish.Name', true)">
+                                <i class="bi bi-dash"></i>
+                            </button>
+
+                            <span class="badge px-3 text-dark bg-warning py-2">@count</span>
+
+                            <button type="button"
+                                    class="btn btn-outline-success btn-sm ms-2"
+                                    onclick="addDishToCart('@dish.Id', '@dish.Name', true)">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+
+                        <!-- Item Total -->
+                        <div class="text-muted small">
+                            Total: <strong>@(dish.Price* count) lv.</strong>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        isFirst = false;
     }
 
-    <p>Total Price (not counting discounted price): @sum</p>
+    <input hidden id="total" class="d-none" value="@sum">
+
+    <!-- Cart Summary -->
+    <div class="border-top p-3">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-basket3 text-warning fs-4 me-2"></i>
+                    <div>
+                        <h6 class="mb-0">@totalItems Items in Cart</h6>
+                        <small class="text-muted">Order Summary</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="text-md-end">
+                    <!-- Subtotal -->
+                    <div class="mb-1">
+                        <span class="text-muted">Subtotal:</span>
+                        <span class="text-warning fw-bold">@sum lv.</span>
+                    </div>
+
+                    <!-- Discount Information -->
+                    @if (TempData.Peek("CuponDiscount") != null)
+                    {
+                        <div class="mb-1">
+                            <span class="text-muted">Discount (@TempData["CuponDiscount"]%):</span>
+                            <span class="text-success fw-bold">
+                                -@((sum * Convert.ToDecimal(TempData["CuponDiscount"]) / 100).ToString("F2")) lv.
+                            </span>
+
+                        </div>
+                        TempData.Remove("CuponDiscount");
+                    }
+
+                    <!-- Final Total -->
+                    @if (TempData.Peek("CuponTotal") != null)
+                    {
+                        <div class="border-top pt-2 mt-2">
+                            <span class="text-muted">Total:</span>
+                            <span class="text-warning fw-bold fs-4">
+                                @(Convert.ToDecimal(TempData["CuponTotal"]).ToString("F2")) lv.
+                            </span>
+                        </div>
+                        TempData.Remove("CuponTotal");
+                    }
+                    else
+                    {
+                        <div class="border-top pt-2 mt-2">
+                            <span class="text-muted">Total:</span>
+                            <span class="text-warning fw-bold fs-4">@sum lv.</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 }

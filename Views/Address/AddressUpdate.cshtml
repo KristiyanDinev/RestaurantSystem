@@ -1,7 +1,7 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels;
 @model RestaurantSystem.Models.View.Address.AddressesViewModel;
 @{
-    ViewData["Title"] = "Update UserAddress";
+    ViewData["Title"] = "Update Address - Savans Restaurant";
     AddressModel address = Model.Addresses.First();
 }
 <head>
@@ -179,7 +179,7 @@
                             </div>
                             <input type="text" id="postalCode" class="form-control form-control-lg"
                                    value="@address.PostalCode"
-                                   placeholder="Enter postal/zip code (e.g., 12345)">
+                                   placeholder="Enter postal / zip code (e.g., 12345)">
                         </div>
 
                         <!-- Notes Section -->
@@ -200,9 +200,6 @@
                                 Help our delivery team find you easily with specific instructions
                             </div>
                         </div>
-
-                        <!-- Status Message -->
-                        <div id="status" class="mb-4"></div>
 
                         <!-- Action Buttons -->
                         <div class="d-grid gap-2 d-md-flex justify-content-md-start">

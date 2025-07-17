@@ -30,11 +30,6 @@ function removeDishFromCart(id, name, isInCart) {
     }
 }
 
-function goToDish(id) {
-    window.location.pathname = "/dish/" + Number(id)
-}
-
-
 function toggleDish(type) {
     document.getElementById('salads').style.display = "none"
     document.getElementById('soups').style.display = "none"

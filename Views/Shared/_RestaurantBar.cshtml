@@ -1,7 +1,7 @@
 ﻿@model RestaurantSystem.Models.DatabaseModels.RestaurantModel;
 
-<!-- Restaurant Information Bar - Floating/Sticky -->
-<div class="position-sticky top-0 border-0 shadow-sm z-1 mb-2" style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+<!-- Restaurant Information Bar - Smart Sticky -->
+<div id="restaurant-info-bar" class="border-0 shadow-sm mb-2" style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s ease;">
     <div class="container-fluid py-2">
         <div class="row align-items-center justify-content-between">
             <!-- Restaurant Name & Location -->
@@ -17,7 +17,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Contact Information -->
             <div class="col-auto d-none d-md-block">
                 <div class="d-flex align-items-center gap-3">
@@ -40,3 +39,65 @@
         </div>
     </div>
 </div>
+
+<!-- Placeholder to maintain layout when bar becomes fixed -->
+<div id="restaurant-info-placeholder" style="height: 0; transition: height 0.3s ease;"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const restaurantBar = document.getElementById('restaurant-info-bar');
+        const placeholder = document.getElementById('restaurant-info-placeholder');
+
+        const originalOffsetTop = restaurantBar.offsetTop;
+        const barHeight = restaurantBar.offsetHeight;
+
+        placeholder.style.height = barHeight + 'px';
+        placeholder.style.display = 'none';
+
+        let ticking = false;
+
+        function handleScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop >= originalOffsetTop) {
+                // User has scrolled past the original position - make it sticky
+                if (restaurantBar.style.position !== 'fixed') {
+                    restaurantBar.style.position = 'fixed';
+                    restaurantBar.style.top = '0';
+                    restaurantBar.style.left = '0';
+                    restaurantBar.style.width = '100%';
+                    restaurantBar.style.zIndex = '9999';
+
+                    // Show placeholder to prevent content jump
+                    placeholder.style.display = 'block';
+                }
+            } else {
+                // User is at or above original position - make it normal
+                if (restaurantBar.style.position !== 'static') {
+                    restaurantBar.style.position = 'static';
+                    restaurantBar.style.top = 'auto';
+                    restaurantBar.style.left = 'auto';
+                    restaurantBar.style.width = 'auto';
+                    restaurantBar.style.zIndex = 'auto';
+
+                    // Hide placeholder
+                    placeholder.style.display = 'none';
+                }
+            }
+
+            ticking = false;
+        }
+
+        function requestTick() {
+            if (!ticking) {
+                requestAnimationFrame(handleScroll);
+                ticking = true;
+            }
+        }
+
+        // Listen for scroll events with throttling
+        window.addEventListener('scroll', requestTick, { passive: true });
+
+        handleScroll();
+    });
+</script>

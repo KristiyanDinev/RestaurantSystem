@@ -1,4 +1,5 @@
-﻿namespace RestaurantSystem.Extentions
+﻿
+namespace RestaurantSystem.Extentions
 {
     public static class ControllersWithViewsExtention
     {
