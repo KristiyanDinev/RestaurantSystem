@@ -15,9 +15,14 @@ async function startOrder() {
         return;
     }
 
+    let cuponCodeElement = document.getElementById("cupon_input")
+    let notesElement = document.getElementById("notes")
+    cuponCodeElement.classList.remove(isInvalid)
+    notesElement.classList.remove(isInvalid)
+
     let formData = new FormData()
-    formData.append("Notes", document.getElementById("notes").value)
-    formData.append("CuponCode", document.getElementById("cupon_input").value)
+    formData.append("Notes", notesElement.value)
+    formData.append("CuponCode", cuponCodeElement.value)
     formData.append("AddressId", address_id)
 
     try {

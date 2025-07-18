@@ -130,9 +130,9 @@ namespace RestaurantSystem.Services
                 .Include(order => order.User)
                 .Where(order => 
                 order.RestaurantId == restaurantId &&
-                !(order.CurrentStatus.ToString().Equals(OrderStatusEnum.Served.ToString()) ||
-                  order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivering.ToString()) ||
-                  order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivered.ToString())))
+                !(order.CurrentStatus.Equals(OrderStatusEnum.Served) ||
+                  order.CurrentStatus.Equals(OrderStatusEnum.Delivering) ||
+                  order.CurrentStatus.Equals(OrderStatusEnum.Delivered)))
                 .ToListAsync();
         }
 
@@ -142,8 +142,8 @@ namespace RestaurantSystem.Services
                 .Include(order => order.User)
                 .Where(order =>
                 order.RestaurantId == restaurantId &&
-                !(order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivering.ToString()) ||
-                  order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivered.ToString())))
+                !(order.CurrentStatus.Equals(OrderStatusEnum.Delivering)) ||
+                  order.CurrentStatus.Equals(OrderStatusEnum.Delivered))
                 .ToListAsync();
         }
 
@@ -193,6 +193,5 @@ namespace RestaurantSystem.Services
                 .AsQueryable(), page)
                 .ToListAsync();
         }
-
     }
 }

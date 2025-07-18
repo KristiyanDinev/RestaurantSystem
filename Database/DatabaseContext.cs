@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
-using System.Reflection.Emit;
 
 namespace RestaurantSystem.Database {
     public class DatabaseContext : DbContext {
 
         public DbSet<UserModel> Users { get; set; }
         public DbSet<CuponModel> Cupons { get; set; }
-        public DbSet<DishModel> Dishies { get; set; }
+        public DbSet<DishModel> Dishes { get; set; }
         public DbSet<OrderedDishesModel> OrderedDishes { get; set; }
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<ServiceModel> Services { get; set; }

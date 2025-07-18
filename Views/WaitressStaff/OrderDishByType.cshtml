@@ -1,0 +1,150 @@
+@using RestaurantSystem.Models.DatabaseModels;
+@model RestaurantSystem.Models.View.Dish.DishesTypeViewModel;
+@{
+    ViewData["Title"] = Model.DishType.Substring(0, 1).ToUpper() + Model.DishType.Substring(1) + " - Savans Restaurant";
+}
+<head>
+    @await Html.PartialAsync("_Header")
+    <script src='~/assets/dishes/dish.js'></script>
+</head>
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.User)
+    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
+
+    <!-- Hero Section -->
+    <div class="bg-warning text-dark py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3">
+                        <i class="bi bi-bookmark-star-fill me-3"></i>
+                        @ViewData["Title"]
+                    </h1>
+                    <p class="lead mb-0">Discover our carefully crafted @ViewData["Title"]!.ToString()!.ToLower() at Savans Restaurant.</p>
+                </div>
+                <div class="col-lg-4 text-end d-none d-lg-block">
+                    <i class="bi bi-heart-fill display-1 text-dark opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dishes Section -->
+    <div class="container my-5">
+        <div class="d-flex justify-content-start align-items-center mb-4">
+            <a href="/staff/orders/dishes" class="btn btn-outline-warning">
+                <i class="bi bi-arrow-left me-2"></i> Back to Menu
+            </a>
+        </div>
+        @if (Model.Dishes.Count == 0)
+        {
+            <!-- Empty State -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-exclamation-circle text-warning display-1 opacity-50"></i>
+                        </div>
+                        <h3 class="mb-3">No dishes available</h3>
+                        <p class="text-muted mb-4">We're currently updating our @ViewData["Title"]!.ToString()!.ToLower() menu. Please check back soon!</p>
+                        <a href="/staff/orders/dishes" class="btn btn-warning text-white fw-semibold px-4 py-2 rounded-pill">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Back to Menu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        } else {
+            <div class="row g-4">
+                @foreach (DishModel dishModel in Model.Dishes)
+                {
+                    <div class="col-xl-4 col-lg-6 col-md-6">
+                        <div class="card border border-warning rounded shadow-sm @(dishModel.IsAvailable ? "h-100" : "h-100 opacity-75")"
+                             style="cursor:pointer;transition: all 0.3s ease;"
+                             onclick="@(dishModel.IsAvailable ? "addDishToCart('" + dishModel.Id + "', '" + dishModel.Name.Replace("'", "\\'") + "', false)" : "")"
+                             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 20px 35px rgba(255,193,7,0.3)';"
+                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                            @if (dishModel.Image != null)
+                            {
+                                <div class="position-relative overflow-hidden" style="height: 200px;">
+                                    <img class="card-img-top w-100 h-100 object-fit-cover" src="@dishModel.Image" alt="@dishModel.Name">
+                                    @if (!dishModel.IsAvailable)
+                                    {
+                                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center">
+                                            <span class="badge bg-secondary fs-6 px-3 py-2">
+                                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                                Not Available
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="bg-warning bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-image text-warning display-4 opacity-50"></i>
+                                </div>
+                            }
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold mb-3">@dishModel.Name</h5>
+
+                                @if (!string.IsNullOrEmpty(dishModel.Ingredients))
+                                {
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-start text-muted">
+                                            <i class="bi bi-list-ul me-2 mt-1"></i>
+                                            <small class="flex-grow-1">@dishModel.Ingredients</small>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="bi bi-speedometer2 me-2"></i>
+                                            <small>@dishModel.Grams g</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+                                            <span class="h5 fw-bold text-warning mb-0">@dishModel.Price lv.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(dishModel.AverageTimeToCook))
+                                {
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="bi bi-clock me-2"></i>
+                                            <small>@dishModel.AverageTimeToCook</small>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                                @if (dishModel.IsAvailable)
+                                {
+                                    <button type="button" class="btn btn-warning text-white fw-semibold w-100 py-2 rounded-pill">
+                                        <i class="bi bi-cart-plus me-2"></i>
+                                        Add to Order
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-secondary w-100 py-2 rounded-pill" disabled>
+                                        <i class="bi bi-x-circle me-2"></i>
+                                        Not Available
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        @await Html.PartialAsync("_RestaurantFooter")
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+</body>

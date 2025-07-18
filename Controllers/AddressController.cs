@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
 using RestaurantSystem.Models.View.Address;

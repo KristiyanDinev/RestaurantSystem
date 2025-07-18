@@ -1,0 +1,205 @@
+﻿@using RestaurantSystem.Enums
+@using RestaurantSystem.Models.DatabaseModels
+@using RestaurantSystem.Models.View.Staff.Waitress
+@model OrderDetailsViewModel;
+@{
+    ViewData["Title"] = "Order Details - Savans Restaurant";
+}
+
+<head>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/dishes/dish.js"></script>
+    <script src='~/assets/cart/cart.js'></script>
+    <script src="~/assets/staff/waitress/order_details_staff.js"></script>
+</head>
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+
+    <!-- Hero Section -->
+    <div class="bg-warning text-dark py-5 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3">
+                        <i class="bi bi-receipt-cutoff me-3"></i> Order Finalize
+                    </h1>
+                    <p class="lead mb-0 fw-medium">Complete and finalize customer orders with precision</p>
+                </div>
+                <div class="col-lg-4 text-end d-none d-lg-block">
+                    <i class="bi bi-clipboard-check display-1 text-dark opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Order Form -->
+    <div class="container mb-5 my-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div class="card shadow-lg border-0">
+                    <div class="d-flex justify-content-start align-items-center mb-4">
+                        <a href="/staff/orders/dishes" class="btn btn-outline-warning">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Back to Dish Selection
+                        </a>
+                    </div>
+                    <div class="card-header bg-warning text-dark py-4">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="card-title mb-0 fw-bold">
+                                    <i class="bi bi-basket3 me-2"></i>
+                                    Finalize Order
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- Selected Dishes Section -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-list-ul text-warning me-2 fs-5"></i>
+                                <h5 class="mb-0 text-dark fw-semibold">Selected Dishes</h5>
+                            </div>
+                            <div class="rounded border p-3 shadow-sm">
+                                @await Html.PartialAsync("_CartDishes", Model.Dishes)
+                            </div>
+                        </div>
+
+                        <!-- Order Details Form -->
+                        <div class="row g-4">
+                            <!-- Table Number -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" id="table" class="form-control border-2" placeholder="Table Number">
+                                    <label for="table" class="text-muted">
+                                        <i class="bi bi-table me-2"></i>
+                                        Table Number
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Quick Table Selection -->
+                            <div class="col-md-6">
+                                <label class="form-label text-muted fw-medium">
+                                    <i class="bi bi-lightning me-1"></i>
+                                    Quick Table Select
+                                </label>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <script>
+                                        const tableButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+                                        for (let i of tableButtons) {
+                                            document.write(`
+                                                <button type="button" class="btn btn-outline-warning btn-sm" onclick="document.getElementById('table').value='${i}'">
+                                                    Table ${i}
+                                                </button>
+                                            `);
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coupon Code Section -->
+                        <div class="mt-4">
+                            <div class="card border-warning shadow-sm">
+                                <div class="card-header bg-warning text-dark py-3">
+                                    <h6 class="mb-0 fw-bold">
+                                        <i class="bi bi-tag me-2"></i>
+                                        Cupon Code
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-8">
+                                            @if (TempData.Peek("CuponInvalid") != null)
+                                            {
+                                                <div class="form-floating">
+                                                    <input id="cupon_input"
+                                                           class="form-control is-invalid border-2"
+                                                           maxlength="25"
+                                                           placeholder="Enter coupon code"
+                                                           value="@TempData["CuponCode"]">
+                                                    <label for="cupon_input">Coupon Code</label>
+                                                    <div class="invalid-feedback">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                                        Invalid coupon code
+                                                    </div>
+                                                </div>
+                                                TempData.Remove("CuponInvalid");
+                                            } 
+                                            else if (TempData.Peek("CuponValid") != null)
+                                            {
+                                                <div class="form-floating">
+                                                    <input id="cupon_input"
+                                                           class="form-control is-valid border-2"
+                                                           maxlength="25"
+                                                           placeholder="Enter coupon code"
+                                                           value="@TempData["CuponCode"]">
+                                                    <label for="cupon_input">Coupon Code</label>
+                                                    <div class="valid-feedback">
+                                                        <i class="bi bi-check-circle me-1"></i>
+                                                        Coupon applied successfully!
+                                                    </div>
+                                                </div>
+                                                TempData.Remove("CuponValid");
+                                            } 
+                                            else
+                                            {
+                                                <div class="form-floating">
+                                                    <input id="cupon_input"
+                                                           class="form-control border-2"
+                                                           maxlength="25"
+                                                           placeholder="Enter coupon code">
+                                                    <label for="cupon_input">Coupon Code</label>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button class="btn btn-warning text-white h-100 w-100 fw-medium" 
+                                                    type="button" onclick="applyCuponCode()" id="apply">
+                                                <i class="bi bi-check2-circle me-2"></i>
+                                                Apply Code
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Notes -->
+                        <div class="mt-4">
+                            <div class="form-floating">
+                                <textarea id="notes" class="form-control border-2" placeholder="Special instructions or notes" style="height: 100px;"></textarea>
+                                <label for="notes" class="text-muted">
+                                    <i class="bi bi-pencil-square me-2"></i>
+                                    Special Instructions & Notes
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Maximum 255 characters
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="card-footer border-0 p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button onclick="submit()" type="button" class="btn btn-warning btn-lg shadow-sm">
+                                    <i class="bi bi-check-circle"></i> Place Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @await Html.PartialAsync("_RestaurantFooter")
+            </div>
+        </div>
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+</body>

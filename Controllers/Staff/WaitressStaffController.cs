@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
+using RestaurantSystem.Models.View.Dish;
 using RestaurantSystem.Models.View.Staff.Waitress;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
@@ -24,17 +24,14 @@ namespace RestaurantSystem.Controllers.Staff
         private DishService _dishService;
         private CuponService _cuponService;
         private WebSocketService _webSocketService;
-        private WebSocketUtility _webSocketUtility;
 
         public WaitressStaffController(UserUtility userUtility,
             OrderedDishesService orderedDishesService,
             ReservationService reservationService,
             OrderService orderService,
-            OrderedDishesService orderedDishes,
             DishService dishService,
             CuponService cuponService,
-            WebSocketService webSocketService,
-            WebSocketUtility webSocketUtility)
+            WebSocketService webSocketService)
         {
             _userUtility = userUtility;
             _reservationService = reservationService;
@@ -43,7 +40,6 @@ namespace RestaurantSystem.Controllers.Staff
             _dishService = dishService;
             _cuponService = cuponService;
             _webSocketService = webSocketService;
-            _webSocketUtility = webSocketUtility;
         }
 
         [HttpGet]
@@ -153,8 +149,8 @@ namespace RestaurantSystem.Controllers.Staff
 
 
         [HttpGet]
-        [Route("/staff/orders/create")]
-        public async Task<IActionResult> OrderCreate()
+        [Route("/staff/orders/details")]
+        public async Task<IActionResult> OrderDetails()
         {
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
@@ -181,7 +177,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
             return View(new OrderDetailsViewModel { 
                 Staff = user,
-                Dishs = dishes,
+                Dishes = dishes,
             });
         }
 
@@ -195,24 +191,37 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return RedirectToAction("Login", "User");
             }
+            return View(user);
+        }
 
-            int restaurantId = user.Restaurant.Id;
-            return View(new OrderChoseDishViewModel
-            { 
-                Staff = user,
-                Salads = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.salads, restaurantId),
-                Soups = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.soups, restaurantId),
-                Appetizers = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.appetizers, restaurantId),
-                Dishes = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.dishes, restaurantId),
-                Desserts = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.desserts, restaurantId),
-                Drinks = await _dishService.GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum.drinks, restaurantId)
+
+        [HttpGet]
+        [Route("/staff/orders/dishes/{dishTypeStr}")]
+        public async Task<IActionResult> OrderDishByType(string dishTypeStr)
+        {
+            if (!DishTypeEnum.TryParse(dishTypeStr, true, out DishTypeEnum dishType))
+            {
+                return BadRequest();
+            }
+            UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            return View(new DishesTypeViewModel()
+            {
+                User = user,
+                Dishes = await _dishService.GetDishesByTypeAndRestaurantIdAsync(dishType, user.Restaurant.Id),
+                DishType = dishType.ToString(),
+                Restaurant = user.Restaurant
             });
         }
 
 
         [HttpPost]
-        [Route("/staff/orders/create")]
-        public async Task<IActionResult> OrderCreatePost(
+        [Route("/staff/orders/details")]
+        public async Task<IActionResult> OrderDetailsPost(
             [FromForm] WaitressOrderFormModel waitressOrderForm)
         {
             if (!ModelState.IsValid)
@@ -228,13 +237,13 @@ namespace RestaurantSystem.Controllers.Staff
             List<int> DishIds = _dishService.GetDishIDsFromCartAsync(HttpContext);
 
             decimal totalPrice = 0;
-            List<int> CoutingDishId = new List<int>(DishIds);
+            List<int> CountingDishId = new List<int>(DishIds);
             foreach (DishModel dishModel in await _dishService.GetDishesByIdsAsync(DishIds.ToHashSet()))
             {
-                int beforeRemovalCount = CoutingDishId.Count;
-                CoutingDishId.RemoveAll(id => id == dishModel.Id);
+                int beforeRemovalCount = CountingDishId.Count;
+                CountingDishId.RemoveAll(id => id == dishModel.Id);
 
-                totalPrice += dishModel.Price * (beforeRemovalCount - CoutingDishId.Count);
+                totalPrice += dishModel.Price * (beforeRemovalCount - CountingDishId.Count);
             }
 
             if (!string.IsNullOrWhiteSpace(waitressOrderForm.CuponCode))

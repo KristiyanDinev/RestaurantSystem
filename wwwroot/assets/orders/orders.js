@@ -157,55 +157,18 @@ async function cancelOrder(id) {
     cancelBtn.disabled = true;
 
     try {
-        const res = await fetch(`/order/cancel/${id}`, {
+        await fetch(`/order/cancel/${id}`, {
             method: 'POST'
         })
 
-        if (res.ok) {
-            // Show success message briefly before reload
-            cancelBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Cancelled';
-            cancelBtn.className = "btn btn-success";
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
-            return
-        }
-    } catch (error) {
-        console.error('Error cancelling order:', error);
-    }
+         window.location.reload();
+         return
+    } catch {}
 
     // Restore button state on error
     cancelBtn.innerHTML = originalContent;
     cancelBtn.disabled = false;
-
-    // Show error message
-    const errorElement = document.getElementById(`error,${id}`);
-    if (errorElement) {
-        errorElement.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i> Unable to cancel order. Please try again.';
-
-        // Clear error message after 5 seconds
-        setTimeout(() => {
-            errorElement.innerHTML = '';
-        }, 5000);
-    }
 }
 
-// Initialize page when DOM is loaded
-document.addEventListener('DOMContentLoaded', function () {
-    // Set initial last updated time
-    updateLastUpdatedTime();
+updateLastUpdatedTime();
 
-    // Add smooth scrolling for any anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-});

@@ -170,6 +170,17 @@ Build command for production (Windows 10/11)
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "./publish"
 ```
 
+Add new package
+```bash
+dotnet add package <PackageName> --version <Version>
+```
+
+Remove package
+```bash
+dotnet remove package <PackageName>
+```
+
+
 ## TODO
 
 - Add cupons for the manager to manage.

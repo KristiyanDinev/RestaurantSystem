@@ -3,6 +3,6 @@
 bin/
 obj/
 logs/
-wwwroot/assets/images/user/*
+wwwroot/assets/images/
 startup.sql
 publish/

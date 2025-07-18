@@ -17,18 +17,18 @@ namespace RestaurantSystem.Services
 
         public async Task<List<DishModel>> GetDishesByTypeAndRestaurantIdAsync(DishTypeEnum type, int restaurantId)
         {
-            return await _databaseContext.Dishies.Where(
+            return await _databaseContext.Dishes.Where(
                 dish => dish.Type_Of_Dish.Equals(type) && 
                 dish.RestaurantId == restaurantId)
                 .ToListAsync();
         }
 
         public async Task<DishModel?> GetDishByIdAsync(int id) {
-            return await _databaseContext.Dishies.FirstOrDefaultAsync(dish => dish.Id == id);
+            return await _databaseContext.Dishes.FirstOrDefaultAsync(dish => dish.Id == id);
         }
         public async Task<List<DishModel>> GetDishesByIdsAsync(HashSet<int> IDs)
         {
-            return IDs.Count == 0 ? new List<DishModel>() : await _databaseContext.Dishies.Where(
+            return IDs.Count == 0 ? new List<DishModel>() : await _databaseContext.Dishes.Where(
                 dish => IDs.Contains(dish.Id))
                 .ToListAsync();
         }
@@ -40,7 +40,7 @@ namespace RestaurantSystem.Services
             {
                 return false;
             }
-            await _databaseContext.Dishies.AddAsync(new DishModel()
+            await _databaseContext.Dishes.AddAsync(new DishModel()
             {
                 Name = dishFormModel.Name,
                 Type_Of_Dish = type,
@@ -57,10 +57,10 @@ namespace RestaurantSystem.Services
 
         public async Task<bool> DeleteDishAsync(int id)
         {
-            DishModel? dish = await _databaseContext.Dishies
+            DishModel? dish = await _databaseContext.Dishes
                 .FirstOrDefaultAsync(d => d.Id == id);
             if (dish == null) { return false; }
-            _databaseContext.Dishies.Remove(dish);
+            _databaseContext.Dishes.Remove(dish);
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
@@ -87,7 +87,7 @@ namespace RestaurantSystem.Services
         public async Task<List<DishModel>> GetDishesByRestaurantIdAsync(int restaurantId, int page)
         {
             List<DishModel>? dishes = await Utility.GetPageAsync<DishModel>(
-                _databaseContext.Dishies
+                _databaseContext.Dishes
                 .Where(dish => dish.RestaurantId == restaurantId)
                 .OrderBy(dish => dish.Name)
                 .AsQueryable(), page)

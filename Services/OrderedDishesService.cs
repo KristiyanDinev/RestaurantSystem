@@ -86,7 +86,7 @@ namespace RestaurantSystem.Services
                 IDs.Add(orderedDish.DishId);
             }
 
-            List<DishModel> dishes = await _databaseContext.Dishies.Where(
+            List<DishModel> dishes = await _databaseContext.Dishes.Where(
                 dish => IDs.Contains(dish.Id))
                 .ToListAsync();
             Dictionary<DishWithStatusModel, int> result = new ();

@@ -23,7 +23,7 @@ namespace RestaurantSystem.Controllers.Staff
         public CookStaffController(UserUtility userUtils,
             OrderService orderService,
             OrderedDishesService orderedDishesService,
-            UserService userService, WebSocketService webSocketService)
+            WebSocketService webSocketService)
         {
             _userUtils = userUtils;
             _orderService = orderService;

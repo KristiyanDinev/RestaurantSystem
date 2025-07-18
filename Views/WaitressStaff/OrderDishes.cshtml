@@ -1,62 +1,184 @@
 ﻿@using RestaurantSystem.Enums
 @using RestaurantSystem.Models.View.Staff.Waitress
-@model RestaurantSystem.Models.View.Staff.Waitress.OrderChoseDishViewModel;
+@model RestaurantSystem.Models.DatabaseModels.UserModel;
 @{
-        ViewData["Title"] = "Order Dishes";
+        ViewData["Title"] = "Order Dishes - Savans Restaurant";
 }
 
 <head>
     @await Html.PartialAsync("_Header")
-    <script src="~/assets/index.js"></script>
     <script src="~/assets/dishes/dish.js"></script>
 </head>
 
 <body>
-    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_StaffNavBar", Model)
 
-    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
 
-    <button onclick="toggleDish('@DishTypeEnum.salads.ToString()')" type="button" class="btn btn-success m-2">Salads</button>
-    <button onclick="toggleDish('@DishTypeEnum.soups.ToString()')" type="button" class="btn btn-success m-2">Soups</button>
-    <button onclick="toggleDish('@DishTypeEnum.appetizers.ToString()')" type="button" class="btn btn-success m-2">Appetizers</button>
-    <button onclick="toggleDish('@DishTypeEnum.dishes.ToString()')" type="button" class="btn btn-success m-2">Dishes</button>
-    <button onclick="toggleDish('@DishTypeEnum.desserts.ToString()')" type="button" class="btn btn-success m-2">Desserts</button>
-    <button onclick="toggleDish('@DishTypeEnum.drinks.ToString()')" type="button" class="btn btn-success m-2">Drinks</button>
+    <!-- Hero Section -->
+    <div class="bg-warning text-dark py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3">
+                        <i class="bi bi-palette-fill me-3"></i>
+                        Our Menu Categories
+                    </h1>
+                    <p class="lead mb-0">Discover the culinary delights at Savans Restaurant. Choose from our carefully crafted categories to explore our exquisite dishes.</p>
+                </div>
+                <div class="col-lg-4 text-end d-none d-lg-block">
+                    <i class="bi bi-cup-hot display-1 text-dark opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="d-flex align-items-center mb-4">
+                <a href="/staff/orders/details" class="btn btn-outline-warning ms-auto">
+                    <i class="bi bi-arrow-right me-2"></i> Go to Order Details
+                </a>
+        </div>
+        <div class="row">
+            <!-- Category Cards -->
+            <div class="col-12">
+                <div class="row g-4">
+                    <!-- Salads Card -->
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/staff/orders/dishes/@DishTypeEnum.salads.ToString()" class="text-decoration-none text-reset">
+                            <div class="card border-0 h-100"
+                                 style="transition: all 0.3s ease; cursor: pointer;"
+                                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
+                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                <div class="card-body text-center p-4">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-leaf text-warning fs-1"></i>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-3">Fresh Salads</h5>
+                                    <p class="card-text text-muted mb-4">Crisp, healthy, and vibrant salads made with the finest seasonal ingredients.</p>
+                                    <span class="btn btn-warning text-white fw-semibold px-4 py-2 rounded-pill">
+                                        <i class="bi bi-arrow-right-circle me-2"></i>
+                                        Explore Salads
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- Soups Card -->
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/staff/orders/dishes/@DishTypeEnum.soups.ToString()" class="text-decoration-none text-reset">
+                            <div class="card border-0 h-100"
+                                 style="transition: all 0.3s ease; cursor: pointer;"
+                                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
+                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                <div class="card-body text-center p-4">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-cup-hot text-warning fs-1"></i>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-3">Hearty Soups</h5>
+                                    <p class="card-text text-muted mb-4">Warming and comforting soups crafted with traditional recipes and modern flair.</p>
+                                    <span class="btn btn-warning text-white fw-semibold px-4 py-2 rounded-pill">
+                                        <i class="bi bi-arrow-right-circle me-2"></i>
+                                        Explore Soups
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-    @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
-    Dishes = Model.Salads,
-        InfoMessage = "No salads in your restaurant",
-        })
+                    <!-- Appetizers Card -->
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/staff/orders/dishes/@DishTypeEnum.appetizers.ToString()" class="text-decoration-none text-reset">
+                            <div class="card border-0 h-100"
+                                 style="transition: all 0.3s ease; cursor: pointer;"
+                                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
+                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                <div class="card-body text-center p-4">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-flower1 text-warning fs-1"></i>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-3">Appetizers</h5>
+                                    <p class="card-text text-muted mb-4">Perfect starters to awaken your palate and prepare for the main course.</p>
+                                    <span class="btn btn-warning text-white fw-semibold px-4 py-2 rounded-pill">
+                                        <i class="bi bi-arrow-right-circle me-2"></i>
+                                        Explore Appetizers
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-    @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
-        Dishes = Model.Soups,
-        InfoMessage = "No soups in your restaurant",
-        })
+                    <!-- Main Dishes Card -->
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/staff/orders/dishes/@DishTypeEnum.dishes.ToString()" class="text-decoration-none text-reset">
+                            <div class="card border-0 h-100"
+                                 style="transition: all 0.3s ease; cursor: pointer;"
+                                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
+                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                <div class="card-body text-center p-4">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-flower1 text-warning fs-1"></i>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-3">Main Dishes</h5>
+                                    <p class="card-text text-muted mb-4">Our signature dishes that showcase the best of Savans' culinary expertise.</p>
+                                    <span class="btn btn-warning text-white fw-semibold px-4 py-2 rounded-pill">
+                                        <i class="bi bi-arrow-right-circle me-2"></i>
+                                        Explore Main Dishes
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
+                    <!-- Desserts Card -->
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/staff/orders/dishes/@DishTypeEnum.desserts.ToString()" class="text-decoration-none text-reset">
+                            <div class="card border-0 h-100"
+                                 style="transition: all 0.3s ease; cursor: pointer;"
+                                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
+                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                <div class="card-body text-center p-4">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-cake2 text-warning fs-1"></i>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-3">Sweet Desserts</h5>
+                                    <p class="card-text text-muted mb-4">Indulgent desserts to end your meal on a perfect sweet note.</p>
+                                    <span class="btn btn-warning text-white fw-semibold px-4 py-2 rounded-pill">
+                                        <i class="bi bi-arrow-right-circle me-2"></i>
+                                        Explore Desserts
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-    @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
-        Dishes = Model.Appetizers,
-        InfoMessage = "No appetizers in your restaurant",
-        })
+                    <!-- Drinks Card -->
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/staff/orders/dishes/@DishTypeEnum.drinks.ToString()" class="text-decoration-none text-reset">
+                            <div class="card border-0 h-100"
+                                 style="transition: all 0.3s ease; cursor: pointer;"
+                                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
+                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                <div class="card-body text-center p-4">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-cup-straw text-warning fs-1"></i>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-3">Beverages</h5>
+                                    <p class="card-text text-muted mb-4">Refreshing drinks, fine wines, and specialty beverages to complement your meal.</p>
+                                    <span class="btn btn-warning text-white fw-semibold px-4 py-2 rounded-pill">
+                                        <i class="bi bi-arrow-right-circle me-2"></i>
+                                        Explore Drinks
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-
-    @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
-        Dishes = Model.Dishes,
-        InfoMessage = "No dishes in your restaurant",
-        })
-
-    @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
-        Dishes = Model.Desserts,
-        InfoMessage = "No desserts in your restaurant",
-        })
-
-    @await Html.PartialAsync("_WairessOrderDish", new OrderDishViewModel {
-        Dishes = Model.Drinks,
-        InfoMessage = "No drinks in your restaurant",
-        })
-
-    <a class="btn btn-success m-2" href="/staff/orders/create">Go to Order Details</a>
-
+        @await Html.PartialAsync("_RestaurantFooter")
+    </div>
     @await Html.PartialAsync("_Footer")
 </body>

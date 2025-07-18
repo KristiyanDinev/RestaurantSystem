@@ -50,7 +50,7 @@ async function updateUser() {
 
     let updateButton = document.getElementById('update')
     updateButton.disabled = true
-    updateButton.innerHTML = '<i class="bi bi - check - circle me - 2"></i> Updating Profile...'
+    updateButton.innerHTML = '<i class="bi bi-check-circle me-2"></i> Updating Profile...'
 
     let formData = new FormData()
     formData.append('Name', username)
