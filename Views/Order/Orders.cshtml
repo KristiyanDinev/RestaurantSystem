@@ -5,7 +5,7 @@
 @model RestaurantSystem.Models.View.Order.OrdersViewModel;
 
 @{
-    ViewData["Title"] = "Orders";
+    ViewData["Title"] = "Your Orders - Savans Restaurant";
 }
 
 <head>
@@ -119,13 +119,13 @@
                                                             <i class="bi bi-clock me-1"></i>
                                                             Est. time: @dishWithStatus.Dish.AverageTimeToCook
                                                         </p>
-                                                        <span class="badge bg-outline-secondary small text-muted">
+                                                        <span class="badge bg-secondary small text-white">
                                                             Quantity: @orderWithDish.DishesCount[dishWithStatus]
                                                         </span>
                                                     </div>
                                                     <div class="col-md-4 text-md-end">
                                                         <span class="badge bg-@(GetStatusBadgeColorDish(dishWithStatus.OrderedDish.CurrentStatus)) mb-2 text-dark" id="dishstatus,@orderWithDish.Order.Id,@dishWithStatus.Dish.Id">
-                                                            <i class="bi bi-@(GetStatusBadgeColorDish(dishWithStatus.OrderedDish.CurrentStatus)) me-1 text-dark"></i>
+                                                            <i class="bi bi-@(GetStatusIconDish(dishWithStatus.OrderedDish.CurrentStatus)) me-1 text-dark"></i>
                                                             @dishWithStatus.OrderedDish.CurrentStatus
                                                         </span>
                                                         <div class="fw-bold text-warning">
@@ -152,8 +152,23 @@
                                                     <span class="text-muted">Total Amount:</span>
                                                     <span class="fw-bold text-warning fs-5">@orderWithDish.Order.TotalPrice lv.</span>
                                                 </div>
+                                                @if (orderWithDish.Order.CuponCode != null)
+                                                {
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span class="text-muted">Used Cupon Code:</span>
+                                                        <span class="fw-bold text-success fs-5">
+                                                            <i class="bi bi-tag text-success"></i> @orderWithDish.Order.Cupon.CuponCode
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span class="text-muted">Cupon Discount:</span>
+                                                        <span class="fw-bold text-success fs-5">
+                                                            @orderWithDish.Order.Cupon.DiscountPercent%
+                                                        </span>
+                                                    </div>
+                                                }
                                                 <div class="d-flex justify-content-between mb-2">
-                                                    <span class="text-muted">Ordered:</span>
+                                                    <span class="text-muted">Ordered At:</span>
                                                     <span class="small">@orderWithDish.Order.OrderedAt.ToString("MMM dd, yyyy HH:mm")</span>
                                                 </div>
                                             </div>
@@ -267,6 +282,17 @@
         };
     }
 
+    private string GetStatusBadgeColorDish(OrderStatusEnum status)
+    {
+        return status switch
+        {
+            OrderStatusEnum.Pending => "warning",
+            OrderStatusEnum.Preparing => "info",
+            OrderStatusEnum.Ready => "success",
+            _ => "secondary"
+        };
+    }
+
     private string GetStatusBadgeColorDish(DishStatusEnum status)
     {
         return status switch
@@ -284,10 +310,21 @@
         {
             OrderStatusEnum.Pending => "hourglass-split",
             OrderStatusEnum.Preparing => "fire",
-            OrderStatusEnum.Ready => "check-circle",
-            OrderStatusEnum.Served => "check-circle-fill",
+            OrderStatusEnum.Ready => "check2",
+            OrderStatusEnum.Served => "check2-all",
             OrderStatusEnum.Delivering => "truck",
-            OrderStatusEnum.Delivered => "check2-circle",
+            OrderStatusEnum.Delivered => "check2-all",
+            _ => "question-circle"
+        };
+    }
+
+    private string GetStatusIconDish(DishStatusEnum status)
+    {
+        return status switch
+        {
+            DishStatusEnum.Pending => "hourglass-split",
+            DishStatusEnum.Preparing => "fire",
+            DishStatusEnum.Ready => "check2",
             _ => "question-circle"
         };
     }

@@ -113,7 +113,14 @@ namespace RestaurantSystem.Controllers.Staff
                     OrderCurrentStatus = statusEnum.ToString()
                 });
 
-                TempData["ServedOrderSuccess"] = true;
+                if (IsServed)
+                {
+                    TempData["ServedOrderSuccess"] = true;
+                }
+                else
+                {
+                    TempData["UnservedOrderSuccess"] = true;
+                }
                 return Ok();
             }
             return BadRequest();
@@ -246,18 +253,20 @@ namespace RestaurantSystem.Controllers.Staff
                 totalPrice += dishModel.Price * (beforeRemovalCount - CountingDishId.Count);
             }
 
+            string? validCupon = null;
             if (!string.IsNullOrWhiteSpace(waitressOrderForm.CuponCode))
             {
                 CuponModel? cupon = await _cuponService.GetCuponByCodeAsync(waitressOrderForm.CuponCode);
                 if (cupon != null)
                 {
                     totalPrice = _cuponService.HandleCuponDiscount(cupon.DiscountPercent, totalPrice);
+                    validCupon = waitressOrderForm.CuponCode;
                 }
             }
 
             if ((await _orderService.AddOrderAsync(user.Id, user.Restaurant.Id,
                 DishIds, waitressOrderForm.Notes, totalPrice, waitressOrderForm.TableNumber,
-                waitressOrderForm.CuponCode, null)) == null)
+                validCupon, null)) == null)
             {
                 return BadRequest();
             }

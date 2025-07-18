@@ -470,7 +470,8 @@ namespace RestaurantSystem.Database {
                 .HasForeignKey(reservation => reservation.RestaurantId);
         }
 
-        private void BuildCuponModel(ref ModelBuilder builder) {
+        private void BuildCuponModel(ref ModelBuilder builder)
+        {
             builder.Entity<CuponModel>().ToTable("Cupons");
 
             builder.Entity<CuponModel>()
@@ -491,6 +492,11 @@ namespace RestaurantSystem.Database {
             builder.Entity<CuponModel>()
                 .Property(cupon => cupon.ExpirationDate)
                 .IsRequired();
+
+            builder.Entity<CuponModel>()
+                .HasMany(cupon => cupon.Orders)
+                .WithOne(order => order.Cupon)
+                .HasForeignKey(cupon => cupon.CuponCode);
         }
 
         private void BuildDeliveryModel(ref ModelBuilder builder) {

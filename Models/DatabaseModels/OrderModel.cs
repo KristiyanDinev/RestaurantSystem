@@ -10,6 +10,9 @@ namespace RestaurantSystem.Models.DatabaseModels {
         public decimal TotalPrice { get; set; }
         public string? TableNumber { get; set; }
 
+        public string? CuponCode { get; set; }
+        public CuponModel Cupon { get; set; } = null!;
+
 
         public required long UserId { get; set; }
         public UserModel User { get; set; } = null!;

@@ -57,7 +57,13 @@
             Message = "Order served successfully!"
         })
 
-<!-- Empty State -->
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "UnservedOrderSuccess",
+            Message = "Order unserved successfully!"
+        })
+
+        <!-- Empty State -->
         @if (Model.Orders.Count == 0)
         {
             <div class="row justify-content-center">
@@ -90,20 +96,18 @@
                 </script>
 
                 <div class="col-lg-6 col-xl-4">
-                    <div class="card border-warning shadow-sm h-100">
+                    <div class="card border-warning shadow-lg h-100">
                         <!-- Order Header -->
-                        <div class="card-header bg-dark text-white py-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="mb-0 fw-bold">
-                                    <i class="bi bi-receipt me-2"></i>
+                        <div class="card-header bg-dark border-warning py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold text-light">
+                                    <i class="bi bi-receipt me-2 text-warning"></i>
                                     Order
                                 </h5>
-                                 <div class="col-md-6 text-md-end text-dark">
-                                    <span class="badge bg-@(GetStatusBadgeColor(order.CurrentStatus)) fs-6 px-3 py-2 text-dark" id="orderstatus,@order.Id">
-                                        <i class="bi bi-@(GetStatusIcon(order.CurrentStatus)) text-dark me-1"></i>
-                                        @order.CurrentStatus
-                                    </span>
-                                </div>
+                                <span class="badge bg-@(GetStatusBadgeColor(order.CurrentStatus)) fs-6 px-3 py-2 text-dark fw-bold" id="orderstatus,@order.Id">
+                                    <i class="bi bi-@(GetStatusIcon(order.CurrentStatus)) me-1"></i>
+                                    @order.CurrentStatus
+                                </span>
                             </div>
                         </div>
 
@@ -112,126 +116,152 @@
                             <div class="p-4">
                                 <h6 class="text-warning fw-bold mb-3">
                                     <i class="bi bi-basket3 me-2"></i>
-                                    Ordered Items
+                                    Order Items
                                 </h6>
                                 
                                 @foreach (DishWithStatusModel dishWithStatus in orderWithDishesCount.DishesCount.Keys)
                                 {
-                                    <div class="card mb-3 border-0 bg-light">
+                                    <div class="card border-warning mb-3">
                                         <div class="card-body py-3">
                                             <div class="row align-items-center">
                                                 <div class="col-auto">
-                                                    @if (dishWithStatus.Dish.Image != null)
+                                                    <div class="position-relative">
+                                                        @if (dishWithStatus.Dish.Image != null)
                                                         {
-                                                            <img src="@dishWithStatus.Dish.Image" class="img-fluid rounded-circle border border-warning object-fit-cover" width="100" />
+                                                            <img src="@dishWithStatus.Dish.Image" class="img-fluid rounded border border-warning" style="width: 80px; height: 80px; object-fit: cover;" />
                                                         }
                                                         else
                                                         {
-                                                            <div class="bg-warning rounded bg-opacity-10 d-flex align-items-center justify-content-center border border-warning p-5">
-                                                                <i class="bi bi-image text-warning display-4 opacity-50"></i>
+                                                            <div class="bg-warning bg-opacity-25 rounded d-flex align-items-center justify-content-center border border-warning" style="width: 80px; height: 80px;">
+                                                                <i class="bi bi-image text-warning fs-3"></i>
                                                             </div>
                                                         }
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                        <h6 class="mb-1 fw-bold">@dishWithStatus.Dish.Name</h6>
-                                                        <p class="text-muted small mb-1">
-                                                            <i class="bi bi-clock me-1"></i>
-                                                            Est. time: @dishWithStatus.Dish.AverageTimeToCook
-                                                        </p>
-                                                        <span class="badge bg-outline-secondary small text-muted">
-                                                            Quantity: @orderWithDishesCount.DishesCount[dishWithStatus]
-                                                        </span>
-                                                </div>
-                                                <div class="col-md-4 text-md-end">
-                                                        <span class="badge bg-@(GetStatusBadgeColorDish(dishWithStatus.OrderedDish.CurrentStatus)) mb-2 text-dark" id="dishstatus,@order.Id,@dishWithStatus.Dish.Id">
-                                                            <i class="bi bi-@(GetStatusBadgeColorDish(dishWithStatus.OrderedDish.CurrentStatus)) me-1 text-dark"></i>
-                                                            @dishWithStatus.OrderedDish.CurrentStatus
-                                                        </span>
-                                                        <div class="fw-bold text-warning">
-                                                            @((dishWithStatus.Dish.Price * orderWithDishesCount.DishesCount[dishWithStatus]).ToString("F2")) lv.
+                                                <div class="col">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <h6 class="mb-1 fw-bold">@dishWithStatus.Dish.Name</h6>
+                                                            <p class="text-muted small mb-1">
+                                                                <i class="bi bi-clock me-1"></i>
+                                                                Est. time: @dishWithStatus.Dish.AverageTimeToCook
+                                                            </p>
+                                                            <span class="badge bg-secondary small text-white">
+                                                                Quantity: @orderWithDishesCount.DishesCount[dishWithStatus]
+                                                            </span>
                                                         </div>
+                                                        <div class="text-end">
+                                                            <span class="badge bg-@(GetStatusBadgeColorDish(dishWithStatus.OrderedDish.CurrentStatus)) mb-2 text-dark" id="dishstatus,@order.Id,@dishWithStatus.Dish.Id">
+                                                                <i class="bi bi-@(GetStatusIconDish(dishWithStatus.OrderedDish.CurrentStatus)) me-1 text-dark"></i>
+                                                                @dishWithStatus.OrderedDish.CurrentStatus
+                                                            </span>
+                                                            <div class="fw-bold text-warning">
+                                                                @((dishWithStatus.Dish.Price * orderWithDishesCount.DishesCount[dishWithStatus]).ToString("F2")) lv.
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 }
                             </div>
-
-                            <!-- Order Details -->
-                            <div class="border-top bg-light p-4">
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <h6 class="text-warning fw-bold mb-2">
-                                            <i class="bi bi-geo-alt me-2"></i>Service Type
-                                        </h6>
-                                        @if (order.TableNumber != null)
-                                        {
-                                            <span class="badge bg-dark text-white fs-6 px-3 py-2">
-                                                <i class="bi bi-table me-1"></i>
-                                                Table @order.TableNumber
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-dark text-white fs-6 px-3 py-2">
-                                                <i class="bi bi-truck me-1"></i>
-                                                Delivery
-                                            </span>
-                                        }
-                                    </div>
-                                    <div class="col-6 text-end">
-                                        <h6 class="text-warning fw-bold mb-2">Total Amount</h6>
-                                        <span class="fw-bold text-dark fs-4">@order.TotalPrice lv.</span>
-                                    </div>
-                                </div>
-
-                                @if (order.TableNumber == null)
-                                {
-                                    <div class="mb-3">
-                                        <h6 class="text-warning fw-bold mb-2">
-                                            <i class="bi bi-person me-2"></i>Customer Details
-                                        </h6>
-                                        <div class="text-dark mb-1">
-                                            <i class="bi bi-person-fill me-1"></i>
-                                            @order.User.Name
-                                        </div>
-                                        <div class="text-muted small">
-                                            <i class="bi bi-envelope me-1"></i>
-                                            @order.User.Email
-                                        </div>
-                                    </div>
-                                }
-
-                                @if (!string.IsNullOrEmpty(order.Notes))
-                                {
-                                    <div class="mb-3">
-                                        <h6 class="text-warning fw-bold mb-2">
-                                            <i class="bi bi-chat-left-text me-2"></i>Special Notes
-                                        </h6>
-                                        <div class="bg-white p-3 rounded border border-warning">
-                                            <i class="bi bi-chat-dots me-2 text-warning"></i>
-                                            <span class="text-dark">@order.Notes</span>
-                                        </div>
-                                    </div>
-                                }
-
-                                <div id="stats,@order.Id" class="text-danger small fw-bold"></div>
-                            </div>
                         </div>
 
-                        <!-- Action Buttons -->
-                        <div class="card-footer bg-white border-warning p-3">
-                            <div class="d-grid gap-2">
+                        <!-- Order Summary -->
+                        <div class="card-footer border border-warning p-4">
+                            <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="text-warning fw-bold mb-0">
+                                        <i class="bi bi-info-circle me-2"></i>Order Summary
+                                    </h6>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted">Total Amount:</span>
+                                    <span class="fw-bold text-warning fs-5">@order.TotalPrice lv.</span>
+                                </div>
+                                @if (order.CuponCode != null)
+                                                {
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span class="text-muted">Used Cupon Code:</span>
+                                                        <span class="fw-bold text-success fs-5">
+                                                            <i class="bi bi-tag text-success"></i> @order.Cupon.CuponCode
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span class="text-muted">Cupon Discount:</span>
+                                                        <span class="fw-bold text-success fs-5">
+                                                            @order.Cupon.DiscountPercent%
+                                                        </span>
+                                                    </div>
+                                                }
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Ordered At:</span>
+                                    <span class="text-muted">@order.OrderedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                    <h6 class="text-warning fw-bold mb-2">
+                                        <i class="bi bi-geo-alt me-2"></i>Service Type
+                                    </h6>
+                                </div>
+                            @if (order.TableNumber != null)
+                            {
+                                <div class="mb-3">
+                                    <span class="badge bg-warning text-dark fs-6 px-3 py-2 fw-bold">
+                                        <i class="bi bi-table me-1"></i>
+                                        Table @order.TableNumber
+                                    </span>
+                                </div>
+                                    
+                            }
+                            else
+                            {
+                                <div class="mb-3">
+                                    <h6 class="badge bg-warning text-dark w-bold mb-2 fs-6 px-3 py-2 fw-bold">
+                                        <i class="bi bi-truck me-2"></i>Delivery
+                                    </h6>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6 class="text-warning fw-bold mb-2">
+                                        <i class="bi bi-person me-2"></i>Customer Details
+                                    </h6>
+                                    <div class="text-muted mb-1">
+                                        <i class="bi bi-person me-1"></i>
+                                        @order.User.Name
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-envelope me-1"></i>
+                                        @order.User.Email
+                                    </div>
+                                </div>
+                            }
+
+                                <div class="mb-3">
+                                    <h6 class="text-warning fw-bold mb-2">
+                                        <i class="bi bi-chat-left-text me-2"></i>Special Notes
+                                    </h6>
+                                    <div class="bg-warning bg-opacity-10 p-3 rounded border border-warning">
+                                        <i class="bi bi-chat-dots me-2 text-warning"></i>
+                                        <span class="text-muted">@order.Notes</span>
+                                    </div>
+                                </div>
+                            
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 mt-3">
                                 @if (order.TableNumber == null && order.CurrentStatus.Equals(OrderStatusEnum.Delivered))
                                 {
-                                    <button onclick="deleteOrder('@order.Id')" class="btn btn-outline-danger btn-lg">
+                                    <button onclick="deleteOrder('@order.Id')" class="btn btn-outline-danger btn-sm">
                                         <i class="bi bi-trash me-2"></i>
                                         Remove Order
                                     </button>
                                 }
                                 else if (order.TableNumber != null && order.CurrentStatus.Equals(OrderStatusEnum.Ready))
                                 {
-                                    <button onclick="servedOrder('@order.Id')" class="btn btn-warning btn-lg">
+                                    <button onclick="servedOrder('@order.Id')" class="btn btn-warning btn-lg text-white fw-bold">
                                         <i class="bi bi-check-circle me-2"></i>
                                         Mark as Served
                                     </button>
@@ -239,15 +269,22 @@
                                 else if (order.TableNumber != null && order.CurrentStatus.Equals(OrderStatusEnum.Served))
                                 {
                                     <div class="d-flex gap-2">
-                                        <button onclick="unserveOrder('@order.Id')" class="btn btn-outline-warning flex-fill">
+                                        <button onclick="unserveOrder('@order.Id')" class="btn btn-outline-danger btn-sm flex-fill">
                                             <i class="bi bi-arrow-counterclockwise me-1"></i>
                                             Unserve
                                         </button>
-                                        <button onclick="deleteOrder('@order.Id')" class="btn btn-outline-danger flex-fill">
+                                        <button onclick="deleteOrder('@order.Id')" class="btn btn-outline-danger btn-sm flex-fill">
                                             <i class="bi bi-trash me-1"></i>
                                             Delete
                                         </button>
                                     </div>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteOrder('@order.Id')">
+                                        <i class="bi bi-x-circle me-2"></i>
+                                        Cancel Order
+                                    </button>
                                 }
                             </div>
                         </div>
@@ -266,6 +303,7 @@
     }
     @await Html.PartialAsync("_Footer")
 </body>
+
 
 @functions{
     private string GetStatusBadgeColor(OrderStatusEnum status)
@@ -299,14 +337,24 @@
         {
             OrderStatusEnum.Pending => "hourglass-split",
             OrderStatusEnum.Preparing => "fire",
-            OrderStatusEnum.Ready => "check-circle",
-            OrderStatusEnum.Served => "check-circle-fill",
+            OrderStatusEnum.Ready => "check2",
+            OrderStatusEnum.Served => "check2-all",
             OrderStatusEnum.Delivering => "truck",
-            OrderStatusEnum.Delivered => "check2-circle",
+            OrderStatusEnum.Delivered => "check2-all",
             _ => "question-circle"
         };
     }
 
+    private string GetStatusIconDish(DishStatusEnum status)
+    {
+        return status switch
+        {
+            DishStatusEnum.Pending => "hourglass-split",
+            DishStatusEnum.Preparing => "fire",
+            DishStatusEnum.Ready => "check2",
+            _ => "question-circle"
+        };
+    }
     private string GetDishIcon(DishTypeEnum dishType)
     {
         return dishType switch

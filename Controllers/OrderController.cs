@@ -98,18 +98,21 @@ namespace RestaurantSystem.Controllers {
                 totalPrice += dishModel.Price * (beforeRemovalCount - CoutingDishId.Count);
             }
 
-            if (!string.IsNullOrWhiteSpace(order.CuponCode)) {
+            string? validCupon = null;
+            if (!string.IsNullOrWhiteSpace(order.CuponCode))
+            {
                 CuponModel? cupon = await _cuponService.GetCuponByCodeAsync(order.CuponCode);
                 if (cupon != null)
                 {
                     totalPrice = _cuponService.HandleCuponDiscount(cupon.DiscountPercent, totalPrice);
+                    validCupon = order.CuponCode;
                 }
             }
 
             if ((await _orderService.AddOrderAsync(user.Id, restaurant.Id,
-                DishIds, order.Notes, totalPrice, null, order.CuponCode, order.AddressId)) == null)
+                    DishIds, order.Notes, totalPrice, null, validCupon, order.AddressId)) == null)
             {
-                return BadRequest();
+                    return BadRequest();
             }
 
             _userUtility.RemoveCartCookie(HttpContext);
