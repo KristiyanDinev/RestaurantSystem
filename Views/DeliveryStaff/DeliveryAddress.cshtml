@@ -1,7 +1,7 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels
 @model RestaurantSystem.Models.View.Address.AddressesViewModel;
 @{
-    ViewData["Title"] = "Delivery Addresses";
+    ViewData["Title"] = "Delivery Addresses - Savans Restaurant";
 }
 
 <head>
@@ -13,36 +13,112 @@
     @await Html.PartialAsync("_StaffNavBar", Model.User)
     @await Html.PartialAsync("_RestaurantBar", Model.User.Restaurant)
 
-    <h3>Delivery Address</h3>
+    <h3 class="text-center fw-bold my-4">Delivery Address</h3>
 
-    @if (Model.Addresses.Count == 0)
-    {
-        <p class="alert aler-warning m-2">No Addresses. Please create one.</p>
-        <a class="btn btn-success m-2" href="/addresses">Make Address</a>
-    }
+    <!-- Paging Component -->
+        <div class="mb-4">
+            @await Html.PartialAsync("_Paging", Model.Page)
+        </div>
 
-    @await Html.PartialAsync("_Paging", Model.Page)
 
-    <div class="m-2 container">
-        @foreach (AddressModel address in Model.Addresses)
+        <!-- Empty State -->
+        @if (!Model.Addresses.Any() && Model.Page == 1)
         {
-            <div class="page-row col-md-4 mb-3" style="cursor: pointer;" onclick="selectAddress('@address.Id')">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Address Information</h5>
-                        <p class="card-text">
-                            <strong>Country:</strong> @address.Country<br />
-                            <strong>State / Province / Region:</strong> @address.Country<br />
-                            <strong>City:</strong> @address.State<br />
-                            <strong>Address:</strong> @address.Address<br />
-                            <strong>Postal/Zip Code:</strong> @address.PostalCode<br />
-                            <strong>Phone Number:</strong> @address.PhoneNumber<br />
-                            <strong>Notes:</strong> @address.Notes<br />
-                        </p>
-                    </div>
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-geo-alt text-warning" style="font-size: 4rem; opacity: 1;"></i>
                 </div>
+                <h4 class="text-muted mb-3">No addresses saved yet</h4>
+                <p class="text-muted mb-4">Add your first delivery address to start ordering from Savans!</p>
+                <a href="/address/add" class="btn btn-warning btn-lg">
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Add Your First Address
+                </a>
             </div>
         }
+        
+    <!-- Addresses Grid -->
+    <div class="container py-4">
+        <div class="row g-4">
+            @foreach (AddressModel address in Model.Addresses)
+            {
+                <div class="page-row col-lg-4 col-md-6">
+                    <div class="card h-100 shadow-sm border-warning position-relative overflow-hidden"
+                         style="transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;"
+                         onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';"
+                         onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='';"
+                         
+                         onclick="selectAddress('@address.Id')">
+                        <!-- Restaurant Theme Accent -->
+                        <div class="position-absolute top-0 start-0 w-100 bg-warning" style="height: 4px;"></div>
+
+                        <div class="card-body p-4 d-flex justify-content-between flex-column">
+                            <!-- Header -->
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-warning bg-opacity-25 rounded-circle p-2 me-3">
+                                    <i class="bi bi-geo-alt-fill text-warning"></i>
+                                </div>
+                                <h5 class="card-title mb-0 fw-bold">Delivery Location</h5>
+                            </div>
+
+                            <!-- Address Information -->
+                            <div class="address-info mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-flag me-1 text-warning"></i>Country:
+                                    </small>
+                                    <span>@address.Country</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-map me-1 text-warning"></i>State / Province / Region:
+                                    </small>
+                                    <span>@address.State</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-building me-1 text-warning"></i>City:
+                                    </small>
+                                    <span>@address.City</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-geo-alt me-1 text-warning"></i>Street Address:
+                                    </small>
+                                    <span>@address.Address</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-mailbox me-1 text-warning"></i>Postal / Zip code:
+                                    </small>
+                                    <span>@address.PostalCode</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-phone me-1 text-warning"></i>Phone:
+                                    </small>
+                                    <span>@address.PhoneNumber</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-chat-left-text me-2 text-warning"></i>Notes:
+                                    </small>
+                                    <span>@address.Notes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+        @await Html.PartialAsync("_RestaurantFooter")
     </div>
 
     @await Html.PartialAsync("_Footer")

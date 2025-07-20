@@ -14,28 +14,27 @@ namespace RestaurantSystem.Services
             _databaseContext = databaseContext;
         }
 
-        public async Task<List<RestaurantModel>> GetDeliveryGuy_RestaurantsAsync(AddressModel address)
+        public async Task<List<RestaurantModel>> GetDeliveryGuy_RestaurantsAsync(AddressModel address, int page)
         {
-            return await _databaseContext.Restaurants
-                .Where(
-                restaurant =>
-                restaurant.DoDelivery &&
-                restaurant.Country.ToLower().Equals(address.Country.ToLower()) &&
-                restaurant.State == address.State &&
-                restaurant.City == address.City)
-                .ToListAsync();
+            return await Utility.GetPageAsync<RestaurantModel>(_databaseContext.Restaurants
+                .Where(restaurant => restaurant.DoDelivery &&
+                                     restaurant.Country.ToLower().Equals(address.Country.ToLower()) &&
+                                     restaurant.State == address.State &&
+                                     restaurant.City == address.City), page)
+                                     .OrderBy(res => res.City)
+                                     .ToListAsync();
         }
 
-        public async Task<List<RestaurantModel>> GetAllRestaurantsForUserAsync(UserModel user)
+        public async Task<List<RestaurantModel>> GetAllRestaurantsForUserAsync(UserModel user, int page)
         {
-            return await _databaseContext.Restaurants
+            return await Utility.GetPageAsync<RestaurantModel>(_databaseContext.Restaurants
                 .Join(_databaseContext.Addresses,
                       restaurant => new { restaurant.Country, restaurant.State, restaurant.City },
                       address => new { address.Country, address.State, address.City },
                       (restaurant, address) => new { restaurant, address })
                 .Where(joined => joined.address.UserId == user.Id)
                 .Select(joined => joined.restaurant)
-                .Distinct()
+                .Distinct().OrderBy(restaurant => restaurant.City), page)
                 .ToListAsync();
         }
 

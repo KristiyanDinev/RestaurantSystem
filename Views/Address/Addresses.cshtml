@@ -110,13 +110,13 @@
             {
                 <div class="page-row col-lg-4 col-md-6">
                     <div class="card h-100 shadow-sm border-warning position-relative overflow-hidden"
-                         style="transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;"
+                         style="transition: transform 0.3s ease, box-shadow 0.3s ease;"
                          onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';"
                          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='';">
                         <!-- Restaurant Theme Accent -->
                         <div class="position-absolute top-0 start-0 w-100 bg-warning" style="height: 4px;"></div>
 
-                        <div class="card-body p-4">
+                        <div class="card-body p-4 d-flex justify-content-between flex-column">
                             <!-- Header -->
                             <div class="d-flex align-items-center mb-3">
                                 <div class="bg-warning bg-opacity-25 rounded-circle p-2 me-3">
@@ -127,71 +127,54 @@
 
                             <!-- Address Information -->
                             <div class="address-info mb-4">
-                                <div class="row g-2 mb-2">
-                                    <div class="col-4">
-                                        <small class="text-muted fw-semibold">Country:</small>
-                                    </div>
-                                    <div class="col-8">
-                                        <span>@address.Country</span>
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-flag me-1 text-warning"></i>Country:
+                                    </small>
+                                    <span>@address.Country</span>
                                 </div>
 
-                                <div class="row g-2 mb-2">
-                                    <div class="col-4">
-                                        <small class="text-muted fw-semibold">State:</small>
-                                    </div>
-                                    <div class="col-8">
-                                        <span>@address.State</span>
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-map me-1 text-warning"></i>State / Province / Region:
+                                    </small>
+                                    <span>@address.State</span>
                                 </div>
 
-                                <div class="row g-2 mb-2">
-                                    <div class="col-4">
-                                        <small class="text-muted fw-semibold">City:</small>
-                                    </div>
-                                    <div class="col-8">
-                                        <span>@address.City</span>
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-building me-1 text-warning"></i>City:
+                                    </small>
+                                    <span>@address.City</span>
                                 </div>
 
-                                <div class="row g-2 mb-2">
-                                    <div class="col-4">
-                                        <small class="text-muted fw-semibold">Address:</small>
-                                    </div>
-                                    <div class="col-8">
-                                        <span>@address.Address</span>
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-geo-alt me-1 text-warning"></i>Street Address:
+                                    </small>
+                                    <span>@address.Address</span>
                                 </div>
 
-                                <div class="row g-2 mb-2">
-                                    <div class="col-4">
-                                        <small class="text-muted fw-semibold">Postal:</small>
-                                    </div>
-                                    <div class="col-8">
-                                        <span>@address.PostalCode</span>
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-mailbox me-1 text-warning"></i>Postal / Zip code:
+                                    </small>
+                                    <span>@address.PostalCode</span>
                                 </div>
 
-                                <div class="row g-2 mb-2">
-                                    <div class="col-4">
-                                        <small class="text-muted fw-semibold">Phone:</small>
-                                    </div>
-                                    <div class="col-8">
-                                        <span>@address.PhoneNumber</span>
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-phone me-1 text-warning"></i>Phone:
+                                    </small>
+                                    <span>@address.PhoneNumber</span>
                                 </div>
 
-                                @if (!string.IsNullOrEmpty(address.Notes))
-                                {
-                                    <div class="row g-2 mb-2">
-                                        <div class="col-4">
-                                            <small class="text-muted fw-semibold">Notes:</small>
-                                        </div>
-                                        <div class="col-8">
-                                            <span>@address.Notes</span>
-                                        </div>
-                                    </div>
-                                }
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="bi bi-chat-left-text me-2 text-warning"></i>Notes:
+                                    </small>
+                                    <span>@address.Notes</span>
+                                </div>
                             </div>
 
                             <!-- Action Buttons -->

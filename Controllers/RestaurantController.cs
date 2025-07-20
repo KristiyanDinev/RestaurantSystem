@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.View.Restaurant;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
 
@@ -26,7 +27,7 @@ namespace RestaurantSystem.Controllers
 
         [HttpGet]
         [Route("/restaurants")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtility.GetUserWithRolesByJWT(HttpContext);
             if (user == null)
@@ -34,7 +35,11 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            return View(await _restaurantService.GetAllRestaurantsForUserAsync(user));
+            return View(new RestaurantViewModel()
+            {
+                Page = page,
+                Restaurants = await _restaurantService.GetAllRestaurantsForUserAsync(user, page)
+            });
         }
     }
 }

@@ -3,107 +3,371 @@
 @using RestaurantSystem.Models
 @model RestaurantSystem.Models.View.Staff.Delivery.DeliveryOrdersViewModel;
 @{
-    ViewData["Title"] = "Delivery Orders";
+    ViewData["Title"] = "Delivery Orders - Savans Restaurant";
 }
 
 <head>
     @await Html.PartialAsync("_Header")
-    <script src="~/assets/index.js"></script>
     <script src="~/assets/staff/delivery/delivery.js"></script>
 </head>
 
 <body>
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
-    <h3>Delivery Orders</h3>
-    <a class="btn btn-primary m-2" href="/staff/delivery/restaurant">Go to Restaurants</a>
-
-    @if (TempData.Peek("Success") != null)
-    {
-        <p class="alert alert-success">Delivered Successfully</p>
-        TempData.Remove("Success");
-    }
-
-    @if (TempData.Peek("Canceled") != null)
-    {
-        <p class="alert alert-success">Canceled Delivery Successfully</p>
-        TempData.Remove("Canceled");
-    }
-
-    <div class="m-2 container">
-        @foreach (OrderWithDishesCountModel orderWithDishes in Model.Orders)
-        {
-            OrderModel order = orderWithDishes.Order;
-            <div class="card m-3">
-                <div class="card-body">
-
-                    @foreach (DishWithStatusModel dish in orderWithDishes.DishesCount.Keys)
-                    {
-                        <div class="card card-body m-3">
-                            @await Html.PartialAsync("_DisplayDish", dish.Dish)
-                            <p class="card-text">Current Status: @dish.OrderedDish.CurrentStatus</p>
-                            <p class="card-text">Amount: @orderWithDishes.DishesCount[dish]</p>
-                        </div>
-                    }
-
-                    <h4 class="card-title">Current Status: @order.CurrentStatus</h4>
-
-                    <h4 class="card-text">Restaurant Address</h4>
-                    <p class="card-text">Country: @Model.Restaurant.Country</p>
-                    <p class="card-text">State / Province / Region: @Model.Restaurant.State</p>
-                    <p class="card-text">City: @Model.Restaurant.City</p>
-                    <p class="card-text">Address: @Model.Restaurant.City</p>
-                    <p class="card-text">Postal Code: @Model.Restaurant.Address</p>
-                    @if (Model.Restaurant.PhoneNumber != null)
-                    {
-                        <p class="card-text">Phone Number: @Model.Restaurant.PhoneNumber</p>
-                    }
-                    @if (Model.Restaurant.Email != null)
-                    {
-                        <p class="card-text">Email: @Model.Restaurant.Email</p>
-                    }
-                    @if (Model.Restaurant.ServeCustomersInPlace)
-                    {
-                        <p class="card-text">Restaurant serves customers in place</p>
-                    }
-
-                    <p class="card-text">Total Price: @order.Restaurant.PostalCode lv.</p>
-                    <p class="card-text">Ordered At: @order.OrderedAt</p>
-
-                    <h4 class="card-text">User Contact</h4>
-                    <p class="card-text">Name: @order.User.Name</p>
-                    <p class="card-text">Email: @order.User.Email</p>
-                    <p class="card-text">Phone Number: @order.UserAddress.PhoneNumber</p>
-                    @if (order.Restaurant.PhoneNumber != null)
-                    {
-                        <img class="img img-thumbnail rounded m-2" src="@order.User.Image" />
-                    }
-
-                    <h4 class="card-text">Address Information</h4>
-                    <p class="card-text">Country: @order.Restaurant.PhoneNumber</p>
-                    <p class="card-text">State / Region / Province: @order.UserAddress.State</p>
-                    <p class="card-text">City: @order.UserAddress.City</p>
-                    <p class="card-text">Address: @order.UserAddress.Address</p>
-                    <p class="card-text">Postal Code: @order.UserAddress.PostalCode</p>
-
-                    <p class="card-text">Order Notes: @order.Notes</p>
-
+    
+    <div class="container-fluid py-4">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center bg-warning bg-gradient rounded p-3 shadow-sm">
                     <div>
-                        @if (Model.Restaurant.ServeCustomersInPlace)
-                    {
-                            <p id="error,@order.Id"></p>
-                            <button class="btn btn-success m-2"  type="button"
-                                onclick="startDelivery('@order.Id')">Deliver</button>
+                        <h2 class="text-dark mb-1">
+                            <i class="bi bi-truck text-dark me-2"></i>
+                            Delivery Orders
+                        </h2>
+                        <p class="text-dark-emphasis mb-0">Manage and track delivery orders</p>
+                    </div>
+                    <a class="btn btn-dark btn-lg shadow" href="/staff/delivery/restaurant">
+                        <i class="bi bi-building me-2"></i>
+                        Go to Restaurants
+                    </a>
+                </div>
+            </div>
+        </div>
 
-                        } else
-                        {
-                            <button type="button" class="btn btn-secondary m-2" disabled>Wait for the order</button>
-                        }
+        <!-- Paging Component -->
+        <div class="row mb-4">
+            <div class="col-12">
+                @await Html.PartialAsync("_Paging", Model.Page)
+            </div>
+        </div>
+
+        <!-- Success Messages -->
+        @if (TempData.Peek("Success") != null)
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Delivered Successfully
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 </div>
             </div>
+            TempData.Remove("Success");
         }
+
+        @if (TempData.Peek("Canceled") != null)
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="bi bi-x-circle-fill me-2"></i>
+                        Canceled Delivery Successfully
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+            </div>
+            TempData.Remove("Canceled");
+        }
+
+        <!-- Orders List -->
+        <div class="row">
+            @foreach (OrderWithDishesCountModel orderWithDishes in Model.Orders)
+            {
+                OrderModel order = orderWithDishes.Order;
+                <div class="col-12 mb-4 border border-warning border-2 mx-4 my-4 rounded">
+                    <div class="card shadow-sm border-0 page-row">
+                        <div class="card-header bg-dark text-white">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-receipt me-2"></i>
+                                        Order #@order.Id
+                                    </h5>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <span class="badge @(order.CurrentStatus == OrderStatusEnum.Ready? "bg-warning text-dark" : "bg-secondary") fs-6 px-3 py-2">
+                                        <i class="bi bi-clock me-1"></i>
+                                        @order.CurrentStatus
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Order Items -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-warning fw-bold pb-2 mb-3">
+                                        <i class="bi bi-list-ul me-2"></i>
+                                        Order Items
+                                    </h6>
+                                    <div class="row">
+                                        @foreach (DishWithStatusModel dish in orderWithDishes.DishesCount.Keys)
+                                        {
+                                            <div class="border border-warning rounded">
+                                                    <div class="mb-2">
+                                                        @await Html.PartialAsync("_DisplayDish", dish.Dish)
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <span class="badge bg-secondary">
+                                                            Quantity: @orderWithDishes.DishesCount[dish]
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <small class="text-muted fw-semibold d-block mb-1">Status:</small>
+                                                        <div class="badge bg-@(GetStatusBadgeColorDish(dish.OrderedDish.CurrentStatus)) text-dark" id="dishstatus,@order.Id,@dish.Dish.Id">
+                                                            <i class="bi bi-@(GetStatusIconDish(dish.OrderedDish.CurrentStatus)) me-1"></i>
+                                                            @dish.OrderedDish.CurrentStatus
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Status Messages -->
+                                                    <div class="mb-3">
+                                                        <div class="alert alert-danger py-2 mb-2 d-none" id="error,@order.Id,@dish.Dish.Id" role="alert">
+                                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                                            <span></span>
+                                                        </div>
+                                                        <div class="alert alert-success py-2 mb-2 d-none" id="success,@order.Id,@dish.Dish.Id" role="alert">
+                                                            <i class="bi bi-check-circle-fill me-1"></i>
+                                                            <span></span>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Restaurant Information -->
+                                <div class="col-lg-4 mb-3">
+                                    <div class="card bg-warning bg-opacity-10 border-warning border-opacity-50 h-100">
+                                        <div class="card-body">
+                                            <h6 class="text-warning fw-bold mb-3">
+                                                <i class="bi bi-building me-2"></i>
+                                                Restaurant Address
+                                            </h6>
+                                            <address class="mb-0">
+                                                <div class="mb-2">
+                                                    <i class="bi bi-geo-alt text-warning me-2"></i>
+                                                    @Model.Restaurant.Address<br>
+                                                    @Model.Restaurant.City, @Model.Restaurant.State<br>
+                                                    @Model.Restaurant.Country @Model.Restaurant.PostalCode
+                                                </div>
+                                                @if (Model.Restaurant.PhoneNumber != null)
+                                                {
+                                                    <div class="mb-2">
+                                                        <i class="bi bi-telephone text-warning me-2"></i>
+                                                        <a href="tel:@Model.Restaurant.PhoneNumber" class="text-decoration-none">
+                                                            @Model.Restaurant.PhoneNumber
+                                                        </a>
+                                                    </div>
+                                                }
+                                                @if (Model.Restaurant.Email != null)
+                                                {
+                                                    <div class="mb-2">
+                                                        <i class="bi bi-envelope text-warning me-2"></i>
+                                                        <a href="mailto:@Model.Restaurant.Email" class="text-decoration-none">
+                                                            @Model.Restaurant.Email
+                                                        </a>
+                                                    </div>
+                                                }
+                                                @if (Model.Restaurant.ServeCustomersInPlace)
+                                                {
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-success">
+                                                            <i class="bi bi-check-circle me-1"></i>
+                                                            Dine-in Available
+                                                        </span>
+                                                    </div>
+                                                }
+                                            </address>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Customer Information -->
+                                <div class="col-lg-4 mb-3">
+                                    <div class="card bg-opacity-10 border-warning border-opacity-10">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3">
+                                                <i class="bi bi-person-circle me-2"></i>
+                                                Customer Contact
+                                            </h6>
+                                            <div class="d-flex align-items-start">
+                                                @if (order.User.Image != null)
+                                                {
+                                                    <img class="img-thumbnail rounded-circle me-3" src="@order.User.Image" style="width: 60px; height: 60px; object-fit: cover;" alt="Customer" />
+                                                }
+                                                <div class="flex-grow-1">
+                                                    <p class="mb-2 fw-semibold">@order.User.Name</p>
+                                                    <div class="mb-2">
+                                                        <i class="bi bi-envelope text-dark me-2"></i>
+                                                        <a href="mailto:@order.User.Email" class="text-decoration-none">
+                                                            @order.User.Email
+                                                        </a>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <i class="bi bi-telephone text-dark me-2"></i>
+                                                        <a href="tel:@order.UserAddress.PhoneNumber" class="text-decoration-none">
+                                                            @order.UserAddress.PhoneNumber
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delivery Information -->
+                                <div class="col-lg-4 mb-3">
+                                    <div class="card bg-warning bg-opacity-10 border-warning border-opacity-50 h-100">
+                                        <div class="card-body">
+                                            <h6 class="text-warning fw-bold mb-3">
+                                                <i class="bi bi-truck me-2"></i>
+                                                Delivery Address
+                                            </h6>
+                                            <address class="mb-3">
+                                                <i class="bi bi-geo-alt-fill text-warning me-2"></i>
+                                                @order.UserAddress.Address<br>
+                                                @order.UserAddress.City, @order.UserAddress.State<br>
+                                                @order.UserAddress.Country @order.UserAddress.PostalCode
+                                            </address>
+                                            
+                                            <div class="border-top pt-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted">Total Price:</span>
+                                                    <span class="fw-bold fs-5 text-success">@order.TotalPrice lv.</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="text-muted">Ordered:</span>
+                                                    <span class="fw-semibold">@order.OrderedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Notes -->
+                            @if (!string.IsNullOrEmpty(order.Notes))
+                            {
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div class="card bg-light border-0">
+                                            <div class="card-body py-2">
+                                                <h6 class="text-muted mb-2">
+                                                    <i class="bi bi-sticky me-2"></i>
+                                                    Order Notes
+                                                </h6>
+                                                <p class="mb-0 fst-italic">@order.Notes</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Action Buttons -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card bg-dark text-white">
+                                        <div class="card-body text-center py-3">
+                                            @if (order.CurrentStatus == OrderStatusEnum.Ready)
+                                            {
+                                                <div id="error,@order.Id" class="mb-2"></div>
+                                                <button class="btn btn-warning btn-lg px-4 shadow" type="button" onclick="startDelivery('@order.Id')">
+                                                    <i class="bi bi-truck me-2"></i>
+                                                    Start Delivery
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-secondary btn-lg px-4" disabled>
+                                                    <i class="bi bi-hourglass-split me-2"></i>
+                                                    Wait for Order Preparation
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @await Html.PartialAsync("_RestaurantFooter")
     </div>
 
     @await Html.PartialAsync("_Footer")
 </body>
+
+
+@functions{
+    private string GetStatusBadgeColor(OrderStatusEnum status)
+    {
+        return status switch
+        {
+            OrderStatusEnum.Pending => "warning",
+            OrderStatusEnum.Preparing => "info",
+            OrderStatusEnum.Ready => "success",
+            OrderStatusEnum.Served => "success",
+            OrderStatusEnum.Delivering => "primary",
+            OrderStatusEnum.Delivered => "success",
+            _ => "secondary"
+        };
+    }
+
+    private string GetStatusBadgeColorDish(DishStatusEnum status)
+    {
+        return status switch
+        {
+            DishStatusEnum.Pending => "warning",
+            DishStatusEnum.Preparing => "info",
+            DishStatusEnum.Ready => "success",
+            _ => "secondary"
+        };
+    }
+
+    private string GetStatusIcon(OrderStatusEnum status)
+    {
+        return status switch
+        {
+            OrderStatusEnum.Pending => "hourglass-split",
+            OrderStatusEnum.Preparing => "fire",
+            OrderStatusEnum.Ready => "check2",
+            OrderStatusEnum.Served => "check2-all",
+            OrderStatusEnum.Delivering => "truck",
+            OrderStatusEnum.Delivered => "check2-all",
+            _ => "question-circle"
+        };
+    }
+
+    private string GetStatusIconDish(DishStatusEnum status)
+    {
+        return status switch
+        {
+            DishStatusEnum.Pending => "hourglass-split",
+            DishStatusEnum.Preparing => "fire",
+            DishStatusEnum.Ready => "check2",
+            _ => "question-circle"
+        };
+    }
+    private string GetDishIcon(DishTypeEnum dishType)
+    {
+        return dishType switch
+        {
+            DishTypeEnum.salads => "leaf-fill",
+            DishTypeEnum.soups => "cup-hot",
+            DishTypeEnum.appetizers => "flower1",
+            DishTypeEnum.dishes => "flower1",
+            DishTypeEnum.desserts => "cake2",
+            DishTypeEnum.drinks => "cup-straw",
+            _ => "dish"
+        };
+    }
+}

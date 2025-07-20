@@ -1,6 +1,6 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels;
 @using RestaurantSystem.Models.View.Messages
-@model List<RestaurantModel>
+@model RestaurantSystem.Models.View.Restaurant.RestaurantViewModel;
 @{
     ViewData["Title"] = "Restaurants - Savans Restaurant";
 }
@@ -27,7 +27,12 @@
             </div>
         </div>
 
-        @if (Model.Count == 0)
+<!-- Paging Component -->
+        <div class="mb-4">
+            @await Html.PartialAsync("_Paging", Model.Page)
+        </div>
+
+        @if (Model.Restaurants.Count == 0)
         {
             <div class="row justify-content-center">
                 <div class="col-md-8">
@@ -53,7 +58,7 @@
             })
 
             <div class="row g-4">
-                @foreach (RestaurantModel restaurant in Model)
+                @foreach (RestaurantModel restaurant in Model.Restaurants)
                     {
                         <div class="col-lg-6 col-xl-4">
                             <div class="card border-warning h-100"

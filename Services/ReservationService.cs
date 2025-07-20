@@ -46,7 +46,9 @@ namespace RestaurantSystem.Services
         public async Task<List<ReservationModel>> GetReservationsByUserIdAsync(long userId, int page)
         {
             return await Utility.GetPageAsync(_databaseContext.Reservations
-                .Where(res => res.UserId == userId).AsQueryable(), page).ToListAsync();
+                .Where(res => res.UserId == userId)
+                .OrderBy(res => res.At_Date)
+                .AsQueryable(), page).ToListAsync();
         }
 
         public async Task<bool> DeleteReservationAsync(int reservationId)
@@ -69,7 +71,9 @@ namespace RestaurantSystem.Services
         {
             return await Utility.GetPageAsync(_databaseContext.Reservations
                 .Include(reservation => reservation.User)
-                .Where(res => res.RestaurantId == restaurantId).AsQueryable(), page)
+                .Where(res => res.RestaurantId == restaurantId)
+                .OrderBy(res => res.At_Date)
+                .AsQueryable(), page)
                 .ToListAsync();
         }
 

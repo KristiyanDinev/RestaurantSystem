@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models;
@@ -63,7 +64,7 @@ namespace RestaurantSystem.Controllers.Staff
 
         [HttpGet]
         [Route("/staff/delivery/restaurant")]
-        public async Task<IActionResult> DeliveryRestaurant()
+        public async Task<IActionResult> DeliveryRestaurant([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
@@ -84,14 +85,15 @@ namespace RestaurantSystem.Controllers.Staff
             return View(new DeliveryRestaurantViewModel()
             {
                 Staff = user,
-                Restaurants = await _restaurantService.GetDeliveryGuy_RestaurantsAsync(address)
+                Page = page,
+                Restaurants = await _restaurantService.GetDeliveryGuy_RestaurantsAsync(address, page)
             });
         }
 
 
         [HttpGet]
         [Route("/staff/delivery/orders")]
-        public async Task<IActionResult> DeliveryOrders()
+        public async Task<IActionResult> DeliveryOrders([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null)
@@ -110,7 +112,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
             List<OrderWithDishesCountModel> orders = new ();
             foreach (OrderModel order in 
-                await _orderService.GetDeliveryOrdersByRestaurantIdAsync(restaurant.Id))
+                await _orderService.GetDeliveryOrdersByRestaurantIdAsync(restaurant.Id, page))
             {
                 orders.Add(new OrderWithDishesCountModel()
                 {
@@ -123,6 +125,7 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 Staff = user,
                 Orders = orders,
+                Page = page,
                 Restaurant = restaurant
             });
         }

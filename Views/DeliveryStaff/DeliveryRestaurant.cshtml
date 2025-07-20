@@ -1,53 +1,93 @@
 ﻿@using RestaurantSystem.Models.DatabaseModels
 @model RestaurantSystem.Models.View.Staff.Delivery.DeliveryRestaurantViewModel;
 @{
-    ViewData["Title"] = "Delivery Restaurants";
+    ViewData["Title"] = "Delivery Restaurants - Savans Restaurant";
 }
 
 <head>
     @await Html.PartialAsync("_Header")
-    <script src="~/assets/index.js"></script>
     <script src="~/assets/staff/delivery/delivery.js"></script>
 </head>
 
 <body>
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
-    <h3>Delivery Restaurants</h3>
+    <h3 class="text-center fw-bold my-4">Delivery Restaurants</h3>
+
+    <!-- Paging Component -->
+        <div class="mb-4">
+            @await Html.PartialAsync("_Paging", Model.Page)
+        </div>
+
     @if (Model.Restaurants.Count == 0)
-    {
-        <p class="alert aler-warning m-2">No Restaurants. Please contact your Manager.</p>
-        <a class="btn btn-success m-2" href="/addresses">Make Address</a>
-    }
-
-    <a class="btn btn-primary m-2" href="/staff/delivery/address">Go to Addresses</a>
-
-    <div class="m-2 container">
-        @foreach (RestaurantModel restaurant in Model.Restaurants)
         {
-            <div style="cursor: pointer;" class="card m-3" onclick="selectRestaurant('@restaurant.Id')">
-                <div class="card-body">
-                    <h4 class="card-title">
-                        @string.Join(", ", restaurant.Address,
-                        restaurant.City, restaurant.State, restaurant.Country)
-                    </h4>
-                    @if (restaurant.ServeCustomersInPlace)
-                    {
-                        <p class="card-text">Restaurant serves customers on-side</p>
-                    }
-                    else
-                    {
-                        <p class="card-text">Restaurant doesn't serve customers on-side</p>
-                    }
-
-                    <p class="card-text">Reservations:</p>
-                    <p class="card-text">Max Adults: @restaurant.ReservationMaxAdults</p>
-                    <p class="card-text">Min Adults: @restaurant.ReservationMinAdults</p>
-                    <p class="card-text">Max Children: @restaurant.ReservationMaxChildren</p>
-                    <p class="card-text">Min Children: @restaurant.ReservationMinChildren</p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1">No Restaurants Available</h5>
+                            <p class="mb-0">No restaurants match your area. Consider changing or adding new addresses to your profile.</p>
+                        </div>
+                    </div>
+                    <a href="/addresses" class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Addresses
+                    </a>
                 </div>
             </div>
         }
+
+
+    <div class="m-2 container">
+        <div class="d-flex justify-content-start align-items-center mb-4 ms-2">
+            <a href="/staff/delivery/address" class="btn btn-outline-warning">
+                <i class="bi bi-arrow-left me-2"></i>
+                Back to Addresses
+            </a>
+        </div>
+        @foreach (RestaurantModel restaurant in Model.Restaurants)
+        {
+            <div class="col-lg-6 col-xl-4 mx-2 my-4">
+                            <div class="card border-warning"
+                                style="cursor: pointer; transition: all 0.3s ease;"
+                                onclick="selectRestaurant('@restaurant.Id')"
+                                onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                                data-bs-theme-target="card">
+                                
+                                <!-- Restaurant Header -->
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0 fw-bold">
+                                        <i class="bi bi-geo-alt-fill me-2"></i>
+                                        Savans Restaurant
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+                                    <!-- Address Section -->
+                                    <div class="mb-3">
+                                        <h6 class="text-warning mb-2">
+                                            <i class="bi bi-pin-map me-2"></i>Location
+                                        </h6>
+                                        <p class="mb-0">
+                                            @string.Join(", ", restaurant.Address, restaurant.City, restaurant.State, restaurant.Country)
+                                        </p>
+                                    </div>
+
+                                <!-- Card Footer -->
+                                <div class="card-footer bg-transparent border-warning">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Click to select</small>
+                                        <i class="bi bi-arrow-right-circle text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+            </div>
+        }
+
+        @await Html.PartialAsync("_RestaurantFooter")
     </div>
 
     @await Html.PartialAsync("_Footer")

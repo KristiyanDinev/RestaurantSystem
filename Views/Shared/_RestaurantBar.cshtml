@@ -24,14 +24,14 @@
                     {
                         <div class="d-flex align-items-center">
                             <i class="bi bi-telephone text-warning me-1"></i>
-                            <small class="text-muted">@Model.PhoneNumber</small>
+                            <a href="tel:@Model.PhoneNumber" class="text-muted">@Model.PhoneNumber</a>
                         </div>
                     }
                     @if (Model.Email != null)
                     {
                         <div class="d-flex align-items-center">
                             <i class="bi bi-envelope text-warning me-1"></i>
-                            <small class="text-muted">@Model.Email</small>
+                            <a href="mailto:@Model.Email" class="text-muted">@Model.Email</a>
                         </div>
                     }
                 </div>
