@@ -56,7 +56,101 @@ body {
 
 
 
+/* Mobile styles */
+@media (max-width: 767.98px) {
+    .ptable {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .wtb {
+        min-width: 100%;
+    }
+    
+    .wtb thead {
+        display: none;
+    }
+    
+    .wtb tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+    }
+    
+    .wtb td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: right;
+    }
+    
+    .wtb td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        margin-right: 1rem;
+        text-align: left;
+    }
+    
+    /* Hide the data-label for the actions column */
+    .wtb td:last-child:before {
+        display: none;
+    }
+    
+    /* Make buttons stack vertically */
+    .wtb .btn {
+        display: block;
+        width: 100%;
+        margin: 0.25rem 0;
+    }
+    
+    /* Make images smaller on mobile */
+    .wtb .smi {
+        max-width: 40px;
+        height: auto;
+    }
+    
+    /* Style the role cards */
+    .wtb .card {
+        margin: 0.25rem 0;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    /* Style the role selection panels */
+    .wtb [id^="give_role_"],
+    .wtb [id^="remove_role_"] {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+    
+    .wtb select {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+}
 
+/* Desktop styles */
+@media (min-width: 768px) {
+    .wtb {
+        width: 90%;
+        table-layout: fixed;
+    }
+    
+    .wtb td, .wtb th {
+        vertical-align: middle;
+    }
+    
+    .wtb .smi {
+        max-width: 80px;
+        max-height: 80px;
+        height: auto;
+    }
+}
 
 
 

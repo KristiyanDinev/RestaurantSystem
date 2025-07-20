@@ -1,5 +1,6 @@
 ﻿@using RestaurantSystem.Enums
 @using RestaurantSystem.Models.DatabaseModels
+@using RestaurantSystem.Models.View.Messages
 @model RestaurantSystem.Models.View.Staff.Manager.ManagerDishViewModel;
 @{
     ViewData["Title"] = "Manage Dishes - Savans Restaurant";
@@ -19,27 +20,28 @@
     <h3>Manage Dishes</h3>
     @await Html.PartialAsync("_Paging", Model.Page)
 
-    @if (TempData.Peek("CreatedSuccessfully") != null)
-    {
-        <p class="alert alert-success m-2">Successfully Created Dish</p>
-        TempData.Remove("CreatedSuccessfully");
-    }
 
-    @if (TempData.Peek("UpdatedSuccessfully") != null)
-    {
-        <p class="alert alert-success m-2">Successfully Updated Dish</p>
-        TempData.Remove("UpdatedSuccessfully");
-    }
+    <div class="mx-3">
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "CreatedSuccessfully",
+            Message = "Successfully Created Dish!"
+        })
 
-    @if (TempData.Peek("DeletedSuccessfully") != null)
-    {
-        <p class="alert alert-success m-2">Successfully Deleted Dish</p>
-        TempData.Remove("DeletedSuccessfully");
-    }
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "UpdatedSuccessfully",
+            Message = "Successfully Updated Dish!"
+        })
 
-    <p id="status"></p>
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "DeletedSuccessfully",
+            Message = "Successfully Deleted Dish!"
+        })
+    </div>
 
-    <button class="btn btn-success m-2" onclick="toggleCreateDish()" type="button">Create Dish</button>
+    <button class="btn btn-success m-2 d-flex" onclick="toggleCreateDish()" type="button">Create Dish</button>
 
     <div id="create_dish" class="container form-group m-2" style="display:none;">
         <input id="dish_name" type="text"
@@ -87,7 +89,7 @@
 
         <button type="button" class="btn btn-success m-2" onclick="createDish()">Submit</button>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive d-flex justify-content-center">
         <table class="table wtb table-bordered table-striped text-center">
             <thead class="thead-dark">
                 <tr>
@@ -109,30 +111,20 @@
                 {
                     <tr class="page-row">
                         <td>@dish.Id</td>
-                        <td>
+                        <td style="display: flex; justify-content: center; align-items: center;flex-direction: column;height: 15vh;">
                             @if (!string.IsNullOrEmpty(dish.Image))
-                                {
-                                    <img src="@dish.Image" alt="Dish Image" class="mt-2 rounded img-thumbnail smi" />
+                            {
+                                    <img src="@dish.Image" alt="Dish Image" width="80px" height="80px" class="mt-2 rounded img-thumbnail smi" />
 
-                                } else {
+                            } else {
                                     <div class="bg-warning bg-opacity-25 rounded d-flex align-items-center justify-content-center border border-warning" style="width: 80px; height: 80px;">
                                         <i class="bi bi-image text-warning fs-3"></i>
                                     </div>
-                                }
-                            <!-- <img src="@dish.Image" class="img-thumbnail smi"> -->
-
+                            }
                             <div id="image,@dish.Id" style="display:none;">
                                 <input type="file" accept="image/*" id="inputimage,@dish.Id">
                                 <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage('@dish.Id')">Remove Image</button>
-                                @if (!string.IsNullOrEmpty(dish.Image))
-                                {
-                                    <img src="@dish.Image" id="preview,@dish.Id" alt="Dish Image Preview" class="mt-2 rounded img-thumbnail" />
-
-                                } else {
-                                    <div class="bg-warning bg-opacity-25 rounded d-flex align-items-center justify-content-center border border-warning" style="width: 80px; height: 80px;">
-                                                                <i class="bi bi-image text-warning fs-3"></i>
-                                      </div>
-                                }
+                                <img id="preview,@dish.Id" class="mt-2 rounded smi img-thumbnail" />
                                 <label for="deleteimage,@dish.Id">Delete Image?</label>
                                 <input type="checkbox" id="deleteimage,@dish.Id">
                                 <script>
