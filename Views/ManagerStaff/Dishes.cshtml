@@ -2,7 +2,7 @@
 @using RestaurantSystem.Models.DatabaseModels
 @model RestaurantSystem.Models.View.Staff.Manager.ManagerDishViewModel;
 @{
-    ViewData["Title"] = "Manage Dishes";
+    ViewData["Title"] = "Manage Dishes - Savans Restaurant";
 }
 
 
@@ -88,7 +88,7 @@
         <button type="button" class="btn btn-success m-2" onclick="createDish()">Submit</button>
     </div>
     <div class="table-responsive">
-        <table class="table table-bordered table-striped text-center">
+        <table class="table wtb table-bordered table-striped text-center">
             <thead class="thead-dark">
                 <tr>
                     <th>ID</th>
@@ -110,12 +110,29 @@
                     <tr class="page-row">
                         <td>@dish.Id</td>
                         <td>
-                            <img src="@dish.Image" class="img-thumbnail rounded m-2">
+                            @if (!string.IsNullOrEmpty(dish.Image))
+                                {
+                                    <img src="@dish.Image" alt="Dish Image" class="mt-2 rounded img-thumbnail smi" />
+
+                                } else {
+                                    <div class="bg-warning bg-opacity-25 rounded d-flex align-items-center justify-content-center border border-warning" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-image text-warning fs-3"></i>
+                                    </div>
+                                }
+                            <!-- <img src="@dish.Image" class="img-thumbnail smi"> -->
 
                             <div id="image,@dish.Id" style="display:none;">
                                 <input type="file" accept="image/*" id="inputimage,@dish.Id">
                                 <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage('@dish.Id')">Remove Image</button>
-                                <img id="preview,@dish.Id" alt="Dish Image Preview" class="mt-2 rounded img-thumbnail" />
+                                @if (!string.IsNullOrEmpty(dish.Image))
+                                {
+                                    <img src="@dish.Image" id="preview,@dish.Id" alt="Dish Image Preview" class="mt-2 rounded img-thumbnail" />
+
+                                } else {
+                                    <div class="bg-warning bg-opacity-25 rounded d-flex align-items-center justify-content-center border border-warning" style="width: 80px; height: 80px;">
+                                                                <i class="bi bi-image text-warning fs-3"></i>
+                                      </div>
+                                }
                                 <label for="deleteimage,@dish.Id">Delete Image?</label>
                                 <input type="checkbox" id="deleteimage,@dish.Id">
                                 <script>

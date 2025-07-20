@@ -1,10 +1,10 @@
 ﻿
-function toggleGiveRole() {
-    toggleElement('give_role')
+function toggleGiveRole(id) {
+    toggleElement('give_role,'+id)
 }
 
-function toggleRemoveRole() {
-    toggleElement('remove_role')
+function toggleRemoveRole(id) {
+    toggleElement('remove_role,'+id)
 }
 
 async function addStaff() {
@@ -51,11 +51,11 @@ async function removeStaff(id, name) {
             return;
         }
     } catch { }
-    status.innerHTML = `Coudn't remove ${name} from staff`
+    status.innerHTML = `Couldn't remove ${name} from staff`
 }
 
 async function giveRole(id, name) {
-    const role = document.getElementById('gi_role').value
+    const role = document.getElementById('gi_role,'+id).value
     if (!role) {
         alert('Select at least one role')
         return
@@ -78,11 +78,11 @@ async function giveRole(id, name) {
             return;
         }
     } catch { }
-    status.innerHTML = `Coudn't give ${role} role to ${name}`
+    status.innerHTML = `Couldn't give ${role} role to ${name}`
 }
 
 async function removeRole(id, name) {
-    const role = document.getElementById('rm_role').value
+    const role = document.getElementById('rm_role,'+id).value
     if (!role) {
         alert('Select at least one role')
         return
@@ -105,5 +105,5 @@ async function removeRole(id, name) {
             return;
         }
     } catch { }
-    status.innerHTML = `Coudn't remove ${role} role to ${name}`
+    status.innerHTML = `Couldn't remove ${role} role to ${name}`
 }

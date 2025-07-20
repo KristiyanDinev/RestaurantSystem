@@ -33,7 +33,7 @@ namespace RestaurantSystem.Controllers.Staff
 
         [HttpGet]
         [Route("/staff/dishes")]
-        public async Task<IActionResult> Dishes()
+        public async Task<IActionResult> Dishes([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
@@ -42,7 +42,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             List<OrderWithDishesCountModel> dishes = new();
-            foreach (OrderModel order in await _orderService.GetCookOrdersByRestaurantIdAsync(user.Restaurant.Id))
+            foreach (OrderModel order in await _orderService.GetCookOrdersByRestaurantIdAsync(user.Restaurant.Id, page))
             {
                 dishes.Add(new OrderWithDishesCountModel()
                 {
@@ -54,7 +54,8 @@ namespace RestaurantSystem.Controllers.Staff
             return View(new DishesViewModel()
             {
                 Staff = user,
-                Orders = dishes
+                Orders = dishes,
+                Page = page
             });
         }
 

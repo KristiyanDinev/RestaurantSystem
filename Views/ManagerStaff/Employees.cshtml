@@ -1,8 +1,9 @@
 ﻿@using RestaurantSystem.Enums
 @using RestaurantSystem.Models.DatabaseModels
 @model RestaurantSystem.Models.View.Staff.Manager.ManagerEmployeesViewModel;
+@using RestaurantSystem.Models.View.Messages
 @{
-    ViewData["Title"] = "Manage Employees";
+    ViewData["Title"] = "Manage Employees - Savans Restaurant";
 }
 
 
@@ -15,45 +16,48 @@
 <body>
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+
+    
     @await Html.PartialAsync("_ManagerNavBar")
-    <h3>Manage Employees</h3>
+
+    <h3 class="text-center mb-4 mt-5">Manage Employees</h3>
     @await Html.PartialAsync("_Paging", Model.Page)
 
-    @if (TempData.Peek("AddStaff") != null)
-    {
-        <p class="alert alert-success m-2">Successfully Added New Employee</p>
-        TempData.Remove("AddStaff");
-    }
+    <div class="p-4">
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "AddStaff",
+            Message = "Successfully Added New Employee!"
+        })
 
-    @if (TempData.Peek("RemoveStaff") != null)
-    {
-        <p class="alert alert-success m-2">Successfully Removed Employee</p>
-        TempData.Remove("RemoveStaff");
-    }
 
-    @if (TempData.Peek("GiveRole") != null)
-    {
-        <p class="alert alert-success m-2">Successfully Give Role to Employee</p>
-        TempData.Remove("GiveRole");
-    }
+    @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "RemoveStaff",
+            Message = "Successfully Removed Employee!"
+        })
 
-    @if (TempData.Peek("RemoveRole") != null)
-    {
-        <p class="alert alert-success m-2">Successfully Removed Role from Employee</p>
-        TempData.Remove("RemoveRole");
-    }
+    @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "GiveRole",
+            Message = "Successfully Give Role to Employee!"
+        })
 
-    <p id="status"></p>
-
-    <div class="container form-group m-2">
+    @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "RemoveRole",
+            Message = "Successfully Removed Role from Employee!"
+        })
+    </div>
+    <div class="d-flex w-100 form-group m-2 justify-content-center align-items-center flex-column">
         <input id="staff_email" type="email"
-               class="input-group form-controled"
+               class=" w-75 form-controled rounded p-2"
                placeholder="Enter the email of the user you want to add as staff">
         <button type="button" class="btn btn-success m-2" onclick="addStaff()">Submit</button>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped text-center">
+    <div class="d-flex justify-content-center">
+        <table class="table ptable wtb table-bordered text-center justify-content-center rounded" >
             <thead class="thead-dark">
                 <tr>
                     <th>ID</th>
@@ -65,30 +69,30 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="">
                 @foreach (UserModel user in Model.Employees)
                 {
                     <tr class="page-row">
-                        <td>@user.Id</td>
-                        <td>
-                            <img src="@user.Image" class="img-thumbnail rounded" />
+                        <td data-label="ID">@user.Id</td>
+                        <td class="p-1" data-label="Image">
+                            <img src="@user.Image" class="img-thumbnail smi "/>
                         </td>
-                        <td>@user.Name</td>
-                        <td>@user.Email</td>
-                        <td>@user.CreatedAt</td>
-                        <td>
+                        <td data-label="Name">@user.Name</td>
+                        <td data-label="Email">@user.Email</td>
+                        <td data-label="Created">@user.CreatedAt</td>
+                        <td data-label="Roles">
                             @foreach (UserRoleModel role in user.Roles)
                             {
                                 <p class="card card-body card-title">@role.Role.Name</p>
                             }
                         </td>
-                        <td>
-                            <button type="button" class="btn btn-primary m-2" onclick="toggleGiveRole()">Give Role</button>
-                            <button type="button" class="btn btn-danger m-2" onclick="toggleRemoveRole()">Remove Role</button>
+                        <td data-label="Actions" class="w-25">
+                            <button type="button" class="btn btn-primary m-2" onclick="toggleGiveRole('@user.Id')">Give Role</button>
+                            <button type="button" class="btn btn-danger m-2" onclick="toggleRemoveRole('@user.Id')">Remove Role</button>
                             <button type="button" class="btn btn-danger m-2" onclick="removeStaff('@user.Id', '@user.Name')">Remove Staff</button>
-                            <div id="give_role" style="display:none;">
+                            <div id="give_role,@user.Id" style="display:none;">
                                 <h4>Give Role</h4>
-                                <select id="gi_role" name="gi_role">
+                                <select id="gi_role,@user.Id" name="gi_role">
                                     @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.delivery.ToString())))
                                     {
                                         <option value="@RoleEnum.delivery.ToString()">@RoleEnum.delivery.ToString()</option>
@@ -110,21 +114,21 @@
                                 <button type="button"
                                         class="btn btn-success m-2"
                                         onclick="giveRole('@user.Id', '@user.Name')">
-                                    Submit
+                                    Give
                                 </button>
                             </div>
-                            <div id="remove_role" style="display:none;">
+                            <div id="remove_role,@user.Id" style="display:none;">
                                 <h4>Remove Role</h4>
-                                <select id="rm_role">
+                                <select id="rm_role,@user.Id" class="rounded p-1">
                                     @foreach (UserRoleModel role in user.Roles)
                                     {
                                         <option value="@role.Role.Name">@role.Role.Name</option>
                                     }
                                 </select>
                                 <button type="button"
-                                        class="btn btn-success m-2"
+                                        class="btn btn-danger m-2"
                                         onclick="removeRole('@user.Id', '@user.Name')">
-                                    Submit
+                                    Remove
                                 </button>
                             </div>
                         </td>

@@ -44,6 +44,28 @@ body {
     user-select: none;
 }
 
+.wtb{
+    width: 90%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .logo {
     color: #ee3434 !important;
@@ -65,7 +87,13 @@ body {
         color: white !important;
     }
 
-
+.smi{
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    border: 2px solid orange;
+    padding:0;
+}
 .btn-outline-warning {
     border-color: #ffc107;
     color: #ffc107;

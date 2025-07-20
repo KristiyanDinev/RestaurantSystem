@@ -1,12 +1,40 @@
-﻿@model RestaurantSystem.Models.DatabaseModels.DishModel;
+@model RestaurantSystem.Models.DatabaseModels.DishModel;
 
-@if (Model.Image != null)
-{
-    <img src="@Model.Image" class="img-thumbnail rounded" alt="No image for now">
-}
-
-<h4 class="card-title">@Model.Name</h4>
-<p class="card-text">Grams: /@Model.Grams/</p>
-<p class="card-text">Ingredients: @Model.Ingredients</p>
-<p class="card-text">Avеrage Time To Cook: @Model.AverageTimeToCook minute/s</p>
-<p class="card-text">Price: @Model.Price lv.</p>
+<div class="card border-0">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                @if (Model.Image != null)
+                {
+                    <img src="@Model.Image" class="img-thumbnail rounded mb-3" alt="No image for now">
+                }
+                else
+                {
+                    <div class="bg-warning bg-opacity-25 border border-warning rounded p-4 text-center mb-3">
+                        <i class="bi bi-image fs-1 text-warning"></i>
+                    </div>
+                }
+            </div>
+            
+            <div class="col-md-8">
+                <h4 class="card-title text-warning mb-3">@Model.Name</h4>
+                
+                <div class="mb-2">
+                    <strong>Grams:</strong> @Model.Grams
+                </div>
+                
+                <div class="mb-2">
+                    <strong>Ingredients:</strong> @Model.Ingredients
+                </div>
+                
+                <div class="mb-2">
+                    <strong>Est. time:</strong> @Model.AverageTimeToCook
+                </div>
+                
+                <div class="mb-0">
+                    <strong>Price:</strong> <span class="text-warning fs-5 fw-bold">@Model.Price lv.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
