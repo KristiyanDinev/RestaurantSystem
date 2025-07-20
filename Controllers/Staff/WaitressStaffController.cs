@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.RateLimiting;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models;
@@ -44,7 +45,7 @@ namespace RestaurantSystem.Controllers.Staff
 
         [HttpGet]
         [Route("/staff/reservations")]
-        public async Task<IActionResult> Reservations()
+        public async Task<IActionResult> Reservations([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
@@ -55,8 +56,9 @@ namespace RestaurantSystem.Controllers.Staff
             return View(new ReservationViewModel()
             {
                 Staff = user,
+                Page = page,
                 Reservations = await _reservationService
-                .GetReservationsByRestaurantIdAsync(user.Restaurant.Id)
+                    .GetReservationsByRestaurantIdAsync(user.Restaurant.Id, page)
             });
         }
 
@@ -91,6 +93,38 @@ namespace RestaurantSystem.Controllers.Staff
             return await _reservationService.DeleteReservationAsync(reservation.Id) ?
                 Ok() : BadRequest();
         }
+
+
+        [HttpPost]
+        [Route("/staff/reservations/setprice")]
+        public async Task<IActionResult> ReservationSetTotalPrice([FromForm] int Id, [FromForm] decimal TotalPrice)
+        {
+            if (TotalPrice < 0)
+            {
+                return BadRequest();
+            }
+
+            ReservationModel? reservation = await _reservationService.GetReservationByIdAsync(Id);
+            if (reservation == null || reservation.CurrentStatus.Equals(ReservationStatusEnum.Cancelled))
+            {
+                return BadRequest();
+            }
+
+            if (reservation.TotalPrice == TotalPrice)
+            {
+                TempData["PriceAlreadySet"] = true;
+                return Ok();
+            }
+
+            if (!await _reservationService.UpdateReservationPriceAsync(Id, TotalPrice))
+            {
+                TempData["PriceSetError"] = true;
+                return BadRequest();
+            }
+            TempData["PriceSetSuccessfully"] = true;
+            return Ok();
+        }
+
 
 
         [HttpPost]
@@ -129,7 +163,7 @@ namespace RestaurantSystem.Controllers.Staff
 
         [HttpGet]
         [Route("/staff/orders")]
-        public async Task<IActionResult> Orders()
+        public async Task<IActionResult> Orders([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtility.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
@@ -138,7 +172,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
 
             List<OrderWithDishesCountModel> dishes = new();
-            foreach (OrderModel order in await _orderService.GetWaitressOrdersByRestaurantIdAsync(user.Restaurant.Id))
+            foreach (OrderModel order in await _orderService.GetWaitressOrdersByRestaurantIdAsync(user.Restaurant.Id, page))
             {
                 dishes.Add(new OrderWithDishesCountModel()
                 {
@@ -150,7 +184,8 @@ namespace RestaurantSystem.Controllers.Staff
             return View(new OrdersViewModel()
             {
                 Staff = user,
-                Orders = dishes
+                Orders = dishes,
+                Page = page
             });
         }
 

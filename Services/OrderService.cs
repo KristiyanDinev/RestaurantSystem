@@ -139,15 +139,17 @@ namespace RestaurantSystem.Services
                 .ToListAsync();
         }
 
-        public async Task<List<OrderModel>> GetWaitressOrdersByRestaurantIdAsync(int restaurantId)
+        public async Task<List<OrderModel>> GetWaitressOrdersByRestaurantIdAsync(int restaurantId, int page)
         {
-            return await _databaseContext.Orders
+            return await Utility.GetPageAsync<OrderModel>(_databaseContext.Orders
                 .Include(order => order.User)
                 .Include(order => order.Cupon)
                 .Where(order =>
                 order.RestaurantId == restaurantId &&
-                !(order.CurrentStatus.Equals(OrderStatusEnum.Delivering)) ||
-                  order.CurrentStatus.Equals(OrderStatusEnum.Delivered))
+                !(order.CurrentStatus.Equals(OrderStatusEnum.Delivering) ||
+                  order.CurrentStatus.Equals(OrderStatusEnum.Delivered)))
+                .OrderBy(order => order.Id)
+                .AsQueryable(), page)
                 .ToListAsync();
         }
 

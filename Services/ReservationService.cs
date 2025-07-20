@@ -65,14 +65,25 @@ namespace RestaurantSystem.Services
         }
 
         public async Task<List<ReservationModel>> GetReservationsByRestaurantIdAsync(
-            int restaurantId)
+            int restaurantId, int page)
         {
-            return await _databaseContext.Reservations
+            return await Utility.GetPageAsync(_databaseContext.Reservations
                 .Include(reservation => reservation.User)
-                .Where(res =>
-                res.RestaurantId == restaurantId).ToListAsync();
+                .Where(res => res.RestaurantId == restaurantId).AsQueryable(), page)
+                .ToListAsync();
         }
 
+        public async Task<bool> UpdateReservationPriceAsync(int id, decimal newPrice)
+        {
+            ReservationModel? existingReservation = await _databaseContext
+                .Reservations.FirstOrDefaultAsync(res => res.Id == id);
+            if (existingReservation == null || existingReservation.TotalPrice == newPrice)
+            {
+                return false;
+            }
+            existingReservation.TotalPrice = newPrice;
+            return await _databaseContext.SaveChangesAsync() > 0;
+        }
 
         public async Task<bool> UpdateReservationAsync(int id, ReservationStatusEnum new_status)
         {

@@ -10,7 +10,7 @@ namespace RestaurantSystem.Utilities
 
         private static async Task<string?> UploadImageAsync(IFormFile? Image, string assetPath)
         {
-            if (Image == null)
+            if (Image == null || Image.Length >= 10_000_000)
             {
                 return null;
             }

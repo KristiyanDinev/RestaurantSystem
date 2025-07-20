@@ -38,6 +38,9 @@
                             <p class="mb-0">No restaurants match your area. Consider changing or adding new addresses to your profile.</p>
                         </div>
                     </div>
+                    <a href="/addresses" class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Addresses
+                    </a>
                 </div>
             </div>
         }
@@ -49,115 +52,115 @@
                 Message = "Please select a restaurant, that serves customers on-site."
             })
 
-        <div class="row g-4">
-            @foreach (RestaurantModel restaurant in Model)
-                {
-                    <div class="col-lg-6 col-xl-4">
-                        <div class="card border-warning h-100"
-                             style="cursor: pointer; transition: all 0.3s ease;"
-                             onclick="choose('@restaurant.Id')"
-                             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
-                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
-                             data-bs-theme-target="card">
-                            
-                            <!-- Restaurant Header -->
-                            <div class="card-header bg-warning text-dark">
-                                <h5 class="card-title mb-0 fw-bold">
-                                    <i class="bi bi-geo-alt-fill me-2"></i>
-                                    Savans Restaurant
-                                </h5>
-                            </div>
-
-                            <div class="card-body">
-                                <!-- Address Section -->
-                                <div class="mb-3">
-                                    <h6 class="text-warning mb-2">
-                                        <i class="bi bi-pin-map me-2"></i>Location
-                                    </h6>
-                                    <p class="mb-0">
-                                        @string.Join(", ", restaurant.Address, restaurant.City, restaurant.State, restaurant.Country)
-                                    </p>
+            <div class="row g-4">
+                @foreach (RestaurantModel restaurant in Model)
+                    {
+                        <div class="col-lg-6 col-xl-4">
+                            <div class="card border-warning h-100"
+                                style="cursor: pointer; transition: all 0.3s ease;"
+                                onclick="choose('@restaurant.Id')"
+                                onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(255,193,7,0.3)';"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                                data-bs-theme-target="card">
+                                
+                                <!-- Restaurant Header -->
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0 fw-bold">
+                                        <i class="bi bi-geo-alt-fill me-2"></i>
+                                        Savans Restaurant
+                                    </h5>
                                 </div>
 
-                                <!-- Services Section -->
-                                <div class="mb-3">
-                                    <h6 class="text-warning mb-2">
-                                        <i class="bi bi-list-check me-2"></i>Services
-                                    </h6>
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            @if (restaurant.DoDelivery)
-                                            {
-                                                <span class="badge bg-success d-flex align-items-center">
-                                                    <i class="bi bi-truck me-1"></i>
-                                                    Delivery
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary d-flex align-items-center">
-                                                    <i class="bi bi-truck me-1"></i>
-                                                    No Delivery
-                                                </span>
-                                            }
+                                <div class="card-body">
+                                    <!-- Address Section -->
+                                    <div class="mb-3">
+                                        <h6 class="text-warning mb-2">
+                                            <i class="bi bi-pin-map me-2"></i>Location
+                                        </h6>
+                                        <p class="mb-0">
+                                            @string.Join(", ", restaurant.Address, restaurant.City, restaurant.State, restaurant.Country)
+                                        </p>
+                                    </div>
+
+                                    <!-- Services Section -->
+                                    <div class="mb-3">
+                                        <h6 class="text-warning mb-2">
+                                            <i class="bi bi-list-check me-2"></i>Services
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                @if (restaurant.DoDelivery)
+                                                {
+                                                    <span class="badge bg-success d-flex align-items-center">
+                                                        <i class="bi bi-truck me-1"></i>
+                                                        Delivery
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary d-flex align-items-center">
+                                                        <i class="bi bi-truck me-1"></i>
+                                                        No Delivery
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="col-6">
+                                                @if (restaurant.ServeCustomersInPlace)
+                                                {
+                                                    <span class="badge bg-success d-flex align-items-center">
+                                                        <i class="bi bi-person-check me-1"></i>
+                                                        Dine-in
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary d-flex align-items-center">
+                                                        <i class="bi bi-person-x me-1"></i>
+                                                        No Dine-in
+                                                    </span>
+                                                }
+                                            </div>
                                         </div>
-                                        <div class="col-6">
-                                            @if (restaurant.ServeCustomersInPlace)
-                                            {
-                                                <span class="badge bg-success d-flex align-items-center">
-                                                    <i class="bi bi-person-check me-1"></i>
-                                                    Dine-in
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary d-flex align-items-center">
-                                                    <i class="bi bi-person-x me-1"></i>
-                                                    No Dine-in
-                                                </span>
-                                            }
+                                    </div>
+
+                                    <!-- Reservations Section -->
+                                    <div>
+                                        <h6 class="text-warning mb-2">
+                                            <i class="bi bi-calendar-check me-2"></i>Reservation Limits
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <div class="bg-body-secondary p-2 rounded">
+                                                    <div class="text-center">
+                                                        <i class="bi bi-people-fill text-warning"></i>
+                                                        <small class="d-block text-muted">Adults</small>
+                                                        <strong>@restaurant.ReservationMinAdults - @restaurant.ReservationMaxAdults</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="bg-body-secondary p-2 rounded">
+                                                    <div class="text-center">
+                                                        <i class="bi bi-person-hearts text-warning"></i>
+                                                        <small class="d-block text-muted">Children</small>
+                                                        <strong>@restaurant.ReservationMinChildren - @restaurant.ReservationMaxChildren</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Reservations Section -->
-                                <div>
-                                    <h6 class="text-warning mb-2">
-                                        <i class="bi bi-calendar-check me-2"></i>Reservation Limits
-                                    </h6>
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <div class="bg-body-secondary p-2 rounded">
-                                                <div class="text-center">
-                                                    <i class="bi bi-people-fill text-warning"></i>
-                                                    <small class="d-block text-muted">Adults</small>
-                                                    <strong>@restaurant.ReservationMinAdults - @restaurant.ReservationMaxAdults</strong>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="bg-body-secondary p-2 rounded">
-                                                <div class="text-center">
-                                                    <i class="bi bi-person-hearts text-warning"></i>
-                                                    <small class="d-block text-muted">Children</small>
-                                                    <strong>@restaurant.ReservationMinChildren - @restaurant.ReservationMaxChildren</strong>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <!-- Card Footer -->
+                                <div class="card-footer bg-transparent border-warning">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Click to select</small>
+                                        <i class="bi bi-arrow-right-circle text-warning"></i>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Card Footer -->
-                            <div class="card-footer bg-transparent border-warning">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">Click to select</small>
-                                    <i class="bi bi-arrow-right-circle text-warning"></i>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
+                    }
             </div>
         }
 

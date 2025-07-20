@@ -6,7 +6,7 @@ namespace RestaurantSystem.Models.View.Staff.Waitress
     {
 
         public required UserModel Staff { get; set; }
-
+        public required int Page { get; set; } = 1;
         public List<ReservationModel> Reservations { get; set; } = new List<ReservationModel>();
     }
 }

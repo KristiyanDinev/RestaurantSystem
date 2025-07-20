@@ -6,3 +6,4 @@ logs/
 wwwroot/assets/images/
 startup.sql
 publish/
+sync_config.jsonc

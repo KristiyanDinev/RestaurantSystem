@@ -1,46 +1,64 @@
 async function changeStatus(id, status) {
-
     let formData = new FormData()
     formData.append('Id', Number(id))
     formData.append('Status', status)
 
     try {
-        const res = await fetch("/staff/reservations", {
+        await fetch("/staff/reservations", {
             method: 'POST',
             body: formData,
             redirect: 'follow'
         })
 
-        if (res.status == 200) {
-            window.location.reload()
-            return
-        }
-
-        document.getElementById('error,' + id).innerHTML = "Couldn't Update Reservation."
-
-    } catch {
-        document.getElementById('error,' + id).innerHTML = "Couldn't Update Reservation."
-        return;
-    }
+        window.location.reload()
+    } catch {}
 }
 
 async function deleteReservation(id) {
-
     if (!confirm("Are you sure you want to delete this reservation?")) {
         return;
     }
 
     try {
-        const res = await fetch(`/staff/reservations/delete/${id}`, {
+        await fetch(`/staff/reservations/delete/${id}`, {
             method: 'POST'
         })
 
-        if (res.ok) {
-            window.location.reload()
-            return
-        }
+        window.location.reload()
 
     } catch {}
-
-    document.getElementById('error,' + id).innerHTML = "Couldn't Delete the Reservation."
 }
+
+function togglePriceInput() {
+    toggleElement('submit_price')
+    toggleElement('new_price_input')
+}
+
+async function submitPrice(id) {
+    if (!confirm("Are you sure you want to set a new price?")) {
+        return;
+    }
+
+    let priceInput = document.getElementById('set_total_price')
+    let newPrice = priceInput.value
+
+    if (newPrice < 0) {
+        alert("Please enter a valid price.")
+        return
+    }
+
+    let formData = new FormData()
+    formData.append('Id', id)
+    formData.append('TotalPrice', newPrice)
+
+    try {
+        await fetch("/staff/reservations/setprice", {
+            method: 'POST',
+            body: formData
+        })
+
+        window.location.reload()
+    } catch {}
+}
+
+

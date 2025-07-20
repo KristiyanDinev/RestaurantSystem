@@ -180,10 +180,16 @@ Remove package
 dotnet remove package <PackageName>
 ```
 
+ASP.NET with Hot Reload (VSC)
+```bash
+dotnet watch run
+```
 
 ## TODO
 
 - Add cupons for the manager to manage.
+
+- Add Restaurant manager to manage the reservations (on/off/limits)
 
 - If there is time. Add cupon checks in the cart and waitress add order page.
 
