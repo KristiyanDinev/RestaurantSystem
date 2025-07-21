@@ -46,23 +46,27 @@
         })
 
 
-        <!-- Orders List -->
-        <div class="row container d-flex flex-row">
-            <div class="d-flex justify-content-start align-items-center mb-4 ms-3">
+            <div class="container d-flex justify-content-center align-items-center mb-4">
                     <a href="/staff/delivery/restaurant" class="btn btn-outline-warning">
                         <i class="bi bi-arrow-left me-2"></i>
                         Back to Restaurants
                     </a>
             </div>
+        <div class="container-fluid py-4 d-flex justify-content-center align-items-center">
+                @if (Model.Orders.Count == 0) {
+                    <!-- No Orders -->
+                    <div class="text-center d-flex flex-column align-items-center">
+                        <div class="mb-4">
+                            <i class="bi bi-receipt display-1 text-warning opacity-50"></i>
+                        </div>
+                        <h4 class="text-warning fw-bold mb-3">No Orders for delivery</h4>
+                    </div>
+                }
+            </div>
 
-            @if (Model.Staff.Deliveries.Count > 0) {
-                <div class="d-flex justify-content-start align-items-center mb-4 ms-3">
-                        <a href="/staff/delivery/myorders" class="btn btn-outline-warning">
-                            <i class="bi bi-arrow-right me-2"></i>
-                            Go to My Orders
-                        </a>
-                </div>
-            }
+
+        <!-- Orders List -->
+        <div class="row container d-flex flex-row">
 
             @foreach (OrderWithDishesCountModel orderWithDishes in Model.Orders)
             {
@@ -113,18 +117,6 @@
                                                             <i class="bi bi-@(GetStatusIconDish(dish.OrderedDish.CurrentStatus)) me-1"></i>
                                                             @dish.OrderedDish.CurrentStatus
                                                         </span>
-                                                    </div>
-
-                                                    <!-- Status Messages -->
-                                                    <div class="mb-2">
-                                                        <div class="alert alert-danger py-2 d-none" id="error,@order.Id,@dish.Dish.Id" role="alert">
-                                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                                                            <span></span>
-                                                        </div>
-                                                        <div class="alert alert-success py-2 d-none" id="success,@order.Id,@dish.Dish.Id" role="alert">
-                                                            <i class="bi bi-check-circle-fill me-1"></i>
-                                                            <span></span>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

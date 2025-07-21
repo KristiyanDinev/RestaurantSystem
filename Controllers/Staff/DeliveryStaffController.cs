@@ -47,6 +47,7 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return RedirectToAction("Login", "User");
             }
+            user.Deliveries = await _deliveryService.GetDeliveriesAsync(user.Id);
             return View(new AddressesViewModel()
             {
                 User = user,
@@ -70,7 +71,7 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return RedirectToAction("DeliveryAddress");
             }
-
+            user.Deliveries = await _deliveryService.GetDeliveriesAsync(user.Id);
             return View(new DeliveryRestaurantViewModel()
             {
                 Staff = user,
@@ -214,8 +215,7 @@ namespace RestaurantSystem.Controllers.Staff
             }
             if (deliveries.Where(d => d.OrderId == orderId).FirstOrDefault() != null &&
                 await _deliveryService.RemoveDeliveryAsync(user.Id, orderId) &&
-                await _orderService.UpdateOrderCurrentStatusByIdAsync(orderId, 
-                                            OrderStatusEnum.Ready)) {
+                await _orderService.UpdateOrderCurrentStatusByIdAsync(orderId, OrderStatusEnum.Ready)) {
                 TempData["CanceledSuccess"] = true;
                 return Ok();
             }

@@ -27,14 +27,26 @@
 
         @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
         {
-            Key = "Success",
-            Message = " Delivery Started Successfully!"
+            Key = "CanceledSuccess",
+            Message = "Delivery canceled successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "CanceledError",
+            Message = "Error while canceling delivery. Please try again."
         })
 
         @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
         {
             Key = "DeliveredSuccessfully",
-            Message = "Delivered Order Successfully!"
+            Message = "Delivered order successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "DeliveredError",
+            Message = "Error while marking order as delivered. Please try again."
         })
 
         <!-- Navigation Button -->
@@ -45,9 +57,25 @@
             </a>
         </div>
 
-        <!-- Orders List -->
-        @if (Model.Orders.Any())
+        @if (Model.Orders.Count == 0)
         {
+            <!-- No Active Deliveries -->
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-truck display-1 text-warning opacity-50"></i>
+                </div>
+                <h4 class="text-warning mb-3">No Active Deliveries</h4>
+                <p class="text-muted mb-4">You don't have any orders currently under delivery</p>
+                <a href="/staff/delivery" class="btn btn-warning">
+                    <i class="bi bi-search me-2"></i>
+                    Browse Available Orders
+                </a>
+            </div>
+
+        }
+
+
+        <!-- Orders List -->
             <div class="row">
                 @foreach (OrderWithDishesCountModel orderWithDishes in Model.Orders)
                 {
@@ -63,7 +91,7 @@
                                         <i class="bi bi-receipt me-2 text-warning"></i>
                                         Order #@order.Id
                                     </h5>
-                                    <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center mt-3">
                                         <span class="badge bg-@(GetStatusBadgeColor(order.CurrentStatus)) fs-6 px-3 py-2 fw-bold me-3">
                                             <i class="bi bi-@(GetStatusIcon(order.CurrentStatus)) me-1"></i>
                                             @order.CurrentStatus
@@ -118,8 +146,8 @@
 
                                 <div class="row mb-4">
                                     <!-- Restaurant Information -->
-                                    <div class="col-lg-4 mb-3">
-                                        <div class="card bg-warning bg-opacity-10 border-warning border-opacity-50 h-100">
+                                    <div class="col-lg-4 mb-3 h-100">
+                                        <div class="card bg-warning bg-opacity-10 border-warning border-opacity-50">
                                             <div class="card-body">
                                                 <h6 class="text-warning fw-bold mb-3">
                                                     <i class="bi bi-building me-2"></i>
@@ -136,7 +164,7 @@
                                                     {
                                                         <div class="mb-2">
                                                             <i class="bi bi-telephone text-warning me-2"></i>
-                                                            <a href="tel:@restaurant.PhoneNumber" class="text-decoration-none text-warning">
+                                                            <a href="tel:@restaurant.PhoneNumber" class="text-decoration-none">
                                                                 @restaurant.PhoneNumber
                                                             </a>
                                                         </div>
@@ -145,7 +173,7 @@
                                                     {
                                                         <div class="mb-2">
                                                             <i class="bi bi-envelope text-warning me-2"></i>
-                                                            <a href="mailto:@restaurant.Email" class="text-decoration-none text-warning">
+                                                            <a href="mailto:@restaurant.Email" class="text-decoration-none">
                                                                 @restaurant.Email
                                                             </a>
                                                         </div>
@@ -166,7 +194,7 @@
 
                                     <!-- Customer Information -->
                                     <div class="col-lg-4 mb-3">
-                                        <div class="card bg-secondary bg-opacity-10 border border-warning h-100">
+                                        <div class="card bg-secondary bg-opacity-10 border border-warning">
                                             <div class="card-body">
                                                 <h6 class="fw-bold mb-3">
                                                     <i class="bi bi-person-circle me-2 text-warning"></i>
@@ -175,12 +203,12 @@
                                                 <div class="d-flex align-items-start">
                                                     @if (order.User.Image != null)
                                                     {
-                                                        <img class="img-thumbnail rounded-circle me-3" src="@order.User.Image" 
-                                                             style="width: 60px; height: 60px; object-fit: cover;" alt="Customer" />
+                                                        <img class="img-thumbnail rounded-circle me-3 object-fit-cover" src="@order.User.Image" 
+                                                            width="60" height="60" alt="Customer" />
                                                     }
                                                     else
                                                     {
-                                                        <div class="bg-warning bg-opacity-25 rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                                                        <div class="bg-warning bg-opacity-25 border border-warning rounded-circle me-3 d-flex align-items-center justify-content-center" 
                                                              style="width: 60px; height: 60px;">
                                                             <i class="bi bi-person-fill text-warning fs-4"></i>
                                                         </div>
@@ -207,11 +235,11 @@
 
                                     <!-- Delivery Information -->
                                     <div class="col-lg-4 mb-3">
-                                        <div class="card bg-warning bg-opacity-10 border-warning border-opacity-50 h-100">
+                                        <div class="card bg-warning bg-opacity-10 border-warning border-opacity-50">
                                             <div class="card-body">
                                                 <h6 class="text-warning fw-bold mb-3">
                                                     <i class="bi bi-geo-alt-fill me-2"></i>
-                                                    Delivery Destination
+                                                    Delivery Location
                                                 </h6>
                                                 <address class="mb-3">
                                                     <i class="bi bi-house-door-fill text-warning me-2"></i>
@@ -231,7 +259,7 @@
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <span class="text-muted">
                                                             <i class="bi bi-clock me-1"></i>
-                                                            Ordered:
+                                                            Ordered at:
                                                         </span>
                                                         <span class="fw-semibold">@order.OrderedAt.ToString("MMM dd, yyyy HH:mm")</span>
                                                     </div>
@@ -242,11 +270,9 @@
                                 </div>
 
                                 <!-- Order Notes -->
-                                @if (!string.IsNullOrEmpty(order.Notes))
-                                {
                                     <div class="row mb-3">
                                         <div class="col-12">
-                                            <div class="card border border-warning bg-warning bg-opacity-5">
+                                            <div class="card border border-warning">
                                                 <div class="card-body py-3">
                                                     <h6 class="text-warning mb-2">
                                                         <i class="bi bi-sticky me-2"></i>
@@ -257,12 +283,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                }
+                                
 
                                 <!-- Action Buttons -->
                                 <div class="row">
                                     <div class="col-12">
-                                        <div class="card bg-dark border-warning">
+                                        <div class="card bg-secondary bg-opacity-10 border-warning">
                                             <div class="card-body text-center py-4">
                                                 <div class="mb-3">
                                                     <p id="error,@order.Id" class="text-danger mb-0"></p>
@@ -272,35 +298,26 @@
                                                 {
                                                     <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3">
                                                         <button class="btn btn-success btn-lg px-5 py-3 shadow"
-                                                                onclick="delivered()"
+                                                                onclick="delivered('@order.Id')"
                                                                 type="button">
                                                             <i class="bi bi-check-circle-fill me-2"></i>
                                                             Mark as Delivered
                                                         </button>
 
-                                                        <button class="btn btn-danger btn-lg px-5 py-3 shadow"
-                                                                onclick="canceled()"
+                                                        <button class="btn btn-danger btn-sm shadow"
+                                                                onclick="canceled('@order.Id')"
                                                                 type="button">
                                                             <i class="bi bi-x-circle-fill me-2"></i>
                                                             Cancel Delivery
                                                         </button>
                                                     </div>
-                                                    
-                                                    <div class="mt-3">
-                                                        <small class="text-light">
-                                                            <i class="bi bi-info-circle me-1"></i>
-                                                            Complete the delivery or cancel if there are issues
-                                                        </small>
-                                                    </div>
                                                 }
                                                 else
                                                 {
                                                     <div class="text-center">
-                                                        <div class="spinner-border text-warning mb-3" role="status">
-                                                            <span class="visually-hidden">Loading...</span>
-                                                        </div>
-                                                        <h6 class="text-light">Order Status Changed</h6>
-                                                        <p class="text-muted mb-0">This order is no longer in delivery status</p>
+                                                        <i class="bi bi-bookmark-check text-success fs-1 mb-2"></i>
+                                                        <h6 class="text-light fs-3 fw-bold">Order Delivered</h6>
+                                                        <p class="text-muted mb-0">Wait for the Manager to verify your delivery</p>
                                                     </div>
                                                 }
                                             </div>
@@ -312,22 +329,6 @@
                     </div>
                 }
             </div>
-        }
-        else
-        {
-            <!-- No Active Deliveries -->
-            <div class="text-center py-5">
-                <div class="mb-4">
-                    <i class="bi bi-truck display-1 text-warning opacity-50"></i>
-                </div>
-                <h4 class="text-warning mb-3">No Active Deliveries</h4>
-                <p class="text-muted mb-4">You don't have any orders currently under delivery</p>
-                <a href="/staff/delivery" class="btn btn-warning">
-                    <i class="bi bi-search me-2"></i>
-                    Browse Available Orders
-                </a>
-            </div>
-        }
 
         @await Html.PartialAsync("_RestaurantFooter")
     </div>

@@ -202,7 +202,7 @@ namespace RestaurantSystem.Services
                 .Where(order =>
                 order.RestaurantId == restaurantId &&
                 order.TableNumber == null &&
-                order.CurrentStatus.ToString().Equals(OrderStatusEnum.Delivered.ToString()))
+                order.CurrentStatus.Equals(OrderStatusEnum.Delivered))
                 .OrderBy(order => order.UserAddress.Country)
                 .AsQueryable(), page)
                 .ToListAsync();

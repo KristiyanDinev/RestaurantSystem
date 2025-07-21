@@ -14,15 +14,25 @@
     @await Html.PartialAsync("_RestaurantBar", Model.User.Restaurant)
 
     <h3 class="text-center fw-bold my-4">Delivery Address</h3>
+    <p class="text-center text-muted my-4">Only used for filtering the restaurants in the next page</p>
 
     <!-- Paging Component -->
         <div class="mb-4">
             @await Html.PartialAsync("_Paging", Model.Page)
         </div>
 
+        @if (Model.User.Deliveries.Count > 0) {
+                <div class="d-flex justify-content-center align-items-center mb-4">
+                        <a href="/staff/delivery/myorders" class="btn btn-outline-warning">
+                            <i class="bi bi-arrow-right me-2"></i>
+                            Go to My Orders
+                        </a>
+                </div>
+            }
+
 
         <!-- Empty State -->
-        @if (!Model.Addresses.Any() && Model.Page == 1)
+        @if (Model.Addresses.Count == 0)
         {
             <div class="text-center py-5">
                 <div class="mb-4">

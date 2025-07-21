@@ -13,13 +13,23 @@
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
     <h3 class="text-center fw-bold my-4">Delivery Restaurants</h3>
+    <p class="text-center text-muted my-4">Only used for getting the correct orders from the right restaurant</p>
 
     <!-- Paging Component -->
         <div class="mb-4">
             @await Html.PartialAsync("_Paging", Model.Page)
         </div>
+    
+    @if (Model.Staff.Deliveries.Count > 0) {
+                <div class="d-flex justify-content-center align-items-center mb-4 ms-3">
+                        <a href="/staff/delivery/myorders" class="btn btn-outline-warning">
+                            <i class="bi bi-arrow-right me-2"></i>
+                            Go to My Orders
+                        </a>
+                </div>
+            }
 
-    @if (Model.Restaurants.Count == 0)
+    @if (Model.Restaurants.Count == 0 && Model.Page == 1)
         {
             <div class="row justify-content-center">
                 <div class="col-md-8">

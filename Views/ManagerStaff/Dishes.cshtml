@@ -46,11 +46,12 @@
     <div id="create_dish" class=" form-group m-2" style="width:100vw;display:none;">
     <div class="d-flex flex-column justify-content-center align-items-center">
         <div class="d-flex flex-column justify-content-center mb-3 align-items-center p-2" style="border-radius:10px;width:40vw;border:inset orange 1px; align-self:center;">
-        <div class="form-floating" style="width: 100%">
-                <input id="dish_name" type="text" class="form-control" placeholder="dish_name" required>
-                <label for="dish_name">Dish Name</label>
+        <div class="form-floating mb-2 mt-2" style="width: 100%;">
+                <input id="dish_name" type="text" class="form-control mb-2" placeholder="dish_name" required>
+                <label for="dish_name">Dish Name <i class="bi bi-tag"></i></label>
         </div>
-        <select id="dish_type" class="input-group border rounded shadow-sm  mb-2 form-control" required>
+        <div class="form-floating mb-2" style="width: 100%;">
+        <select id="dish_type" class="input-group border rounded shadow-sm  mb-2 form-control" placeholder="type" required>
             <option value="@DishTypeEnum.salads.ToString()">@DishTypeEnum.salads.ToString()</option>
             <option value="@DishTypeEnum.soups.ToString()">@DishTypeEnum.soups.ToString()</option>
             <option value="@DishTypeEnum.appetizers.ToString()">@DishTypeEnum.drinks.ToString()</option>
@@ -58,36 +59,49 @@
             <option value="@DishTypeEnum.desserts.ToString()">@DishTypeEnum.desserts.ToString()</option>
             <option value="@DishTypeEnum.drinks.ToString()">@DishTypeEnum.drinks.ToString()</option>
         </select>
-        
+        <label for="type">Dish Type <i class="bi bi-fork-knife"></i></label>
+        </div>
 
-        <input id="dish_price" type="number"
+            <div class="form-floating mb-2" style="width: 100%;">
+                <input id="dish_price" type="number"
                class="input-group border rounded shadow-sm  mb-2 form-control"
                min="0.1" max="9999999999"
-               placeholder="Dish Price lv." required>
+               placeholder="dish_price" required>
+                <label for="dish_price">Dish Price <i class="bi bi-cash-coin"></i></label>
+            </div>
 
-        <input id="dish_ingredients" type="text"
+            <div class="form-floating mb-2" style="width: 100%;">
+                <input id="dish_ingredients" type="text"
                class="input-group border rounded shadow-sm  mb-2 form-control"
-               placeholder="Dish Ingredients" required>
+               placeholder="dish_ingredients" required>
+               <label for="dish_ingredients">Dish Ingredients <i class="bi bi-list-ul me-2 mt-1"></i></label>
+            </div>
 
-        <input id="dish_attc" type="text"
+            <div class="form-floating mb-2" style="width: 100%;">
+               <input id="dish_attc" type="text"
                class="input-group border rounded shadow-sm  mb-2 form-control"
-               placeholder="Dish Average Time To Cook: 1 - 2 minutes." required>
+               placeholder="dish-attc" required>
+               <label for="dish_attc">Dish Average Time To Cook: 1 - 2 minutes. <i class="bi bi-clock"></i></label>
+            </div>
 
-        <input id="dish_grams" type="number"
-               class="input-group border rounded shadow-sm  mb-2 form-control"
+            <div class="form-floating mb-2" style="width: 100%;">
+                <input id="dish_grams" type="number"
+               class="input-group border rounded shadow-sm  mb-1 form-control"
                min="1" max="999999"
-               placeholder="Dish Grams" required>
+               placeholder="dish_grams" required>
+               <label for="dish_grams">Dish Grams <i class="bi bi-speedometer2"></i></label>
+            </div>
         </div>
 
         <div class="d-flex flex-column justify-content-center align-items-start">
         <div class="d-flex">
-        <label for="dish_isavailable">Is Dish Currently Available</label> &nbsp;&nbsp;&nbsp;
+        <label for="dish_isavailable">Is Dish Currently Available</label>
         <input id="dish_isavailable" type="checkbox"
-               class="input-group form-control " style="width: fit-content;" required>
+               class="rounded bg-dark p-2" style="width: fit-content;">
         </div>
-               
 
-        <div class="mb-3">
+
+        <div>
             <label for="Image" class="form-label">Dish Image</label>
             <button type="button" class="btn btn-danger rounded m-2" onclick="removeImage(null)">Remove Image</button>
             <input type="file" class="form-control" id="dish_image" accept="image/*">
@@ -260,14 +274,14 @@
                                 <i class="bi bi-check-lg"></i>
                                 <input id="isavailable,@dish.Id" type="checkbox"
                                        style="display:none;"
-                                       class="input-group form-control"
+                                       class="input-group"
                                        checked required>
                             }
                             else
                             {
                                 <i class="bi bi-ban"></i>
                                 <input id="isavailable,@dish.Id" type="checkbox"
-                                       class="input-group form-control"
+                                       class="input-group"
                                        style="display:none;"
                                        required>
                             }
