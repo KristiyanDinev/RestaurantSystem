@@ -17,7 +17,7 @@
     @await Html.PartialAsync("_StaffNavBar", Model.Staff)
     @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
 
-    <div class="container-fluid py-4">
+    <div class="container py-4">
         <!-- Page Header -->
         <div class="row mb-4">
             <div class="col-12">
@@ -31,6 +31,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="pb-4">
+            @await Html.PartialAsync("_Paging", Model.Page)
         </div>
 
         <!-- Orders Status Overview -->
@@ -65,10 +69,6 @@
             </div>
         }
 
-        <div class="pb-4">
-            @await Html.PartialAsync("_Paging", Model.Page)
-        </div>
-
         <!-- Orders List -->
         <div class="row">
             @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.Orders)
@@ -80,7 +80,7 @@
                 </script>
 
                 <div class="col-12 mb-4 page-row">
-                    <div class="card border border-warning border-2 shadow-sm h-100">
+                    <div class="card border border-warning border-2 shadow-sm">
                         <div class="card-header bg-dark text-warning py-3">
                             <div class="row align-items-center">
                                 <div class="col-md-6">

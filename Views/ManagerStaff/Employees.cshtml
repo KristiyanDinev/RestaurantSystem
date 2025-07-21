@@ -51,7 +51,7 @@
     </div>
     <div class="d-flex w-100 form-group m-2 justify-content-center align-items-center flex-column">
         <input id="staff_email" type="email"
-               class=" w-75 form-controled rounded p-2"
+               class=" w-75 form-control rounded p-2"
                placeholder="Enter the email of the user you want to add as staff">
         <button type="button" class="btn btn-success m-2" onclick="addStaff()">Submit</button>
     </div>
@@ -75,7 +75,17 @@
                     <tr class="page-row">
                         <td data-label="ID">@user.Id</td>
                         <td class="p-1" data-label="Image">
-                            <img src="@user.Image" class="img-thumbnail smi "/>
+                           @if (@user.Image != null)
+                                {
+                                    <img id="image" src="@user.Image" alt="user image"
+                                         class="img-thumbnail smi">
+                                }
+                                else
+                                {
+                                    <div class="img-thumbnail smi bg-secondary d-flex align-items-center justify-content-center" style="margin-left:auto;margin-right:auto;">
+                                        <i class="bi bi-person text-white fs-2" ></i>
+                                    </div>
+                                }
                         </td>
                         <td data-label="Name">@user.Name</td>
                         <td data-label="Email">@user.Email</td>
@@ -86,7 +96,7 @@
                                 <p class="card card-body card-title">@role.Role.Name</p>
                             }
                         </td>
-                        <td data-label="Actions" class="w-25">
+                        <td data-label="Actions">
                             <button type="button" class="btn btn-primary m-2" onclick="toggleGiveRole('@user.Id')">Give Role</button>
                             <button type="button" class="btn btn-danger m-2" onclick="toggleRemoveRole('@user.Id')">Remove Role</button>
                             <button type="button" class="btn btn-danger m-2" onclick="removeStaff('@user.Id', '@user.Name')">Remove Staff</button>

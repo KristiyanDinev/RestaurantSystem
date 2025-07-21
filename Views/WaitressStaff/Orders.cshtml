@@ -37,6 +37,11 @@
         </div>
     </div>
 
+<!-- Paging Component -->
+        <div class="mb-4">
+            @await Html.PartialAsync("_Paging", Model.Page)
+        </div>
+
     <div class="container-fluid py-4">
         <!-- Alert Messages -->
         @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
@@ -84,12 +89,6 @@
                 </div>
             </div>
         }
-
-        <!-- Paging Component -->
-        <div class="mb-4">
-            @await Html.PartialAsync("_Paging", Model.Page)
-        </div>
-
         <!-- Orders Grid -->
         <div class="row g-4">
             @foreach (OrderWithDishesCountModel orderWithDishesCount in Model.Orders)

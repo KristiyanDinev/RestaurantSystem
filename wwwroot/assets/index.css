@@ -1,4 +1,5 @@
 ﻿html,
+
 body {
     height: 100%;
 }
@@ -48,6 +49,9 @@ body {
     width: 90%;
 }
 
+.dedish{
+    width:90%;
+}
 
 
 
@@ -55,6 +59,26 @@ body {
 
 
 
+
+
+
+.inputite{
+    background-color: rgba(0, 0, 0, 0) !important;
+    text-decoration: none !important;
+    margin: 0.4em 0 !important;
+    padding: 6px;
+    height: fit-content;
+    border-radius: 5px;
+}
+.insel{
+    background-color: rgba(0, 0, 0, 0) !important;
+}
+.inputite:hover{
+    background-color: rgba(0, 0, 0, 0.158) !important;
+    text-decoration: none !important;
+    border: rgba(255, 255, 255, 0.685) 1px outset !important;
+    box-shadow: none !important;
+}
 
 /* Mobile styles */
 @media (max-width: 767.98px) {
@@ -62,6 +86,10 @@ body {
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+    }
+    .dedish{
+        scale:0.8;
+        margin-left: 20em;
     }
     
     .wtb {
@@ -108,6 +136,9 @@ body {
         width: 100%;
         margin: 0.25rem 0;
     }
+    .smi{
+        margin-right: 0 !important;
+    }
     
     /* Make images smaller on mobile */
     .wtb .smi {
@@ -150,6 +181,11 @@ body {
         max-height: 80px;
         height: auto;
     }
+    .smi{
+        min-height:80px ;
+        min-width: 80px;
+    }
+
 }
 
 
@@ -183,7 +219,7 @@ body {
 
 .smi{
     width: 80px;
-    height: 80px;
+    height: 40px !important;
     border-radius: 10px;
     border: 2px solid orange;
     padding:0;

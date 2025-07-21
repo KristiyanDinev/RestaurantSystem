@@ -1,6 +1,7 @@
 ﻿@using RestaurantSystem.Enums
 @using RestaurantSystem.Models.DatabaseModels
 @using RestaurantSystem.Models
+@using RestaurantSystem.Models.View.Messages;
 @model RestaurantSystem.Models.View.Staff.Delivery.DeliveryOrdersViewModel;
 @{
     ViewData["Title"] = "Delivery Orders - Savans Restaurant";
@@ -17,23 +18,7 @@
     
     <div class="container-fluid py-4">
         <!-- Page Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center bg-warning bg-gradient rounded p-3 shadow-sm">
-                    <div>
-                        <h2 class="text-dark mb-1">
-                            <i class="bi bi-truck text-dark me-2"></i>
-                            Delivery Orders
-                        </h2>
-                        <p class="text-dark-emphasis mb-0">Manage and track delivery orders</p>
-                    </div>
-                    <a class="btn btn-dark btn-lg shadow" href="/staff/delivery/restaurant">
-                        <i class="bi bi-building me-2"></i>
-                        Go to Restaurants
-                    </a>
-                </div>
-            </div>
-        </div>
+        <h2 class="text-center fw-bold my-4">Delivery Orders</h2>
 
         <!-- Paging Component -->
         <div class="row mb-4">
@@ -42,53 +27,58 @@
             </div>
         </div>
 
-        <!-- Success Messages -->
-        @if (TempData.Peek("Success") != null)
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
         {
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        Delivered Successfully
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                </div>
-            </div>
-            TempData.Remove("Success");
-        }
+            Key = "Success",
+            Message = "Started delivery successfully!"
+        })
 
-        @if (TempData.Peek("Canceled") != null)
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
         {
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
-                        <i class="bi bi-x-circle-fill me-2"></i>
-                        Canceled Delivery Successfully
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                </div>
-            </div>
-            TempData.Remove("Canceled");
-        }
+            Key = "Canceled",
+            Message = "Canceled delivery Successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "Error",
+            Message = "Couldn't start delivery. Please try again."
+        })
+
 
         <!-- Orders List -->
-        <div class="row">
+        <div class="row container d-flex flex-row">
+            <div class="d-flex justify-content-start align-items-center mb-4 ms-3">
+                    <a href="/staff/delivery/restaurant" class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Back to Restaurants
+                    </a>
+            </div>
+
+            @if (Model.Staff.Deliveries.Count > 0) {
+                <div class="d-flex justify-content-start align-items-center mb-4 ms-3">
+                        <a href="/staff/delivery/myorders" class="btn btn-outline-warning">
+                            <i class="bi bi-arrow-right me-2"></i>
+                            Go to My Orders
+                        </a>
+                </div>
+            }
+
             @foreach (OrderWithDishesCountModel orderWithDishes in Model.Orders)
             {
                 OrderModel order = orderWithDishes.Order;
-                <div class="col-12 mb-4 border border-warning border-2 mx-4 my-4 rounded">
-                    <div class="card shadow-sm border-0 page-row">
-                        <div class="card-header bg-dark text-white">
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <h5 class="mb-0">
-                                        <i class="bi bi-receipt me-2"></i>
-                                        Order #@order.Id
-                                    </h5>
-                                </div>
-                                <div class="col-md-6 text-md-end">
-                                    <span class="badge @(order.CurrentStatus == OrderStatusEnum.Ready? "bg-warning text-dark" : "bg-secondary") fs-6 px-3 py-2">
-                                        <i class="bi bi-clock me-1"></i>
+                <div class="col-12 mb-4 my-4 mx-3 rounded page-row">
+                    <div class="card shadow-sm page-row border border-warning border-2">
+                        <!-- Order Header -->
+                        <div class="card-header bg-dark border-warning py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold text-light">
+                                    <i class="bi bi-receipt me-2 text-warning"></i>
+                                    Order #@order.Id
+                                </h5>
+                                <div class="mt-2 mt-md-0">
+                                    <span class="badge bg-@(GetStatusBadgeColor(order.CurrentStatus)) fs-6 px-3 py-2 text-dark fw-bold" id="orderstatus,@order.Id">
+                                        <i class="bi bi-@(GetStatusIcon(order.CurrentStatus)) me-1"></i>
                                         @order.CurrentStatus
                                     </span>
                                 </div>
@@ -100,41 +90,43 @@
                             <div class="row mb-4">
                                 <div class="col-12">
                                     <h6 class="text-warning fw-bold pb-2 mb-3">
-                                        <i class="bi bi-list-ul me-2"></i>
+                                        <i class="bi bi-list-ul me-4"></i>
                                         Order Items
                                     </h6>
                                     <div class="row">
                                         @foreach (DishWithStatusModel dish in orderWithDishes.DishesCount.Keys)
                                         {
-                                            <div class="border border-warning rounded">
-                                                    <div class="mb-2">
+                                            <div class="mx-1">
+                                                <div class="border border-warning rounded px-4 py-4">
+                                                    <!-- Dish Display Partial -->
+                                                    <div class="mb-3">
                                                         @await Html.PartialAsync("_DisplayDish", dish.Dish)
                                                     </div>
-                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                                    <!-- Quantity and Status row -->
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <span class="badge bg-secondary">
                                                             Quantity: @orderWithDishes.DishesCount[dish]
                                                         </span>
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <small class="text-muted fw-semibold d-block mb-1">Status:</small>
-                                                        <div class="badge bg-@(GetStatusBadgeColorDish(dish.OrderedDish.CurrentStatus)) text-dark" id="dishstatus,@order.Id,@dish.Dish.Id">
+                                                        <span class="badge bg-@(GetStatusBadgeColorDish(dish.OrderedDish.CurrentStatus)) text-dark"
+                                                            id="dishstatus,@order.Id,@dish.Dish.Id">
                                                             <i class="bi bi-@(GetStatusIconDish(dish.OrderedDish.CurrentStatus)) me-1"></i>
                                                             @dish.OrderedDish.CurrentStatus
-                                                        </div>
+                                                        </span>
                                                     </div>
 
                                                     <!-- Status Messages -->
-                                                    <div class="mb-3">
-                                                        <div class="alert alert-danger py-2 mb-2 d-none" id="error,@order.Id,@dish.Dish.Id" role="alert">
+                                                    <div class="mb-2">
+                                                        <div class="alert alert-danger py-2 d-none" id="error,@order.Id,@dish.Dish.Id" role="alert">
                                                             <i class="bi bi-exclamation-triangle-fill me-1"></i>
                                                             <span></span>
                                                         </div>
-                                                        <div class="alert alert-success py-2 mb-2 d-none" id="success,@order.Id,@dish.Dish.Id" role="alert">
+                                                        <div class="alert alert-success py-2 d-none" id="success,@order.Id,@dish.Dish.Id" role="alert">
                                                             <i class="bi bi-check-circle-fill me-1"></i>
                                                             <span></span>
                                                         </div>
                                                     </div>
+                                                </div>
                                             </div>
                                         }
                                     </div>
@@ -191,7 +183,7 @@
 
                                 <!-- Customer Information -->
                                 <div class="col-lg-4 mb-3">
-                                    <div class="card bg-opacity-10 border-warning border-opacity-10">
+                                    <div class="card bg-secondary bg-opacity-10 border border-warning">
                                         <div class="card-body">
                                             <h6 class="fw-bold mb-3">
                                                 <i class="bi bi-person-circle me-2"></i>
@@ -205,13 +197,13 @@
                                                 <div class="flex-grow-1">
                                                     <p class="mb-2 fw-semibold">@order.User.Name</p>
                                                     <div class="mb-2">
-                                                        <i class="bi bi-envelope text-dark me-2"></i>
+                                                        <i class="bi bi-envelope me-2"></i>
                                                         <a href="mailto:@order.User.Email" class="text-decoration-none">
                                                             @order.User.Email
                                                         </a>
                                                     </div>
                                                     <div class="mb-2">
-                                                        <i class="bi bi-telephone text-dark me-2"></i>
+                                                        <i class="bi bi-telephone me-2"></i>
                                                         <a href="tel:@order.UserAddress.PhoneNumber" class="text-decoration-none">
                                                             @order.UserAddress.PhoneNumber
                                                         </a>
@@ -240,10 +232,10 @@
                                             <div class="border-top pt-3">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <span class="text-muted">Total Price:</span>
-                                                    <span class="fw-bold fs-5 text-success">@order.TotalPrice lv.</span>
+                                                    <span class="fw-bold fs-5 text-warning">@order.TotalPrice lv.</span>
                                                 </div>
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="text-muted">Ordered:</span>
+                                                    <span class="text-muted">Ordered at:</span>
                                                     <span class="fw-semibold">@order.OrderedAt.ToString("MMM dd, yyyy HH:mm")</span>
                                                 </div>
                                             </div>
@@ -252,15 +244,12 @@
                                 </div>
                             </div>
 
-                            <!-- Order Notes -->
-                            @if (!string.IsNullOrEmpty(order.Notes))
-                            {
                                 <div class="row mb-3">
                                     <div class="col-12">
-                                        <div class="card bg-light border-0">
+                                        <div class="card border border-warning">
                                             <div class="card-body py-2">
                                                 <h6 class="text-muted mb-2">
-                                                    <i class="bi bi-sticky me-2"></i>
+                                                    <i class="bi bi-sticky me-2 text-warning"></i>
                                                     Order Notes
                                                 </h6>
                                                 <p class="mb-0 fst-italic">@order.Notes</p>
@@ -268,12 +257,12 @@
                                         </div>
                                     </div>
                                 </div>
-                            }
+                            
 
                             <!-- Action Buttons -->
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="card bg-dark text-white">
+                                    <div class="card bg-secondary bg-opacity-10 border border-warning text-white">
                                         <div class="card-body text-center py-3">
                                             @if (order.CurrentStatus == OrderStatusEnum.Ready)
                                             {

@@ -20,21 +20,28 @@ namespace RestaurantSystem.Services
             _addressService = addressService;
             _restaurantService = restaurantService;
         }
-        public async Task<DeliveryModel?> GetDeliveryAsync(long user_id)
+        public async Task<List<DeliveryModel>> GetDeliveriesAsync(long user_id)
         {
             return await _databaseContext.Delivery
                 .Include(d => d.Order)
                 .Include(d => d.Order.UserAddress)
                 .Include(d => d.Order.Restaurant)
                 .Include(d => d.Order.User)
-                .FirstOrDefaultAsync(d => d.UserId == user_id);
+                .Where(d => d.UserId == user_id).ToListAsync();
+        }
+
+        public async Task<DeliveryModel?> GetRestaurantDeliveriesAsync(int restaurantId, long orderId)
+        {
+            return await _databaseContext.Delivery
+                .Where(d => d.User.RestaurantId == restaurantId && d.OrderId == orderId)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<bool> AddDeliveryAsync(long user_id, long order_id)
         {
             OrderModel? order = await _databaseContext.Orders
                 .FirstOrDefaultAsync(o => o.Id == order_id);
-            if (order == null || 
+            if (order == null ||
                 !order.CurrentStatus.Equals(OrderStatusEnum.Ready) ||
                 order.TableNumber != null)
             {
@@ -48,16 +55,16 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> RemoveDeliveryAsync(long user_id)
+        public async Task<bool> RemoveDeliveryAsync(long user_id, long orderId)
         {
-            DeliveryModel? delivery = await GetDeliveryAsync(user_id);
+            DeliveryModel? delivery = await _databaseContext.Delivery
+                .Where(d => d.UserId == user_id && d.OrderId == orderId)
+                .FirstOrDefaultAsync();
             if (delivery == null)
             {
                 return false;
             }
-
             _databaseContext.Delivery.Remove(delivery);
-
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 

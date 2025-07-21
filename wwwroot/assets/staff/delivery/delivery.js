@@ -15,18 +15,12 @@ async function startDelivery(orderId) {
     }
 
     try {
-        const response = await fetch(`/staff/delivery/start/${orderId}`, {
+        await fetch(`/staff/delivery/start/${orderId}`, {
             method: 'POST',
         });
 
-        if (response.ok) {
-            window.location.pathname = "/staff/delivery/myorder";
-            return
-        }
-        document.getElementById(`error,${orderId}`).innerText = "Couldn't start your order.";
+        window.location.reload()
 
-    } catch {
-        document.getElementById(`error,${orderId}`).innerText = "An error occurred while starting the delivery. Please try again.";
-    }
+    } catch {}
 }
 

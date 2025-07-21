@@ -191,7 +191,7 @@
                             </label>
                             <div class="border border-warning bg-warning bg-opacity-10 rounded p-3 mb-2">
                                 <small class="text-muted">Current:</small>
-                                <strong class="ms-2">@(string.IsNullOrEmpty(address.Notes) ? "No notes..." : address.Notes)</strong>
+                                <strong class="ms-2">@(string.IsNullOrEmpty(address.Notes) ? "" : address.Notes)</strong>
                             </div>
                             <textarea rows="4" id="notes" class="form-control"
                                       placeholder="Add any special delivery instructions (e.g., 'Ring doorbell twice', 'Leave at front desk', 'Gate code: 1234')">@address.Notes</textarea>

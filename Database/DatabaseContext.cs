@@ -132,13 +132,13 @@ namespace RestaurantSystem.Database {
                 .HasDefaultValueSql("NOW()");
 
             builder.Entity<UserModel>()
-                .Property(user => user.LastTimeLogedIn)
+                .Property(user => user.LastTimeLoggedIn)
                 .IsRequired()
                 .HasDefaultValue(DateOnly.FromDateTime(DateTime.Now));
 
             builder.Entity<UserModel>()
                 .HasOne(user => user.Restaurant)
-                .WithMany(restaurat => restaurat.Employees)
+                .WithMany(r => r.Employees)
                 .HasForeignKey(user => user.RestaurantId);
         }
 
@@ -514,18 +514,13 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<DeliveryModel>()
-                .HasIndex(delivery => delivery.UserId)
-                .IsUnique();
-
-            builder.Entity<DeliveryModel>()
                 .HasIndex(delivery => delivery.OrderId)
                 .IsUnique();
 
             builder.Entity<DeliveryModel>()
                 .HasOne(delivery => delivery.User)
-                .WithOne(user => user.Delivery)
-                .HasForeignKey<DeliveryModel>(
-                    delivery => delivery.UserId);
+                .WithMany(user => user.Deliveries)
+                .HasForeignKey(delivery => delivery.UserId);
 
             builder.Entity<DeliveryModel>()
                 .HasOne(delivery => delivery.Order)

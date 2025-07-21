@@ -12,8 +12,8 @@ using RestaurantSystem.Database;
 namespace RestaurantSystem.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250718151322_UpdatedCupons")]
-    partial class UpdatedCupons
+    [Migration("20250721110425_UpdatedDeliveries")]
+    partial class UpdatedDeliveries
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -116,8 +116,7 @@ namespace RestaurantSystem.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Delivery", (string)null);
                 });
@@ -465,10 +464,10 @@ namespace RestaurantSystem.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("text");
 
-                    b.Property<DateOnly>("LastTimeLogedIn")
+                    b.Property<DateOnly>("LastTimeLoggedIn")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("date")
-                        .HasDefaultValue(new DateOnly(2025, 7, 18));
+                        .HasDefaultValue(new DateOnly(2025, 7, 21));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -536,8 +535,8 @@ namespace RestaurantSystem.Migrations
                         .IsRequired();
 
                     b.HasOne("RestaurantSystem.Models.DatabaseModels.UserModel", "User")
-                        .WithOne("Delivery")
-                        .HasForeignKey("RestaurantSystem.Models.DatabaseModels.DeliveryModel", "UserId")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -721,8 +720,7 @@ namespace RestaurantSystem.Migrations
                 {
                     b.Navigation("Addresses");
 
-                    b.Navigation("Delivery")
-                        .IsRequired();
+                    b.Navigation("Deliveries");
 
                     b.Navigation("Orders");
 

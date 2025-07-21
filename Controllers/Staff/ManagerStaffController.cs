@@ -291,18 +291,19 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return BadRequest();
             }
-            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            DeliveryModel? delivery = await _deliveryService.GetRestaurantDeliveriesAsync(user.Restaurant.Id, orderId);
             if (delivery == null)
             {
                 return BadRequest();
             }
-            if (await _deliveryService.RemoveDeliveryAsync(user.Id) &&
-                await _orderService.UpdateOrderCurrentStatusByIdAsync(delivery.OrderId,
+            if (await _deliveryService.RemoveDeliveryAsync(user.Id, orderId) &&
+                await _orderService.UpdateOrderCurrentStatusByIdAsync(orderId,
                                             OrderStatusEnum.Ready))
             {
-                TempData["Canceled"] = true;
+                TempData["CanceledSuccess"] = true;
                 return Ok();
             }
+            TempData["CanceledError"] = true;
             return BadRequest();
         }
 
@@ -316,17 +317,18 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return BadRequest();
             }
-            DeliveryModel? delivery = await _deliveryService.GetDeliveryAsync(user.Id);
+            DeliveryModel? delivery = await _deliveryService.GetRestaurantDeliveriesAsync(user.Restaurant.Id, orderId);
             if (delivery == null)
             {
                 return BadRequest();
             }
-            if (await _deliveryService.RemoveDeliveryAsync(user.Id) &&
-                await _orderService.DeleteOrderAsync(delivery.OrderId, false))
+            if (await _deliveryService.RemoveDeliveryAsync(user.Id, orderId) &&
+                await _orderService.DeleteOrderAsync(orderId, false))
             {
-                TempData["Deleted"] = true;
+                TempData["DeletedSuccess"] = true;
                 return Ok();
             }
+            TempData["DeletedError"] = true;
             return BadRequest();
         }
 

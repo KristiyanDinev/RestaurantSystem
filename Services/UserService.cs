@@ -14,7 +14,6 @@ namespace RestaurantSystem.Services
         {
             _databaseContext = databaseContext;
         }
-
         public async Task<UserModel?> GetUserAsync(long id)
         {
             return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == id);
@@ -72,7 +71,7 @@ namespace RestaurantSystem.Services
 
         public async Task<bool> UpdateLastLoginDate(UserModel user)
         {
-            user.LastTimeLogedIn = DateOnly.FromDateTime(DateTime.Now);
+            user.LastTimeLoggedIn = DateOnly.FromDateTime(DateTime.Now);
             return await _databaseContext.SaveChangesAsync() >= 0;
         }
 
