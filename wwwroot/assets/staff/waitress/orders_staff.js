@@ -23,11 +23,67 @@ function onmessage(event) {
     if (!registeredOrders.includes(String(obj.OrderId))) return;
 
     if (obj.OrderCurrentStatus) {
-        document.getElementById(`orderstatus,${obj.OrderId}`).innerHTML = `Current Status: ${obj.OrderCurrentStatus}`;
+        let element = document.getElementById(`orderstatus,${obj.OrderId}`)
+
+        let orderStatusBadgeColor = 'primary'
+        if (obj.OrderCurrentStatus == 'Pending') {
+            orderStatusBadgeColor = 'warning'
+
+        } else if (obj.OrderCurrentStatus == 'Preparing') {
+            orderStatusBadgeColor = 'info'
+
+        } else if (obj.OrderCurrentStatus == 'Ready' || 
+                    obj.OrderCurrentStatus == 'Served' ||
+                    obj.OrderCurrentStatus == 'Delivered') {
+            orderStatusBadgeColor = 'success'
+        }
+
+        let orderStatusIcon = ''
+        if (obj.OrderCurrentStatus == 'Pending') {
+            orderStatusIcon = 'hourglass-split'
+
+        } else if (obj.OrderCurrentStatus == 'Preparing') {
+            orderStatusIcon = 'fire'
+
+        } else if (obj.OrderCurrentStatus == 'Ready') {
+            orderStatusIcon = 'check2'
+
+        } else if (obj.OrderCurrentStatus == 'Served' ||
+                    obj.OrderCurrentStatus == 'Delivered') {
+            orderStatusIcon = 'check2-all'
+        }
+
+
+        element.className = `badge bg-${orderStatusBadgeColor} fs-6 px-3 py-2 text-dark`
+        element.innerHTML = `<i class="bi bi-${orderStatusIcon} text-dark me-1"></i>${obj.OrderCurrentStatus}`;
     }
 
     if (obj.DishId && obj.DishCurrentStatus) {
-        document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`).innerHTML = `Dish Status: ${obj.DishCurrentStatus}`;
+        let element2 = document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`)
+
+        let dishStatusBadgeColor = 'primary'
+        if (obj.DishCurrentStatus == 'Pending') {
+            dishStatusBadgeColor = 'warning'
+
+        } else if (obj.DishCurrentStatus == 'Preparing') {
+            dishStatusBadgeColor = 'info'
+
+        } else if (obj.DishCurrentStatus == 'Ready') {
+            dishStatusBadgeColor = 'success'
+        }
+
+        let dishStatusIcon = 'primary'
+        if (obj.DishCurrentStatus == 'Pending') {
+            dishStatusIcon = 'hourglass-split'
+
+        } else if (obj.DishCurrentStatus == 'Preparing') {
+            dishStatusIcon = 'fire'
+
+        } else if (obj.DishCurrentStatus == 'Ready') {
+            dishStatusIcon = 'check2'
+        }
+        element2.className = `badge bg-${dishStatusBadgeColor} mb-2 text-dark`
+        element2.innerHTML = `<i class="bi bi-${dishStatusIcon} me-1 text-dark"></i>${obj.DishCurrentStatus}`;
     }
 }
 
