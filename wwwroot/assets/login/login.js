@@ -42,3 +42,68 @@ async function submit() {
 
     } catch {}
 }
+
+
+async function requestCode() {
+    if (!confirm('Are you sure you want to reset your password?')) return;
+    
+    let emailElement = document.getElementById("Email")
+    let email = emailElement.value
+    emailElement.classList.remove(invalidClass)
+    if (!email) {
+        emailElement.classList.add(invalidClass)
+        return
+    }
+
+    let formData = new FormData()
+    formData.append("Email", email)
+
+    try {
+        await fetch("/requestcode", {
+            method: "POST",
+            body: formData
+        })
+        window.location.reload()
+    } catch {}
+}
+
+
+async function submitNewPassword() {
+    if (!confirm('Are you sure you want to reset your password?')) return;
+
+    let emailElement = document.getElementById("Email")
+    let codeElement = document.getElementById("Code")
+    let passwordElement = document.getElementById("NewPassword")
+    let email = emailElement.value
+    let code = codeElement.value
+    let password = passwordElement.value
+    emailElement.classList.remove(invalidClass)
+    codeElement.classList.remove(invalidClass)
+    passwordElement.classList.remove(invalidClass)
+    if (!email) {
+        emailElement.classList.add(invalidClass)
+        return
+    }
+    if (!code) {
+        codeElement.classList.add(invalidClass)
+        return
+    }
+    if (!password) {
+        passwordElement.classList.add(invalidClass)
+        return
+    }
+
+    let formData = new FormData()
+    formData.append("Email", email)
+    formData.append("Code", code)
+    formData.append("NewPassword", password)
+
+    try {
+        await fetch("/resetpassword", {
+            method: "POST",
+            body: formData
+        })
+
+        window.location.reload()
+    } catch {}
+}

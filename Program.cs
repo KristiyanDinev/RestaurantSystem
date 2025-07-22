@@ -64,6 +64,9 @@ namespace RestaurantSystem
             builder.Services.AddScoped<UserUtility>();
             builder.Services.AddScoped<WebSocketDatabaseService>();
 
+            builder.Services.AddScoped<EmailService>();
+            builder.Services.AddSingleton<EmailSendService>(_ => new EmailSendService(builder.Configuration));
+
             builder.Services.AddSingleton<WebSocketUtility>();
             builder.Services.AddScoped<WebSocketService>();
             builder.Host.UseRateLimits();

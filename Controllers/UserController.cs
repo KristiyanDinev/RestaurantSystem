@@ -12,15 +12,20 @@ namespace RestaurantSystem.Controllers {
     [ApiController]
     [EnableRateLimiting("fixed")]
     [IgnoreAntiforgeryToken]
-    public class UserController : Controller {
+    public class UserController : Controller
+    {
 
         private UserService _userService;
         private UserUtility _userUtility;
+        private EmailService _emailService;
 
-        public UserController(UserService userService, UserUtility userUtility)
+        public UserController(UserService userService,
+            UserUtility userUtility,
+            EmailService emailService)
         {
             _userService = userService;
             _userUtility = userUtility;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -61,7 +66,8 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            if (!await _userService.UpdateLastLoginDate(loggedIn)) {
+            if (!await _userService.UpdateLastLoginDate(loggedIn))
+            {
                 TempData["Email"] = loginFormModel.Email;
                 TempData["LastLoginUpdateError"] = true;
                 return BadRequest();
@@ -108,7 +114,6 @@ namespace RestaurantSystem.Controllers {
         }
 
 
-
         [HttpGet]
         [Route("/profile")]
         public async Task<IActionResult> Profile()
@@ -147,6 +152,50 @@ namespace RestaurantSystem.Controllers {
         public IActionResult Logout()
         {
             _userUtility.RemoveAuthBearerHeader(HttpContext);
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("/requestcode")]
+        public async Task<IActionResult> RequestCode([FromForm] string Email)
+        {
+            EmailVerificationModel? model = await _emailService.GetEmailVerificationAsync(Email);
+            if (model != null)
+            {
+                TempData["ExpTime"] = model.ExpiresAt;
+                return BadRequest();
+            }
+            if (!await _emailService.AddEmailCodeAsync(Email))
+            {
+                TempData["RequestCodeError"] = true;
+                return BadRequest();
+            }
+            TempData["RequestCodeSuccess"] = true;
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("/resetpassword")]
+        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordFormModel resetPasswordForm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            EmailVerificationModel? model = await _emailService.GetEmailVerificationAsync(resetPasswordForm.Email);
+            if (model == null || !resetPasswordForm.Code.Equals(model.Code) || DateTime.UtcNow > model.ExpiresAt)
+            {
+                TempData["VerificationError"] = true;
+                return BadRequest();
+            }
+            if (!await _userService.UpdateUserPasswordAsync(resetPasswordForm.Email, resetPasswordForm.NewPassword))
+            {
+                TempData["ResetError"] = true;
+                return BadRequest();
+            }
+            TempData["ResetSuccess"] = true;
             return Ok();
         }
     }

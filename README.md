@@ -185,13 +185,19 @@ ASP.NET with Hot Reload (VSC)
 dotnet watch run
 ```
 
-## TODO
+## Steps for setting up SMTP for sending emails
 
-- Add cupons for the manager to manage.
+### Gmail
 
-- Add Restaurant manager to manage the reservations (on/off/limits)
+1. Make sure you have 2-Steps Authentication on the account you want this app to use as the **Sender**. (At least 2 methods of authentication)
 
-- If there is time. Add cupon checks in the cart and waitress add order page.
+2. Go to **https://myaccount.google.com/apppasswords** and create your app password. It should look like this: aaaa bbbb cccc dddd
 
-- Waitresses update total price of reservations if needed.
+3. Set the `From_Email` option to the email address of that account.
+
+4. Set the `App_Password` option to the generated password, which Google gave you.
+
+## Database Notes
+
+- Postgres -> C# DateTime only supports `DateTime.UtcNow`
 

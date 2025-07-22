@@ -7,3 +7,4 @@ wwwroot/assets/images/
 startup.sql
 publish/
 sync_config.jsonc
+appsettings_Showcase.json

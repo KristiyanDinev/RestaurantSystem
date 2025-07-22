@@ -74,8 +74,19 @@ namespace RestaurantSystem.Services
             user.LastTimeLoggedIn = DateOnly.FromDateTime(DateTime.Now);
             return await _databaseContext.SaveChangesAsync() >= 0;
         }
+        
+        public async Task<bool> UpdateUserPasswordAsync(string Email, string no_hash_password)
+        {
+            UserModel? user = await _databaseContext.Users.FirstOrDefaultAsync(u => u.Email.Equals(Email));
+            if (user == null)
+            {
+                return false;
+            }
+            user.Password = Convert.ToBase64String(EncryptionUtility.HashIt(no_hash_password));
+            return await _databaseContext.SaveChangesAsync() > 0;
+        }
 
-        public async Task<bool> UpdateUserAsync(UserModel user, 
+        public async Task<bool> UpdateUserAsync(UserModel user,
             ProfileUpdateFormModel profileUpdateForm)
         {
             if (profileUpdateForm.DeleteImage)
@@ -83,7 +94,8 @@ namespace RestaurantSystem.Services
                 Utility.DeleteImage(user.Image);
                 user.Image = null;
 
-            } else
+            }
+            else
             {
                 string? img = await Utility.UpdateImageAsync(user.Image,
                     profileUpdateForm.Image);

@@ -19,9 +19,9 @@ namespace RestaurantSystem.Database {
         public DbSet<DeliveryModel> Delivery { get; set; }
         public DbSet<AddressModel> Addresses { get; set; }
         public DbSet<OrderServerMappingModel> OrderServerMappings { get; set; }
+        public DbSet<EmailVerificationModel> EmailVerificationModels { get; set; }
 
-
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) {}
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -73,8 +73,37 @@ namespace RestaurantSystem.Database {
 
             // OrderServerMappingModel
             BuildOrderServerMappingModel(ref builder);
+
+            // EmailVerificationModel
+            BuildEmailVerificationModel(ref builder);
         }
 
+        private void BuildEmailVerificationModel(ref ModelBuilder builder)
+        {
+            builder.Entity<EmailVerificationModel>().ToTable("Email_Verification");
+            builder.Entity<EmailVerificationModel>()
+                .HasKey(e => e.Id);
+
+            builder.Entity<EmailVerificationModel>()
+                .Property(e => e.Email)
+                .IsRequired();
+
+            builder.Entity<EmailVerificationModel>()
+                .HasIndex(e => e.Email)
+                .IsUnique();
+
+            builder.Entity<EmailVerificationModel>()
+                .Property(e => e.Code)
+                .IsRequired();
+            
+            builder.Entity<EmailVerificationModel>()
+                .HasIndex(e => e.Code)
+                .IsUnique();
+
+            builder.Entity<EmailVerificationModel>()
+                .Property(e => e.ExpiresAt)
+                .IsRequired();
+        }
 
         private void BuildOrderServerMappingModel(ref ModelBuilder builder)
         {
