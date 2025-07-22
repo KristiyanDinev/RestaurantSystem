@@ -23,6 +23,8 @@ namespace RestaurantSystem.Controllers.Staff
         private OrderService _orderService;
         private OrderedDishesService _orderedDishesService;
         private DeliveryService _deliveryService;
+        private CuponService _cuponService;
+        private RestaurantService _restaurantService;
 
         public ManagerStaffController(UserUtility userUtils,
             RoleService roleService,
@@ -30,7 +32,9 @@ namespace RestaurantSystem.Controllers.Staff
             DishService dishService,
             OrderService orderService,
             OrderedDishesService orderedDishesService,
-            DeliveryService deliveryService)
+            DeliveryService deliveryService,
+            CuponService cuponService,
+            RestaurantService restaurantService)
         {
             _userUtils = userUtils;
             _roleService = roleService;
@@ -39,6 +43,8 @@ namespace RestaurantSystem.Controllers.Staff
             _orderService = orderService;
             _orderedDishesService = orderedDishesService;
             _deliveryService = deliveryService;
+            _cuponService = cuponService;
+            _restaurantService = restaurantService;
         }
 
 
@@ -342,14 +348,116 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return RedirectToAction("Login", "User");
             }
-            return null;
-            /*
             return View(new ManagerCuponViewModel()
             {
                 Staff = user,
-                Cupons = await ,
+                Cupons = await _cuponService.GetCuponsAsync(page),
                 Page = page
-            });*/
+            });
+        }
+
+        [HttpPost]
+        [Route("/staff/manager/cupons/edit")]
+        public async Task<IActionResult> CuponEdit([FromForm] CuponCreateFormModel cuponCreateForm)
+        {
+            if (!ModelState.IsValid ||
+                cuponCreateForm.DiscountPercent > 100 ||
+                cuponCreateForm.DiscountPercent < 0)
+            {
+                return BadRequest();
+            }
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
+            if (user == null || user.Restaurant == null)
+            {
+                return BadRequest();
+            }
+            if (!await _cuponService.EditCuponAsync(cuponCreateForm))
+            {
+                TempData["CuponEditError"] = true;
+                return BadRequest();
+            }
+            TempData["CuponEditSuccess"] = true;
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("/staff/manager/cupons/create")]
+        public async Task<IActionResult> CuponCreate([FromForm] CuponCreateFormModel cuponCreateForm)
+        {
+            if (!ModelState.IsValid ||
+                cuponCreateForm.DiscountPercent > 100 ||
+                cuponCreateForm.DiscountPercent < 0)
+            {
+                return BadRequest();
+            }
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
+            if (user == null || user.Restaurant == null)
+            {
+                return BadRequest();
+            }
+            if (!await _cuponService.CreateCuponAsync(cuponCreateForm))
+            {
+                TempData["CuponCreateError"] = true;
+                return BadRequest();
+            }
+            TempData["CuponCreateSuccess"] = true;
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("/staff/manager/cupons/delete/{code}")]
+        public async Task<IActionResult> CuponDelete(string code)
+        {
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
+            if (user == null || user.Restaurant == null)
+            {
+                return BadRequest();
+            }
+            if (!await _cuponService.DeleteCuponAsync(code))
+            {
+                TempData["CuponDeleteError"] = true;
+                return BadRequest();
+            }
+            TempData["CuponDeleteSuccess"] = true;
+            return Ok();
+        }
+
+
+        [HttpGet]
+        [Route("/staff/manager/restaurant")]
+        public async Task<IActionResult> Restaurant()
+        {
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
+            if (user == null || user.Restaurant == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+            return View(user);
+        }
+
+
+        [HttpPost]
+        [Route("/staff/manager/restaurant/edit")]
+        public async Task<IActionResult> RestaurantEdit([FromForm] RestaurantEditModel restaurantEdit)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
+            if (user == null || user.Restaurant == null)
+            {
+                return BadRequest();
+            }
+            if (!await _restaurantService.EditRestaurantAsync(restaurantEdit))
+            {
+                TempData["EditError"] = true;
+                return BadRequest();
+            }
+            TempData["EditSuccess"] = true;
+            return Ok();
         }
     }
 }

@@ -129,17 +129,13 @@ namespace RestaurantSystem.Services
 
         public async Task<List<OrderModel>> GetCookOrdersByRestaurantIdAsync(int restaurantId, int page)
         {
-            // Get all orders that are not served, delivering or delivered
-            // and are not in the preparing status.
-            // This is because the cook should only see orders that are pending or ready.
-            // The cook should not see orders that are already delivered.
             return await Utility.GetPageAsync<OrderModel>(_databaseContext.Orders
                 .Include(order => order.User)
                 .Where(order =>
                 order.RestaurantId == restaurantId &&
                 !(order.CurrentStatus.Equals(OrderStatusEnum.Delivering) ||
                   order.CurrentStatus.Equals(OrderStatusEnum.Delivered)))
-                .OrderBy(order => order.Id)
+                .OrderByDescending(order => order.OrderedAt)
                 .AsQueryable(), page)
                 .ToListAsync();
         }
@@ -153,7 +149,7 @@ namespace RestaurantSystem.Services
                 order.RestaurantId == restaurantId &&
                 !(order.CurrentStatus.Equals(OrderStatusEnum.Delivering) ||
                   order.CurrentStatus.Equals(OrderStatusEnum.Delivered)))
-                .OrderBy(order => order.Id)
+                .OrderByDescending(order => order.Id)
                 .AsQueryable(), page)
                 .ToListAsync();
         }
@@ -203,7 +199,7 @@ namespace RestaurantSystem.Services
                 order.RestaurantId == restaurantId &&
                 order.TableNumber == null &&
                 order.CurrentStatus.Equals(OrderStatusEnum.Delivered))
-                .OrderBy(order => order.UserAddress.Country)
+                .OrderBy(order => order.UserAddress.City)
                 .AsQueryable(), page)
                 .ToListAsync();
         }

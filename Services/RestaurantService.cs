@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Models.Form;
 using RestaurantSystem.Utilities;
 
 namespace RestaurantSystem.Services
@@ -12,6 +13,29 @@ namespace RestaurantSystem.Services
         public RestaurantService(DatabaseContext databaseContext)
         {
             _databaseContext = databaseContext;
+        }
+
+        public async Task<bool> EditRestaurantAsync(RestaurantEditModel model)
+        {
+            RestaurantModel? restaurant = await _databaseContext.Restaurants.FirstOrDefaultAsync(r => r.Id == model.Id);
+            if (restaurant == null)
+            {
+                return false;
+            }
+            restaurant.Country = model.Country;
+            restaurant.State = model.State;
+            restaurant.Address = model.Address;
+            restaurant.PhoneNumber = model.PhoneNumber;
+            restaurant.Email = model.Email;
+            restaurant.City = model.City;
+            restaurant.PostalCode = model.PostalCode;
+            restaurant.DoDelivery = model.DoDelivery;
+            restaurant.ServeCustomersInPlace = model.ServeCustomersInPlace;
+            restaurant.ReservationMaxAdults = model.ReservationMaxAdults;
+            restaurant.ReservationMinChildren = model.ReservationMinChildren;
+            restaurant.ReservationMaxChildren = model.ReservationMaxChildren;
+            restaurant.ReservationMinAdults = model.ReservationMinAdults;
+            return await _databaseContext.SaveChangesAsync() >= 0;
         }
 
         public async Task<List<RestaurantModel>> GetDeliveryGuy_RestaurantsAsync(AddressModel address, int page)

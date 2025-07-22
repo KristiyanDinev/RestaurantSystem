@@ -1,0 +1,275 @@
+@using RestaurantSystem.Models.DatabaseModels
+@using RestaurantSystem.Models.View.Messages
+@model UserModel
+
+@{
+    ViewData["Title"] = "Your Restaurant - Savans Restaurant";
+}
+
+<header>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/staff/manager/manager_restaurant.js"></script>
+</header>
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model)
+    @await Html.PartialAsync("_RestaurantBar", Model.Restaurant)
+    @await Html.PartialAsync("_ManagerNavBar")
+
+    <div class="container my-4">
+        <!-- Header Section -->
+        <div class="text-center mb-5">
+            <div class="d-inline-flex align-items-center justify-content-center bg-warning rounded-circle mb-3" style="width: 80px; height: 80px;">
+                <i class="bi bi-shop text-dark fs-1"></i>
+            </div>
+            <h1 class="display-6 fw-bold text-dark mb-2">Manage Your current Restaurant</h1>
+            <h3 class="text-muted mb-4">It is your responsibility</h3>
+            <div class="border-bottom border-warning border-3 mx-auto" style="width: 100px;"></div>
+        </div>
+
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "EditSuccess",
+            Message = "Restaurant edited successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "EditError",
+            Message = "Error while editing the restaurant. Please try again."
+        })
+
+        <!-- Restaurant Management Form -->
+        <div class="card shadow-lg border border-warning rounded">
+            <div class="card-header bg-dark text-warning py-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-gear-fill me-3 fs-4"></i>
+                    <h3 class="mb-0 fw-bold">Restaurant Configuration</h3>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- Location Information -->
+                    <div class="col-12">
+                        <div class="border-start border-warning border-4 ps-3 mb-4">
+                            <h5 class="text-dark mb-3">
+                                <i class="bi bi-geo-alt-fill text-warning me-2"></i>Location Details
+                            </h5>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="country" class="form-label fw-semibold">
+                                    <i class="bi bi-globe me-2"></i>Country
+                                </label>
+                                <select id="country" class="form-select form-select-lg border-2">
+                                    <option value="" selected disabled>Select Country</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="state" class="form-label fw-semibold">State/Province</label>
+                                <select id="state" class="form-select form-select-lg border-2" disabled>
+                                    <option value="" selected disabled>Select State / Province / Region</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="city" class="form-label fw-semibold">
+                                    <i class="bi bi-building me-2"></i>City
+                                </label>
+                                <select id="city" class="form-select form-select-lg border-2">
+                                    <option value="">Select City</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label for="Address" class="form-label fw-semibold">
+                                    <i class="bi bi-house-door me-2"></i>Street Address
+                                </label>
+                                <div class="form-floating">
+                                    <input id="Address" class="form-control form-control-lg border-2" 
+                                           value="@Model.Restaurant!.Address" 
+                                           placeholder="Restaurant's Street Address" type="text">
+                                    <label for="Address">Restaurant's Street Address</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="PostalCode" class="form-label fw-semibold">Postal Code</label>
+                                <div class="form-floating">
+                                    <input id="PostalCode" class="form-control form-control-lg border-2" 
+                                           value="@Model.Restaurant.PostalCode" 
+                                           placeholder="Restaurant's Postal / Zip code" type="text">
+                                    <label for="PostalCode">Restaurant's Postal / Zip code</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="col-12">
+                        <div class="border-start border-warning border-4 ps-3 mb-4">
+                            <h5 class="text-dark mb-3">
+                                <i class="bi bi-telephone-fill text-warning me-2"></i>Contact Information
+                            </h5>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="Email" class="form-label fw-semibold">
+                                    <i class="bi bi-envelope me-2"></i>Email Address
+                                </label>
+                                <div class="form-floating">
+                                    <input id="Email" class="form-control form-control-lg border-2" 
+                                           value="@Model.Restaurant.Email" 
+                                           placeholder="Restaurant's Contact Email" type="email">
+                                    <label for="Email">Restaurant's Contact Email</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="PhoneNumber" class="form-label fw-semibold">
+                                    <i class="bi bi-phone me-2"></i>Phone Number
+                                </label>
+                                <div class="form-floating">
+                                    <input id="PhoneNumber" class="form-control form-control-lg border-2" 
+                                           value="@Model.Restaurant.PhoneNumber" 
+                                           placeholder="Restaurant's Contact Phone Number" type="tel">
+                                    <label for="PhoneNumber">Restaurant's Contact Phone Number</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reservation Limits -->
+                    <div class="col-12">
+                        <div class="border-start border-warning border-4 ps-3 mb-4">
+                            <h5 class="text-dark mb-3">
+                                <i class="bi bi-calendar-check text-warning me-2"></i>Reservation Limits
+                            </h5>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="ReservationMaxAdults" class="form-label fw-semibold">
+                                    <i class="bi bi-people me-2"></i>Max Adults
+                                </label>
+                                <div class="form-floating">
+                                    <input id="ReservationMaxAdults" class="form-control form-control-lg border-2" 
+                                           value="@Model.Restaurant.ReservationMaxAdults" 
+                                           placeholder="Reservation's max Adults - Allowed" type="number">
+                                    <label for="ReservationMaxAdults">Reservation's max Adults - Allowed</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="ReservationMinAdults" class="form-label fw-semibold">
+                                    <i class="bi bi-person me-2"></i>Min Adults
+                                </label>
+                                <div class="form-floating">
+                                    <input id="ReservationMinAdults" class="form-control form-control-lg border-2" 
+                                           value="@Model.Restaurant.ReservationMinAdults" 
+                                           placeholder="Reservation's min Adults - Allowed" type="number">
+                                    <label for="ReservationMinAdults">Reservation's min Adults - Allowed</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="ReservationMaxChildren" class="form-label fw-semibold">
+                                    <i class="bi bi-emoji-laughing me-2"></i>Max Children
+                                </label>
+                                <div class="form-floating">
+                                    <input id="ReservationMaxChildren" class="form-control form-control-lg border-2" 
+                                           value="@Model.Restaurant.ReservationMaxChildren" 
+                                           placeholder="Reservation's max Children - Allowed" type="number">
+                                    <label for="ReservationMaxChildren">Reservation's max Children - Allowed</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="ReservationMinChildren" class="form-label fw-semibold">
+                                    <i class="bi bi-emoji-smile me-2"></i>Min Children
+                                </label>
+                                <div class="form-floating">
+                                    <input id="ReservationMinChildren" class="form-control form-control-lg border-2" 
+                                           value="@Model.Restaurant.ReservationMinChildren" 
+                                           placeholder="Reservation's min Children - Allowed" type="number">
+                                    <label for="ReservationMinChildren">Reservation's min Children - Allowed</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service Options -->
+                    <div class="col-12">
+                        <div class="border-start border-warning border-4 ps-3 mb-4">
+                            <h5 class="text-dark mb-3">
+                                <i class="bi bi-gear-wide-connected text-warning me-2"></i>Service Options
+                            </h5>
+                        </div>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card border-2 border-warning h-100">
+                                    <div class="card-body text-center p-4">
+                                        <i class="bi bi-truck text-warning fs-1 mb-3"></i>
+                                        <h6 class="fw-bold mb-3">Delivery Service</h6>
+                                        <div class="form-check form-switch d-flex justify-content-center mb-3">
+                                            @if (Model.Restaurant.DoDelivery) {
+                                                <input id="DoDelivery" type="checkbox" class="form-check-input fs-5" checked>
+                                            } else {
+                                                <input id="DoDelivery" type="checkbox" class="form-check-input fs-5">
+                                            }
+                                            <label class="form-check-label ms-2 fw-semibold" for="DoDelivery">Does your Restaurant do delivery?</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-2 border-warning h-100">
+                                    <div class="card-body text-center p-4">
+                                        <i class="bi bi-person-check text-warning fs-1 mb-3"></i>
+                                        <h6 class="fw-bold mb-3">Dine-In Service</h6>
+                                        <div class="form-check form-switch d-flex justify-content-center mb-3">
+                                            @if (Model.Restaurant.ServeCustomersInPlace) {
+                                                <input id="ServeCustomersInPlace" type="checkbox" class="form-check-input fs-5" checked>
+
+                                            } else {
+                                                <input id="ServeCustomersInPlace" type="checkbox" class="form-check-input fs-5">
+                                            }
+                                            <label class="form-check-label ms-2 fw-semibold" for="ServeCustomersInPlace">Does your Restaurant have a place to serve customers?</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="d-flex justify-content-end mt-5 pt-4 border-top">
+                    <button type="button" class="btn btn-warning btn-lg px-5 fw-bold" onclick="submitEdit('@Model.Restaurant.Id')">
+                        <i class="bi bi-check-circle-fill me-2"></i>Submit Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Info Card -->
+        <div class="card bg-dark border border-warning text-warning mt-4 rounded-4">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-info-circle-fill me-2"></i>Important Notice
+                        </h6>
+                        <p class="mb-0 small">
+                            Changes to restaurant settings will affect customer experience and staff operations. 
+                            Please review all information carefully before submitting.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <i class="bi bi-shield-check fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("_RestaurantFooter")
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+    <script src="~/assets/user_location.js"></script>
+    <script>
+        load('@Model.Restaurant!.Country', '@Model.Restaurant.State', '@Model.Restaurant.City')
+    </script>
+</body>
