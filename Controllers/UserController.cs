@@ -160,6 +160,11 @@ namespace RestaurantSystem.Controllers {
         [Route("/requestcode")]
         public async Task<IActionResult> RequestCode([FromForm] string Email)
         {
+            if (await _userService.GetUserByEmailAsync(Email) == null)
+            {
+                TempData["RequestCodeError"] = true;
+                return BadRequest();
+            }
             EmailVerificationModel? model = await _emailService.GetEmailVerificationAsync(Email);
             if (model != null)
             {
@@ -197,6 +202,14 @@ namespace RestaurantSystem.Controllers {
             }
             TempData["ResetSuccess"] = true;
             return Ok();
+        }
+
+
+        [HttpGet]
+        [Route("/forgetpassword")]
+        public async Task<IActionResult> ForgetPassword()
+        {
+            return View();
         }
     }
 }
