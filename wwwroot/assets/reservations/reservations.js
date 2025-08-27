@@ -9,7 +9,7 @@ async function submit() {
 
     if (at_date.length == 0 || at_time.length == 0 || Number(amount_of_children) < 0 ||
         Number(amount_of_adults) <= 0 || !phone) {
-        document.getElementById('reservation_status').innerHTML = "Invalid inputs. Specify positive numbers. Make sure you have at least 1 adult."
+        alert("Invalid inputs. Specify positive numbers. Make sure you have at least 1 adult.")
         return;
     }
 
@@ -30,13 +30,9 @@ async function submit() {
             window.location.pathname = "/reservations"
             return
         }
-
-        document.getElementById('reservation_status').innerHTML = "Couldn't place the reservation."
-
     } catch {
-        document.getElementById('reservation_status').innerHTML = "Couldn't place the reservation."
-        return;
     }
+    alert("Couldn't make a reservation. Please try again later.")
 }
 
 async function cancelReservation(id) {
