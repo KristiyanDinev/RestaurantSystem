@@ -109,7 +109,7 @@
                                     }
                                     @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.waitress.ToString())))
                                     {
-                                        <option value="@RoleEnum.waitress.ToString()">RoleEnum.waitress.ToString()</option>
+                                        <option value="@RoleEnum.waitress.ToString()">@RoleEnum.waitress.ToString()</option>
                                     }
                                     @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.cook.ToString())))
                                     {
