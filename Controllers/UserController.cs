@@ -207,7 +207,7 @@ namespace RestaurantSystem.Controllers {
 
         [HttpGet]
         [Route("/forgetpassword")]
-        public async Task<IActionResult> ForgetPassword()
+        public IActionResult ForgetPassword()
         {
             return View();
         }

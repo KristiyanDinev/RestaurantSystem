@@ -138,7 +138,7 @@
                                                     <p class="mb-2 fw-semibold">@order.Delivery.User.Name</p>
                                                     <div class="mb-0">
                                                         <i class="bi bi-envelope me-2 text-warning"></i>
-                                                        <span class="text-muted small">@order.Delivery.User.Email</span>
+                                                        <a class="text-decoration-none" href="mailto:@order.Delivery.User.Email">@order.Delivery.User.Email</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -171,11 +171,11 @@
                                                     <p class="mb-2 fw-semibold">@order.User.Name</p>
                                                     <div class="mb-2">
                                                         <i class="bi bi-envelope me-2 text-warning"></i>
-                                                        <span class="text-muted small">@order.User.Email</span>
+                                                        <a class="text-decoration-none" href="mailto:@order.User.Email">@order.User.Email</a>
                                                     </div>
                                                     <div class="mb-0">
                                                         <i class="bi bi-telephone me-2 text-warning"></i>
-                                                        <span class="text-muted small">@order.UserAddress.PhoneNumber</span>
+                                                        <a class="text-decoration-none" href="tel:@order.UserAddress.PhoneNumber">@order.UserAddress.PhoneNumber</a>
                                                     </div>
                                                 </div>
                                             </div>
