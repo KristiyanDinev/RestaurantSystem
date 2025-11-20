@@ -27,7 +27,7 @@ namespace RestaurantSystem.Services
             // total price here is with applied discount if the code is correct.
             OrderModel order = new OrderModel
             {
-                Notes = notes != null && notes.Replace(" ", "").Length == 0 ? null : notes,
+                Notes = notes != null && notes.Count(c => c == ' ') == notes.Length ? null : notes,
                 RestaurantId = restaurantId,
                 CurrentStatus = OrderStatusEnum.Pending,
                 TotalPrice = decimal.Parse($"{totalPrice:F2}"),

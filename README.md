@@ -337,4 +337,5 @@ dotnet watch run
 ## Database Notes
 
 - Postgres -> C# DateTime only supports `DateTime.UtcNow`
-
+- Password: 123
+- Email: k...5000
