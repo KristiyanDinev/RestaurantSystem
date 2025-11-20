@@ -15,14 +15,14 @@ async function startOrder() {
         return;
     }
 
-    let cuponCodeElement = document.getElementById("cupon_input")
+    let couponCodeElement = document.getElementById("coupon_input")
     let notesElement = document.getElementById("notes")
-    cuponCodeElement.classList.remove(isInvalid)
+    couponCodeElement.classList.remove(isInvalid)
     notesElement.classList.remove(isInvalid)
 
     let formData = new FormData()
     formData.append("Notes", notesElement.value)
-    formData.append("CuponCode", cuponCodeElement.value)
+    formData.append("CouponCode", couponCodeElement.value)
     formData.append("AddressId", address_id)
 
     try {
@@ -38,15 +38,15 @@ async function startOrder() {
 
 
 
-async function applyCuponCode() {
-    let cuponCodeElement = document.getElementById("cupon_input")
-    const code = cuponCodeElement.value
+async function applyCouponCode() {
+    let couponCodeElement = document.getElementById("coupon_input")
+    const code = couponCodeElement.value
     if (code.length == 0) {
-        cuponCodeElement.classList.add(isInvalid)
+        couponCodeElement.classList.add(isInvalid)
         return;
     }
 
-    cuponCodeElement.classList.remove(isInvalid)
+    couponCodeElement.classList.remove(isInvalid)
 
     let applyButton = document.getElementById("apply")
     const originText = applyButton.innerHTML
@@ -54,11 +54,11 @@ async function applyCuponCode() {
     applyButton.innerHTML = '<i class="bi bi-check2"></i> Applying...'
 
     let formData = new FormData()
-    formData.append("CuponCode", code)
+    formData.append("CouponCode", code)
     formData.append("Total", document.getElementById("total").value)
 
     try {
-        const res = await fetch(`/cupon/validate`, {
+        const res = await fetch(`/coupon/validate`, {
             method: "POST",
             body: formData,
         })
@@ -70,7 +70,7 @@ async function applyCuponCode() {
         
     } catch {}
 
-    cuponCodeElement.classList.add(isInvalid)
+    couponCodeElement.classList.add(isInvalid)
     applyButton.disabled = false
     applyButton.innerHTML = originText
 }

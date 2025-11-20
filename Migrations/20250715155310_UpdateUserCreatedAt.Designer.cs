@@ -77,9 +77,9 @@ namespace RestaurantSystem.Migrations
                     b.ToTable("Addresses", (string)null);
                 });
 
-            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.CuponModel", b =>
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.CouponModel", b =>
                 {
-                    b.Property<string>("CuponCode")
+                    b.Property<string>("CouponCode")
                         .HasColumnType("text");
 
                     b.Property<int>("DiscountPercent")
@@ -92,9 +92,9 @@ namespace RestaurantSystem.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("CuponCode");
+                    b.HasKey("CouponCode");
 
-                    b.ToTable("Cupons", (string)null);
+                    b.ToTable("Coupons", (string)null);
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DeliveryModel", b =>

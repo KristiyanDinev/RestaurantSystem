@@ -27,15 +27,15 @@ namespace RestaurantSystem.Migrations
                 defaultValue: new DateOnly(2025, 7, 21));
 
             migrationBuilder.AddColumn<string>(
-                name: "CuponCode",
+                name: "CouponCode",
                 table: "Orders",
                 type: "text",
                 nullable: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_CuponCode",
+                name: "IX_Orders_CouponCode",
                 table: "Orders",
-                column: "CuponCode");
+                column: "CouponCode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Delivery_UserId",
@@ -43,22 +43,22 @@ namespace RestaurantSystem.Migrations
                 column: "UserId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Orders_Cupons_CuponCode",
+                name: "FK_Orders_Coupons_CouponCode",
                 table: "Orders",
-                column: "CuponCode",
-                principalTable: "Cupons",
-                principalColumn: "CuponCode");
+                column: "CouponCode",
+                principalTable: "Coupons",
+                principalColumn: "CouponCode");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Orders_Cupons_CuponCode",
+                name: "FK_Orders_Coupons_CouponCode",
                 table: "Orders");
 
             migrationBuilder.DropIndex(
-                name: "IX_Orders_CuponCode",
+                name: "IX_Orders_CouponCode",
                 table: "Orders");
 
             migrationBuilder.DropIndex(
@@ -70,7 +70,7 @@ namespace RestaurantSystem.Migrations
                 table: "Users");
 
             migrationBuilder.DropColumn(
-                name: "CuponCode",
+                name: "CouponCode",
                 table: "Orders");
 
             migrationBuilder.AddColumn<DateOnly>(

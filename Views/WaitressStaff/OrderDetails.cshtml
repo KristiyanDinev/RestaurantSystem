@@ -108,58 +108,58 @@
                                 <div class="card-header bg-warning text-dark py-3">
                                     <h6 class="mb-0 fw-bold">
                                         <i class="bi bi-tag me-2"></i>
-                                        Cupon Code
+                                        Coupon Code
                                     </h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-md-8">
-                                            @if (TempData.Peek("CuponInvalid") != null)
+                                            @if (TempData.Peek("CouponInvalid") != null)
                                             {
                                                 <div class="form-floating">
-                                                    <input id="cupon_input"
+                                                    <input id="coupon_input"
                                                            class="form-control is-invalid border-2"
                                                            maxlength="25"
                                                            placeholder="Enter coupon code"
-                                                           value="@TempData["CuponCode"]">
-                                                    <label for="cupon_input">Coupon Code</label>
+                                                           value="@TempData["CouponCode"]">
+                                                    <label for="coupon_input">Coupon Code</label>
                                                     <div class="invalid-feedback">
                                                         <i class="bi bi-exclamation-triangle me-1"></i>
                                                         Invalid coupon code
                                                     </div>
                                                 </div>
-                                                TempData.Remove("CuponInvalid");
+                                                TempData.Remove("CouponInvalid");
                                             } 
-                                            else if (TempData.Peek("CuponValid") != null)
+                                            else if (TempData.Peek("CouponValid") != null)
                                             {
                                                 <div class="form-floating">
-                                                    <input id="cupon_input"
+                                                    <input id="coupon_input"
                                                            class="form-control is-valid border-2"
                                                            maxlength="25"
                                                            placeholder="Enter coupon code"
-                                                           value="@TempData["CuponCode"]">
-                                                    <label for="cupon_input">Coupon Code</label>
+                                                           value="@TempData["CouponCode"]">
+                                                    <label for="coupon_input">Coupon Code</label>
                                                     <div class="valid-feedback">
                                                         <i class="bi bi-check-circle me-1"></i>
                                                         Coupon applied successfully!
                                                     </div>
                                                 </div>
-                                                TempData.Remove("CuponValid");
+                                                TempData.Remove("CouponValid");
                                             } 
                                             else
                                             {
                                                 <div class="form-floating">
-                                                    <input id="cupon_input"
+                                                    <input id="coupon_input"
                                                            class="form-control border-2"
                                                            maxlength="25"
                                                            placeholder="Enter coupon code">
-                                                    <label for="cupon_input">Coupon Code</label>
+                                                    <label for="coupon_input">Coupon Code</label>
                                                 </div>
                                             }
                                         </div>
                                         <div class="col-md-4">
                                             <button class="btn btn-warning text-white h-100 w-100 fw-medium" 
-                                                    type="button" onclick="applyCuponCode()" id="apply">
+                                                    type="button" onclick="applyCouponCode()" id="apply">
                                                 <i class="bi bi-check2-circle me-2"></i>
                                                 Apply Code
                                             </button>

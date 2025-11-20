@@ -18,20 +18,20 @@ namespace RestaurantSystem.Controllers {
         private OrderService _orderService;
         private DishService _dishService;
         private UserUtility _userUtility;
-        private CuponService _cuponService;
+        private CouponService _couponService;
         private OrderedDishesService _orderedDishesService;
         private RestaurantService _restaurantService;
 
         public OrderController(OrderService orderService, 
             DishService dishService, UserUtility userUtility,
-            RestaurantService restaurantService, CuponService cuponService, 
+            RestaurantService restaurantService, CouponService couponService, 
             OrderedDishesService orderedDishesService)
         {
             _orderService = orderService;
             _dishService = dishService;
             _userUtility = userUtility;
             _restaurantService = restaurantService;
-            _cuponService = cuponService;
+            _couponService = couponService;
             _orderedDishesService = orderedDishesService;
         }
 
@@ -98,19 +98,19 @@ namespace RestaurantSystem.Controllers {
                 totalPrice += dishModel.Price * (beforeRemovalCount - CoutingDishId.Count);
             }
 
-            string? validCupon = null;
-            if (!string.IsNullOrWhiteSpace(order.CuponCode))
+            string? validCoupon = null;
+            if (!string.IsNullOrWhiteSpace(order.CouponCode))
             {
-                CuponModel? cupon = await _cuponService.GetCuponByCodeAsync(order.CuponCode);
-                if (cupon != null)
+                CouponModel? coupon = await _couponService.GetCouponByCodeAsync(order.CouponCode);
+                if (coupon != null)
                 {
-                    totalPrice = _cuponService.HandleCuponDiscount(cupon.DiscountPercent, totalPrice);
-                    validCupon = order.CuponCode;
+                    totalPrice = _couponService.HandleCouponDiscount(coupon.DiscountPercent, totalPrice);
+                    validCoupon = order.CouponCode;
                 }
             }
 
             if ((await _orderService.AddOrderAsync(user.Id, restaurant.Id,
-                    DishIds, order.Notes, totalPrice, null, validCupon, order.AddressId)) == null)
+                    DishIds, order.Notes, totalPrice, null, validCoupon, order.AddressId)) == null)
             {
                     return BadRequest();
             }

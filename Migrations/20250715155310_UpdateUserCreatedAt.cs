@@ -19,17 +19,17 @@ namespace RestaurantSystem.Migrations
                 .Annotation("Npgsql:Enum:reservation_status_enum", "pending,accepted,cancelled");
 
             migrationBuilder.CreateTable(
-                name: "Cupons",
+                name: "Coupons",
                 columns: table => new
                 {
-                    CuponCode = table.Column<string>(type: "text", nullable: false),
+                    CouponCode = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     DiscountPercent = table.Column<int>(type: "integer", nullable: false),
                     ExpirationDate = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cupons", x => x.CuponCode);
+                    table.PrimaryKey("PK_Coupons", x => x.CouponCode);
                 });
 
             migrationBuilder.CreateTable(
@@ -441,7 +441,7 @@ namespace RestaurantSystem.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Cupons");
+                name: "Coupons");
 
             migrationBuilder.DropTable(
                 name: "Delivery");

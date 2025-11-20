@@ -74,9 +74,9 @@ namespace RestaurantSystem.Migrations
                     b.ToTable("Addresses", (string)null);
                 });
 
-            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.CuponModel", b =>
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.CouponModel", b =>
                 {
-                    b.Property<string>("CuponCode")
+                    b.Property<string>("CouponCode")
                         .HasColumnType("text");
 
                     b.Property<int>("DiscountPercent")
@@ -89,9 +89,9 @@ namespace RestaurantSystem.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("CuponCode");
+                    b.HasKey("CouponCode");
 
-                    b.ToTable("Cupons", (string)null);
+                    b.ToTable("Coupons", (string)null);
                 });
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.DeliveryModel", b =>
@@ -204,7 +204,7 @@ namespace RestaurantSystem.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("CuponCode")
+                    b.Property<string>("CouponCode")
                         .HasColumnType("text");
 
                     b.Property<string>("CurrentStatus")
@@ -238,7 +238,7 @@ namespace RestaurantSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CuponCode");
+                    b.HasIndex("CouponCode");
 
                     b.HasIndex("RestaurantId");
 
@@ -585,9 +585,9 @@ namespace RestaurantSystem.Migrations
 
             modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.OrderModel", b =>
                 {
-                    b.HasOne("RestaurantSystem.Models.DatabaseModels.CuponModel", "Cupon")
+                    b.HasOne("RestaurantSystem.Models.DatabaseModels.CouponModel", "coupon")
                         .WithMany("Orders")
-                        .HasForeignKey("CuponCode");
+                        .HasForeignKey("CouponCode");
 
                     b.HasOne("RestaurantSystem.Models.DatabaseModels.RestaurantModel", "Restaurant")
                         .WithMany("Orders")
@@ -605,7 +605,7 @@ namespace RestaurantSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Cupon");
+                    b.Navigation("coupon");
 
                     b.Navigation("Restaurant");
 
@@ -704,7 +704,7 @@ namespace RestaurantSystem.Migrations
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.CuponModel", b =>
+            modelBuilder.Entity("RestaurantSystem.Models.DatabaseModels.CouponModel", b =>
                 {
                     b.Navigation("Orders");
                 });

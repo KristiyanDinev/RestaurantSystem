@@ -6,7 +6,7 @@ namespace RestaurantSystem.Database {
     public class DatabaseContext : DbContext {
 
         public DbSet<UserModel> Users { get; set; }
-        public DbSet<CuponModel> Cupons { get; set; }
+        public DbSet<CouponModel> Coupons { get; set; }
         public DbSet<DishModel> Dishes { get; set; }
         public DbSet<OrderedDishesModel> OrderedDishes { get; set; }
         public DbSet<OrderModel> Orders { get; set; }
@@ -56,8 +56,8 @@ namespace RestaurantSystem.Database {
             // ReservationModel
             BuildReservationModel(ref builder);
 
-            // CuponModel
-            BuildCuponModel(ref builder);
+            // CouponModel
+            BuildCouponModel(ref builder);
 
             // RoleModel
             BuildRoleModel(ref builder);
@@ -499,33 +499,33 @@ namespace RestaurantSystem.Database {
                 .HasForeignKey(reservation => reservation.RestaurantId);
         }
 
-        private void BuildCuponModel(ref ModelBuilder builder)
+        private void BuildCouponModel(ref ModelBuilder builder)
         {
-            builder.Entity<CuponModel>().ToTable("Cupons");
+            builder.Entity<CouponModel>().ToTable("Coupons");
 
-            builder.Entity<CuponModel>()
-                .HasKey(cupon => cupon.CuponCode);
+            builder.Entity<CouponModel>()
+                .HasKey(coupon => coupon.CouponCode);
 
-            builder.Entity<CuponModel>()
-                .Property(cupon => cupon.Name)
+            builder.Entity<CouponModel>()
+                .Property(coupon => coupon.Name)
                 .IsRequired();
 
-            builder.Entity<CuponModel>()
-                .Property(cupon => cupon.CuponCode)
+            builder.Entity<CouponModel>()
+                .Property(coupon => coupon.CouponCode)
                 .IsRequired();
 
-            builder.Entity<CuponModel>()
-                .Property(cupon => cupon.DiscountPercent)
+            builder.Entity<CouponModel>()
+                .Property(coupon => coupon.DiscountPercent)
                 .IsRequired();
 
-            builder.Entity<CuponModel>()
-                .Property(cupon => cupon.ExpirationDate)
+            builder.Entity<CouponModel>()
+                .Property(coupon => coupon.ExpirationDate)
                 .IsRequired();
 
-            builder.Entity<CuponModel>()
-                .HasMany(cupon => cupon.Orders)
-                .WithOne(order => order.Cupon)
-                .HasForeignKey(cupon => cupon.CuponCode);
+            builder.Entity<CouponModel>()
+                .HasMany(coupon => coupon.Orders)
+                .WithOne(order => order.coupon)
+                .HasForeignKey(coupon => coupon.CouponCode);
         }
 
         private void BuildDeliveryModel(ref ModelBuilder builder) {

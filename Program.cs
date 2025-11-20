@@ -45,7 +45,7 @@ namespace RestaurantSystem
             builder.Services.AddScoped<DishService>();
             builder.Services.AddScoped<OrderedDishesService>();
             builder.Services.AddScoped<RestaurantService>();
-            builder.Services.AddScoped<CuponService>();
+            builder.Services.AddScoped<CouponService>();
             builder.Services.AddScoped<OrderService>();
             builder.Services.AddScoped<RoleService>();
             builder.Services.AddScoped<ReservationService>();

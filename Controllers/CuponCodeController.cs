@@ -9,41 +9,41 @@ namespace RestaurantSystem.Controllers
     [ApiController]
     [EnableRateLimiting("fixed")]
     [IgnoreAntiforgeryToken]
-    public class CuponCodeController : Controller
+    public class CouponCodeController : Controller
     {
-        private CuponService _cuponService;
-        public CuponCodeController(CuponService cuponService)
+        private CouponService _couponService;
+        public CouponCodeController(CouponService couponService)
         {
-            _cuponService = cuponService;
+            _couponService = couponService;
         }
 
 
         [HttpPost]
-        [Route("/cupon/validate")]
-        public async Task<IActionResult> ValidateCuponCode(
-            [FromForm] string CuponCode,
+        [Route("/coupon/validate")]
+        public async Task<IActionResult> ValidateCouponCode(
+            [FromForm] string CouponCode,
             [FromForm] decimal Total)
         {
-            if (string.IsNullOrEmpty(CuponCode))
+            if (string.IsNullOrEmpty(CouponCode))
             {
-                TempData["CuponInvalid"] = true;
+                TempData["CouponInvalid"] = true;
                 return BadRequest();
             }
-            TempData["CuponCode"] = CuponCode;
-            CuponModel? code = await _cuponService.GetCuponByCodeAsync(CuponCode);
+            TempData["CouponCode"] = CouponCode;
+            CouponModel? code = await _couponService.GetCouponByCodeAsync(CouponCode);
             if (code == null)
             {
-                TempData["CuponInvalid"] = true;
+                TempData["CouponInvalid"] = true;
                 return NotFound();
             }
             if (code.ExpirationDate <= DateOnly.FromDateTime(DateTime.Now))
             {
-                TempData["CuponInvalid"] = true;
+                TempData["CouponInvalid"] = true;
                 return BadRequest();
             }
-            TempData["CuponValid"] = true;
-            TempData["CuponDiscount"] = code.DiscountPercent;
-            TempData["CuponTotal"] = _cuponService.HandleCuponDiscount(code.DiscountPercent, Total).ToString();
+            TempData["CouponValid"] = true;
+            TempData["CouponDiscount"] = code.DiscountPercent;
+            TempData["CouponTotal"] = _couponService.HandleCouponDiscount(code.DiscountPercent, Total).ToString();
             return Ok();
         }
     }

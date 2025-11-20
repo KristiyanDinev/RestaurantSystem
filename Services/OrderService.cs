@@ -22,7 +22,7 @@ namespace RestaurantSystem.Services
 
         public async Task<OrderModel?> AddOrderAsync(long userId, int restaurantId,
             List<int> dishesId, string? notes, decimal totalPrice,
-            string? tableNumber, string? cupon, long? address_id)
+            string? tableNumber, string? coupon, long? address_id)
         {
             // total price here is with applied discount if the code is correct.
             OrderModel order = new OrderModel
@@ -34,7 +34,7 @@ namespace RestaurantSystem.Services
                 UserId = userId,
                 TableNumber = tableNumber,
                 UserAddressId = address_id,
-                CuponCode = cupon
+                CouponCode = coupon
             };
 
             await _databaseContext.Orders.AddAsync(order);
@@ -120,7 +120,7 @@ namespace RestaurantSystem.Services
                 .Include(order => order.Restaurant)
                 .Include(order => order.UserAddress)
                 .Include(order => order.OrderedDishes)
-                .Include(order => order.Cupon)
+                .Include(order => order.coupon)
                 .Where(order => 
                 order.UserId == userId && 
                 order.TableNumber == null)
@@ -144,7 +144,7 @@ namespace RestaurantSystem.Services
         {
             return await Utility.GetPageAsync<OrderModel>(_databaseContext.Orders
                 .Include(order => order.User)
-                .Include(order => order.Cupon)
+                .Include(order => order.coupon)
                 .Where(order =>
                 order.RestaurantId == restaurantId &&
                 !(order.CurrentStatus.Equals(OrderStatusEnum.Delivering) ||

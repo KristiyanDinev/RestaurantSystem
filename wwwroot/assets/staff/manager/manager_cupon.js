@@ -1,8 +1,8 @@
-function toggleCreateCupon() {
-    toggleElement('create_cupon')
+function toggleCreateCoupon() {
+    toggleElement('create_coupon')
 }
 
-function toggleEditCupon(code) {
+function toggleEditCoupon(code) {
     toggleElement(`name,${code}`)
     toggleElement(`discount,${code}`)
     toggleElement(`expdate,${code}`)
@@ -11,7 +11,7 @@ function toggleEditCupon(code) {
 
 let isInvalid = 'is-invalid'
 async function submitCreate() {
-    if (!confirm(`Are you sure you want to create this cupon?`)) return;
+    if (!confirm(`Are you sure you want to create this coupon?`)) return;
 
     let NameElement = document.getElementById(`Name`)
     let CodeElement = document.getElementById(`Code`)
@@ -47,12 +47,12 @@ async function submitCreate() {
 
     let formData = new FormData()
     formData.append('Name', nameValue)
-    formData.append('CuponCode', codeValue)
+    formData.append('CouponCode', codeValue)
     formData.append('DiscountPercent', Number(discountValue))
     formData.append('ExpDate', expDateValue)
 
     try {
-        await fetch('/staff/manager/cupons/create', {
+        await fetch('/staff/manager/coupons/create', {
             method: 'POST',
             body: formData
         })
@@ -62,7 +62,7 @@ async function submitCreate() {
 }
 
 async function submitEdit(code) {
-    if (!confirm(`Are you sure you want to edit ${code} cupon?`)) return;
+    if (!confirm(`Are you sure you want to edit ${code} coupon?`)) return;
 
     let NameElement = document.getElementById(`name,${code}`)
     let DiscountElement = document.getElementById(`discount,${code}`)
@@ -91,12 +91,12 @@ async function submitEdit(code) {
 
     let formData = new FormData()
     formData.append('Name', nameValue)
-    formData.append('CuponCode', code)
+    formData.append('CouponCode', code)
     formData.append('DiscountPercent', Number(discountValue))
     formData.append('ExpDate', expDateValue)
 
     try {
-        await fetch(`/staff/manager/cupons/edit`, {
+        await fetch(`/staff/manager/coupons/edit`, {
             method: 'POST',
             body:formData
         })
@@ -106,10 +106,10 @@ async function submitEdit(code) {
 }
 
 async function submitDelete(code) {
-    if (!confirm(`Are you sure you want to delete ${code} cupon?`)) return;
+    if (!confirm(`Are you sure you want to delete ${code} coupon?`)) return;
 
     try {
-        await fetch(`/staff/manager/cupons/delete/${code}`, {
+        await fetch(`/staff/manager/coupons/delete/${code}`, {
             method: 'POST'
         })
 

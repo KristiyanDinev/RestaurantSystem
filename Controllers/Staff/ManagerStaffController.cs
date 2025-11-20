@@ -23,7 +23,7 @@ namespace RestaurantSystem.Controllers.Staff
         private OrderService _orderService;
         private OrderedDishesService _orderedDishesService;
         private DeliveryService _deliveryService;
-        private CuponService _cuponService;
+        private CouponService _couponService;
         private RestaurantService _restaurantService;
 
         public ManagerStaffController(UserUtility userUtils,
@@ -33,7 +33,7 @@ namespace RestaurantSystem.Controllers.Staff
             OrderService orderService,
             OrderedDishesService orderedDishesService,
             DeliveryService deliveryService,
-            CuponService cuponService,
+            CouponService couponService,
             RestaurantService restaurantService)
         {
             _userUtils = userUtils;
@@ -43,7 +43,7 @@ namespace RestaurantSystem.Controllers.Staff
             _orderService = orderService;
             _orderedDishesService = orderedDishesService;
             _deliveryService = deliveryService;
-            _cuponService = cuponService;
+            _couponService = couponService;
             _restaurantService = restaurantService;
         }
 
@@ -340,29 +340,29 @@ namespace RestaurantSystem.Controllers.Staff
 
 
         [HttpGet]
-        [Route("/staff/manager/cupons")]
-        public async Task<IActionResult> Cupons([FromQuery] int page = 1)
+        [Route("/staff/manager/coupons")]
+        public async Task<IActionResult> Coupons([FromQuery] int page = 1)
         {
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
                 return RedirectToAction("Login", "User");
             }
-            return View(new ManagerCuponViewModel()
+            return View(new ManagerCouponViewModel()
             {
                 Staff = user,
-                Cupons = await _cuponService.GetCuponsAsync(page),
+                Coupons = await _couponService.GetCouponsAsync(page),
                 Page = page
             });
         }
 
         [HttpPost]
-        [Route("/staff/manager/cupons/edit")]
-        public async Task<IActionResult> CuponEdit([FromForm] CuponCreateFormModel cuponCreateForm)
+        [Route("/staff/manager/coupons/edit")]
+        public async Task<IActionResult> CouponEdit([FromForm] CouponCreateFormModel couponCreateForm)
         {
             if (!ModelState.IsValid ||
-                cuponCreateForm.DiscountPercent > 100 ||
-                cuponCreateForm.DiscountPercent < 0)
+                couponCreateForm.DiscountPercent > 100 ||
+                couponCreateForm.DiscountPercent < 0)
             {
                 return BadRequest();
             }
@@ -371,23 +371,23 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return BadRequest();
             }
-            if (!await _cuponService.EditCuponAsync(cuponCreateForm))
+            if (!await _couponService.EditCouponAsync(couponCreateForm))
             {
-                TempData["CuponEditError"] = true;
+                TempData["CouponEditError"] = true;
                 return BadRequest();
             }
-            TempData["CuponEditSuccess"] = true;
+            TempData["CouponEditSuccess"] = true;
             return Ok();
         }
 
 
         [HttpPost]
-        [Route("/staff/manager/cupons/create")]
-        public async Task<IActionResult> CuponCreate([FromForm] CuponCreateFormModel cuponCreateForm)
+        [Route("/staff/manager/coupons/create")]
+        public async Task<IActionResult> CouponCreate([FromForm] CouponCreateFormModel couponCreateForm)
         {
             if (!ModelState.IsValid ||
-                cuponCreateForm.DiscountPercent > 100 ||
-                cuponCreateForm.DiscountPercent < 0)
+                couponCreateForm.DiscountPercent > 100 ||
+                couponCreateForm.DiscountPercent < 0)
             {
                 return BadRequest();
             }
@@ -396,31 +396,31 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return BadRequest();
             }
-            if (!await _cuponService.CreateCuponAsync(cuponCreateForm))
+            if (!await _couponService.CreateCouponAsync(couponCreateForm))
             {
-                TempData["CuponCreateError"] = true;
+                TempData["CouponCreateError"] = true;
                 return BadRequest();
             }
-            TempData["CuponCreateSuccess"] = true;
+            TempData["CouponCreateSuccess"] = true;
             return Ok();
         }
 
 
         [HttpPost]
-        [Route("/staff/manager/cupons/delete/{code}")]
-        public async Task<IActionResult> CuponDelete(string code)
+        [Route("/staff/manager/coupons/delete/{code}")]
+        public async Task<IActionResult> CouponDelete(string code)
         {
             UserModel? user = await _userUtils.GetStaffUserByJWT(HttpContext, true);
             if (user == null || user.Restaurant == null)
             {
                 return BadRequest();
             }
-            if (!await _cuponService.DeleteCuponAsync(code))
+            if (!await _couponService.DeleteCouponAsync(code))
             {
-                TempData["CuponDeleteError"] = true;
+                TempData["CouponDeleteError"] = true;
                 return BadRequest();
             }
-            TempData["CuponDeleteSuccess"] = true;
+            TempData["CouponDeleteSuccess"] = true;
             return Ok();
         }
 

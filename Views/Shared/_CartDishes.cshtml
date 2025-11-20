@@ -108,28 +108,28 @@
                     </div>
 
                     <!-- Discount Information -->
-                    @if (TempData.Peek("CuponDiscount") != null)
+                    @if (TempData.Peek("CouponDiscount") != null)
                     {
                         <div class="mb-1">
-                            <span class="text-muted">Discount (@TempData["CuponDiscount"]%):</span>
+                            <span class="text-muted">Discount (@TempData["CouponDiscount"]%):</span>
                             <span class="text-success fw-bold">
-                                -@((sum * Convert.ToDecimal(TempData["CuponDiscount"]) / 100).ToString("F2")) lv.
+                                -@((sum * Convert.ToDecimal(TempData["CouponDiscount"]) / 100).ToString("F2")) lv.
                             </span>
 
                         </div>
-                        TempData.Remove("CuponDiscount");
+                        TempData.Remove("CouponDiscount");
                     }
 
                     <!-- Final Total -->
-                    @if (TempData.Peek("CuponTotal") != null)
+                    @if (TempData.Peek("CouponTotal") != null)
                     {
                         <div class="border-top pt-2 mt-2">
                             <span class="text-muted">Total:</span>
                             <span class="text-warning fw-bold fs-4">
-                                @(Convert.ToDecimal(TempData["CuponTotal"]).ToString("F2")) lv.
+                                @(Convert.ToDecimal(TempData["CouponTotal"]).ToString("F2")) lv.
                             </span>
                         </div>
-                        TempData.Remove("CuponTotal");
+                        TempData.Remove("CouponTotal");
                     }
                     else
                     {

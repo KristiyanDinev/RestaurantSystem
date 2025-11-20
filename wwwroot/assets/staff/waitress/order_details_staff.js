@@ -20,14 +20,14 @@ async function submit() {
         return
     }
 
-    let cuponElement = document.getElementById('cupon_input')
+    let couponElement = document.getElementById('coupon_input')
     let notesElement = document.getElementById('notes')
-    cuponElement.classList.remove(isInvalid)
+    couponElement.classList.remove(isInvalid)
     notesElement.classList.remove(isInvalid)
 
     let formData = new FormData()
     formData.append('Notes', notesElement.value)
-    formData.append('CuponCode', cuponElement.value)
+    formData.append('CouponCode', couponElement.value)
     formData.append('TableNumber', table)
 
     try {
