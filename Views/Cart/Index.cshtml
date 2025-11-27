@@ -71,31 +71,11 @@
                     </div>
                     <div class="card-body">
                         <div class="input-group">
-                            @if (TempData.Peek("CouponInvalid") != null)
-                            {
-                                <input id="coupon_input"
-                                   class="form-control is-invalid"
-                                   maxlength="25"
-                                   placeholder="Enter coupon code"
-                                value="@TempData["CouponCode"]">
-                                TempData.Remove("CouponInvalid");
-
-                            } else if (TempData.Peek("CouponValid") != null)
-                            {
-                                <input id="coupon_input"
-                                   class="form-control is-valid"
-                                   maxlength="25"
-                                   placeholder="Enter coupon code"
-                                value="@TempData["CouponCode"]">
-                                TempData.Remove("CouponValid");
-
-                            } else
-                            {
-                                <input id="coupon_input"
+                            <input id="coupon_input"
                                        class="form-control"
                                        maxlength="25"
                                        placeholder="Enter coupon code">
-                            }
+                            
                             <button class="btn btn-warning text-white" 
                                     type="button" onclick="applyCouponCode()" id="apply">
                                 <i class="bi bi-check2"></i> Apply

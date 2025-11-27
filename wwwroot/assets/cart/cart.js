@@ -64,13 +64,39 @@ async function applyCouponCode() {
         })
 
         if (res.ok) {
-            window.location.reload()
+            const data = await res.json()
+            
+            // Update input styling to show success
+            couponCodeElement.classList.remove("is-invalid")
+            couponCodeElement.classList.add("is-valid")
+            
+            // Update any discount/total display elements
+            // Assuming you have elements with these IDs - adjust as needed
+            if (data.CouponDiscount) {
+                const discountElement = document.getElementById("discount")
+                if (discountElement) {
+                    discountElement.textContent = `$${data.CouponDiscount.toFixed(2)}`
+                }
+            }
+            
+            if (data.CouponTotal) {
+                const finalTotalElement = document.getElementById("finalTotal")
+                if (finalTotalElement) {
+                    finalTotalElement.textContent = `$${data.CouponTotal.toFixed(2)}`
+                }
+            }
+            
+            // Re-enable button with success state
+            applyButton.disabled = false
+            applyButton.innerHTML = originText
             return
         }
         
     } catch {}
 
-    couponCodeElement.classList.add(isInvalid)
+    // On error or invalid coupon
+    couponCodeElement.classList.remove("is-valid")
+    couponCodeElement.classList.add("is-invalid")
     applyButton.disabled = false
     applyButton.innerHTML = originText
 }

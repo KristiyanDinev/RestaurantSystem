@@ -14,12 +14,10 @@ namespace RestaurantSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Configure Serilog
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
                 .CreateLogger();
 
-            // Replace default logging with Serilog
             builder.Host.UseSerilog((context, loggerConfig) =>
             {
                 loggerConfig.ReadFrom.Configuration(context.Configuration);
@@ -97,7 +95,7 @@ namespace RestaurantSystem
             app.UseStaticFiles();
             app.UseAuthenticationMiddleware();
             app.UseWebSocketMiddleware();
-            app.UseLoggingMiddleware();
+            //app.UseLoggingMiddleware();
             app.MapControllers();
             app.UseStartupSQL(app);
 

@@ -13,8 +13,7 @@ namespace RestaurantSystem.Services
         private OrderedDishesService _orderedDishesDatabaseHandler;
 
         public OrderService(DatabaseContext databaseContext, 
-            OrderedDishesService orderedDishesDatabaseHandler,
-            WebSocketUtility webSocketUtility)
+            OrderedDishesService orderedDishesDatabaseHandler)
         {
             _databaseContext = databaseContext;
             _orderedDishesDatabaseHandler = orderedDishesDatabaseHandler;

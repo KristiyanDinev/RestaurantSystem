@@ -12,10 +12,10 @@ namespace RestaurantSystem.Extentions
                 s => s.AddRateLimiter(_ => _
                     .AddFixedWindowLimiter(policyName: "fixed", options =>
                     {
-                        options.PermitLimit = 1;
+                        options.PermitLimit = 5;
                         options.Window = TimeSpan.FromSeconds(1);
                         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                        options.QueueLimit = 2;
+                        options.QueueLimit = 10;
                     })
                 )
             );

@@ -129,9 +129,6 @@ Staff endpoints:
 - user: ResturantUser
 - password: password123
 
-### Add test data
-*Note: Make sure that this will be the first data inserted in the tables in the database.*
-
 Add Role
 ```sql
 INSERT INTO "User_Roles" 
@@ -195,30 +192,6 @@ dotnet watch run
 ## Steps for setting up SMTP (Simple Mail Transfer Protocol) for sending emails
 
 ### Gmail
-- SMTP Settings
-
-    Host: smtp.gmail.com
-
-    Port: 587 (TLS) or 465 (SSL)
-
-    Requires Auth: ✅
-
-    SSL/TLS: ✅
-
-- Usage Limits
-
-    Free accounts: ~500 emails/day
-
-    Google Workspace (paid): ~2,000 emails/day
-
-    Attachment size: 25MB
-
-- Pricing
-
-    Free personal Gmail
-
-    Workspace starts at $6/user/month
-
 - Steps:
     1. Make sure you have 2-Steps Authentication on the account you want this app to use as the **Sender**. (At least 2 methods of authentication)
 
@@ -229,113 +202,8 @@ dotnet watch run
     4. Set the `App_Password` option to the generated password, which Google gave you.
 
 
-### iCloud Mail (Apple)
-- SMTP Settings
-
-    Host: smtp.mail.me.com
-
-    Port: 587
-
-    SSL/TLS: ✅
-
-    Auth: ✅
-
-- Usage Limits
-
-    Daily cap: ~200–300 emails
-
-    Attachment size: 20MB
-
-- Pricing
-
-    Free with iCloud email (5GB storage)
-
-    Extra storage starts at $0.99/month
-
-
-### Zoho Mail
-- SMTP Settings
-
-    Host: smtp.zoho.com
-
-    Port: 587 (TLS) or 465 (SSL)
-
-    SSL/TLS: ✅
-
-    Auth: ✅
-
-- Usage Limits
-
-    Free: 500 emails/day
-
-    Paid (Zoho Mail Standard): up to 30,000/day per domain
-
-- Pricing
-
-    Free (for up to 5 users with custom domain)
-
-    Paid: from $1/user/month
-
-### Outlook / Hotmail / Live (Microsoft)
-- SMTP Settings
-
-    Host: smtp.office365.com (Outlook/365)
-    or smtp.live.com (Hotmail/Live)
-
-    Port: 587
-
-    SSL/TLS: ✅
-
-    Auth: ✅
-
-- Usage Limits
-
-    Free accounts: 300 emails/day approx.
-
-    Microsoft 365 Business: ~10,000/day (shared pool)
-
-- Pricing
-
-    Free (Outlook.com)
-
-    Microsoft 365 Business: starts at ~$6/user/month
-
-### Yahoo Mail
-- SMTP Settings
-
-    Host: smtp.mail.yahoo.com
-
-    Port: 587 (TLS) or 465 (SSL)
-
-    SSL/TLS: ✅
-
-    Auth: ✅
-
-- Usage Limits
-
-    ~500 emails/day
-
-    Attachments: 25MB
-
-- Pricing
-
-    Free with ads
-
-    Yahoo Mail Plus: ~$5/month (no email limit increase)
-
-
-### Comparison Table
-| Provider | Free Limit     | App Password Req. | Paid Upgrade             | SMTP Host           |
-| -------- | -------------- | ----------------- | ------------------------ | ------------------- |
-| Gmail    | 500/day        |  (with 2FA)      | \$6/mo via Workspace     | smtp.gmail.com      |
-| Yahoo    | 500/day        |  (with 2FA)      | \$5/mo Yahoo Mail Plus   | smtp.mail.yahoo.com |
-| Outlook  | 300/day approx |  (with 2FA)      | \$6/mo Microsoft 365     | smtp.office365.com  |
-| Zoho     | 500/day        |  (with 2FA)      | \$1/user/mo for business | smtp.zoho.com       |
-| iCloud   | \~200–300/day  |  (with 2FA)      | \$0.99+/mo (for storage) | smtp.mail.me.com    |
-
 
 ## Database Notes
 
-- Postgres -> C# DateTime only supports `DateTime.UtcNow`
 - Password: 123
 - Email: k...5000
