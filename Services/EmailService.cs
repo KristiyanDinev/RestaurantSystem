@@ -29,8 +29,7 @@ namespace RestaurantSystem.Services
         }
       }
       string code = _emailSendService.GenerateVerificationCode();
-      List<string> clients = new List<string>();
-      clients.Add(Email);
+      List<string> clients = new List<string> { Email };
       bool res = _emailSendService.SendEmailToClients(clients,
 """
 Hello,
@@ -53,7 +52,7 @@ Thank you, The Support Team
         {
           Email = Email,
           Code = code,
-          ExpiresAt = DateTime.UtcNow.AddMinutes(5)
+          ExpiresAt = DateTime.UtcNow.AddMinutes(_emailSendService.getOTP_Expiration_Minutes())
         });
         return await _databaseManager.SaveChangesAsync() > 0;
     }

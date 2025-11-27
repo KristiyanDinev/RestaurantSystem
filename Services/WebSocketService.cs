@@ -42,9 +42,7 @@ namespace RestaurantSystem.Services
             InitializeRabbitMQ(model);
         }
 
-        /// <summary>
         /// Initialize RabbitMQ connection and set up message consumption
-        /// </summary>
         private async void InitializeRabbitMQ(RabbitMQOptionsModel options)
         {
             try
@@ -68,22 +66,18 @@ namespace RestaurantSystem.Services
 
                 await _channel.ExchangeDeclareAsync(exchange: _exchangeName, type: ExchangeType.Direct);
 
-                // Declare queue for this server instance
                 await _channel.QueueDeclareAsync(queue: _queueName!, 
                     durable: false, 
                     exclusive: false, 
                     autoDelete: true);
 
-                // Bind queue to exchange with server ID as routing key
                 await _channel.QueueBindAsync(queue: _queueName!, 
                     exchange: _exchangeName, 
                     routingKey: _webSocketUtility.GetServerId());
 
-                // Set up message consumer
                 var consumer = new AsyncEventingBasicConsumer(_channel);
                 consumer.ReceivedAsync += OnMessageReceived;
 
-                // Start consuming messages
                 await _channel.BasicConsumeAsync(queue: _queueName, 
                     autoAck: true, consumer: consumer);
             }
@@ -94,9 +88,7 @@ namespace RestaurantSystem.Services
             }
         }
 
-        /// <summary>
         /// Handle incoming RabbitMQ messages for WebSocket distribution
-        /// </summary>
         private async Task OnMessageReceived(object sender, BasicDeliverEventArgs e)
         {
             try
@@ -118,9 +110,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        /// <summary>
         /// Handle JSON messages from WebSocket clients
-        /// </summary>
         private async void HandleJsonMessages(Dictionary<string, object> data, WebSocket socket)
         {
             // The user sets Orders to listen to
@@ -141,14 +131,14 @@ namespace RestaurantSystem.Services
                         ids.Add(orderId);
                         if (!distributionEnabled)
                         {
-                            continue; // Distribution is not enabled, skip database mapping
+                            continue;
                         }
                         await _webSocketDatabaseService
                             .AddOrderServerMappingAsync(orderId, _webSocketUtility.GetServerId());
                     }
                     else
                     {
-                        continue; // Invalid order ID format
+                        continue;
                     }
                 }
 
@@ -158,9 +148,7 @@ namespace RestaurantSystem.Services
 
 
 
-        /// <summary>
         /// Handle WebSocket connection lifecycle
-        /// </summary>
         public async Task HandleWebSocketAsync(string endpoint, WebSocket socket,
             TaskCompletionSource<object> taskCompletionSource)
         {
@@ -233,13 +221,10 @@ namespace RestaurantSystem.Services
         }
 
 
-        /// <summary>
         /// Send JSON message to a specific order across all servers
         /// This is the main method for distributed WebSocket messaging
-        /// </summary>
         public async Task SendJsonToOrder<T>(string endpoint, long orderId, T data)
         {
-            // First, try to deliver locally
             List<WebSocket> localSockets = _webSocketUtility.GetListenersForOrderId(orderId);
             if (localSockets.Count != 0)
             {
@@ -247,9 +232,8 @@ namespace RestaurantSystem.Services
             }
 
             if (!distributionEnabled) { 
-                return; // If distribution is not enabled, skip further processing
+                return; 
             }
-            // Then, check if we need to send to other servers
             OrderServerMappingModel? orderServerMapping =
                 await _webSocketDatabaseService
                 .GetServerWhichHasListenersForOrderIdAsync(orderId);
@@ -272,9 +256,7 @@ namespace RestaurantSystem.Services
         }
 
 
-        /// <summary>
         /// Publish a distribution message to RabbitMQ
-        /// </summary>
         private async Task PublishDistributionMessageAsync(WebSocketDistributionMessageModel distributionMessage)
         {
             try
@@ -293,9 +275,7 @@ namespace RestaurantSystem.Services
             catch {}
         }
 
-        /// <summary>
         /// Send JSON message to specific WebSocket clients
-        /// </summary>
         public async Task SendJsonToClients<T>(string endpoint, T data, List<WebSocket> sockets)
         {
             foreach (WebSocket socket in sockets)

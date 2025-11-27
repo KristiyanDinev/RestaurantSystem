@@ -9,6 +9,7 @@ namespace RestaurantSystem.Services
         private int smtp_port;
         private string smtp_fromEmail;
         private string smtp_password;
+        private int otp_expiration_minutes;
 
         public EmailSendService(IConfiguration configuration)
         {
@@ -16,6 +17,12 @@ namespace RestaurantSystem.Services
             smtp_port = configuration.GetValue<int>("Smtp:Port", 587);
             smtp_fromEmail = configuration.GetValue<string>("Smtp:From_Email", "");
             smtp_password = configuration.GetValue<string>("Smtp:App_Password", "");
+            otp_expiration_minutes = configuration.GetValue<int>("Smtp:OTP_Expiration_Minutes", 5);
+        }
+
+        public int getOTP_Expiration_Minutes()
+        {
+            return otp_expiration_minutes;
         }
 
         public string GenerateVerificationCode(int length = 8)
