@@ -1,0 +1,173 @@
+@using RestaurantSystem.Models.DatabaseModels
+@using RestaurantSystem.Models.View.Messages
+@model RestaurantSystem.Models.View.Staff.Manager.ManagerCouponViewModel
+
+@{
+    ViewData["Title"] = "Manage Coupons - Savans Restaurant";
+}
+
+<header>
+    @await Html.PartialAsync("_Header")
+    <script src="~/assets/staff/manager/manager_coupon.js"></script>
+</header>
+
+<body>
+    @await Html.PartialAsync("_StaffNavBar", Model.Staff)
+    @await Html.PartialAsync("_RestaurantBar", Model.Staff.Restaurant)
+    @await Html.PartialAsync("_ManagerNavBar")
+    @await Html.PartialAsync("_Paging", Model.Page)
+
+    <div class="container my-4">
+        <h1 class="text-center mb-4">Manage Coupons</h1>
+
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "CouponDeleteSuccess",
+            Message = "coupon deleted successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "CouponDeleteError",
+            Message = "Error while deleting coupon. Please try again."
+        })
+
+
+
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "CouponCreateSuccess",
+            Message = "coupon created successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "CouponCreateError",
+            Message = "Error while creating the coupon. Please try again."
+        })
+
+
+
+        @await Html.PartialAsync("_SuccessMessage", new MessageViewModel
+        {
+            Key = "CouponEditSuccess",
+            Message = "coupon edited successfully!"
+        })
+
+        @await Html.PartialAsync("_ErrorMessage", new MessageViewModel
+        {
+            Key = "CouponEditError",
+            Message = "Error while editing the coupon. Please try again."
+        })
+
+
+        @if (Model.Coupons.Count == 0)
+        {
+            <div class="alert alert-info text-center">No Coupons to manage</div>
+        }
+
+        <!-- Create coupon Button -->
+        <div class="text-center mb-3">
+            <button class="btn btn-success" onclick="toggleCreateCoupon()" type="button">
+                <i class="bi bi-plus-circle me-2"></i>Create coupon
+            </button>
+        </div>
+
+        <!-- Create coupon Form -->
+        <div id="create_coupon" class="border rounded p-4 shadow-sm mb-4" style="display: none; max-width: 600px; margin: 0 auto;">
+            <h4 class="text-center text-success mb-3">New coupon</h4>
+
+            <div class="form-floating mb-3">
+                <input id="Name" type="text" class="form-control" placeholder="coupon Name">
+                <label for="Name">coupon Name</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input id="Code" type="text" class="form-control" placeholder="coupon Code">
+                <label for="Code">coupon Code</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input id="Discount" type="number" class="form-control" placeholder="Discount Percent">
+                <label for="Discount">Discount Percent (%)</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input id="ExpirationDate" type="date" class="form-control" placeholder="Expiration Date">
+                <label for="ExpirationDate">Expiration Date</label>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-success" type="button" onclick="submitCreate()">Submit</button>
+            </div>
+        </div>
+
+        <!-- Coupons Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-success">
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Discount (%)</th>
+                        <th>Expiration Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (CouponModel coupon in Model.Coupons)
+                    {
+                        <tr class="page-row">
+                            <!-- Name -->
+                            <td>
+                                <span>@coupon.Name</span>
+                                <input class="form-control mt-1" 
+                                    style="display: none;" 
+                                    id="name,@coupon.CouponCode" 
+                                    type="text" value="@coupon.Name" 
+                                    placeholder="coupon Name" />
+                            </td>
+
+                            <!-- Code -->
+                            <td>
+                                <span>@coupon.CouponCode</span>
+                            </td>
+
+                            <!-- Discount -->
+                            <td>
+                                <span>@coupon.DiscountPercent%</span>
+                                <input class="form-control mt-1" 
+                                style="display: none;" 
+                                id="discount,@coupon.CouponCode" 
+                                type="number" 
+                                value="@coupon.DiscountPercent" placeholder="Discount" />
+                            </td>
+
+                            <!-- Expiration -->
+                            <td>
+                                <span>@coupon.ExpirationDate.ToString("yyyy-MM-dd")</span>
+                                <input class="form-control mt-1" 
+                                style="display: none;" 
+                                id="expdate,@coupon.CouponCode"
+                                type="date"
+                                value="@coupon.ExpirationDate.ToString("yyyy-MM-dd")" />
+                            </td>
+
+                            <!-- Actions -->
+                            <td>
+                                <div class="d-flex flex-column gap-2">
+                                    <button class="btn btn-sm btn-primary" onclick="toggleEditCoupon('@coupon.CouponCode')">Edit</button>
+                                    <button class="btn btn-sm btn-primary" style="display: none;" id="editsub,@coupon.CouponCode" onclick="submitEdit('@coupon.CouponCode')">Submit Edit</button>
+                                    <button class="btn btn-sm btn-danger" onclick="submitDelete('@coupon.CouponCode')">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @await Html.PartialAsync("_RestaurantFooter")
+    </div>
+
+    @await Html.PartialAsync("_Footer")
+</body>

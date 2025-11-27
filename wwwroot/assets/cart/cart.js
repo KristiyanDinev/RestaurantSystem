@@ -65,28 +65,33 @@ async function applyCouponCode() {
 
         if (res.ok) {
             const data = await res.json()
-            
-            // Update input styling to show success
+    
             couponCodeElement.classList.remove("is-invalid")
             couponCodeElement.classList.add("is-valid")
             
-            // Update any discount/total display elements
-            // Assuming you have elements with these IDs - adjust as needed
-            if (data.CouponDiscount) {
-                const discountElement = document.getElementById("discount")
-                if (discountElement) {
-                    discountElement.textContent = `$${data.CouponDiscount.toFixed(2)}`
-                }
+            const totalContainer = document.querySelector('.text-md-end')
+            const subtotalElement = totalContainer.querySelector('.text-warning.fw-bold')
+            
+            let discountSection = totalContainer.querySelector('.discount-section')
+            if (!discountSection) {
+                discountSection = document.createElement('div')
+                discountSection.className = 'mb-1 discount-section'
+                subtotalElement.closest('.mb-1').after(discountSection)
             }
             
-            if (data.CouponTotal) {
-                const finalTotalElement = document.getElementById("finalTotal")
-                if (finalTotalElement) {
-                    finalTotalElement.textContent = `$${data.CouponTotal.toFixed(2)}`
-                }
-            }
+            discountSection.innerHTML = `
+                <span class="text-muted">Discount (${data.discountPercentage}%):</span>
+                <span class="text-success fw-bold">
+                    -${data.discountAmount.toFixed(2)} lv.
+                </span>
+            `
             
-            // Re-enable button with success state
+            const totalSection = totalContainer.querySelector('.border-top.pt-2.mt-2')
+            totalSection.innerHTML = `
+                <span class="text-muted">Total:</span>
+                <span class="text-warning fw-bold fs-4">${data.finalTotal.toFixed(2)} lv.</span>
+            `
+            
             applyButton.disabled = false
             applyButton.innerHTML = originText
             return
@@ -96,7 +101,23 @@ async function applyCouponCode() {
 
     // On error or invalid coupon
     couponCodeElement.classList.remove("is-valid")
-    couponCodeElement.classList.add("is-invalid")
+    couponCodeElement.classList.add(isInvalid)
+    
+    const totalContainer = document.querySelector('.text-md-end')
+    const discountSection = totalContainer.querySelector('.discount-section')
+    if (discountSection) {
+        discountSection.remove()
+    }
+    
+    const subtotalElement = totalContainer.querySelector('.text-warning.fw-bold')
+    const subtotal = parseFloat(subtotalElement.textContent.replace(' lv.', ''))
+    
+    const totalSection = totalContainer.querySelector('.border-top.pt-2.mt-2')
+    totalSection.innerHTML = `
+        <span class="text-muted">Total:</span>
+        <span class="text-warning fw-bold fs-4">${subtotal.toFixed(2)} lv.</span>
+    `
+    
     applyButton.disabled = false
     applyButton.innerHTML = originText
 }

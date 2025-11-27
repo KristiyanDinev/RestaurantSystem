@@ -116,6 +116,10 @@ namespace RestaurantSystem.Controllers {
             }
 
             _userUtility.RemoveCartCookie(HttpContext);
+            if (!string.IsNullOrWhiteSpace(order.CouponCode))
+            {
+                await _couponService.DeleteCouponAsync(order.CouponCode);
+            }
             TempData["OrderedSuccess"] = true;
             return Ok();
         }
@@ -123,7 +127,7 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("/order/cancel/{orderId}")]
-        public async Task<IActionResult> OrderCancele(int orderId)
+        public async Task<IActionResult> OrderCancel(int orderId)
         {
             UserModel? user = await _userUtility.GetUserByJWT(HttpContext);
             if (user == null)
