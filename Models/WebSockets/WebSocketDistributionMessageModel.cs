@@ -1,8 +1,6 @@
 ﻿namespace RestaurantSystem.Models.WebSockets
 {
-    /// <summary>
     /// Message structure for WebSocket distribution across servers
-    /// </summary>
     public class WebSocketDistributionMessageModel
     {
         public long OrderId { get; set; }

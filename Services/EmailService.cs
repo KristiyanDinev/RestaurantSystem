@@ -20,7 +20,7 @@ namespace RestaurantSystem.Services
       EmailVerificationModel? model = await _databaseManager.EmailVerificationModels
       .FirstOrDefaultAsync(e => e.Email.Equals(Email));
 
-      if (model != null && DateTime.UtcNow > model.ExpiresAt)
+      if (model != null && DateTime.UtcNow > model.ExpiresAt.ToUniversalTime())
       {
         _databaseManager.EmailVerificationModels.Remove(model);
         if (await _databaseManager.SaveChangesAsync() <= 0)

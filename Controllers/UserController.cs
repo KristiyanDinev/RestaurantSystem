@@ -190,11 +190,14 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
             EmailVerificationModel? model = await _emailService.GetEmailVerificationAsync(resetPasswordForm.Email);
-            if (model == null || !resetPasswordForm.Code.Equals(model.Code) || DateTime.UtcNow > model.ExpiresAt)
+            if (model == null || 
+            !resetPasswordForm.Code.Equals(model.Code) || 
+            DateTime.UtcNow > model.ExpiresAt.ToUniversalTime())
             {
                 TempData["VerificationError"] = true;
                 return BadRequest();
             }
+            await _emailService.DeleteEmailVerificationAsync(resetPasswordForm.Email);
             if (!await _userService.UpdateUserPasswordAsync(resetPasswordForm.Email, resetPasswordForm.NewPassword))
             {
                 TempData["ResetError"] = true;

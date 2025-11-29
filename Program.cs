@@ -53,7 +53,9 @@ namespace RestaurantSystem
 
             builder.Services.AddScoped<EncryptionUtility>(_ =>
                 new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??
-                "D471E0624EA5A7FFFABAA918E87"));
+                "D471E0624EA5A7FFFABAA918E87",
+                builder.Configuration.GetValue<string>("Hash_Salt") ??
+                "wqw231s"));
 
             builder.Services.AddScoped<JWTUtility>(_ =>
                 new JWTUtility(builder.Configuration.GetValue<string>("JWT_Key") ?? 
@@ -72,17 +74,26 @@ namespace RestaurantSystem
             WebApplication app = builder.Build();
 
             string ipPort = uri.Split("/").Last();
+            string[] parts = ipPort.Split(":");
+            string ip = parts.First();
+            string port = parts.Last();
             // Security headers middleware
             app.Use(async (context, next) =>
             {
                 // Content Security Policy
-                context.Response.Headers.Add("Content-Security-Policy",
+                context.Response.Headers.Add(
+                    "Content-Security-Policy",
                     "default-src 'self';" +
                     "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com;" +
                     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com;" +
                     "font-src 'self' https://cdn.jsdelivr.net;" +
                     "img-src 'self' data: https:;" +
-                    "connect-src 'self' wss://" +ipPort + " ws://"+ ipPort + ";");
+                    "connect-src 'self' " +
+                        "wss://" + ipPort + " " +
+                        "ws://" + ipPort + " " +
+                        "ws://localhost:" + port + " " +
+                        "wss://localhost:" + port + ";"
+                );
 
                 context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
                 await next();

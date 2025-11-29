@@ -21,7 +21,6 @@ namespace RestaurantSystem.Utilities
             _userService = userService;
         }
 
-
         /*
          * Generates a JWT:
          * Claims: "Id": model.Id

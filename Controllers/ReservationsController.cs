@@ -90,7 +90,7 @@ namespace RestaurantSystem.Controllers
         public async Task<IActionResult> ReservationCreate(
             [FromForm] ReservationFormModel reservationFormModel)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || reservationFormModel.At_Date.ToUniversalTime() < DateTime.UtcNow)
             {
                 return BadRequest();
             }

@@ -8,10 +8,7 @@ namespace RestaurantSystem.Extentions
         {
             host.ConfigureServices(
                 s => s.AddControllersWithViews()
-                .AddCookieTempDataProvider(options =>
-                {
-                    options.Cookie.Name = "restaurant_temp_data";
-                })
+                .AddCookieTempDataProvider()
             );
         }
     }

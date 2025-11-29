@@ -362,7 +362,8 @@ namespace RestaurantSystem.Controllers.Staff
         {
             if (!ModelState.IsValid ||
                 couponCreateForm.DiscountPercent > 100 ||
-                couponCreateForm.DiscountPercent < 0)
+                couponCreateForm.DiscountPercent < 0 ||
+                couponCreateForm.ExpDate < DateOnly.FromDateTime(DateTime.UtcNow))
             {
                 return BadRequest();
             }
@@ -387,7 +388,8 @@ namespace RestaurantSystem.Controllers.Staff
         {
             if (!ModelState.IsValid ||
                 couponCreateForm.DiscountPercent > 100 ||
-                couponCreateForm.DiscountPercent < 0)
+                couponCreateForm.DiscountPercent < 0 ||
+                couponCreateForm.ExpDate < DateOnly.FromDateTime(DateTime.UtcNow))
             {
                 return BadRequest();
             }

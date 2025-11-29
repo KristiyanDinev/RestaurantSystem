@@ -7,11 +7,18 @@ namespace RestaurantSystem.Utilities
     {
 
         private readonly byte[] _key;
+        private readonly string _hashSalt;
 
-        public EncryptionUtility(string key)
+        public EncryptionUtility(string key, string hashSalt)
         {
             // key = 256 bit.
             _key = HashIt(key);
+            _hashSalt = hashSalt;
+        }
+
+        public string GetHashSalt()
+        {
+            return _hashSalt;
         }
 
         public static byte[] HashIt(string key)

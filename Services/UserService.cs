@@ -9,11 +9,14 @@ namespace RestaurantSystem.Services
     public class UserService
     {
         private DatabaseContext _databaseContext;
+        private EncryptionUtility _encryptionUtility;
 
-        public UserService(DatabaseContext databaseContext)
+        public UserService(DatabaseContext databaseContext, EncryptionUtility encryptionUtility)
         {
             _databaseContext = databaseContext;
+            _encryptionUtility = encryptionUtility;
         }
+
         public async Task<UserModel?> GetUserAsync(long id)
         {
             return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == id);
@@ -53,7 +56,8 @@ namespace RestaurantSystem.Services
                 Name = registerFormModel.Name,
                 Email = registerFormModel.Email,
                 Image = await Utility.UploadUserImageAsync(registerFormModel.Image),
-                Password = Convert.ToBase64String(EncryptionUtility.HashIt(registerFormModel.Password)),
+                Password = Convert.ToBase64String(
+                    EncryptionUtility.HashIt(_encryptionUtility.GetHashSalt()+registerFormModel.Password)),
             };
 
             await _databaseContext.Users.AddAsync(user);
@@ -63,7 +67,8 @@ namespace RestaurantSystem.Services
 
         public async Task<UserModel?> LoginUserAsync(string email, string no_hash_password)
         {
-            string hash_password = Convert.ToBase64String(EncryptionUtility.HashIt(no_hash_password));
+            string hash_password = Convert.ToBase64String(
+                EncryptionUtility.HashIt(_encryptionUtility.GetHashSalt()+no_hash_password));
             return await _databaseContext.Users.FirstOrDefaultAsync(
                 user => user.Email.Equals(email) && 
                 user.Password.Equals(hash_password));
@@ -82,7 +87,8 @@ namespace RestaurantSystem.Services
             {
                 return false;
             }
-            user.Password = Convert.ToBase64String(EncryptionUtility.HashIt(no_hash_password));
+            user.Password = Convert.ToBase64String(
+                EncryptionUtility.HashIt(_encryptionUtility.GetHashSalt()+no_hash_password));;
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
