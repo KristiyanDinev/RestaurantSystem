@@ -25,24 +25,10 @@ body {
         border-top-right-radius: 0;
     }
 
-.btn-theme-toggle {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1000;
-}
 
 .theme-icon {
     width: 1.25rem;
     height: 1.25rem;
-}
-
-.bd-placeholder-img {
-    font-size: 1.125rem;
-    text-anchor: middle;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
 }
 
 .wtb{
@@ -62,26 +48,10 @@ body {
 
 
 
-.inputite{
-    background-color: rgba(0, 0, 0, 0) !important;
-    text-decoration: none !important;
-    margin: 0.4em 0 !important;
-    padding: 6px;
-    height: fit-content;
-    border-radius: 5px;
-}
-.insel{
-    background-color: rgba(0, 0, 0, 0) !important;
-}
-.inputite:hover{
-    background-color: rgba(0, 0, 0, 0.158) !important;
-    text-decoration: none !important;
-    border: rgba(255, 255, 255, 0.685) 1px outset !important;
-    box-shadow: none !important;
-}
+
 
 /* Mobile styles */
-@media (max-width: 767.98px) {
+@media (max-width: 767px) {
     .ptable {
         width: 100%;
         overflow-x: auto;
@@ -124,13 +94,11 @@ body {
         margin-right: 1rem;
         text-align: left;
     }
-    
-    /* Hide the data-label for the actions column */
+
     .wtb td:last-child:before {
         display: none;
     }
     
-    /* Make buttons stack vertically */
     .wtb .btn {
         display: block;
         width: 100%;
@@ -146,7 +114,6 @@ body {
         height: auto;
     }
     
-    /* Style the role cards */
     .wtb .card {
         margin: 0.25rem 0;
         padding: 0.25rem 0.5rem;

@@ -61,7 +61,6 @@ setDataToSessionStorage("WebSocketHost", (document.location.protocol === "https:
 
 
 function startOrderWebSocket(onopen, onclose, onerror, onmessage) {
-    // getDataFromLocalStorage("WebSocketHost") + 
     return UseWebSockets("/ws/orders", 
         onopen, onclose, onerror, onmessage)
 }
@@ -102,6 +101,3 @@ function toggleElement(id) {
     }
 }
 
-
-
-// const theme = localStorage.getItem('theme');

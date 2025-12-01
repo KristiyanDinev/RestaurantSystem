@@ -24,6 +24,7 @@ namespace RestaurantSystem.Services
                     path = path.Split('?')[0];
                 }
                 path = path.Last() == '/' ? path.Remove(path.LastIndexOf('/')) : path;
+                
                 Dictionary<string, object>? claims = await userUtility.GetAuthClaimFromJWT(context);
                 if (claims == null || !claims.TryGetValue("Id", out object? value) ||
                     !int.TryParse((string?)value, out int Id))

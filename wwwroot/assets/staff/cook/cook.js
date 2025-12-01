@@ -183,7 +183,6 @@ function onmessage(event) {
     const obj = JSON.parse(event.data);
     if (!registeredOrders.includes(String(obj.OrderId))) return;
     
-    // Update order status
     if (obj.OrderCurrentStatus) {
         const orderStatusElement = document.getElementById(`orderstatus,${obj.OrderId}`);
         if (orderStatusElement) {
@@ -195,7 +194,6 @@ function onmessage(event) {
         }
     }
     
-    // Update dish status
     if (obj.DishId && obj.DishCurrentStatus) {
         const dishStatusElement = document.getElementById(`dishstatus,${obj.OrderId},${obj.DishId}`);
         if (dishStatusElement) {

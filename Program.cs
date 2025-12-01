@@ -13,6 +13,15 @@ namespace RestaurantSystem
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+            string? Encryption_Key = builder.Configuration.GetValue<string>("Encryption_Key");
+            string? Hash_Salt = builder.Configuration.GetValue<string>("Hash_Salt");
+            string? JWT_Key = builder.Configuration.GetValue<string>("JWT_Key");
+
+            if (Encryption_Key == null || Hash_Salt == null || JWT_Key == null)
+            {
+                throw new Exception("Encryption_Key, Hash_Salt, or JWT_Key is not set in configuration.");
+            }
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
@@ -52,14 +61,10 @@ namespace RestaurantSystem
             builder.Services.AddScoped<DeliveryService>();
 
             builder.Services.AddScoped<EncryptionUtility>(_ =>
-                new EncryptionUtility(builder.Configuration.GetValue<string>("Encryption_Key") ??
-                "D471E0624EA5A7FFFABAA918E87",
-                builder.Configuration.GetValue<string>("Hash_Salt") ??
-                "wqw231s"));
+                new EncryptionUtility(Encryption_Key, Hash_Salt));
 
             builder.Services.AddScoped<JWTUtility>(_ =>
-                new JWTUtility(builder.Configuration.GetValue<string>("JWT_Key") ?? 
-                "234w13543ewf53erdfa"));
+                new JWTUtility(JWT_Key));
 
             builder.Services.AddScoped<UserUtility>();
             builder.Services.AddScoped<WebSocketDatabaseService>();
@@ -106,7 +111,6 @@ namespace RestaurantSystem
             app.UseStaticFiles();
             app.UseAuthenticationMiddleware();
             app.UseWebSocketMiddleware();
-            //app.UseLoggingMiddleware();
             app.MapControllers();
             app.UseStartupSQL(app);
 
