@@ -89,10 +89,12 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateReservationAsync(int id, ReservationStatusEnum new_status)
+        public async Task<bool> UpdateReservationAsync(int id, ReservationStatusEnum new_status,
+            long? userId = null)
         {
             ReservationModel? existingReservation = await _databaseContext
-                .Reservations.FirstOrDefaultAsync(res => res.Id == id);
+                .Reservations.FirstOrDefaultAsync(res => res.Id == id &&
+                    (!userId.HasValue || res.UserId == userId.Value));
             if (existingReservation == null)
             {
                 return false;

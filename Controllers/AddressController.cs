@@ -10,7 +10,6 @@ namespace RestaurantSystem.Controllers
 {
     [ApiController]
     [EnableRateLimiting("fixed")]
-    [IgnoreAntiforgeryToken]
     public class AddressController : Controller
     {
         private UserUtility _userUtility;
@@ -51,7 +50,7 @@ namespace RestaurantSystem.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            AddressModel? address = await _addressService.GetAddressByIdAsync(address_id);
+            AddressModel? address = await _addressService.GetAddressByIdAsync(address_id, user.Id);
             if (address == null)
             {
                 return NotFound();
@@ -89,7 +88,7 @@ namespace RestaurantSystem.Controllers
                 return Unauthorized();
             }
 
-            if (await _addressService.DeleteAddressAsync(address_id))
+            if (await _addressService.DeleteAddressAsync(address_id, user.Id))
             {
                 TempData["DeleteSuccess"] = true;
                 return Ok();
@@ -116,7 +115,7 @@ namespace RestaurantSystem.Controllers
                 return Unauthorized();
             }
 
-            if (await _addressService.UpdateAddressAsync(addressUpdateForm))
+            if (await _addressService.UpdateAddressAsync(addressUpdateForm, user.Id))
             {
                 TempData["UpdateSuccess"] = true;
                 return Ok();

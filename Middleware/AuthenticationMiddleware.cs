@@ -1,5 +1,6 @@
 ﻿
-using RestaurantSystem.Utilities;
+using Microsoft.AspNetCore.Identity;
+using RestaurantSystem.Models.DatabaseModels;
 
 namespace RestaurantSystem.Services
 {
@@ -14,7 +15,7 @@ namespace RestaurantSystem.Services
         }
 
         public async Task InvokeAsync(HttpContext context, 
-            UserUtility userUtility, RoleService roleService)
+            UserManager<UserModel> userManager, RoleService roleService)
         {
             string path = context.Request.Path.Value ?? "/";
             if (path.StartsWith(staff_endpoint_prefix))
@@ -25,13 +26,13 @@ namespace RestaurantSystem.Services
                 }
                 path = path.Last() == '/' ? path.Remove(path.LastIndexOf('/')) : path;
                 
-                Dictionary<string, object>? claims = await userUtility.GetAuthClaimFromJWT(context);
-                if (claims == null || !claims.TryGetValue("Id", out object? value) ||
-                    !int.TryParse((string?)value, out int Id))
+                UserModel? user = await userManager.GetUserAsync(context.User);
+                if (user == null)
                 {
+                    context.Response.Redirect("/login");
                     return;
                 }
-                if (!await roleService.CanUserAccessServiceAsync(Id, path))
+                if (!await roleService.CanUserAccessServiceAsync(user.Id, path))
                 {
                     // user doesn't have the roles to do so.
                     context.Response.Redirect("/login");

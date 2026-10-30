@@ -1,9 +1,9 @@
-﻿namespace RestaurantSystem.Models.DatabaseModels {
-    public class UserModel {
-        public long Id { get; set; }
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace RestaurantSystem.Models.DatabaseModels {
+    public class UserModel : IdentityUser<long> {
         public required string Name { get; set; }
-        public required string Email { get; set; }
-        public required string Password { get; set; }
         public string? Image { get; set; }
         public DateOnly CreatedAt { get; set; }
         public DateOnly LastTimeLoggedIn { get; set; }
@@ -14,8 +14,8 @@
 
 
 
-        // navigation
-        public ICollection<UserRoleModel> Roles { get; set; } = new List<UserRoleModel>();
+        [NotMapped]
+        public ICollection<RoleModel> Roles { get; set; } = new List<RoleModel>();
         public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
         public ICollection<ReservationModel> Reservations { get; set; } = new List<ReservationModel>();
         public ICollection<DeliveryModel> Deliveries { get; set; } = new List<DeliveryModel>();

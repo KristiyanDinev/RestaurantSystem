@@ -55,11 +55,11 @@ namespace RestaurantSystem.Services
             return order;
         }
 
-        public async Task<bool> DeleteOrderAsync(long orderId, 
-            bool checkOrderStatus = true)
+        public async Task<bool> DeleteOrderAsync(long orderId,
+            bool checkOrderStatus = true, long? userId = null)
         {
             OrderModel? order = await _databaseContext.Orders.FirstOrDefaultAsync(
-                o => o.Id == orderId);
+                o => o.Id == orderId && (!userId.HasValue || o.UserId == userId.Value));
             if (order == null)
             {
                 return false;

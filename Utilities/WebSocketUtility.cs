@@ -7,6 +7,7 @@ namespace RestaurantSystem.Utilities
     public class WebSocketUtility
     {
         private List<OrderWebSocketModel> OrderWebSockets = new List<OrderWebSocketModel>();
+        private readonly object _listenerLock = new();
         private IConnection? _connection = null;
         private IChannel? _channel = null;
         public readonly string _serverId;
@@ -19,7 +20,10 @@ namespace RestaurantSystem.Utilities
 
         public List<OrderWebSocketModel> GetOrderWebSocketModels()
         {
-            return OrderWebSockets;
+            lock (_listenerLock)
+            {
+                return OrderWebSockets.ToList();
+            }
         }
 
         public void SetConnection(IConnection connection)
@@ -59,33 +63,46 @@ namespace RestaurantSystem.Utilities
 
         public void AddOrdersToListenTo(List<long> orderIds, WebSocket socket)
         {
-            OrderWebSockets.RemoveAll(order => !order.Socket.State.Equals(WebSocketState.Open));
-
-            OrderWebSockets.Add(new OrderWebSocketModel()
+            lock (_listenerLock)
             {
-                Socket = socket,
-                OrderIds = orderIds
-            });
+                OrderWebSockets.RemoveAll(order =>
+                    !order.Socket.State.Equals(WebSocketState.Open));
+                OrderWebSockets.RemoveAll(order => order.Socket.Equals(socket));
+                OrderWebSockets.Add(new OrderWebSocketModel()
+                {
+                    Socket = socket,
+                    OrderIds = orderIds.Distinct().ToList()
+                });
+            }
         }
 
         public List<WebSocket> GetListenersForOrderId(long order_id)
         {
-            return OrderWebSockets
-                .Where(order => order.OrderIds.Contains(order_id))
-                .Select(order => order.Socket).ToList();
+            lock (_listenerLock)
+            {
+                return OrderWebSockets
+                    .Where(order => order.OrderIds.Contains(order_id))
+                    .Select(order => order.Socket).ToList();
+            }
         }
 
 
         public List<long> GetOrderIdsForSocket(WebSocket socket)
         {
-            return OrderWebSockets
-                .Where(order => order.Socket.Equals(socket))
-                .SelectMany(order => order.OrderIds).ToList();
+            lock (_listenerLock)
+            {
+                return OrderWebSockets
+                    .Where(order => order.Socket.Equals(socket))
+                    .SelectMany(order => order.OrderIds).ToList();
+            }
         }
 
         public void RemoveOrderIdsFromSocket(WebSocket socket)
         {
-            OrderWebSockets.RemoveAll(order => order.Socket.Equals(socket));
+            lock (_listenerLock)
+            {
+                OrderWebSockets.RemoveAll(order => order.Socket.Equals(socket));
+            }
         }
     }
 }

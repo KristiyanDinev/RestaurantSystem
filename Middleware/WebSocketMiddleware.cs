@@ -20,12 +20,19 @@ namespace RestaurantSystem.Middlewares
             string? path = context.Request.Path.Value?.ToLower();
             if (path != null && path.StartsWith("/ws/"))
             {
+                if (context.User?.Identity?.IsAuthenticated != true)
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return;
+                }
+
                 if (context.WebSockets.IsWebSocketRequest)
                 {
                     using WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
                     TaskCompletionSource<object> socketFinishedTcs = new TaskCompletionSource<object>();
-                    await _webSocketManager.HandleWebSocketAsync(path, webSocket, socketFinishedTcs);
+                    await _webSocketManager.HandleWebSocketAsync(
+                        path, webSocket, context.User, socketFinishedTcs);
                     await socketFinishedTcs.Task;
                 }
                 else

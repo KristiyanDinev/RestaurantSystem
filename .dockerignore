@@ -1,0 +1,14 @@
+.git
+.gitignore
+.vs
+.vscode
+bin
+obj
+logs
+publish
+wwwroot/assets/images
+RestaurantSystem.csproj.user
+Dockerfile
+docker-compose.yml
+README.md
+ProjectImages

@@ -1,8 +1,12 @@
 using RestaurantSystem.Extentions;
+using RestaurantSystem.Database;
 using RestaurantSystem.Middlewares;
 using RestaurantSystem.Models.WebSockets;
 using RestaurantSystem.Services;
 using RestaurantSystem.Utilities;
+using RestaurantSystem.Models.DatabaseModels;
+using RestaurantSystem.Enums;
+using Microsoft.AspNetCore.Identity;
 using Serilog;
 using System.Net.WebSockets;
 
@@ -14,15 +18,6 @@ namespace RestaurantSystem
         {
             var builder = WebApplication.CreateBuilder(args);
             
-            string? Encryption_Key = builder.Configuration.GetValue<string>("Encryption_Key");
-            string? Hash_Salt = builder.Configuration.GetValue<string>("Hash_Salt");
-            string? JWT_Key = builder.Configuration.GetValue<string>("JWT_Key");
-
-            if (Encryption_Key == null || Hash_Salt == null || JWT_Key == null)
-            {
-                throw new Exception("Encryption_Key, Hash_Salt, or JWT_Key is not set in configuration.");
-            }
-
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
                 .CreateLogger();
@@ -40,6 +35,7 @@ namespace RestaurantSystem
 
             builder.Host.UseSessions();
             builder.Host.UseControllersWithViews();
+            builder.Services.AddMemoryCache();
 
             string uri = builder.Configuration.GetValue<string>("Uri")
                     ?? "http://127.0.0.1:7278";
@@ -47,6 +43,27 @@ namespace RestaurantSystem
             builder.WebHost.UseUrls([uri]);
 
             builder.Host.UseDatabaseContext(builder.Configuration);
+            builder.Services.AddIdentity<UserModel, RoleModel>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+            })
+                .AddEntityFrameworkStores<DatabaseContext>()
+                .AddDefaultTokenProviders();
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/login";
+                options.AccessDeniedPath = "/login";
+                options.Cookie.Name = "RestaurantSystem.Identity";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            });
 
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<DishService>();
@@ -60,12 +77,6 @@ namespace RestaurantSystem
             builder.Services.AddScoped<AddressService>();
             builder.Services.AddScoped<DeliveryService>();
 
-            builder.Services.AddScoped<EncryptionUtility>(_ =>
-                new EncryptionUtility(Encryption_Key, Hash_Salt));
-
-            builder.Services.AddScoped<JWTUtility>(_ =>
-                new JWTUtility(JWT_Key));
-
             builder.Services.AddScoped<UserUtility>();
             builder.Services.AddScoped<WebSocketDatabaseService>();
 
@@ -77,6 +88,26 @@ namespace RestaurantSystem
             builder.Host.UseRateLimits();
 
             WebApplication app = builder.Build();
+
+            using (IServiceScope scope = app.Services.CreateScope())
+            {
+                DatabaseContext databaseContext = scope.ServiceProvider
+                    .GetRequiredService<DatabaseContext>();
+                databaseContext.Database.EnsureCreated();
+                databaseContext.EnsureIdentitySchemaAsync()
+                    .GetAwaiter().GetResult();
+
+                RoleManager<RoleModel> roleManager = scope.ServiceProvider
+                    .GetRequiredService<RoleManager<RoleModel>>();
+                foreach (string role in Enum.GetNames<RoleEnum>())
+                {
+                    if (!roleManager.RoleExistsAsync(role).GetAwaiter().GetResult())
+                    {
+                        roleManager.CreateAsync(new RoleModel { Name = role })
+                            .GetAwaiter().GetResult();
+                    }
+                }
+            }
 
             string ipPort = uri.Split("/").Last();
             string[] parts = ipPort.Split(":");
@@ -109,6 +140,8 @@ namespace RestaurantSystem
             app.UseRateLimiter();
             app.UseRouting();
             app.UseStaticFiles();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseAuthenticationMiddleware();
             app.UseWebSocketMiddleware();
             app.MapControllers();

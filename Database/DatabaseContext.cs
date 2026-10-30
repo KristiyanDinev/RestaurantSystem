@@ -1,19 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
 
 namespace RestaurantSystem.Database {
-    public class DatabaseContext : DbContext {
+    public class DatabaseContext : IdentityDbContext<UserModel, RoleModel, long> {
 
-        public DbSet<UserModel> Users { get; set; }
+        public override DbSet<UserModel> Users { get; set; }
         public DbSet<CouponModel> Coupons { get; set; }
         public DbSet<DishModel> Dishes { get; set; }
         public DbSet<OrderedDishesModel> OrderedDishes { get; set; }
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<ServiceModel> Services { get; set; }
-        public DbSet<UserRoleModel> UserRoles { get; set; }
         public DbSet<RolePermissionModel> RolePermissions { get; set; }
-        public DbSet<RoleModel> Roles { get; set; }
         public DbSet<ReservationModel> Reservations { get; set; }
         public DbSet<RestaurantModel> Restaurants { get; set; }
         public DbSet<DeliveryModel> Delivery { get; set; }
@@ -38,9 +38,6 @@ namespace RestaurantSystem.Database {
             // ServiceModel
             BuildServicesModel(ref builder);
 
-            // UserRoleModel
-            BuildUserRoleModel(ref builder);
-
             // RestaurantModel
             BuildRestaurantModel(ref builder);
 
@@ -58,9 +55,6 @@ namespace RestaurantSystem.Database {
 
             // CouponModel
             BuildCouponModel(ref builder);
-
-            // RoleModel
-            BuildRoleModel(ref builder);
 
             // RolePermissionModel
             BuildRolePermissionModel(ref builder);
@@ -139,14 +133,6 @@ namespace RestaurantSystem.Database {
                 .IsRequired();
 
             builder.Entity<UserModel>()
-                .Property(user => user.Email)
-                .IsRequired();
-
-            builder.Entity<UserModel>()
-                .HasIndex(user => user.Email)
-                .IsUnique();
-
-            builder.Entity<UserModel>()
                 .Property(user => user.Image)
                 .HasDefaultValue(null);
 
@@ -190,53 +176,11 @@ namespace RestaurantSystem.Database {
                 .HasKey(role => role.Id);
 
             builder.Entity<RolePermissionModel>()
-                .HasOne(role => role.Role)
-                .WithMany(role => role.RolePermissions)
-                .HasForeignKey(role => role.RoleName);
-
-            builder.Entity<RolePermissionModel>()
                 .HasOne(role => role.Service)
                 .WithMany(role => role.RolePermissions)
                 .HasForeignKey(role => role.ServicePath);
         }
 
-        private void BuildUserRoleModel(ref ModelBuilder builder)
-        {
-            builder.Entity<UserRoleModel>().ToTable("User_Roles");
-
-            builder.Entity<UserRoleModel>()
-                .HasKey(role => role.Id);
-
-            builder.Entity<UserRoleModel>()
-                .Property(user => user.UserId)
-                .IsRequired();
-
-            builder.Entity<UserRoleModel>()
-                .Property(user => user.RoleName)
-                .IsRequired();
-
-            builder.Entity<UserRoleModel>()
-                .HasOne(user => user.User)
-                .WithMany(user => user.Roles)
-                .HasForeignKey(user => user.UserId);
-
-            builder.Entity<UserRoleModel>()
-                .HasOne(role => role.Role)
-                .WithMany(role => role.UserRoles)
-                .HasForeignKey(role => role.RoleName);
-        }
-
-        private void BuildRoleModel(ref ModelBuilder builder)
-        {
-            builder.Entity<RoleModel>().ToTable("Roles");
-
-            builder.Entity<RoleModel>()
-                .HasKey(role => role.Name);
-
-            builder.Entity<RoleModel>()
-                .Property(role => role.Description)
-                .HasDefaultValue(null);
-        }
         
         private void BuildRestaurantModel(ref ModelBuilder builder)
         {

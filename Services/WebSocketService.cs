@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RestaurantSystem.Models.DatabaseModels;
@@ -8,6 +9,9 @@ using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using RestaurantSystem.Database;
 
 namespace RestaurantSystem.Services
 {
@@ -20,15 +24,20 @@ namespace RestaurantSystem.Services
 
         private readonly ILogger<WebSocketService> _logger;
         private WebSocketDatabaseService _webSocketDatabaseService;
+        private readonly DatabaseContext _databaseContext;
+        private readonly UserManager<UserModel> _userManager;
 
         public WebSocketService(WebSocketUtility webSocketUtility,
             WebSocketDatabaseService webSocketDatabaseService,
-            IOptions<RabbitMQOptionsModel> options, ILogger<WebSocketService> logger)
+            IOptions<RabbitMQOptionsModel> options, ILogger<WebSocketService> logger,
+            DatabaseContext databaseContext, UserManager<UserModel> userManager)
         {
             RabbitMQOptionsModel model = options.Value;
             _logger = logger;
             _webSocketDatabaseService = webSocketDatabaseService;
             _webSocketUtility = webSocketUtility;
+            _databaseContext = databaseContext;
+            _userManager = userManager;
 
             if (model.Username == null ||
                 model.Port < 1 ||
@@ -39,11 +48,11 @@ namespace RestaurantSystem.Services
             distributionEnabled = true;
             
             // Initialize RabbitMQ connection
-            InitializeRabbitMQ(model);
+            _ = InitializeRabbitMQAsync(model);
         }
 
         /// Initialize RabbitMQ connection and set up message consumption
-        private async void InitializeRabbitMQ(RabbitMQOptionsModel options)
+        private async Task InitializeRabbitMQAsync(RabbitMQOptionsModel options)
         {
             try
             {
@@ -84,7 +93,7 @@ namespace RestaurantSystem.Services
             catch (Exception ex)
             {
                 _logger.LogError($"Failed to initialize RabbitMQ: {ex.Message}");
-                throw;
+                _logger.LogWarning("WebSocket distribution is unavailable; local WebSockets remain enabled.");
             }
         }
 
@@ -111,24 +120,56 @@ namespace RestaurantSystem.Services
 
 
         /// Handle JSON messages from WebSocket clients
-        private async void HandleJsonMessages(Dictionary<string, object> data, WebSocket socket)
+        private async Task HandleJsonMessagesAsync(
+            Dictionary<string, object> data, WebSocket socket, ClaimsPrincipal principal)
         {
             // The user sets Orders to listen to
             // list of order Ids
             if (data.TryGetValue("orders", out object? orders_obj))
             {
-                List<string>? idsString = JsonSerializer.Deserialize<List<string>>(orders_obj.ToString()!);
+                List<string>? idsString = JsonSerializer.Deserialize<List<string>>(
+                    orders_obj.ToString()!);
                 if (idsString == null)
                 {
                     return;
                 }
 
-                List<long> ids = new List<long>();
+                UserModel? user = await _userManager.GetUserAsync(principal);
+                if (user == null)
+                {
+                    return;
+                }
+                IList<string> roles = await _userManager.GetRolesAsync(user);
+                bool isStaff = roles.Any(role =>
+                    role.Equals("cook", StringComparison.OrdinalIgnoreCase) ||
+                    role.Equals("waitress", StringComparison.OrdinalIgnoreCase) ||
+                    role.Equals("delivery", StringComparison.OrdinalIgnoreCase) ||
+                    role.Equals("manager", StringComparison.OrdinalIgnoreCase));
+
+                List<long> requestedIds = new();
+                foreach (string id in idsString.Take(100))
+                {
+                    if (long.TryParse(id, out long orderId) && orderId > 0)
+                    {
+                        requestedIds.Add(orderId);
+                    }
+                }
+
+                List<long> ids = await _databaseContext.Orders
+                    .Where(order => requestedIds.Contains(order.Id) &&
+                        (order.UserId == user.Id ||
+                         (isStaff && user.RestaurantId.HasValue &&
+                          order.RestaurantId == user.RestaurantId.Value)))
+                    .Select(order => (long)order.Id)
+                    .ToListAsync();
                 foreach (string id in idsString)
                 {
                     if (long.TryParse(id, out long orderId))
                     {
-                        ids.Add(orderId);
+                        if (!ids.Contains(orderId))
+                        {
+                            continue;
+                        }
                         if (!distributionEnabled)
                         {
                             continue;
@@ -150,6 +191,7 @@ namespace RestaurantSystem.Services
 
         /// Handle WebSocket connection lifecycle
         public async Task HandleWebSocketAsync(string endpoint, WebSocket socket,
+            ClaimsPrincipal principal,
             TaskCompletionSource<object> taskCompletionSource)
         {
             ConcurrentBag<WebSocket> sockets = _endpointSockets.GetOrAdd(endpoint, _ => new ConcurrentBag<WebSocket>());
@@ -160,21 +202,43 @@ namespace RestaurantSystem.Services
             {
                 while (socket.State.Equals(WebSocketState.Open))
                 {
-                    WebSocketReceiveResult result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    using MemoryStream messageBuffer = new();
+                    WebSocketReceiveResult result;
+                    do
+                    {
+                        result = await socket.ReceiveAsync(
+                            new ArraySegment<byte>(buffer), CancellationToken.None);
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            break;
+                        }
+                        if (result.MessageType == WebSocketMessageType.Text)
+                        {
+                            messageBuffer.Write(buffer, 0, result.Count);
+                            if (messageBuffer.Length > 64 * 1024)
+                            {
+                                await socket.CloseAsync(
+                                    WebSocketCloseStatus.MessageTooBig,
+                                    "Message too large", CancellationToken.None);
+                                return;
+                            }
+                        }
+                    } while (!result.EndOfMessage);
+
                     if (result.MessageType.Equals(WebSocketMessageType.Close))
                     {
                         break;
                     }
                     if (result.MessageType.Equals(WebSocketMessageType.Text))
                     {
-                        // expect a JSON text
-                        Dictionary<string, object>? message = JsonSerializer.Deserialize
-                            <Dictionary<string, object>>(Encoding.UTF8.GetString(buffer, 0, result.Count));
-                        if (message == null)
+                        Dictionary<string, object>? parsedMessage = JsonSerializer.Deserialize
+                            <Dictionary<string, object>>(Encoding.UTF8.GetString(
+                                messageBuffer.ToArray()));
+                        if (parsedMessage == null)
                         {
-                            break;
+                            continue;
                         }
-                        HandleJsonMessages(message, socket);
+                        await HandleJsonMessagesAsync(parsedMessage, socket, principal);
                     }
                 }
             }
@@ -186,7 +250,7 @@ namespace RestaurantSystem.Services
                 }
                 catch { }
                 RemoveSocket(endpoint, socket);
-                CleanupOrderMappings(socket);
+                await CleanupOrderMappingsAsync(socket);
                 taskCompletionSource.TrySetResult(endpoint);
             }
         }
@@ -207,7 +271,7 @@ namespace RestaurantSystem.Services
         /// <summary>
         /// Clean up order mappings when a socket disconnects
         /// </summary>
-        private async void CleanupOrderMappings(WebSocket disconnectedSocket)
+        private async Task CleanupOrderMappingsAsync(WebSocket disconnectedSocket)
         {
             List<long> orderIds = _webSocketUtility.GetOrderIdsForSocket(disconnectedSocket);
             _webSocketUtility.RemoveOrderIdsFromSocket(disconnectedSocket);
@@ -301,7 +365,7 @@ namespace RestaurantSystem.Services
                     }
                     catch { }
                     RemoveSocket(endpoint, socket);
-                    CleanupOrderMappings(socket);
+                    await CleanupOrderMappingsAsync(socket);
                 }
             }
         }

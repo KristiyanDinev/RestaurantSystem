@@ -42,7 +42,8 @@
                 @await Html.PartialAsync("_ErrorMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
                 {
                     Key = "Error",
-                    Message = "Invalid email or password. Please try again."
+                    Message = TempData["LoginError"]?.ToString()
+                        ?? "Invalid email or password. Please try again."
                 })
 
                 @await Html.PartialAsync("_ErrorMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel

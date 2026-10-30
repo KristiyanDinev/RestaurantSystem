@@ -14,19 +14,28 @@ namespace RestaurantSystem.Utilities
             {
                 return null;
             }
-            string imageName = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+            string extension = Path.GetExtension(Image.FileName).ToLowerInvariant();
+            string[] allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+            if (!allowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            string imageName = $"{Guid.NewGuid():N}{extension}";
             try
             {
                 string path = "wwwroot" + assetPath;
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
                 }
-                using FileStream fileStream = new FileStream(path + imageName, FileMode.Create);
+                using FileStream fileStream = new FileStream(
+                    Path.Combine(path, imageName), FileMode.CreateNew);
                 await Image.CopyToAsync(fileStream);
                 return assetPath + imageName;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                Console.Error.WriteLine($"Image upload failed: {exception.Message}");
                 return null;
             }
         }
@@ -57,13 +66,13 @@ namespace RestaurantSystem.Utilities
         public static async Task<string?> UpdateImageAsync(string? OldImage, 
             IFormFile? Image, bool isDish = false) {
 
-            if (OldImage != null)
+            string? newImage = isDish ? await UploadDishImageAsync(Image) :
+                await UploadUserImageAsync(Image);
+            if (newImage != null && OldImage != null)
             {
                 DeleteImage(OldImage);
             }
-
-            return isDish ? await UploadDishImageAsync(Image) :
-                await UploadUserImageAsync(Image);
+            return newImage;
         }
 
         public static IQueryable<T> GetPageAsync<T>(IQueryable<T> query, int pageNumber)

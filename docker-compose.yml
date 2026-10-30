@@ -1,0 +1,65 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: restaurant-system:release
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-7278}:7278"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:7278
+      Uri: http://0.0.0.0:7278
+      ConnectionString: >-
+        Host=postgres;Port=5432;Database=${POSTGRES_DB:-Restaurant};
+        Username=${POSTGRES_USER:-RestaurantUser};Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env};
+        Pooling=true;MinPoolSize=1;MaxPoolSize=50;ConnectionLifeTime=15;
+      StartUpSQLFile: ${STARTUP_SQL_FILE:-}
+      Smtp__Host: ${SMTP_HOST:-smtp.gmail.com}
+      Smtp__Port: ${SMTP_PORT:-587}
+      Smtp__OTP_Expiration_Minutes: ${SMTP_OTP_EXPIRATION_MINUTES:-5}
+      Smtp__From_Email: ${SMTP_FROM_EMAIL:-}
+      Smtp__App_Password: ${SMTP_APP_PASSWORD:-}
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: ${RABBITMQ_DEFAULT_USER:-restaurant}
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-Restaurant}
+      POSTGRES_USER: ${POSTGRES_USER:-RestaurantUser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-restaurant}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in .env}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  rabbitmq_data:

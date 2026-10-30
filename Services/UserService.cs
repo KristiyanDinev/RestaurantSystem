@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
@@ -9,12 +10,15 @@ namespace RestaurantSystem.Services
     public class UserService
     {
         private DatabaseContext _databaseContext;
-        private EncryptionUtility _encryptionUtility;
+        private readonly UserManager<UserModel> _userManager;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(DatabaseContext databaseContext, EncryptionUtility encryptionUtility)
+        public UserService(DatabaseContext databaseContext, UserManager<UserModel> userManager,
+            ILogger<UserService> logger)
         {
             _databaseContext = databaseContext;
-            _encryptionUtility = encryptionUtility;
+            _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<UserModel?> GetUserAsync(long id)
@@ -24,14 +28,13 @@ namespace RestaurantSystem.Services
 
         public async Task<UserModel?> GetUserByEmailAsync(string Email)
         {
-            return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Email.Equals(Email));
+            return await _userManager.FindByEmailAsync(Email.Trim());
         }
 
         public async Task<UserModel?> GetUserWithRolesAsync(long id)
         {
-            return await _databaseContext.Users
-                .Include(user => user.Roles)
-                .FirstOrDefaultAsync(user => user.Id == id);
+            UserModel? user = await GetUserAsync(id);
+            return user == null ? null : await WithRolesAsync(user);
         }
 
         public async Task<UserModel?> GetStaffUserAsync(long id)
@@ -43,53 +46,56 @@ namespace RestaurantSystem.Services
 
         public async Task<UserModel?> GetStaffUserWithRolesAsync(long id)
         {
-            return await _databaseContext.Users
+            UserModel? user = await _databaseContext.Users
                 .Include(user => user.Restaurant)
-                .Include(user => user.Roles)
                 .FirstOrDefaultAsync(user => user.Id == id);
+            return user == null ? null : await WithRolesAsync(user);
         }
 
-        public async Task<UserModel?> RegisterUserAsync(RegisterFormModel registerFormModel)
+        public async Task<(UserModel? User, IdentityResult Result)> RegisterUserAsync(
+            RegisterFormModel registerFormModel)
         {
             UserModel user = new UserModel
             {
-                Name = registerFormModel.Name,
-                Email = registerFormModel.Email,
+                Name = registerFormModel.Name.Trim(),
+                UserName = registerFormModel.Email.Trim(),
+                Email = registerFormModel.Email.Trim(),
                 Image = await Utility.UploadUserImageAsync(registerFormModel.Image),
-                Password = Convert.ToBase64String(
-                    EncryptionUtility.HashIt(_encryptionUtility.GetHashSalt()+registerFormModel.Password)),
             };
 
-            await _databaseContext.Users.AddAsync(user);
-
-            return await _databaseContext.SaveChangesAsync() > 0 ? user : null;
+            IdentityResult result = await _userManager.CreateAsync(user, registerFormModel.Password);
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning("Identity user creation failed for {Email}: {Errors}",
+                    user.Email, string.Join("; ",
+                        result.Errors.Select(error => $"{error.Code}: {error.Description}")));
+            }
+            return (result.Succeeded ? user : null, result);
         }
 
         public async Task<UserModel?> LoginUserAsync(string email, string no_hash_password)
         {
-            string hash_password = Convert.ToBase64String(
-                EncryptionUtility.HashIt(_encryptionUtility.GetHashSalt()+no_hash_password));
-            return await _databaseContext.Users.FirstOrDefaultAsync(
-                user => user.Email.Equals(email) && 
-                user.Password.Equals(hash_password));
+            UserModel? user = await _userManager.FindByEmailAsync(email.Trim());
+            return user?.PasswordHash != null &&
+                await _userManager.CheckPasswordAsync(user, no_hash_password)
+                ? user : null;
         }
 
         public async Task<bool> UpdateLastLoginDate(UserModel user)
         {
             user.LastTimeLoggedIn = DateOnly.FromDateTime(DateTime.Now);
-            return await _databaseContext.SaveChangesAsync() >= 0;
+            return await _userManager.UpdateAsync(user) is { Succeeded: true };
         }
         
         public async Task<bool> UpdateUserPasswordAsync(string Email, string no_hash_password)
         {
-            UserModel? user = await _databaseContext.Users.FirstOrDefaultAsync(u => u.Email.Equals(Email));
+            UserModel? user = await GetUserByEmailAsync(Email);
             if (user == null)
             {
                 return false;
             }
-            user.Password = Convert.ToBase64String(
-                EncryptionUtility.HashIt(_encryptionUtility.GetHashSalt()+no_hash_password));;
-            return await _databaseContext.SaveChangesAsync() > 0;
+            string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            return (await _userManager.ResetPasswordAsync(user, token, no_hash_password)).Succeeded;
         }
 
         public async Task<bool> UpdateUserAsync(UserModel user,
@@ -112,7 +118,15 @@ namespace RestaurantSystem.Services
             }
             user.Name = profileUpdateForm.Name;
             user.Email = profileUpdateForm.Email;
-            return await _databaseContext.SaveChangesAsync() >= 0;
+            user.UserName = profileUpdateForm.Email;
+            IdentityResult result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning("Identity profile update failed for user {UserId}: {Errors}",
+                    user.Id, string.Join("; ",
+                        result.Errors.Select(error => $"{error.Code}: {error.Description}")));
+            }
+            return result.Succeeded;
         }
 
         public async Task<bool> DeleteUserAsync(long userId)
@@ -133,7 +147,7 @@ namespace RestaurantSystem.Services
 
             _databaseContext.Users.Remove(user);
 
-            return await _databaseContext.SaveChangesAsync() > 0;
+            return (await _userManager.DeleteAsync(user)).Succeeded;
         }
 
         public async Task<RestaurantModel?> GetRestaurantWhereUserWorksInAsync(UserModel user)
@@ -146,13 +160,13 @@ namespace RestaurantSystem.Services
         public async Task<bool> AddEmployeeToRestaurantAsync(UserModel user, int restaurantId)
         {
             user.RestaurantId = restaurantId;
-            return await _databaseContext.SaveChangesAsync() > 0;
+            return (await _userManager.UpdateAsync(user)).Succeeded;
         }
 
         public async Task<bool> RemoveEmployeeFromRestaurantAsync(UserModel user)
         {
             user.RestaurantId = null;
-            return await _databaseContext.SaveChangesAsync() > 0;
+            return (await _userManager.UpdateAsync(user)).Succeeded;
         }
 
         public async Task<List<UserModel>> GetRestaurantEmployeesAsync(
@@ -160,13 +174,26 @@ namespace RestaurantSystem.Services
         {
             List<UserModel>? employees = await Utility
                 .GetPageAsync<UserModel>(_databaseContext.Users
-                .Include(user => user.Roles)
-                .ThenInclude(role => role.Role)
                 .Where(user => user.RestaurantId == restaurantId)
                 .OrderBy(user => user.Name)
                 .AsQueryable(), page)
                 .ToListAsync();
-            return employees ?? new List<UserModel>();
+            foreach (UserModel employee in employees ?? [])
+            {
+                await WithRolesAsync(employee);
+            }
+            return employees ?? [];
+        }
+
+        private async Task<UserModel> WithRolesAsync(UserModel user)
+        {
+            user.Roles = (await _userManager.GetRolesAsync(user))
+                .Select(roleName => new RoleModel
+                {
+                    Name = roleName
+                })
+                .ToList();
+            return user;
         }
     }
 }

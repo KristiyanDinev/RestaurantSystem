@@ -12,7 +12,6 @@ namespace RestaurantSystem.Controllers {
 
     [ApiController]
     [EnableRateLimiting("fixed")]
-    [IgnoreAntiforgeryToken]
     public class OrderController : Controller {
 
         private OrderService _orderService;
@@ -135,7 +134,7 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            if (await _orderService.DeleteOrderAsync(orderId))
+            if (await _orderService.DeleteOrderAsync(orderId, userId: user.Id))
             {
                 TempData["Canceled"] = true;
                 return Ok();

@@ -58,14 +58,22 @@ async function submit() {
     formData.append("Name", username);
     formData.append("Password", password);
     formData.append("Email", email);
-    formData.append("Image", document.getElementById('Image').files[0]);
+    const image = document.getElementById('Image').files[0];
+    if (image) {
+        formData.append("Image", image);
+    }
     formData.append("RememberMe", document.getElementById('RememberMe').checked);
 
     try {
-        await fetch("/register", {
+        const response = await fetch("/register", {
             method: "POST",
             body: formData,
         });
+
+        if (!response.ok) {
+            window.location.reload();
+            return;
+        }
 
         usernameElement.classList.remove(invalidClass)
         emailElement.classList.remove(invalidClass)

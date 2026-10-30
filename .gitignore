@@ -5,5 +5,7 @@ obj/
 logs/
 wwwroot/assets/images/
 startup.sql
+.env
 publish/
 sync_config.jsonc
+RestaurantSystem.csproj.user

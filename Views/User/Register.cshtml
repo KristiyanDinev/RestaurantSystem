@@ -53,7 +53,8 @@
                     @await Html.PartialAsync("_ErrorMessage", new RestaurantSystem.Models.View.Messages.MessageViewModel
                     {
                         Key = "Error",
-                        Message = "Invalid account details. Please try again."
+                        Message = TempData["IdentityErrors"]?.ToString()
+                            ?? "Invalid account details. Please try again."
                     })
                 </div>
 

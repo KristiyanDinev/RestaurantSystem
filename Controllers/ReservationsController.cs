@@ -13,7 +13,6 @@ namespace RestaurantSystem.Controllers
 
     [ApiController]
     [EnableRateLimiting("fixed")]
-    [IgnoreAntiforgeryToken]
     public class ReservationsController : Controller
     {
         private ReservationService _reservationService;
@@ -135,12 +134,13 @@ namespace RestaurantSystem.Controllers
                 .GetReservationByIdAsync(reservationId);
 
             if (reservation == null || 
+                reservation.UserId != user.Id ||
                 DateTime.UtcNow > reservation.At_Date.ToUniversalTime().AddHours(-1)) { 
                 return BadRequest();
             }
 
-            if (await _reservationService.UpdateReservationAsync(reservationId, 
-                ReservationStatusEnum.Cancelled))
+            if (await _reservationService.UpdateReservationAsync(reservationId,
+                ReservationStatusEnum.Cancelled, user.Id))
             {
                 TempData["CanceledSuccessful"] = true;
                 return Ok();

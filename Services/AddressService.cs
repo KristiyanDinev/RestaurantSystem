@@ -47,15 +47,16 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<AddressModel?> GetAddressByIdAsync(long address_id)
+        public async Task<AddressModel?> GetAddressByIdAsync(long address_id, long? userId = null)
         {
             return await _databaseContext.Addresses
-                .FirstOrDefaultAsync(a => a.Id == address_id);
+                .FirstOrDefaultAsync(a => a.Id == address_id &&
+                    (!userId.HasValue || a.UserId == userId.Value));
         }
 
-        public async Task<bool> DeleteAddressAsync(long address_id)
+        public async Task<bool> DeleteAddressAsync(long address_id, long userId)
         {
-            AddressModel? address = await GetAddressByIdAsync(address_id);
+            AddressModel? address = await GetAddressByIdAsync(address_id, userId);
             if (address == null)
             {
                 return false;
@@ -64,9 +65,9 @@ namespace RestaurantSystem.Services
             return await _databaseContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateAddressAsync(AddressUpdateFormModel addressUpdateForm)
+        public async Task<bool> UpdateAddressAsync(AddressUpdateFormModel addressUpdateForm, long userId)
         {
-            AddressModel? address = await GetAddressByIdAsync(addressUpdateForm.Id);
+            AddressModel? address = await GetAddressByIdAsync(addressUpdateForm.Id, userId);
             if (address == null)
             {
                 return false;

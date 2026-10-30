@@ -1,4 +1,6 @@
-﻿
+﻿const locationCache = new Map();
+const locationRequests = new Map();
+
 function populateDropDown(element, values) {
     values.forEach(v => {
         const option = document.createElement('option');
@@ -8,29 +10,42 @@ function populateDropDown(element, values) {
     });
 }
 
-async function handleLocationResponse(res) {
-    let values = []
-    const data = await res.json()
-    data.forEach(line => {
-        values.push(line.trim())
-    });
-    return values;
+async function getLocation(level, country = '', state = '') {
+    const key = `${level}:${country.trim().toLowerCase()}:${state.trim().toLowerCase()}`;
+    if (locationCache.has(key)) {
+        return locationCache.get(key);
+    }
+
+    if (locationRequests.has(key)) {
+        return locationRequests.get(key);
+    }
+
+    const query = new URLSearchParams();
+    if (country) query.set('Country', country);
+    if (state) query.set('State', state);
+    const request = fetch(`/location?${query}`, { signal: locationController.signal })
+        .then(response => {
+            if (!response.ok) throw new Error(`Location request failed: ${response.status}`);
+            return response.json();
+        })
+        .then(values => {
+            const normalized = [...new Set(values.map(value => value.trim()).filter(Boolean))];
+            locationCache.set(key, normalized);
+            return normalized;
+        })
+        .finally(() => locationRequests.delete(key));
+    locationRequests.set(key, request);
+    return request;
 }
 
+let locationController = new AbortController();
 
 async function populateStates() {
     const selectedCountry = document.getElementById('country').value;
-
-    const res = await fetch('/location?' + new URLSearchParams({
-        Country: selectedCountry
-    }),
-        {
-            method: 'POST'
-        })
-
-    if (res.ok) {
-        const values = await handleLocationResponse(res);
-
+    locationController.abort();
+    locationController = new AbortController();
+    try {
+        const values = await getLocation('states', selectedCountry);
         let cityEle = document.getElementById('city')
         cityEle.disabled = true
         cityEle.innerHTML = '<option value="" selected disabled>Select City</option>'
@@ -39,28 +54,24 @@ async function populateStates() {
         ele.disabled = false
         ele.innerHTML = '<option value="" selected disabled>Select State/Province</option>'
         populateDropDown(document.getElementById('state'), values)
+    } catch (error) {
+        if (error.name !== 'AbortError') console.error(error);
     }
-
 }
 
 async function populateCities() {
     const selectedCountry = document.getElementById('country').value;
     const selectedState = document.getElementById('state').value;
 
-    const res = await fetch('/location?' + new URLSearchParams({
-        Country: selectedCountry, State: selectedState
-    }),
-        {
-            method: 'POST'
-        })
-    if (res.ok) {
-        const values = await handleLocationResponse(res);
+    try {
+        const values = await getLocation('cities', selectedCountry, selectedState);
         const ele = document.getElementById('city')
         ele.disabled = false
         ele.innerHTML = '<option value="" selected disabled>Select City</option>'
         populateDropDown(ele, values)
+    } catch (error) {
+        if (error.name !== 'AbortError') console.error(error);
     }
-
 }
 
 async function load(country, state, city) {
@@ -69,14 +80,11 @@ async function load(country, state, city) {
 
     if (countrySelect && stateSelect) {
 
-        const res = await fetch('/location',
-            {
-                method: 'POST'
-            })
-
-        if (res.ok) {
-            const values = await handleLocationResponse(res);
+        try {
+            const values = await getLocation('countries');
             populateDropDown(document.getElementById('country'), values)
+        } catch (error) {
+            console.error(error);
         }
 
         countrySelect.addEventListener('change', populateStates);

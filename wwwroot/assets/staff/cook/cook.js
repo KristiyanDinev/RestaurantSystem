@@ -174,7 +174,11 @@ function onopen() {
 }
 
 // WebSocket close event handler (currently empty)
-function onclose() { }
+function onclose() {
+    if (registeredOrders.length > 0) {
+        window.setTimeout(startWebSocket, 2000);
+    }
+}
 
 // WebSocket message event handler
 function onmessage(event) {

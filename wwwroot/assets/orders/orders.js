@@ -82,6 +82,9 @@ function onopen() {
 
 // WebSocket close event handler (currently empty)
 function onclose() {
+    if (registeredOrders.length > 0) {
+        window.setTimeout(startWebSocket, 2000);
+    }
 }
 
 // WebSocket message event handler
@@ -91,7 +94,13 @@ function onmessage(event) {
         return
     }
 
-    const obj = JSON.parse(data)
+    let obj;
+    try {
+        obj = JSON.parse(data);
+    } catch {
+        console.error("Ignoring malformed WebSocket message.");
+        return;
+    }
 
     if (!registeredOrders.includes(String(obj.OrderId))) {
         return
@@ -147,4 +156,3 @@ async function cancelOrder(id) {
 }
 
 updateLastUpdatedTime();
-

@@ -91,9 +91,9 @@
                         <td data-label="Email">@user.Email</td>
                         <td data-label="Created">@user.CreatedAt</td>
                         <td data-label="Roles">
-                            @foreach (UserRoleModel role in user.Roles)
+                            @foreach (RoleModel role in user.Roles)
                             {
-                                <p class="card card-body card-title">@role.Role.Name</p>
+                                <p class="card card-body card-title">@role.Name</p>
                             }
                         </td>
                         <td data-label="Actions">
@@ -103,19 +103,19 @@
                             <div id="give_role,@user.Id" style="display:none;">
                                 <h4>Give Role</h4>
                                 <select id="gi_role,@user.Id" name="gi_role">
-                                    @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.delivery.ToString())))
+                                    @if (!user.Roles.Any(r => r.Name.Equals(RoleEnum.delivery.ToString())))
                                     {
                                         <option value="@RoleEnum.delivery.ToString()">@RoleEnum.delivery.ToString()</option>
                                     }
-                                    @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.waitress.ToString())))
+                                    @if (!user.Roles.Any(r => r.Name.Equals(RoleEnum.waitress.ToString())))
                                     {
                                         <option value="@RoleEnum.waitress.ToString()">@RoleEnum.waitress.ToString()</option>
                                     }
-                                    @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.cook.ToString())))
+                                    @if (!user.Roles.Any(r => r.Name.Equals(RoleEnum.cook.ToString())))
                                     {
                                         <option value="@RoleEnum.cook.ToString()">@RoleEnum.cook.ToString()</option>
                                     }
-                                    @if (!user.Roles.Any(r => r.RoleName.Equals(RoleEnum.manager.ToString())))
+                                    @if (!user.Roles.Any(r => r.Name.Equals(RoleEnum.manager.ToString())))
                                     {
                                         <option value="@RoleEnum.manager.ToString()">@RoleEnum.manager.ToString()</option>
                                     }
@@ -130,9 +130,9 @@
                             <div id="remove_role,@user.Id" style="display:none;">
                                 <h4>Remove Role</h4>
                                 <select id="rm_role,@user.Id" class="rounded p-1">
-                                    @foreach (UserRoleModel role in user.Roles)
+                                    @foreach (RoleModel role in user.Roles)
                                     {
-                                        <option value="@role.Role.Name">@role.Role.Name</option>
+                                        <option value="@role.Name">@role.Name</option>
                                     }
                                 </select>
                                 <button type="button"

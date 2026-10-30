@@ -109,6 +109,10 @@ namespace RestaurantSystem.Controllers.Staff
             {
                 return BadRequest();
             }
+            if (employee.RestaurantId != user.Restaurant.Id)
+            {
+                return Forbid();
+            }
             if (await _userService.RemoveEmployeeFromRestaurantAsync(employee))
             {
                 TempData["RemoveStaff"] = true;
@@ -136,6 +140,10 @@ namespace RestaurantSystem.Controllers.Staff
             if (employee == null)
             {
                 return BadRequest();
+            }
+            if (employee.RestaurantId != user.Restaurant.Id)
+            {
+                return Forbid();
             }
             if (await _roleService.AssignRoleToUserAsync(
                 employeeRoleFormModel.Id, employeeRoleFormModel.Role))
@@ -165,6 +173,10 @@ namespace RestaurantSystem.Controllers.Staff
             if (employee == null)
             {
                 return BadRequest();
+            }
+            if (employee.RestaurantId != user.Restaurant.Id)
+            {
+                return Forbid();
             }
             if (await _roleService.RemoveRoleFromUserAsync(
                 employeeRoleFormModel.Id, employeeRoleFormModel.Role))

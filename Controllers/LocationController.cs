@@ -9,7 +9,6 @@ namespace RestaurantSystem.Controllers
 
     [ApiController]
     [EnableRateLimiting("fixed")]
-    [IgnoreAntiforgeryToken]
     public class LocationController : Controller
     {
         private readonly LocationService _locationService;
@@ -20,30 +19,49 @@ namespace RestaurantSystem.Controllers
         }
 
 
+        [HttpGet]
         [HttpPost]
         [Route("/location")]
-        public async Task<IActionResult> Location([FromQuery] LocationQueryModel locationQuery)
+        public async Task<IActionResult> Location(
+            [FromQuery] LocationQueryModel locationQuery,
+            CancellationToken cancellationToken)
         {
-            bool emptyCountry = string.IsNullOrWhiteSpace(locationQuery.Country);
-            bool emptyState = string.IsNullOrWhiteSpace(locationQuery.State);
-            if (emptyCountry && emptyState)
+            try
             {
-                return Ok(await _locationService.GetCountriesAsync());
+                bool emptyCountry = string.IsNullOrWhiteSpace(locationQuery.Country);
+                bool emptyState = string.IsNullOrWhiteSpace(locationQuery.State);
+                if (emptyCountry && emptyState)
+                {
+                    return Ok(await _locationService.GetCountriesAsync(cancellationToken));
+                }
+                if (!emptyCountry && emptyState)
+                {
+                    if (!LocationService.IsValidSelection(locationQuery.Country, null))
+                    {
+                        return BadRequest("Invalid country.");
+                    }
+                    return Ok(await _locationService.GetStatesAsync(
+                        locationQuery.Country!, cancellationToken));
+                }
 
-            }
-            else if (!emptyCountry && emptyState)
-            {
-                return Ok(await _locationService.GetStatesAsync(locationQuery.Country!));
+                if (!emptyCountry && !emptyState)
+                {
+                    if (!LocationService.IsValidSelection(
+                        locationQuery.Country, locationQuery.State))
+                    {
+                        return BadRequest("Invalid country or state.");
+                    }
+                    return Ok(await _locationService.GetCitiesAsync(
+                        locationQuery.Country!, locationQuery.State!, cancellationToken));
+                }
 
-            }
-            else if (!emptyCountry && !emptyState)
-            {
-                return Ok(await _locationService.GetCitiesAsync(locationQuery.Country!, 
-                    locationQuery.State!));
-
-            } else
-            {
                 return BadRequest("Invalid query parameters.");
+            }
+            catch (InvalidOperationException exception)
+            {
+                return Problem(
+                    detail: exception.Message,
+                    statusCode: StatusCodes.Status503ServiceUnavailable);
             }
         }
     }

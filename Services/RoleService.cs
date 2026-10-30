@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RestaurantSystem.Database;
 using RestaurantSystem.Enums;
 using RestaurantSystem.Models.DatabaseModels;
@@ -9,57 +10,56 @@ namespace RestaurantSystem.Services
     {
 
         private DatabaseContext _databaseContext;
+        private UserManager<UserModel> _userManager;
+        private RoleManager<RoleModel> _roleManager;
 
-        public RoleService(DatabaseContext databaseContext)
+        public RoleService(DatabaseContext databaseContext,
+            UserManager<UserModel> userManager, RoleManager<RoleModel> roleManager)
         {
             _databaseContext = databaseContext;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<bool> AssignRoleToUserAsync(long userId, RoleEnum roleName)
         {
-            // Check if assignment already exists
-            if (await _databaseContext.UserRoles.AnyAsync(
-                ur => ur.UserId == userId && ur.RoleName.Equals(roleName.ToString())))
+            UserModel? user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
             {
-                return true;
-            };
+                return false;
+            }
 
-            // Create new assignment
-            await _databaseContext.UserRoles.AddAsync(new UserRoleModel
+            string role = roleName.ToString();
+            if (!await _roleManager.RoleExistsAsync(role) &&
+                !(await _roleManager.CreateAsync(new RoleModel { Name = role })).Succeeded)
             {
-                UserId = userId,
-                RoleName = roleName.ToString()
-            });
+                return false;
+            }
 
-            return await _databaseContext.SaveChangesAsync() > 0;
+            return (await _userManager.AddToRoleAsync(user, role)).Succeeded;
         }
 
         public async Task<bool> RemoveRoleFromUserAsync(long userId, RoleEnum roleName)
         {
-            UserRoleModel? userRole = await _databaseContext.UserRoles
-                .FirstOrDefaultAsync(u => 
-                    u.UserId == userId && 
-                    u.RoleName.Equals(roleName.ToString()));
-            if (userRole == null) {
-                return false;
-            }
-            _databaseContext.UserRoles.Remove(userRole);
-            return await _databaseContext.SaveChangesAsync() > 0;
+            UserModel? user = await _userManager.FindByIdAsync(userId.ToString());
+            return user != null &&
+                (await _userManager.RemoveFromRoleAsync(user, roleName.ToString())).Succeeded;
         }
 
-        public async Task<bool> CanUserAccessServiceAsync(int userId, string servicePath)
+        public async Task<bool> CanUserAccessServiceAsync(long userId, string servicePath)
         {
-            // Get all roles for the user
-            List<string> userRoles = await _databaseContext.UserRoles
-                .Where(ur => ur.UserId == userId)
-                .Select(ur => ur.RoleName)
-                .ToListAsync();
-
-            if (userRoles.Count == 0) {
+            UserModel? user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
                 return false;
             }
 
-            // Check if any of the user's roles has access to the service
+            IList<string> userRoles = await _userManager.GetRolesAsync(user);
+            if (userRoles.Count == 0)
+            {
+                return false;
+            }
+
             return await _databaseContext.RolePermissions
                 .AnyAsync(rp => servicePath.StartsWith(rp.ServicePath) && 
                     userRoles.Contains(rp.RoleName));

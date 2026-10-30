@@ -27,25 +27,25 @@
                 <i class="bi bi-geo-alt me-1"></i> Your Addresses
             </a>
 
-            @if (Model.Roles.Any(r => RoleEnum.manager.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            @if (Model.Roles.Any(r => RoleEnum.manager.ToString().Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 <a class="btn btn-success btn-hover-outline-success" href="/staff/manager/employees">
                     <i class="bi bi-people me-1"></i> Staff Panel
                 </a>
             }
-            else if (Model.Roles.Any(r => RoleEnum.cook.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            else if (Model.Roles.Any(r => RoleEnum.cook.ToString().Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 <a class="btn btn-success btn-hover-outline-success" href="/staff/dishes">
                     <i class="bi bi-people me-1"></i> Staff Panel
                 </a>
             }
-            else if (Model.Roles.Any(r => RoleEnum.waitress.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            else if (Model.Roles.Any(r => RoleEnum.waitress.ToString().Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 <a class="btn btn-success btn-hover-outline-success" href="/staff/orders">
                     <i class="bi bi-people me-1"></i> Staff Panel
                 </a>
             }
-            else if (Model.Roles.Any(r => RoleEnum.delivery.ToString().Equals(r.RoleName, StringComparison.OrdinalIgnoreCase)))
+            else if (Model.Roles.Any(r => RoleEnum.delivery.ToString().Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 <a class="btn btn-success btn-hover-outline-success" href="/staff/delivery/address">
                     <i class="bi bi-people me-1"></i> Staff Panel

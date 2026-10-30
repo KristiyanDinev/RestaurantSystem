@@ -31,10 +31,15 @@ async function submit() {
     formData.append("RememberMe", document.getElementById('RememberMe').checked)
 
     try {
-        await fetch("/login", {
+        const response = await fetch("/login", {
             method: "POST",
             body: formData,
         })
+
+        if (!response.ok) {
+            window.location.reload();
+            return;
+        }
 
         emailElement.classList.remove(invalidClass)
         passwordElement.classList.remove(invalidClass)

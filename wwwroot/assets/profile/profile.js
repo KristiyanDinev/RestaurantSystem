@@ -55,14 +55,21 @@ async function updateUser() {
     let formData = new FormData()
     formData.append('Name', username)
     formData.append('Email', email)
-    formData.append('Image', document.getElementById("Image").files[0])
+    const image = document.getElementById("Image").files[0]
+    if (image) {
+        formData.append('Image', image)
+    }
     formData.append('DeleteImage', document.getElementById("deleteimage").checked)
 
     try {
-        await fetch('/profile/update', {
+        const response = await fetch('/profile/update', {
             method: 'POST',
             body: formData
         })
+        if (!response.ok) {
+            window.location.reload()
+            return
+        }
         usernameElement.classList.remove(isInvalid)
         emailElement.classList.remove(isInvalid)
         window.location.reload()

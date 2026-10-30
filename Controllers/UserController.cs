@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Identity;
 using RestaurantSystem.Models.DatabaseModels;
 using RestaurantSystem.Models.Form;
 using RestaurantSystem.Services;
@@ -18,14 +19,17 @@ namespace RestaurantSystem.Controllers {
         private UserService _userService;
         private UserUtility _userUtility;
         private EmailService _emailService;
+        private ILogger<UserController> _logger;
 
         public UserController(UserService userService,
             UserUtility userUtility,
-            EmailService emailService)
+        EmailService emailService,
+        ILogger<UserController> logger)
         {
             _userService = userService;
             _userUtility = userUtility;
             _emailService = emailService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -63,6 +67,13 @@ namespace RestaurantSystem.Controllers {
             {
                 TempData["Email"] = loginFormModel.Email;
                 TempData["Error"] = true;
+                UserModel? existingUser = await _userService.GetUserByEmailAsync(
+                    loginFormModel.Email);
+                TempData["LoginError"] = existingUser?.PasswordHash == null
+                    ? "This account needs a password reset before it can be used."
+                    : "Invalid email or password. Please try again.";
+                _logger.LogWarning("Identity login failed for {Email}; account exists: {AccountExists}, has password hash: {HasPasswordHash}",
+                    loginFormModel.Email, existingUser != null, existingUser?.PasswordHash != null);
                 return BadRequest();
             }
 
@@ -75,10 +86,7 @@ namespace RestaurantSystem.Controllers {
 
             TempData["LoginSuccess"] = true;
 
-            _userUtility.SetUserAuthBearerHeader(
-                HttpContext,
-                _userUtility.GenerateAuthBearerHeader_JWT(
-                    loggedIn, loginFormModel.RememberMe));
+            await _userUtility.SignInAsync(loggedIn, loginFormModel.RememberMe);
 
             return Ok();
         }
@@ -94,21 +102,25 @@ namespace RestaurantSystem.Controllers {
                 return BadRequest();
             }
 
-            UserModel? registered = await _userService.RegisterUserAsync(registerFormModel);
+            (UserModel? registered, IdentityResult registrationResult) =
+                await _userService.RegisterUserAsync(registerFormModel);
             if (registered == null)
             {
                 TempData["Email"] = registerFormModel.Email;
                 TempData["Name"] = registerFormModel.Name;
                 TempData["Error"] = true;
+                TempData["IdentityErrors"] = string.Join(
+                    " ", registrationResult.Errors.Select(error => error.Description));
+                _logger.LogWarning("Identity registration failed for {Email}: {Errors}",
+                    registerFormModel.Email,
+                    string.Join("; ", registrationResult.Errors.Select(error =>
+                        $"{error.Code}: {error.Description}")));
                 return BadRequest();
             }
 
             TempData["RegisterSuccess"] = true;
 
-            _userUtility.SetUserAuthBearerHeader(
-                HttpContext,
-                _userUtility.GenerateAuthBearerHeader_JWT(
-                    registered, registerFormModel.RememberMe));
+            await _userUtility.SignInAsync(registered, registerFormModel.RememberMe);
 
             return Ok();
         }
@@ -149,9 +161,9 @@ namespace RestaurantSystem.Controllers {
 
         [HttpPost]
         [Route("/logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            _userUtility.RemoveAuthBearerHeader(HttpContext);
+            await _userUtility.SignOutAsync();
             return Ok();
         }
 

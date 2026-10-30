@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Remove="logs\**" />
+    <Compile Remove="Tests\**" />
     <Compile Remove="wwwroot\assets\dishes\drinks\**" />
     <Compile Remove="wwwroot\user\**" />
     <Content Remove="logs\**" />
@@ -17,20 +18,20 @@
     <EmbeddedResource Remove="wwwroot\assets\dishes\drinks\**" />
     <EmbeddedResource Remove="wwwroot\user\**" />
     <None Remove="logs\**" />
+    <None Remove="Tests\**" />
     <None Remove="wwwroot\assets\dishes\drinks\**" />
     <None Remove="wwwroot\user\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.18" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.12.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
     <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
   </ItemGroup>
 
 
