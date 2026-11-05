@@ -11,6 +11,8 @@
   <a href="https://www.rabbitmq.com/">RabbitMQ</a>
 </p>
 
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/KristiyanDinev/badge.svg)](https://hub.xerj.org/contributors/KristiyanDinev)
+
 Restaurant System brings customer ordering, reservations, delivery tracking, and restaurant staff operations together in one application. It combines a role-based MVC interface with PostgreSQL persistence, live WebSocket updates, authentication, email verification, and structured logging.
 
 ## What this project demonstrates
